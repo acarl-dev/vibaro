@@ -37,15 +37,49 @@ Vibaro should feel like:
 
 ## 3. Typography
 
-- sans-serif
-- highly readable
-- clear hierarchy (headline → body → meta)
-- slightly larger rather than too small
 
 Avoid:
 - playful fonts
-- condensed fonts
-- “techy” typography experiments
+
+### Typo-Rollen (Landing Page)
+
+🅰️ Headline (Hero & Section Titles)
+- Inter, weight 600–700
+- leicht negatives Letter-spacing (~-0.01em)
+- kompakte Line-height
+- Farbe: Primary Text Color (Theme)
+- Einsatz: Hero-Headline, Haupt-Section-Titel („So sieht deine Seite aus“, „Bereit für deine eigene Seite?“)
+
+🅱️ Subheadlines / erklärende Titel
+- Inter Medium (500)
+- etwas kleiner als A
+- mehr Zeilenabstand, ruhiger
+- etwas weniger Kontrast als A
+- Einsatz: erklärende Überschriften, Übergänge zwischen Sections
+
+🅲 Main Copy (Absätze)
+- Inter Regular (400)
+- großzügige Line-height (z.B. `leading-relaxed`)
+- ruhige Textfarbe (nicht reinweiß, z.B. leicht abgedunkeltes Foreground)
+- max. Textbreite begrenzen (z.B. `max-w-xl` / `max-w-2xl`)
+- Einsatz: Produktbeschreibung, Erklärtexte, Benefits (keine Bullet-Wüsten)
+
+🅳 Meta / Secondary Text
+- Inter Regular oder Medium
+- kleiner als Main Copy
+- weniger Kontrast, aber nie „grau auf grau“
+- Einsatz: Hinweise, kleine Erklärungen, Footer, rechtliches
+
+🅴 Buttons & CTAs
+- Inter Medium oder Semibold
+- klar, keine verspielten Caps
+- kein extra Letterspacing
+- CTA soll wirken wie eine Entscheidung, nicht wie Werbung
+### Hero Typografie (Landing Page)
+
+- Font: Inter (self-hosted, sans-serif)
+- Headline: weight 600–700, slightly negative letter-spacing (~0.01em), rather tight line height for an editorial feel
+- Subline: Inter Regular/Medium, more relaxed line height, clearly calmer than the headline
 
 ---
 
