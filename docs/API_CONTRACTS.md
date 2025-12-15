@@ -112,7 +112,7 @@ Code kopieren
     "bio": "Independent artist from Berlin",
     "theme_key": "dark-editorial",
     "theme_variant": "auto",
-    "accent_color": "#7F8FA3",
+    "accent_color": null,
     "is_published": true
   }
 }
@@ -154,7 +154,9 @@ Code kopieren
 {
   "bio": "New bio text",
   "theme_key": "dark-editorial",
-  "theme_variant": "stage-blue"
+  "theme_variant": "stage-blue",
+  "accent_mode": "manual",
+  "accent_color": "#7F8FA3"
 }
 Response
 
@@ -165,9 +167,13 @@ Code kopieren
     "id": 10,
     "bio": "New bio text",
     "theme_key": "dark-editorial",
-    "theme_variant": "stage-blue"
+    "theme_variant": "stage-blue",
+    "accent_color": "#7F8FA3"
   }
 }
+Hinweise
+- `accent_mode` ist optional im Request (`auto` | `manual`); wird nicht in Responses ausgegeben.
+- Wenn `accent_mode = manual`, ist `accent_color` Pflicht; bei `auto` ist `accent_color` immer null.
 Public Artist Page
 GET /api/v1/p/{handle}
 Öffentliche, nicht-authentifizierte Ansicht.
@@ -191,7 +197,7 @@ Code kopieren
     "theme": {
       "key": "dark-editorial",
       "variant": "auto",
-      "accent_color": "#7F8FA3"
+      "accent_color": null
     }
   }
 }
