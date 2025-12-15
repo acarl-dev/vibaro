@@ -1,0 +1,30 @@
+cat << 'EOF' > .gitignore
+# OS
+.DS_Store
+
+# Node / Next
+node_modules/
+.next/
+out/
+dist/
+*.log
+
+# Env
+.env
+.env.*
+
+# Laravel
+/apps/api/vendor/
+/apps/api/storage/*.key
+/apps/api/storage/app/public
+/apps/api/storage/framework/cache/*
+/apps/api/storage/framework/sessions/*
+/apps/api/storage/framework/views/*
+/apps/api/storage/logs/*
+/apps/api/bootstrap/cache/*
+/apps/api/public/storage
+
+# IDE
+.vscode/
+.idea/
+EOF
