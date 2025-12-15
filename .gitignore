@@ -27,4 +27,7 @@ dist/
 # IDE
 .vscode/
 .idea/
+ 
+# Windows alternate data stream metadata (Explorer)
+*Zone.Identifier*
 EOF
