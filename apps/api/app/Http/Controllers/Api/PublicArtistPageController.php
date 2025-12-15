@@ -36,8 +36,8 @@ class PublicArtistPageController extends Controller
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,
-                'accent_mode' => $page->accent_mode,
-                'accent_color' => $page->accent_color,
+                // accent color is only exposed when set manually
+                'accent_color' => $page->accent_mode === 'manual' ? $page->accent_color : null,
             ],
         ]);
     }
