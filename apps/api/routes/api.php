@@ -28,6 +28,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/artist-pages/me', [ArtistPageController::class, 'me']);
         Route::post('/artist-pages', [ArtistPageController::class, 'store']);
         Route::patch('/artist-pages/{id}', [ArtistPageController::class, 'update']);
+        Route::post('/artist-pages/{id}/publish', [ArtistPageController::class, 'publish']);
+        Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

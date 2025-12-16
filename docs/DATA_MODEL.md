@@ -15,6 +15,7 @@ Authentifizierte Benutzer.
 | name | string | |
 | email | string | unique |
 | password | string | hashed |
+| is_admin | boolean | default false, internes Flag |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -28,7 +29,7 @@ Zentrale Entität für Musiker-Seiten.
 |----|----|----|
 | id | bigint | PK |
 | user_id | bigint | FK → users.id |
-| handle | string | unique, lowercase |
+| handle | string | unique, lowercase, url-safe |
 | display_name | string | öffentlich sichtbar |
 | bio | text | nullable |
 | avatar_path | string | nullable |
@@ -38,6 +39,7 @@ Zentrale Entität für Musiker-Seiten.
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
 | is_published | boolean | default false |
+| published_at | timestamp | nullable, gesetzt beim ersten Publish |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 

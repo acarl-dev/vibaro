@@ -77,6 +77,7 @@ class ArtistPageController extends Controller
             $validated = $request->validate([
                 'display_name' => ['sometimes', 'string', 'max:255'],
                 'bio' => ['sometimes', 'nullable', 'string'],
+                'avatar_path' => ['sometimes', 'nullable', 'string'],
                 'theme_key' => ['sometimes', 'string', 'max:255'],
                 'theme_variant' => ['sometimes', 'string', 'max:255'],
                 'accent_mode' => ['sometimes', 'string', 'in:auto,manual'],
@@ -96,10 +97,66 @@ class ArtistPageController extends Controller
             $validated['accent_color'] = null;
         }
 
+        // Set published_at timestamp when publishing
+        if (isset($validated['is_published']) && $validated['is_published'] && !$page->is_published) {
+            $validated['published_at'] = now();
+        }
+
         $page->fill($validated);
         $page->save();
 
         return $this->success($this->transform($page));
+    }
+
+    public function publish(Request $request, int $id): JsonResponse
+    {
+        $page = ArtistPage::find($id);
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        // Check if required fields are filled
+        if (!$page->handle || !$page->display_name || !$page->bio) {
+            return $this->error('INCOMPLETE_PROFILE', 'Handle, display name, and bio are required to publish.', 400);
+        }
+
+        if (!$page->is_published) {
+            $page->is_published = true;
+            $page->published_at = now();
+            $page->save();
+        }
+
+        return $this->success($this->transform($page));
+    }
+
+    public function checkHandle(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'handle' => ['required', 'string', 'min:3', 'max:40', 'regex:/^[a-z0-9-]+$/'],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        }
+
+        $handle = strtolower($validated['handle']);
+        $exists = ArtistPage::where('handle', $handle)->exists();
+
+        // If checking own handle, allow it
+        if ($request->user() && $request->user()->artistPage) {
+            $ownHandle = $request->user()->artistPage->handle;
+            if ($ownHandle === $handle) {
+                $exists = false;
+            }
+        }
+
+        return $this->success([
+            'handle' => $handle,
+            'available' => !$exists,
+        ]);
     }
 
     private function transform(ArtistPage $page): array
@@ -109,10 +166,12 @@ class ArtistPageController extends Controller
             'handle' => $page->handle,
             'display_name' => $page->display_name,
             'bio' => $page->bio,
+            'avatar_path' => $page->avatar_path,
             'theme_key' => $page->theme_key,
             'theme_variant' => $page->theme_variant,
             'accent_color' => $page->accent_color,
             'is_published' => $page->is_published,
+            'published_at' => $page->published_at?->toIso8601String(),
         ];
     }
 }

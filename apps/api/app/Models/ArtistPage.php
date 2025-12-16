@@ -25,6 +25,7 @@ class ArtistPage extends Model
         'accent_mode',
         'accent_color',
         'is_published',
+        'published_at',
     ];
 
     /**
@@ -32,6 +33,7 @@ class ArtistPage extends Model
      */
     protected $casts = [
         'is_published' => 'boolean',
+        'published_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

@@ -15,11 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Lokaler Admin-Account für Entwicklung
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin',
+            'email' => 'admin@vibaro.local',
+            'password' => 'admin1234',
+            'is_admin' => true,
         ]);
     }
 }

@@ -153,6 +153,7 @@ json
 Code kopieren
 {
   "bio": "New bio text",
+  "avatar_path": "/path/to/avatar.jpg",
   "theme_key": "dark-editorial",
   "theme_variant": "stage-blue",
   "accent_mode": "manual",
@@ -165,15 +166,75 @@ Code kopieren
 {
   "data": {
     "id": 10,
+    "handle": "emily-j",
+    "display_name": "Emily J.",
     "bio": "New bio text",
+    "avatar_path": "/path/to/avatar.jpg",
     "theme_key": "dark-editorial",
     "theme_variant": "stage-blue",
-    "accent_color": "#7F8FA3"
+    "accent_color": "#7F8FA3",
+    "is_published": false,
+    "published_at": null
   }
 }
+
+POST /api/v1/artist-pages/{id}/publish
+Veröffentlicht eine Artist Page.
+
+Auth: required
+
+Setzt `is_published = true` und `published_at = now()`.
+
+Validierung:
+- Handle muss vorhanden sein
+- Display Name muss vorhanden sein
+- Bio muss vorhanden sein
+
+Response
+
+json
+Code kopieren
+{
+  "data": {
+    "id": 10,
+    "handle": "emily-j",
+    "display_name": "Emily J.",
+    "bio": "Independent artist from Berlin",
+    "theme_key": "dark-editorial",
+    "theme_variant": "auto",
+    "accent_color": null,
+    "is_published": true,
+    "published_at": "2025-12-16T10:30:00Z"
+  }
+}
+
+POST /api/v1/handles/check
+Prüft die Verfügbarkeit eines Handles.
+
+Auth: required
+
+Request
+
+json
+Code kopieren
+{
+  "handle": "emily-j"
+}
+Response
+
+json
+Code kopieren
+{
+  "data": {
+    "handle": "emily-j",
+    "available": true
+  }
+}
+
 Hinweise
 - `accent_mode` ist optional im Request (`auto` | `manual`); wird nicht in Responses ausgegeben.
 - Wenn `accent_mode = manual`, ist `accent_color` Pflicht; bei `auto` ist `accent_color` immer null.
+- `published_at` ist nullable und wird nur gesetzt, wenn die Seite veröffentlicht wird.
 Public Artist Page
 GET /api/v1/p/{handle}
 Öffentliche, nicht-authentifizierte Ansicht.
