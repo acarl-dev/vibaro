@@ -61,10 +61,37 @@ export async function POST(request: NextRequest) {
   const token = json?.data?.token as string | undefined;
   const user = json?.data?.user;
 
+  // Default next target if we cannot determine a page state
+  let nextPath: string = "/studio";
+
+  if (token) {
+    // Try to inspect the artist page; if none exists, send user to onboarding
+    try {
+      const pageRes = await fetch(`${API_BASE_URL}/api/v1/artist-pages/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (pageRes.status === 404) {
+        nextPath = "/studio/onboarding";
+      } else if (!pageRes.ok) {
+        // keep default /studio on non-404 errors
+        nextPath = "/studio";
+      } else {
+        nextPath = "/studio";
+      }
+    } catch {
+      nextPath = "/studio";
+    }
+  }
+
   const response = NextResponse.json(
     {
       data: {
         user,
+        next: nextPath,
       },
     },
     { status: apiResponse.status }

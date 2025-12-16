@@ -61,10 +61,14 @@ export async function POST(request: NextRequest) {
   const token = json?.data?.token as string | undefined;
   const user = json?.data?.user;
 
+  // After registration, users should normally go into onboarding
+  const nextPath = "/studio/onboarding";
+
   const response = NextResponse.json(
     {
       data: {
         user,
+        next: nextPath,
       },
     },
     { status: apiResponse.status }

@@ -9,7 +9,7 @@ export default function Home() {
             <a href="/login" className="text-sm text-zinc-400 transition-colors hover:text-white">
               Anmelden
             </a>
-            <a href="/signup" className="rounded-full bg-white px-5 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200">
+            <a href="/register" className="rounded-full bg-white px-5 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200">
               Kostenlos starten
             </a>
           </nav>
@@ -48,7 +48,7 @@ export default function Home() {
                 Deine persönliche Musiker-Homepage. Profil, Shows & Releases – klar und ohne Aufwand.
               </p>
               <div className="mt-8">
-                <a href="/signup" className="inline-block rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-950 transition-all hover:scale-105 hover:bg-zinc-200">
+                <a href="/register" className="inline-block rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-950 transition-all hover:scale-105 hover:bg-zinc-200">
                   Kostenlos ausprobieren
                 </a>
               </div>
@@ -198,7 +198,7 @@ export default function Home() {
                   <span className="text-zinc-200">Ausgewählte Themes</span>
                 </li>
               </ul>
-              <a href="/signup" className="mt-8 block w-full rounded-full border border-zinc-700 py-3 text-center font-medium transition-colors hover:bg-zinc-800">Jetzt starten</a>
+              <a href="/register" className="mt-8 block w-full rounded-full border border-zinc-700 py-3 text-center font-medium transition-colors hover:bg-zinc-800">Jetzt starten</a>
             </div>
             <div className="rounded-2xl border-2 border-white bg-white p-8 text-zinc-950">
               <div className="flex items-center justify-between">
@@ -225,7 +225,7 @@ export default function Home() {
                   <span className="text-sm font-medium text-zinc-900">Kein Vibaro-Branding</span>
                 </li>
               </ul>
-              <a href="/signup" className="mt-8 block w-full rounded-full bg-zinc-950 py-3 text-center font-semibold text-white transition-colors hover:bg-zinc-800">Jetzt upgraden</a>
+              <a href="/register" className="mt-8 block w-full rounded-full bg-zinc-950 py-3 text-center font-semibold text-white transition-colors hover:bg-zinc-800">Jetzt upgraden</a>
             </div>
           </div>
         </section>
@@ -239,7 +239,7 @@ export default function Home() {
             <p className="mx-auto mt-6 max-w-2xl text-lg font-medium leading-relaxed text-zinc-300">
               Erstelle in wenigen Minuten deine persönliche Musiker-Homepage. Kostenlos, ohne Verpflichtung.
             </p>
-            <a href="/signup" className="mt-10 inline-block rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-950 transition-all hover:scale-105 hover:bg-zinc-200">Jetzt loslegen</a>
+            <a href="/register" className="mt-10 inline-block rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-950 transition-all hover:scale-105 hover:bg-zinc-200">Jetzt loslegen</a>
           </div>
         </section>
       </main>
