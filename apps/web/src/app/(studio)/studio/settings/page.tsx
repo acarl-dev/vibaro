@@ -57,6 +57,24 @@ export default async function StudioSettingsPage() {
       </div>
 
       <div className="space-y-6">
+        {/* Appearance - Link to appearance page */}
+        <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+          <h2 className="text-sm font-medium text-zinc-300 mb-4">Appearance</h2>
+          
+          <div className="space-y-3">
+            <p className="text-xs text-zinc-500">
+              Wähle ein Template und Style für deine Seite.
+            </p>
+            <a
+              href="/studio/settings/appearance"
+              className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-zinc-100 transition-colors"
+            >
+              Template & Style anpassen
+              <span className="text-zinc-600">→</span>
+            </a>
+          </div>
+        </div>
+
         {/* Handle */}
         <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
           <h2 className="text-sm font-medium text-zinc-300 mb-4">Deine Webadresse</h2>

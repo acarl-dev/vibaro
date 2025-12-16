@@ -15,10 +15,22 @@ type LivePreviewProps = {
 };
 
 export default function LivePreview({ page, links }: LivePreviewProps) {
+  // Get theme key with fallback
+  const themeKey = page.theme_key || "dark-editorial";
+
+  // Determine max-width based on template
+  const maxWidthClass =
+    themeKey === "dark-minimal"
+      ? "max-w-xl"
+      : themeKey === "dark-stage"
+        ? "max-w-3xl"
+        : "max-w-2xl";
+
   return (
     <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-4 h-full">
       <div className="flex items-center justify-between border-b border-zinc-900 pb-3 mb-4">
         <span className="text-xs text-zinc-500">Live Preview</span>
+        <span className="text-xs text-zinc-600">{getTemplateName(themeKey)}</span>
       </div>
 
       <div className="space-y-6">
@@ -83,4 +95,16 @@ export default function LivePreview({ page, links }: LivePreviewProps) {
       </div>
     </div>
   );
+}
+
+function getTemplateName(themeKey: string): string {
+  switch (themeKey) {
+    case "dark-minimal":
+      return "Minimal";
+    case "dark-stage":
+      return "Stage";
+    case "dark-editorial":
+    default:
+      return "Editorial";
+  }
 }

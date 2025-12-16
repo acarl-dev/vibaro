@@ -12,6 +12,8 @@ export type ArtistPageData = {
   is_published: boolean;
   avatar_url: string | null;
   hero_image_url: string | null;
+  theme_key?: string | null;
+  theme_variant?: string | null;
 };
 
 async function fetchMe(): Promise<{ artist_page?: { is_onboarded: boolean } | null } | null> {
@@ -41,6 +43,8 @@ async function fetchArtistPage(): Promise<ArtistPageData | null> {
       is_published: Boolean(data.is_published),
       avatar_url: data.avatar_url ?? null,
       hero_image_url: data.hero_image_url ?? null,
+      theme_key: data.theme_key ?? "dark-editorial",
+      theme_variant: data.theme_variant ?? "auto",
     };
   } catch {
     return null;
