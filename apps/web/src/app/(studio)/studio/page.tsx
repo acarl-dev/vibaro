@@ -13,6 +13,13 @@ type ArtistPage = {
   hero_image_url: string | null;
 };
 
+type Link = {
+  id: number;
+  title: string;
+  url: string;
+  position: number;
+};
+
 async function fetchArtistPage(): Promise<ArtistPage | null> {
   try {
     const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
@@ -35,6 +42,19 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
   }
 }
 
+async function fetchLinks(): Promise<Link[]> {
+  try {
+    const res = await backendFetch("/api/v1/artist-pages/me/links", {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function StudioOverviewPage() {
   const page = await fetchArtistPage();
 
@@ -42,5 +62,7 @@ export default async function StudioOverviewPage() {
     redirect("/studio/onboarding");
   }
 
-  return <OverviewClient initialPage={page} />;
+  const links = await fetchLinks();
+
+  return <OverviewClient initialPage={page} initialLinks={links} />;
 }

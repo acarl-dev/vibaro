@@ -22,8 +22,10 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
   const [bio, setBio] = useState(initialPage.bio ?? "");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
-  // Debounced autosave
+  // Debounced autosave with race condition prevention
   useEffect(() => {
+    const controller = new AbortController();
+    
     const timeout = setTimeout(async () => {
       const hasChanges =
         displayName !== initialPage.display_name ||
@@ -40,20 +42,30 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
             display_name: displayName,
             bio: bio || null,
           }),
+          signal: controller.signal,
         });
 
-        if (res.ok) {
+        if (res.ok && !controller.signal.aborted) {
           setSaveStatus("saved");
-          setTimeout(() => setSaveStatus("idle"), 2000);
-        } else {
+          setTimeout(() => {
+            if (!controller.signal.aborted) {
+              setSaveStatus("idle");
+            }
+          }, 2000);
+        } else if (!controller.signal.aborted) {
           setSaveStatus("idle");
         }
-      } catch {
-        setSaveStatus("idle");
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setSaveStatus("idle");
+        }
       }
     }, 600);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, [displayName, bio, initialPage.display_name, initialPage.bio]);
 
   const previewPage: ArtistPage = {

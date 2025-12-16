@@ -11,6 +11,31 @@ use Illuminate\Support\Facades\Gate;
 class LinkController extends Controller
 {
     /**
+     * GET /artist-pages/me/links
+     */
+    public function myLinks(Request $request)
+    {
+        $artistPage = $request->user()->artistPage;
+
+        if (!$artistPage) {
+            return response()->json(['error' => 'Artist page not found'], 404);
+        }
+
+        $links = $artistPage->links()->orderBy('position')->get();
+
+        return response()->json([
+            'data' => $links->map(fn($link) => [
+                'id' => $link->id,
+                'type' => $link->type,
+                'title' => $link->title,
+                'url' => $link->url,
+                'position' => $link->position,
+                'is_visible' => $link->is_visible,
+            ])
+        ]);
+    }
+
+    /**
      * GET /artist-pages/{id}/links
      */
     public function index(int $id)

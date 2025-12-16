@@ -9,13 +9,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // -----------------------------------------------------------------------------
 
 type LinkItem = {
-  id: string;
   title: string;
   url: string;
 };
 
 type ShowItem = {
-  id: string;
   title: string;
   venue: string;
   date: string;
@@ -23,7 +21,6 @@ type ShowItem = {
 };
 
 type ReleaseItem = {
-  id: string;
   title: string;
   cover_url?: string;
   url?: string;
@@ -306,8 +303,8 @@ function LinkList({ items }: { items: LinkItem[] }) {
 
   return (
     <ul className="space-y-3">
-      {items.map((link) => (
-        <li key={link.id}>
+      {items.map((link, index) => (
+        <li key={index}>
           <a
             href={link.url}
             target="_blank"
@@ -327,9 +324,9 @@ function ShowList({ items }: { items: ShowItem[] }) {
 
   return (
     <ul className="space-y-3">
-      {items.map((show) => (
+      {items.map((show, index) => (
         <li
-          key={show.id}
+          key={index}
           className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3"
         >
           <div className="min-w-0 flex-1">
@@ -360,8 +357,8 @@ function ReleaseList({ items }: { items: ReleaseItem[] }) {
 
   return (
     <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-      {items.map((release) => (
-        <li key={release.id}>
+      {items.map((release, index) => (
+        <li key={index}>
           <a
             href={release.url ?? "#"}
             target="_blank"

@@ -57,3 +57,23 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## Vibaro API Setup
+
+### File Storage Setup
+
+For image uploads (avatars, hero images), you need to create the storage symlink:
+
+```bash
+php artisan storage:link
+```
+
+This creates a symbolic link from `public/storage` to `storage/app/public`, making uploaded files accessible via HTTP.
+
+The following directories are used:
+- `storage/app/public/avatars` - User avatars/logos
+- `storage/app/public/hero-images` - Artist page header images
+
+Files are served via `/storage/*` URLs in development.

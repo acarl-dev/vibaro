@@ -13,17 +13,29 @@ type ArtistPage = {
   hero_image_url: string | null;
 };
 
-type OverviewClientProps = {
-  initialPage: ArtistPage;
+type Link = {
+  id: number;
+  title: string;
+  url: string;
+  position: number;
 };
 
-export default function OverviewClient({ initialPage }: OverviewClientProps) {
+type OverviewClientProps = {
+  initialPage: ArtistPage;
+  initialLinks: Link[];
+};
+
+export default function OverviewClient({ initialPage, initialLinks }: OverviewClientProps) {
   const [displayName, setDisplayName] = useState(initialPage.display_name);
   const [bio, setBio] = useState(initialPage.bio ?? "");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [heroUploading, setHeroUploading] = useState(false);
 
-  // Debounced autosave
+  // Debounced autosave with race condition prevention
   useEffect(() => {
+    const controller = new AbortController();
+    
     const timeout = setTimeout(async () => {
       const hasChanges =
         displayName !== initialPage.display_name ||
@@ -40,28 +52,104 @@ export default function OverviewClient({ initialPage }: OverviewClientProps) {
             display_name: displayName,
             bio: bio || null,
           }),
+          signal: controller.signal,
         });
 
-        if (res.ok) {
+        if (res.ok && !controller.signal.aborted) {
           setSaveStatus("saved");
-          setTimeout(() => setSaveStatus("idle"), 2000);
-        } else {
+          setTimeout(() => {
+            if (!controller.signal.aborted) {
+              setSaveStatus("idle");
+            }
+          }, 2000);
+        } else if (!controller.signal.aborted) {
           setSaveStatus("idle");
         }
-      } catch {
-        setSaveStatus("idle");
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setSaveStatus("idle");
+        }
       }
     }, 600);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, [displayName, bio, initialPage.display_name, initialPage.bio]);
 
-  const isReady = !!(initialPage.handle && displayName && bio);
+  const isReady = !!(
+    initialPage.handle &&
+    displayName.trim().length > 0 &&
+    bio.trim().length > 0
+  );
 
   const previewPage: ArtistPage = {
     ...initialPage,
     display_name: displayName,
     bio,
+  };
+
+  const handleLogoUpload = async (file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Datei zu gro\u00df. Maximal 2 MB erlaubt.");
+      return;
+    }
+
+    setLogoUploading(true);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const res = await fetch("/api/studio/upload-avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const error = await res.json().catch(() => ({ error: "Unknown error" }));
+        console.error("Upload error:", error);
+        alert(`Upload fehlgeschlagen: ${JSON.stringify(error)}`);
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Netzwerkfehler. Bitte versuche es erneut.");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const handleHeroUpload = async (file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Datei zu gro\u00df. Maximal 2 MB erlaubt.");
+      return;
+    }
+
+    setHeroUploading(true);
+    const formData = new FormData();
+    formData.append("hero_image", file);
+
+    try {
+      const res = await fetch("/api/studio/upload-hero", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const error = await res.json().catch(() => ({ error: "Unknown error" }));
+        console.error("Upload error:", error);
+        alert(`Upload fehlgeschlagen: ${JSON.stringify(error)}`);
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Netzwerkfehler. Bitte versuche es erneut.");
+    } finally {
+      setHeroUploading(false);
+    }
   };
 
   return (
@@ -123,35 +211,106 @@ export default function OverviewClient({ initialPage }: OverviewClientProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">
-                  Avatar
+                <label className="block text-xs font-medium text-zinc-400 mb-2">
+                  Logo
                 </label>
-                <div className="text-xs text-zinc-600">
-                  {initialPage.avatar_url ? (
-                    <span>Bild: {initialPage.avatar_url.slice(0, 40)}...</span>
-                  ) : (
-                    <span>Kein Bild hochgeladen</span>
-                  )}
-                </div>
-                <button className="mt-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
-                  Bild hinzufügen (TODO)
-                </button>
+                {initialPage.avatar_url ? (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={initialPage.avatar_url}
+                      alt="Logo"
+                      className="h-16 w-16 rounded-lg object-cover border border-zinc-800"
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs text-zinc-500 mb-2">Logo hochgeladen</p>
+                      <label className="inline-block">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          disabled={logoUploading}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleLogoUpload(file);
+                          }}
+                        />
+                        <span className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-300 transition-colors">
+                          {logoUploading ? "Lädt hoch..." : "Ändern"}
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="block">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      disabled={logoUploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleLogoUpload(file);
+                      }}
+                    />
+                    <div className="cursor-pointer flex items-center justify-center h-24 rounded-lg border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50 transition-colors">
+                      <span className="text-xs text-zinc-500">
+                        {logoUploading ? "Lädt hoch..." : "+ Logo hochladen"}
+                      </span>
+                    </div>
+                  </label>
+                )}
+                <p className="mt-2 text-xs text-zinc-600">JPG, PNG oder WebP (max. 2 MB)</p>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">
-                  Hero Image
+                <label className="block text-xs font-medium text-zinc-400 mb-2">
+                  Header-Bild
                 </label>
-                <div className="text-xs text-zinc-600">
-                  {initialPage.hero_image_url ? (
-                    <span>Bild: {initialPage.hero_image_url.slice(0, 40)}...</span>
-                  ) : (
-                    <span>Kein Bild hochgeladen</span>
-                  )}
-                </div>
-                <button className="mt-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
-                  Bild hinzufügen (TODO)
-                </button>
+                {initialPage.hero_image_url ? (
+                  <div>
+                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden border border-zinc-800 mb-2">
+                      <img
+                        src={initialPage.hero_image_url}
+                        alt="Header-Bild"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <label className="inline-block">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        disabled={heroUploading}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleHeroUpload(file);
+                        }}
+                      />
+                      <span className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-300 transition-colors">
+                        {heroUploading ? "Lädt hoch..." : "Ändern"}
+                      </span>
+                    </label>
+                  </div>
+                ) : (
+                  <label className="block">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      disabled={heroUploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleHeroUpload(file);
+                      }}
+                    />
+                    <div className="cursor-pointer flex items-center justify-center aspect-[16/9] rounded-lg border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50 transition-colors">
+                      <span className="text-xs text-zinc-500">
+                        {heroUploading ? "Lädt hoch..." : "+ Header-Bild hochladen"}
+                      </span>
+                    </div>
+                  </label>
+                )}
+                <p className="mt-2 text-xs text-zinc-600">JPG, PNG oder WebP (max. 2 MB)</p>
               </div>
             </div>
           </div>
@@ -198,7 +357,7 @@ export default function OverviewClient({ initialPage }: OverviewClientProps) {
 
         {/* Preview Column */}
         <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)]">
-          <LivePreview page={previewPage} />
+          <LivePreview page={previewPage} links={initialLinks} />
         </div>
       </div>
     </div>

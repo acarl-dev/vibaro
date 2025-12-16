@@ -16,25 +16,36 @@ class PublicArtistPageController extends Controller
     {
         $page = ArtistPage::where('handle', $handle)
             ->where('is_published', true)
+            ->with('links')
             ->first();
 
         if (!$page) {
             return $this->error('NOT_FOUND', 'Artist page not found or unpublished.', 404);
         }
 
+        $appUrl = rtrim(config('app.url'), '/');
+
+        // Transform links without exposing internal IDs
+        $links = $page->links->map(function ($link) {
+            return [
+                'title' => $link->title,
+                'url' => $link->url,
+            ];
+        })->values()->toArray();
+
         return $this->success([
             'handle' => $page->handle,
             'display_name' => $page->display_name,
             'bio' => $page->bio,
             'images' => [
-                'avatar_url' => $page->avatar_path ? Storage::url($page->avatar_path) : null,
-                'hero_image_url' => $page->header_path ? Storage::url($page->header_path) : null,
+                'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
+                'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,
             ],
             'focus' => [
                 'type' => 'links', // MVP: Free plan always shows links
                 'limit' => 3,
             ],
-            'links' => [],
+            'links' => $links,
             'shows' => [],
             'releases' => [],
             'theme' => [

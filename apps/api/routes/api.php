@@ -31,9 +31,12 @@ Route::prefix('v1')->group(function () {
         Route::patch('/artist-pages/{id}', [ArtistPageController::class, 'update']);
         Route::post('/artist-pages/{id}/publish', [ArtistPageController::class, 'publish']);
         Route::post('/artist-pages/{id}/unpublish', [ArtistPageController::class, 'unpublish']);
+        Route::post('/artist-pages/upload-avatar', [ArtistPageController::class, 'uploadAvatar']);
+        Route::post('/artist-pages/upload-hero', [ArtistPageController::class, 'uploadHero']);
         Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
 
         // Links (private CRUD)
+        Route::get('/artist-pages/me/links', [LinkController::class, 'myLinks']);
         Route::get('/artist-pages/{id}/links', [LinkController::class, 'index']);
         Route::post('/artist-pages/{id}/links', [LinkController::class, 'store']);
         Route::patch('/artist-pages/{id}/links/{linkId}', [LinkController::class, 'update']);

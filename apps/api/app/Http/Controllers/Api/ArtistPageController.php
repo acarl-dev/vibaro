@@ -7,6 +7,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ArtistPageController extends Controller
@@ -118,8 +119,12 @@ class ArtistPageController extends Controller
 
         $this->authorize('update', $page);
 
-        // Check if required fields are filled
-        if (!$page->handle || !$page->display_name || !$page->bio) {
+        // Check if required fields are filled (with trim validation)
+        if (!$page->handle ||
+            !$page->display_name ||
+            trim($page->display_name) === '' ||
+            !$page->bio ||
+            trim($page->bio) === '') {
             return $this->error('INCOMPLETE_PROFILE', 'Handle, display name, and bio are required to publish.', 400);
         }
 
@@ -179,17 +184,82 @@ class ArtistPageController extends Controller
 
     private function transform(ArtistPage $page): array
     {
+        $appUrl = rtrim(config('app.url'), '/');
+
         return [
             'id' => $page->id,
             'handle' => $page->handle,
             'display_name' => $page->display_name,
             'bio' => $page->bio,
-            'avatar_path' => $page->avatar_path,
+            'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
+            'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,
             'theme_key' => $page->theme_key,
             'theme_variant' => $page->theme_variant,
             'accent_color' => $page->accent_color,
             'is_published' => $page->is_published,
             'published_at' => $page->published_at?->toIso8601String(),
         ];
+    }
+
+    public function uploadAvatar(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        try {
+            $validated = $request->validate([
+                'avatar' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        }
+
+        // Delete old avatar if exists
+        if ($page->avatar_path) {
+            Storage::disk('public')->delete($page->avatar_path);
+        }
+
+        // Store new avatar
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $page->avatar_path = $path;
+        $page->save();
+
+        return $this->success($this->transform($page));
+    }
+
+    public function uploadHero(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        try {
+            $validated = $request->validate([
+                'hero_image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        }
+
+        // Delete old hero image if exists
+        if ($page->header_path) {
+            Storage::disk('public')->delete($page->header_path);
+        }
+
+        // Store new hero image
+        $path = $request->file('hero_image')->store('hero-images', 'public');
+        $page->header_path = $path;
+        $page->save();
+
+        return $this->success($this->transform($page));
     }
 }

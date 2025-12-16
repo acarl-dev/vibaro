@@ -13,7 +13,12 @@ export default function StudioHeader({ page }: StudioHeaderProps) {
   const router = useRouter();
   const [isPublishing, setIsPublishing] = useState(false);
 
-  const isReady = !!(page.handle && page.display_name && page.bio);
+  const isReady = !!(
+    page.handle &&
+    page.display_name.trim().length > 0 &&
+    page.bio &&
+    page.bio.trim().length > 0
+  );
   const canPublish = !page.is_published && isReady;
   const canUnpublish = page.is_published;
 
