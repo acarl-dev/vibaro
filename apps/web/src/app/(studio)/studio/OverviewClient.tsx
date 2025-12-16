@@ -45,9 +45,10 @@ export default function OverviewClient({ initialPage }: OverviewClientProps) {
         if (res.ok) {
           setSaveStatus("saved");
           setTimeout(() => setSaveStatus("idle"), 2000);
+        } else {
+          setSaveStatus("idle");
         }
-      } catch (error) {
-        console.error("Autosave failed:", error);
+      } catch {
         setSaveStatus("idle");
       }
     }, 600);
@@ -76,14 +77,7 @@ export default function OverviewClient({ initialPage }: OverviewClientProps) {
         {/* Editor Column */}
         <div className="space-y-6">
           <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-medium text-zinc-300">Profil-Basics</h2>
-              {saveStatus !== "idle" && (
-                <span className="text-xs text-zinc-500">
-                  {saveStatus === "saving" ? "Speichert..." : "Gespeichert"}
-                </span>
-              )}
-            </div>
+            <h2 className="text-sm font-medium text-zinc-300 mb-4">Profil-Basics</h2>
 
             <div className="space-y-4">
               <div>
@@ -119,8 +113,12 @@ export default function OverviewClient({ initialPage }: OverviewClientProps) {
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 resize-none"
                   placeholder="Erzähl kurz über dich..."
                 />
-                <div className="mt-1 text-right text-xs text-zinc-600">
-                  {bio.length}/300
+                <div className="mt-1 flex items-center justify-between text-xs text-zinc-600">
+                  <span>
+                    {saveStatus === "saving" && "Speichert..."}
+                    {saveStatus === "saved" && "Gespeichert"}
+                  </span>
+                  <span>{bio.length}/300</span>
                 </div>
               </div>
 

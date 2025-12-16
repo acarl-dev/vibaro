@@ -31,8 +31,8 @@ export default function StudioHeader({ page }: StudioHeaderProps) {
       if (res.ok) {
         router.refresh();
       }
-    } catch (error) {
-      console.error("Publish failed:", error);
+    } catch {
+      // Fehler wird stillschweigend behandelt
     } finally {
       setIsPublishing(false);
     }
@@ -47,8 +47,8 @@ export default function StudioHeader({ page }: StudioHeaderProps) {
       if (res.ok) {
         router.refresh();
       }
-    } catch (error) {
-      console.error("Unpublish failed:", error);
+    } catch {
+      // Fehler wird stillschweigend behandelt
     } finally {
       setIsPublishing(false);
     }

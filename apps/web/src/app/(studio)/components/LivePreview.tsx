@@ -23,11 +23,11 @@ export default function LivePreview({ page, links }: LivePreviewProps) {
         <span className="text-xs text-zinc-500">Live Preview</span>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Hero Section */}
-        <div className="text-center">
+        <div className="text-center space-y-3">
           {heroUrl && (
-            <div className="mb-4 flex justify-center">
+            <div className="mb-6 flex justify-center">
               <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-zinc-800">
                 <img
                   src={heroUrl}
@@ -43,7 +43,7 @@ export default function LivePreview({ page, links }: LivePreviewProps) {
           </h1>
           
           {page.bio && (
-            <p className="mt-2 text-sm text-zinc-400 whitespace-pre-wrap">
+            <p className="mt-3 text-sm leading-relaxed text-zinc-400 line-clamp-3">
               {page.bio}
             </p>
           )}
@@ -51,7 +51,7 @@ export default function LivePreview({ page, links }: LivePreviewProps) {
 
         {/* Links Section */}
         {links && links.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {links.map((link) => (
               <a
                 key={link.id}

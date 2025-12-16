@@ -56,10 +56,10 @@ export default function LinksClient({ initialPage, initialLinks }: LinksClientPr
         setIsCreating(false);
         setError("");
       } else {
-        setError("Fehler beim Erstellen");
+        setError("Erstellen fehlgeschlagen");
       }
     } catch {
-      setError("Fehler beim Erstellen");
+      setError("Erstellen fehlgeschlagen");
     }
   };
 
@@ -87,10 +87,10 @@ export default function LinksClient({ initialPage, initialLinks }: LinksClientPr
         setFormData({ title: "", url: "" });
         setError("");
       } else {
-        setError("Fehler beim Aktualisieren");
+        setError("Aktualisieren fehlgeschlagen");
       }
     } catch {
-      setError("Fehler beim Aktualisieren");
+      setError("Aktualisieren fehlgeschlagen");
     }
   };
 
@@ -105,8 +105,8 @@ export default function LinksClient({ initialPage, initialLinks }: LinksClientPr
       if (res.ok) {
         setLinks(links.filter((l) => l.id !== linkId));
       }
-    } catch (error) {
-      console.error("Fehler beim Löschen:", error);
+    } catch {
+      // Fehler wird stillschweigend behandelt
     }
   };
 
@@ -131,8 +131,8 @@ export default function LinksClient({ initialPage, initialLinks }: LinksClientPr
           link_ids: newLinks.map((l) => l.id),
         }),
       });
-    } catch (err) {
-      console.error("Fehler beim Umsortieren:", err);
+    } catch {
+      // Fehler wird stillschweigend behandelt
     }
   };
 
