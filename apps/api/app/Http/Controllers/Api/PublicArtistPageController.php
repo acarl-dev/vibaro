@@ -28,7 +28,11 @@ class PublicArtistPageController extends Controller
             'bio' => $page->bio,
             'images' => [
                 'avatar_url' => $page->avatar_path ? Storage::url($page->avatar_path) : null,
-                'header_url' => $page->header_path ? Storage::url($page->header_path) : null,
+                'hero_image_url' => $page->header_path ? Storage::url($page->header_path) : null,
+            ],
+            'focus' => [
+                'type' => 'links', // MVP: Free plan always shows links
+                'limit' => 3,
             ],
             'links' => [],
             'shows' => [],
@@ -36,7 +40,6 @@ class PublicArtistPageController extends Controller
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,
-                // accent color is only exposed when set manually
                 'accent_color' => $page->accent_mode === 'manual' ? $page->accent_color : null,
             ],
         ]);
