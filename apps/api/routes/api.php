@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ArtistPageController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\PublicArtistPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,7 +30,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/artist-pages', [ArtistPageController::class, 'store']);
         Route::patch('/artist-pages/{id}', [ArtistPageController::class, 'update']);
         Route::post('/artist-pages/{id}/publish', [ArtistPageController::class, 'publish']);
+        Route::post('/artist-pages/{id}/unpublish', [ArtistPageController::class, 'unpublish']);
         Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
+
+        // Links (private CRUD)
+        Route::get('/artist-pages/{id}/links', [LinkController::class, 'index']);
+        Route::post('/artist-pages/{id}/links', [LinkController::class, 'store']);
+        Route::patch('/artist-pages/{id}/links/{linkId}', [LinkController::class, 'update']);
+        Route::delete('/artist-pages/{id}/links/{linkId}', [LinkController::class, 'destroy']);
+        Route::post('/artist-pages/{id}/links/reorder', [LinkController::class, 'reorder']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

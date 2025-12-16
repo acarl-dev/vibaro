@@ -132,6 +132,24 @@ class ArtistPageController extends Controller
         return $this->success($this->transform($page));
     }
 
+    public function unpublish(Request $request, int $id): JsonResponse
+    {
+        $page = ArtistPage::find($id);
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        if ($page->is_published) {
+            $page->is_published = false;
+            $page->save();
+        }
+
+        return $this->success($this->transform($page));
+    }
+
     public function checkHandle(Request $request): JsonResponse
     {
         try {
