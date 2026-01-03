@@ -24,12 +24,8 @@ export default function StudioSidebar({ page }: StudioSidebarProps) {
         <NavLink href="/studio">Übersicht</NavLink>
         <NavLink href="/studio/profile">Profil</NavLink>
         <NavLink href="/studio/links">Links</NavLink>
-        <NavLink href="/studio/shows" locked>
-          Shows
-        </NavLink>
-        <NavLink href="/studio/releases" locked>
-          Releases
-        </NavLink>
+        <NavLink href="/studio/shows">Shows</NavLink>
+        <NavLink href="/studio/releases">Releases</NavLink>
         <div className="pt-2">
           <NavLink href="/studio/settings">Einstellungen</NavLink>
         </div>

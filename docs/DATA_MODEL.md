@@ -55,29 +55,56 @@ Zentrale Entität für Musiker-Seiten.
 |----|----|----|
 | id | bigint | PK |
 | artist_page_id | bigint | FK |
-| type | string | spotify, youtube, instagram, custom |
+| type | string | facebook, instagram, tiktok, x, youtube, spotify, applemusic, soundcloud, bandcamp, website, custom |
 | title | string | nullable |
-| url | string | |
+| url | string | nullable (für Social Media vorgefertigt) |
 | position | int | sort order |
 | is_visible | boolean | |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
+**type-Werte:**
+- Social Media: `facebook`, `instagram`, `tiktok`, `x` (Twitter)
+- Music Platforms: `youtube`, `spotify`, `applemusic`, `soundcloud`, `bandcamp`
+- Other: `website`, `custom`
+
+**Verhalten:**
+- Bei ArtistPage-Erstellung werden vorgefertigte Social Media Links mit leeren URLs erstellt
+- Nur Links mit ausgefüllten URLs werden öffentlich angezeigt
+- Vorgefertigte Links haben feste titles basierend auf `type`
+
 ---
 
-## shows (post-MVP)
+## shows
 
-| Feld | Typ |
-|----|----|
-| id | bigint |
-| artist_page_id | bigint |
-| starts_at | datetime |
-| venue | string |
-| city | string |
-| ticket_url | string |
-| status | string |
-| position | int |
-| timestamps | |
+| Feld | Typ | Hinweise |
+|----|----|-------|
+| id | bigint | PK |
+| artist_page_id | bigint | FK → artist_pages.id |
+| starts_at | datetime | Konzertbeginn |
+| venue | string | Ort/Location |
+| city | string | Stadt |
+| address | text | nullable, vollständige Adresse für Routenplanung |
+| ticket_url | string | nullable |
+| price | decimal(8,2) | nullable, Eintrittspreis in € |
+| is_free | boolean | default false, true = freier Eintritt |
+| support_acts | json | nullable, Array von Artist-Namen/Handles |
+| flyer_path | string | nullable, Pfad zum Flyer-Bild |
+| status | string | `upcoming` \| `sold_out` \| `cancelled` |
+| position | int | sortierung |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+**Indizes:**
+- index(artist_page_id)
+- index(starts_at) für chronologische Sortierung
+
+**Verhalten:**
+- Standard-Sortierung nach `starts_at` (aufsteigend für kommende Shows)
+- `address` wird für Google Maps Routenplanung verwendet
+- `is_free` überschreibt `price` - wenn true, wird `price` ignoriert
+- `support_acts` ist ein JSON-Array von Strings (Artist-Namen), später erweitert um Vibaro-Verlinkung
+- Optional: Flyer-Upload ähnlich wie Avatar/Hero
 
 ---
 

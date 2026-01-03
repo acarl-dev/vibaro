@@ -2,23 +2,21 @@ import Link from "next/link";
 
 export default function StudioReleasesPage() {
   return (
-    <div className="mx-auto max-w-2xl py-16">
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-12 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight mb-3">Releases</h1>
-        
-        <p className="text-sm text-zinc-400 mb-1">
-          Releases sind im Artist Plan verfügbar.
+    <div className="mx-auto max-w-5xl">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-tight">Releases</h1>
+        <p className="mt-1 text-sm text-zinc-500">
+          Präsentiere deine Alben, EPs und Singles.
         </p>
-        <p className="text-xs text-zinc-600 mb-8">
-          Präsentiere deine Alben, EPs und Singles mit Cover-Bildern.
-        </p>
+      </div>
 
-        <Link
-          href="/pricing"
-          className="inline-flex rounded-full border border-zinc-700 bg-zinc-900 px-6 py-2.5 text-sm font-medium text-zinc-200 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
-        >
-          Artist Plan ansehen
-        </Link>
+      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+        <div className="text-center py-12">
+          <p className="text-sm text-zinc-600">Noch keine Releases hinzugefügt</p>
+          <button className="mt-4 rounded-lg bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-950 transition-all hover:bg-zinc-200">
+            + Neues Release
+          </button>
+        </div>
       </div>
     </div>
   );

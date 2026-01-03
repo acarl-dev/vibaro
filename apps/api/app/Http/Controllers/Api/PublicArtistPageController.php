@@ -25,13 +25,20 @@ class PublicArtistPageController extends Controller
 
         $appUrl = rtrim(config('app.url'), '/');
 
-        // Transform links without exposing internal IDs
-        $links = $page->links->map(function ($link) {
-            return [
-                'title' => $link->title,
-                'url' => $link->url,
-            ];
-        })->values()->toArray();
+        // Transform links - only include links with URLs
+        $links = $page->links
+            ->filter(function ($link) {
+                return !empty($link->url);
+            })
+            ->map(function ($link) {
+                return [
+                    'type' => $link->type,
+                    'title' => $link->title,
+                    'url' => $link->url,
+                ];
+            })
+            ->values()
+            ->toArray();
 
         return $this->success([
             'handle' => $page->handle,

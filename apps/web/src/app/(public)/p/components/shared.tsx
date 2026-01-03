@@ -1,10 +1,11 @@
-import Image from "next/image";
+// Image component removed - using native img for localhost compatibility
 
 // -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
 
 export type LinkItem = {
+  type?: string;
   title: string;
   url: string;
 };
@@ -53,68 +54,69 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
   const hasAvatar = !!page.images.avatar_url;
 
   return (
-    <header className="relative pt-16 pb-12 px-6">
-      {/* Hero Image Background */}
-      {hasHeroImage && (
-        <div className="absolute inset-0 -z-10">
-          <Image
+    <section className="relative w-full overflow-hidden" style={{ height: 'clamp(520px, 72vh, 860px)' }}>
+      {/* Full-bleed hero image */}
+      {hasHeroImage ? (
+        <>
+          <img
             src={page.images.hero_image_url!}
-            alt=""
-            fill
-            className="object-cover opacity-30"
-            priority
+            alt={`${page.display_name} hero image`}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ 
+              objectPosition: '50% 15%',
+              maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.92) 70%, rgba(0,0,0,0.70) 82%, rgba(0,0,0,0.35) 92%, rgba(0,0,0,0) 100%)',
+              maskSize: '100% 100%',
+              maskRepeat: 'no-repeat',
+              WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.92) 70%, rgba(0,0,0,0.70) 82%, rgba(0,0,0,0.35) 92%, rgba(0,0,0,0) 100%)',
+              WebkitMaskSize: '100% 100%',
+              WebkitMaskRepeat: 'no-repeat'
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/80 to-zinc-950" />
-        </div>
-      )}
-
-      {/* Hero Placeholder Background (no hero image) */}
-      {!hasHeroImage && (
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950" />
-        </div>
-      )}
-
-      <div className="mx-auto max-w-2xl">
-        {/* Avatar (only if no hero image) */}
-        {!hasHeroImage && hasAvatar && (
-          <div className="mb-8 flex justify-center">
-            <div className="relative h-28 w-28 overflow-hidden rounded-full ring-2 ring-zinc-800">
-              <Image
-                src={page.images.avatar_url!}
-                alt={page.display_name}
-                fill
-                className="object-cover"
-                priority
-              />
+          
+          {/* Text overlay - lower third */}
+          <div 
+            className="absolute"
+            style={{
+              top: '68%',
+              left: 0,
+              right: 0,
+              transform: 'translateY(-5%)',
+              paddingBottom: '2rem'
+            }}
+          >
+            <div className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
+                {page.display_name}
+              </h1>
+              
+              {page.bio && (
+                <p className="mt-3 text-zinc-200 text-base md:text-lg leading-relaxed" style={{ maxWidth: '60ch' }}>
+                  {page.bio}
+                </p>
+              )}
             </div>
           </div>
-        )}
-
-        {/* Avatar Placeholder (no hero, no avatar) */}
-        {!hasHeroImage && !hasAvatar && (
-          <div className="mb-8 flex justify-center">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-zinc-800 ring-2 ring-zinc-700">
-              <span className="text-3xl text-zinc-500">
+        </>
+      ) : (
+        <div className="relative w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(to bottom, rgb(24, 24, 27), rgb(9, 9, 11))' }}>
+          {hasAvatar ? (
+            <div className="relative h-40 w-40 overflow-hidden rounded-full ring-1 ring-zinc-800/50">
+              <img
+                src={page.images.avatar_url!}
+                alt={page.display_name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex h-40 w-40 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-zinc-800/50">
+              <span className="text-5xl font-light text-zinc-600">
                 {getInitials(page.display_name)}
               </span>
             </div>
-          </div>
-        )}
-
-        {/* Display Name */}
-        <h1 className="text-4xl font-semibold tracking-tight text-center leading-tight md:text-5xl">
-          {page.display_name}
-        </h1>
-
-        {/* Bio */}
-        {page.bio && (
-          <p className="mt-4 text-center text-zinc-400 text-base leading-relaxed max-w-lg mx-auto">
-            {truncateBio(page.bio, 300)}
-          </p>
-        )}
-      </div>
-    </header>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -130,8 +132,8 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-12">
-      <h2 className="text-sm font-medium uppercase tracking-widest text-zinc-500 mb-4">
+    <section className="mt-20 pt-12 border-t border-zinc-800/20">
+      <h2 className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-6">
         {title}
       </h2>
       {children}
@@ -155,16 +157,16 @@ export function FocusSection({
   const isEmpty = items.length === 0;
 
   return (
-    <section className="mt-8">
-      <h2 className="text-sm font-medium uppercase tracking-widest text-zinc-500 mb-4">
+    <section className="mx-auto" style={{ maxWidth: '980px', padding: '48px clamp(16px, 4vw, 48px)' }}>
+      <h2 className="text-[10px] font-medium uppercase tracking-widest text-zinc-600 mb-6">
         {getSectionTitle(type)}
       </h2>
 
       {isEmpty ? (
-        <EmptyState type={type} />
+        <EmptyState />
       ) : (
         <>
-          {type === "links" && <LinkList items={links.slice(0, items.length)} />}
+          {type === "links" && <LinkList items={links} />}
           {type === "shows" && <ShowList items={shows.slice(0, items.length)} />}
           {type === "releases" && <ReleaseList items={releases.slice(0, items.length)} />}
         </>
@@ -173,17 +175,12 @@ export function FocusSection({
   );
 }
 
-function EmptyState({ type }: { type: "links" | "shows" | "releases" }) {
-  const messages: Record<string, string> = {
-    links: "No links yet.",
-    shows: "No upcoming shows.",
-    releases: "No releases yet.",
-  };
-
+function EmptyState() {
+  // Calm empty states - no call to action
   return (
-    <p className="text-sm text-zinc-600 py-4">
-      {messages[type]}
-    </p>
+    <div className="py-12 text-center">
+      <p className="text-sm text-zinc-700">—</p>
+    </div>
   );
 }
 
@@ -194,21 +191,96 @@ function EmptyState({ type }: { type: "links" | "shows" | "releases" }) {
 export function LinkList({ items }: { items: LinkItem[] }) {
   if (items.length === 0) return null;
 
+  // Dynamic import for icons to avoid bundling issues
+  const getSocialIcon = (type?: string) => {
+    const iconClass = "w-6 h-6 md:w-7 md:h-7";
+    
+    switch (type) {
+      case 'instagram':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+          </svg>
+        );
+      case 'facebook':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+          </svg>
+        );
+      case 'tiktok':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
+          </svg>
+        );
+      case 'x':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+        );
+      case 'youtube':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+        );
+      case 'spotify':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+          </svg>
+        );
+      case 'applemusic':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408a10.61 10.61 0 00-.1 1.18c0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.62.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 001.57-.1c.822-.106 1.596-.35 2.296-.81a4.948 4.948 0 002.12-2.325c.25-.63.345-1.29.398-1.96.025-.323.017-.648.024-.973L24 6.124zM6.16 4.457h11.68c.22 0 .433.02.643.05.57.08 1.03.32 1.384.74.35.42.524.914.524 1.486v10.093c0 .97-.49 1.665-1.425 1.963-.165.053-.333.086-.503.105-.068.008-.136.013-.204.016H6.4c-.26 0-.516-.028-.767-.09-.645-.16-1.096-.56-1.335-1.177a2.38 2.38 0 01-.124-.747V6.733c0-.97.49-1.665 1.425-1.963.165-.053.333-.086.503-.105.068-.008.136-.013.204-.016.285-.003.57 0 .854-.192z" />
+          </svg>
+        );
+      case 'soundcloud':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c0-.057-.045-.1-.09-.1m-.899.828c-.051 0-.078.042-.089.092L0 14.479l.187 1.318c0 .056.038.092.089.092.05 0 .089-.036.095-.092l.21-1.318-.21-1.334c-.006-.05-.045-.092-.095-.092m1.83-1.229c-.06 0-.11.051-.117.117l-.2 2.359.2 2.237c.006.066.056.117.116.117.063 0 .11-.051.122-.117l.227-2.237-.227-2.359c-.011-.066-.059-.117-.121-.117m.941-.439c-.07 0-.132.06-.138.131l-.182 2.797.182 2.724c.006.071.068.132.138.132.062 0 .124-.061.133-.132l.21-2.724-.21-2.797c-.009-.071-.071-.131-.133-.131m.97-.452c-.08 0-.144.063-.153.149l-.166 3.246.166 3.16c.009.085.073.148.153.148.074 0 .136-.063.148-.148l.19-3.16-.19-3.246c-.012-.086-.074-.149-.148-.149m1.009-.091c-.082 0-.151.068-.16.154l-.149 3.337.149 3.258c.009.087.078.155.16.155.081 0 .15-.068.157-.155l.172-3.258-.172-3.337c-.007-.086-.076-.154-.157-.154m.964.039c-.09 0-.161.073-.172.166l-.138 3.298.138 3.218c.011.093.082.165.172.165.089 0 .159-.072.172-.165l.16-3.218-.16-3.298c-.013-.093-.083-.166-.172-.166m1.013.124c-.095 0-.168.077-.179.175l-.124 3.174.124 3.096c.011.099.084.176.179.176.093 0 .168-.077.179-.176l.142-3.096-.142-3.174c-.011-.098-.086-.175-.179-.175m.986.103c-.101 0-.181.081-.191.186l-.113 3.071.113 3.058c.01.104.09.186.191.186.1 0 .181-.082.191-.186l.13-3.058-.13-3.071c-.01-.105-.091-.186-.191-.186m1.005.17c-.106 0-.19.087-.2.196l-.101 2.901.101 2.98c.01.11.094.196.2.196.11 0 .19-.086.202-.196l.117-2.98-.117-2.901c-.012-.109-.092-.196-.202-.196m.962.119c-.111 0-.196.091-.206.204l-.09 2.782.09 2.973c.01.112.095.204.206.204.112 0 .196-.092.206-.204l.105-2.973-.105-2.782c-.01-.113-.094-.204-.206-.204m1.008.165c-.117 0-.206.095-.216.211l-.083 2.617.083 2.967c.01.118.099.213.216.213.118 0 .206-.095.216-.213l.096-2.967-.096-2.617c-.01-.116-.098-.211-.216-.211m.965.143c-.121 0-.216.099-.227.225l-.074 2.474.074 2.962c.011.125.106.225.227.225.123 0 .218-.1.227-.225l.087-2.962-.087-2.474c-.009-.126-.104-.225-.227-.225m1.007.126c-.128 0-.226.103-.236.232l-.065 2.348.065 2.957c.01.129.108.231.236.231.128 0 .226-.102.237-.231l.078-2.957-.078-2.348c-.011-.129-.109-.232-.237-.232m.993.162c-.133 0-.236.107-.246.241l-.057 2.186.057 2.952c.01.135.113.241.246.241.133 0 .235-.106.245-.241l.066-2.952-.066-2.186c-.01-.134-.112-.241-.245-.241m1.007.091c-.138 0-.246.111-.255.25l-.048 2.095.048 2.946c.009.139.117.25.255.25.14 0 .247-.111.256-.25l.057-2.946-.057-2.095c-.009-.139-.116-.25-.256-.25m.969.082c-.144 0-.251.115-.259.261l-.041 2.013.041 2.942c.008.146.115.261.259.261.145 0 .251-.115.26-.261l.05-2.942-.05-2.013c-.009-.146-.115-.261-.26-.261m1.006.077c-.151 0-.261.119-.269.269l-.032 1.931.032 2.938c.008.15.118.269.269.269.149 0 .261-.119.269-.269l.039-2.938-.039-1.931c-.008-.15-.12-.269-.269-.269m.986.064c-.155 0-.27.123-.279.279l-.023 1.867.023 2.934c.009.156.124.279.279.279.155 0 .27-.123.278-.279l.029-2.934-.029-1.867c-.008-.156-.123-.279-.278-.279m1.006.052c-.16 0-.279.127-.287.287l-.014 1.815.014 2.93c.008.161.127.288.287.288.161 0 .279-.127.288-.288l.018-2.93-.018-1.815c-.009-.16-.127-.287-.288-.287m.968.039c-.166 0-.288.131-.295.297l-.007 1.776.007 2.925c.007.167.129.297.295.297.167 0 .288-.13.295-.297l.009-2.925-.009-1.776c-.007-.166-.128-.297-.295-.297m1.007.025c-.171 0-.292.135-.3.305l-.001 1.751.001 2.922c.008.169.129.305.3.305.172 0 .293-.136.301-.305v-2.922c0-.17-.129-.305-.301-.305m.975.013c-.177 0-.302.139-.309.313v4.673c.007.174.132.313.309.313.176 0 .302-.139.309-.313V12.66c-.007-.174-.133-.313-.309-.313" />
+          </svg>
+        );
+      case 'bandcamp':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M0 9.6l6.842 4.8H24L17.158 9.6H0z" />
+          </svg>
+        );
+      case 'website':
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+          </svg>
+        );
+      default:
+        return (
+          <svg className={iconClass} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+          </svg>
+        );
+    }
+  };
+
   return (
-    <ul className="space-y-3">
+    <div className="flex flex-wrap gap-4 md:gap-6">
       {items.map((link, index) => (
-        <li key={index}>
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-center text-sm font-medium text-zinc-100 transition-colors hover:bg-zinc-800 hover:border-zinc-700"
-          >
-            {link.title}
-          </a>
-        </li>
+        <a
+          key={index}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center text-zinc-400 transition-colors hover:text-white"
+          title={link.title}
+          aria-label={link.title}
+        >
+          {getSocialIcon(link.type)}
+        </a>
       ))}
-    </ul>
+    </div>
   );
 }
 
@@ -216,26 +288,26 @@ export function ShowList({ items }: { items: ShowItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-4">
       {items.map((show, index) => (
         <li
           key={index}
-          className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3"
+          className="flex items-start justify-between gap-6 py-3 border-b border-zinc-800/30"
         >
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-zinc-100 truncate">{show.title}</p>
-            <p className="text-xs text-zinc-500 truncate">{show.venue}</p>
+            <p className="text-base text-zinc-200">{show.title}</p>
+            <p className="text-sm text-zinc-500 mt-1">{show.venue}</p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <time className="text-xs text-zinc-500">{formatDate(show.date)}</time>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <time className="text-sm text-zinc-500 whitespace-nowrap">{formatDate(show.date)}</time>
             {show.url && (
               <a
                 href={show.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-medium text-zinc-300 hover:text-white transition-colors"
+                className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors border-b border-zinc-800 hover:border-zinc-600"
               >
-                Tickets
+                Info
               </a>
             )}
           </div>
@@ -249,33 +321,32 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+    <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2">
       {items.map((release, index) => (
         <li key={index}>
           <a
             href={release.url ?? "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="group block rounded-lg border border-zinc-800 bg-zinc-900/50 overflow-hidden transition-colors hover:border-zinc-700"
+            className="group block rounded-md border border-zinc-800/50 bg-zinc-900/30 overflow-hidden transition-all hover:border-zinc-700/70"
           >
             {release.cover_url ? (
-              <div className="relative aspect-square w-full">
-                <Image
+              <div className="relative aspect-square w-full overflow-hidden">
+                <img
                   src={release.cover_url}
                   alt={release.title}
-                  fill
-                  className="object-cover transition-transform group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
             ) : (
-              <div className="aspect-square w-full bg-zinc-800 flex items-center justify-center">
-                <span className="text-3xl text-zinc-600">♫</span>
+              <div className="aspect-square w-full bg-zinc-900 flex items-center justify-center">
+                <span className="text-4xl text-zinc-700">♪</span>
               </div>
             )}
-            <div className="p-3">
+            <div className="p-4">
               <p className="text-sm font-medium text-zinc-100 truncate">{release.title}</p>
               {release.release_date && (
-                <p className="text-xs text-zinc-500 mt-1">{release.release_date}</p>
+                <p className="text-xs text-zinc-500 mt-1.5">{release.release_date}</p>
               )}
             </div>
           </a>
@@ -291,10 +362,12 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
 
 export function Footer({ displayName }: { displayName: string }) {
   return (
-    <footer className="border-t border-zinc-900 py-8 px-6">
-      <div className="mx-auto max-w-2xl flex flex-col items-center gap-2 text-center">
+    <footer className="border-t border-zinc-900/50 py-10 px-6 mt-16">
+      <div className="mx-auto max-w-xl flex flex-col items-center gap-3 text-center">
         <p className="text-xs text-zinc-600">© {displayName}</p>
-        <p className="text-[10px] text-zinc-700">Vibaro</p>
+        <p className="text-[10px] text-zinc-800 font-light tracking-wider uppercase">
+          Vibaro
+        </p>
       </div>
     </footer>
   );
@@ -352,11 +425,6 @@ export function getOptionalSections(
   }
 
   return sections;
-}
-
-function truncateBio(bio: string, maxLength: number): string {
-  if (bio.length <= maxLength) return bio;
-  return bio.slice(0, maxLength).trim() + "…";
 }
 
 function getInitials(name: string): string {

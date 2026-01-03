@@ -46,4 +46,9 @@ class ArtistPage extends Model
     {
         return $this->hasMany(Link::class)->orderBy('position');
     }
+
+    public function shows(): HasMany
+    {
+        return $this->hasMany(Show::class)->orderBy('starts_at');
+    }
 }

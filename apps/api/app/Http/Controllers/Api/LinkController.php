@@ -66,16 +66,16 @@ class LinkController extends Controller
         Gate::authorize('update', $artistPage);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'url' => 'required|url|max:2048',
-            'type' => 'nullable|string|in:custom,spotify,youtube,instagram',
+            'title' => 'nullable|string|max:255',
+            'url' => 'nullable|url|max:2048',
+            'type' => 'nullable|string|in:facebook,instagram,tiktok,x,youtube,spotify,applemusic,soundcloud,bandcamp,website,custom',
         ]);
 
         $maxPosition = $artistPage->links()->max('position') ?? -1;
 
         $link = $artistPage->links()->create([
-            'title' => $validated['title'],
-            'url' => $validated['url'],
+            'title' => $validated['title'] ?? null,
+            'url' => $validated['url'] ?? null,
             'type' => $validated['type'] ?? 'custom',
             'position' => $maxPosition + 1,
             'is_visible' => true,
@@ -104,9 +104,9 @@ class LinkController extends Controller
         $link = $artistPage->links()->findOrFail($linkId);
 
         $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'url' => 'sometimes|required|url|max:2048',
-            'type' => 'nullable|string|in:custom,spotify,youtube,instagram',
+            'title' => 'nullable|string|max:255',
+            'url' => 'nullable|url|max:2048',
+            'type' => 'nullable|string|in:facebook,instagram,tiktok,x,youtube,spotify,applemusic,soundcloud,bandcamp,website,custom',
             'is_visible' => 'nullable|boolean',
         ]);
 

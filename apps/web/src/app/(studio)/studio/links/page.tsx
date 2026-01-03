@@ -14,8 +14,9 @@ type ArtistPage = {
 
 type Link = {
   id: number;
-  title: string;
-  url: string;
+  type?: string;
+  title: string | null;
+  url: string | null;
   position: number;
 };
 

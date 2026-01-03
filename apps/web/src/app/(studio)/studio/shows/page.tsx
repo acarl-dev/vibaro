@@ -1,25 +1,54 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { backendFetch } from "@/lib/api/backend";
+import ShowsClient from "./ShowsClient";
 
-export default function StudioShowsPage() {
-  return (
-    <div className="mx-auto max-w-2xl py-16">
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-12 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight mb-3">Shows</h1>
-        
-        <p className="text-sm text-zinc-400 mb-1">
-          Shows sind im Artist Plan verfügbar.
-        </p>
-        <p className="text-xs text-zinc-600 mb-8">
-          Zeige kommende Konzerte und Auftritte auf deiner Seite.
-        </p>
+type Show = {
+  id: number;
+  starts_at: string;
+  venue: string;
+  city: string;
+  address: string | null;
+  ticket_url: string | null;
+  price: number | null;
+  is_free: boolean;
+  support_acts: string[] | null;
+  flyer_path: string | null;
+  status: string;
+};
 
-        <Link
-          href="/pricing"
-          className="inline-flex rounded-full border border-zinc-700 bg-zinc-900 px-6 py-2.5 text-sm font-medium text-zinc-200 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
-        >
-          Artist Plan ansehen
-        </Link>
-      </div>
-    </div>
-  );
+async function fetchArtistPageId(): Promise<number | null> {
+  try {
+    const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.data?.id ?? null;
+  } catch {
+    return null;
+  }
 }
+
+async function fetchShows(artistPageId: number): Promise<Show[]> {
+  try {
+    const res = await backendFetch(`/api/v1/artist-pages/${artistPageId}/shows`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function StudioShowsPage() {
+  const artistPageId = await fetchArtistPageId();
+
+  if (!artistPageId) {
+    redirect("/login");
+  }
+
+  const shows = await fetchShows(artistPageId);
+
+  return <ShowsClient initialShows={shows} />;
+}
+

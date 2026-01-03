@@ -17,7 +17,7 @@ export default function DarkEditorialTemplate({
 }: {
   page: PublicArtistPageData;
 }) {
-  // Default focus for MVP (Free plan = links)
+  // MVP: Free plan = links focus by default
   const focus = page.focus ?? { type: "links" as const, limit: 3 };
   const focusType = focus.type;
   const focusLimit = focus.limit;
@@ -30,29 +30,30 @@ export default function DarkEditorialTemplate({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
-      {/* Hero */}
+      {/* Full-bleed Hero with overlay text */}
       <Hero page={page} />
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-2xl px-6 pb-20">
-        {/* Focus Section (always rendered) */}
-        <FocusSection
-          type={focusType}
-          items={focusItems}
-          links={page.links}
-          shows={page.shows}
-          releases={page.releases}
-        />
+      {/* First section: Links (directly after hero) */}
+      <FocusSection
+        type={focusType}
+        items={focusItems}
+        links={page.links}
+        shows={page.shows}
+        releases={page.releases}
+      />
 
-        {/* Optional Sections (max 2) */}
-        {optionalSections.map((section) => (
-          <Section key={section.type} title={getSectionTitle(section.type)}>
-            {section.type === "links" && <LinkList items={page.links} />}
-            {section.type === "shows" && <ShowList items={page.shows} />}
-            {section.type === "releases" && <ReleaseList items={page.releases} />}
-          </Section>
-        ))}
-      </main>
+      {/* Optional Sections */}
+      {optionalSections.length > 0 && (
+        <main className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
+          {optionalSections.map((section) => (
+            <Section key={section.type} title={getSectionTitle(section.type)}>
+              {section.type === "links" && <LinkList items={page.links} />}
+              {section.type === "shows" && <ShowList items={page.shows} />}
+              {section.type === "releases" && <ReleaseList items={page.releases} />}
+            </Section>
+          ))}
+        </main>
+      )}
 
       {/* Footer */}
       <Footer displayName={page.display_name} />

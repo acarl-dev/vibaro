@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
+use App\Services\LinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -55,6 +56,9 @@ class ArtistPageController extends Controller
             'accent_color' => null,
             'is_published' => false,
         ]);
+
+        // Create default social media links (pre-filled, empty URLs)
+        LinkService::createDefaultLinksForArtistPage($page);
 
         return $this->success([
             'id' => $page->id,

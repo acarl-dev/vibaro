@@ -247,6 +247,111 @@ Auth required.
 
 * `POST /{resource}/reorder`
 
+### Links Details
+
+Bei ArtistPage-Erstellung werden automatisch vorgefertigte Social Media Links erstellt:
+- instagram, facebook, tiktok, x, youtube, spotify, applemusic, soundcloud, bandcamp, website
+- Diese haben anfangs `url: null`
+- User trägt URLs im Dashboard ein
+- **Nur Links mit ausgefüllten URLs werden öffentlich angezeigt**
+
+**POST /artist-pages/{id}/links**
+```json
+{
+  "type": "instagram",  // optional: facebook, tiktok, x, youtube, spotify, applemusic, soundcloud, bandcamp, website, custom
+  "title": "Instagram",  // optional, wird automatisch gesetzt für bekannte types
+  "url": "https://instagram.com/artist"  // optional, nullable
+}
+```
+
+**PATCH /artist-pages/{id}/links/{linkId}**
+```json
+{
+  "url": "https://instagram.com/artist"  // kann auch null sein um Link zu leeren
+}
+```
+
+**Response**
+```json
+{
+  "data": {
+    "id": 1,
+    "type": "instagram",
+    "title": "Instagram",
+    "url": "https://instagram.com/artist",
+    "position": 0,
+    "is_visible": true
+  }
+}
+```
+
+---
+
+### Shows Details
+
+**GET /artist-pages/{id}/shows**
+Returns all shows for the artist page, sorted by `starts_at` ascending.
+
+**Response**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "starts_at": "2026-02-15T20:00:00Z",
+      "venue": "Club XYZ",
+      "city": "Berlin",
+      "address": "Musterstraße 123, 10115 Berlin",
+      "ticket_url": "https://tickets.com/show123",
+      "price": 15.00,
+      "is_free": false,
+      "support_acts": ["Band A", "Band B"],
+      "flyer_path": "/storage/flyers/abc123.jpg",
+      "status": "upcoming",
+      "position": 0
+    }
+  ]
+}
+```
+
+**POST /artist-pages/{id}/shows**
+```json
+{
+  "starts_at": "2026-02-15T20:00:00",
+  "venue": "Club XYZ",
+  "city": "Berlin",
+  "address": "Musterstraße 123, 10115 Berlin",  // optional
+  "ticket_url": "https://tickets.com/show123",  // optional
+  "price": 15.00,  // optional, decimal
+  "is_free": false,  // optional, boolean
+  "support_acts": ["Band A", "Band B"]  // optional, array of strings
+}
+```
+
+**PATCH /artist-pages/{id}/shows/{showId}**
+```json
+{
+  "starts_at": "2026-02-15T21:00:00",
+  "venue": "Updated Venue",
+  "city": "Hamburg",
+  "address": "Neue Straße 456",
+  "ticket_url": null,
+  "price": null,
+  "is_free": true,
+  "support_acts": null
+}
+```
+
+**DELETE /artist-pages/{id}/shows/{showId}**
+Returns 204 No Content on success.
+
+**POST /artist-pages/{id}/shows/reorder**
+```json
+{
+  "ids": [3, 1, 2]
+}
+```
+
 ---
 
 ## Public Artist Page
