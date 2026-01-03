@@ -89,9 +89,9 @@ class GalleryImageController extends Controller
     /**
      * Update a gallery image (only title)
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, string $id): JsonResponse
     {
-        $image = GalleryImage::find($id);
+        $image = GalleryImage::find((int) $id);
 
         if (!$image) {
             return $this->error('NOT_FOUND', 'Gallery image not found.', 404);
@@ -130,9 +130,9 @@ class GalleryImageController extends Controller
     /**
      * Delete a gallery image
      */
-    public function destroy(Request $request, int $id): JsonResponse
+    public function destroy(Request $request, string $id): JsonResponse
     {
-        $image = GalleryImage::find($id);
+        $image = GalleryImage::find((int) $id);
 
         if (!$image) {
             return $this->error('NOT_FOUND', 'Gallery image not found.', 404);

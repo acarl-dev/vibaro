@@ -23,14 +23,28 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUpload = async (file: File) => {
-    if (images.length >= 16) {
-      setError("Maximale Anzahl von 16 Bildern erreicht");
-      return;
+  const validateFile = (file: File): { valid: boolean; error?: string } => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+    if (!allowedTypes.includes(file.type)) {
+      return { valid: false, error: `${file.name}: Ungültiges Format (nur JPEG, PNG, WebP erlaubt)` };
     }
 
-    setUploading(true);
-    setError("");
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+      return { valid: false, error: `${file.name}: Zu groß (${sizeMB}MB, max. 5MB)` };
+    }
+
+    return { valid: true };
+  };
+
+  const handleUpload = async (file: File) => {
+    // Validate file before upload
+    const validation = validateFile(file);
+    if (!validation.valid) {
+      return { success: false, error: validation.error! };
+    }
 
     const formData = new FormData();
     formData.append("image", file);
@@ -43,18 +57,14 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
       if (res.ok) {
         const json = await res.json();
-        setImages([...images, json.data]);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
+        return { success: true, data: json.data };
       } else {
         const errorData = await res.json();
-        setError(errorData.error?.message || "Upload fehlgeschlagen");
+        const errorMsg = errorData.error?.message || "Upload fehlgeschlagen";
+        return { success: false, error: `${file.name}: ${errorMsg}` };
       }
     } catch {
-      setError("Upload fehlgeschlagen");
-    } finally {
-      setUploading(false);
+      return { success: false, error: `${file.name}: Upload fehlgeschlagen` };
     }
   };
 
@@ -83,14 +93,45 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
       return;
     }
 
-    // Upload files sequentially to avoid overwhelming the server
-    for (const file of imageFiles) {
-      if (images.length >= 16) {
-        setError("Maximale Anzahl von 16 Bildern erreicht");
-        break;
-      }
-      await handleUpload(file);
+    const maxImages = 16;
+    const availableSlots = maxImages - images.length;
+
+    if (availableSlots <= 0) {
+      setError("Maximale Anzahl von 16 Bildern erreicht");
+      return;
     }
+
+    // Limit to available slots
+    const filesToUpload = imageFiles.slice(0, availableSlots);
+    if (imageFiles.length > availableSlots) {
+      setError(`Nur ${availableSlots} von ${imageFiles.length} Bildern hochgeladen (Maximum 16 erreicht)`);
+    }
+
+    setUploading(true);
+    setError("");
+
+    // Upload all files in parallel
+    const uploadPromises = filesToUpload.map(file => handleUpload(file));
+    const results = await Promise.all(uploadPromises);
+
+    // Collect successful uploads and errors
+    const successfulUploads = results.filter(r => r.success).map(r => r.data!);
+    const errors = results.filter(r => !r.success).map(r => r.error!);
+
+    // Update images with successful uploads
+    if (successfulUploads.length > 0) {
+      setImages([...images, ...successfulUploads]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+
+    // Show errors if any
+    if (errors.length > 0) {
+      setError(errors.join("\n"));
+    }
+
+    setUploading(false);
   };
 
   const handleUpdateTitle = async (imageId: number, newTitle: string) => {
@@ -126,9 +167,14 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
       if (res.ok) {
         setImages(images.filter((img) => img.id !== imageId));
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Delete error:", res.status, errorData);
+        setError(errorData.error?.message || "Löschen fehlgeschlagen");
       }
-    } catch {
-      // Fehler wird stillschweigend behandelt
+    } catch (err) {
+      console.error("Delete exception:", err);
+      setError("Löschen fehlgeschlagen");
     }
   };
 
@@ -161,10 +207,46 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUpload(file);
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length === 0) return;
+
+                  const maxImages = 16;
+                  const availableSlots = maxImages - images.length;
+
+                  if (availableSlots <= 0) {
+                    setError("Maximale Anzahl von 16 Bildern erreicht");
+                    return;
+                  }
+
+                  const filesToUpload = files.slice(0, availableSlots);
+                  if (files.length > availableSlots) {
+                    setError(`Nur ${availableSlots} von ${files.length} Bildern hochgeladen (Maximum 16 erreicht)`);
+                  }
+
+                  setUploading(true);
+                  setError("");
+
+                  const uploadPromises = filesToUpload.map(file => handleUpload(file));
+                  const results = await Promise.all(uploadPromises);
+
+                  const successfulUploads = results.filter(r => r.success).map(r => r.data!);
+                  const errors = results.filter(r => !r.success).map(r => r.error!);
+
+                  if (successfulUploads.length > 0) {
+                    setImages([...images, ...successfulUploads]);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
+                  }
+
+                  if (errors.length > 0) {
+                    setError(errors.join("\n"));
+                  }
+
+                  setUploading(false);
                 }}
                 className="hidden"
                 id="gallery-upload"
@@ -184,7 +266,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
+          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400 whitespace-pre-line">
             {error}
           </div>
         )}

@@ -86,9 +86,9 @@ Route::prefix('v1')->group(function () {
         // Gallery Images (private CRUD)
         Route::get('/studio/gallery', [GalleryImageController::class, 'index']);
         Route::post('/studio/gallery', [GalleryImageController::class, 'store']);
+        Route::post('/studio/gallery/reorder', [GalleryImageController::class, 'reorder']);
         Route::patch('/studio/gallery/{id}', [GalleryImageController::class, 'update']);
         Route::delete('/studio/gallery/{id}', [GalleryImageController::class, 'destroy']);
-        Route::post('/studio/gallery/reorder', [GalleryImageController::class, 'reorder']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
