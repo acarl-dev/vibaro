@@ -16,7 +16,7 @@ class PublicArtistPageController extends Controller
     {
         $page = ArtistPage::where('handle', $handle)
             ->where('is_published', true)
-            ->with('links')
+            ->with(['links', 'shows', 'releases'])
             ->first();
 
         if (!$page) {
@@ -53,8 +53,22 @@ class PublicArtistPageController extends Controller
                 'limit' => 3,
             ],
             'links' => $links,
-            'shows' => [],
-            'releases' => [],
+            'shows' => $page->shows->map(function ($show) {
+                return [
+                    'title' => $show->venue . ' - ' . $show->city,
+                    'venue' => $show->venue,
+                    'date' => $show->starts_at->toIso8601String(),
+                    'url' => $show->ticket_url,
+                ];
+            })->toArray(),
+            'releases' => $page->releases->map(function ($release) use ($appUrl) {
+                return [
+                    'title' => $release->title,
+                    'cover_url' => $release->cover_path ? $appUrl . Storage::url($release->cover_path) : null,
+                    'url' => $release->url,
+                    'release_date' => $release->release_date->toDateString(),
+                ];
+            })->toArray(),
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,

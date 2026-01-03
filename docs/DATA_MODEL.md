@@ -108,10 +108,37 @@ Zentrale Entität für Musiker-Seiten.
 
 ---
 
-## releases (post-MVP)
+## releases
 
 | Feld | Typ |
 |----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| title | string |
+| release_date | date |
+| url | string | nullable |
+| cover_path | string | nullable |
+| is_featured | boolean |
+| position | int |
+| timestamps | |
+
+**Indizes:**
+- index(artist_page_id)
+- index(artist_page_id, release_date) für chronologische Sortierung
+
+**Verhalten:**
+- Standard-Sortierung nach `release_date` (absteigend für neueste zuerst)
+- `url` sollte auf Streaming-Plattformen verweisen (Spotify, Apple Music, etc.)
+- `is_featured` kann für hervorgehobene Releases verwendet werden
+- Cover-Upload ähnlich wie Flyer/Avatar
+
+---
+
+## releases (entfernt - post-MVP)
+
+| Feld | Typ |
+|----|----|
+
 | id | bigint |
 | artist_page_id | bigint |
 | title | string |
@@ -137,8 +164,8 @@ Zentrale Entität für Musiker-Seiten.
 ## MVP Notes
 
 - MVP kann mit `users` + `artist_pages` starten
-- `links` ist der erste sinnvolle Ausbau
-- Shows/Releases bewusst post-MVP
+- `links`, `shows` und `releases` sind nun implementiert
+- Weitere Features (z.B. AI, erweiterte Plans) post-MVP
 
 ---
 

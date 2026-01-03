@@ -51,4 +51,9 @@ class ArtistPage extends Model
     {
         return $this->hasMany(Show::class)->orderBy('starts_at');
     }
+
+    public function releases(): HasMany
+    {
+        return $this->hasMany(Release::class)->orderBy('release_date', 'desc');
+    }
 }

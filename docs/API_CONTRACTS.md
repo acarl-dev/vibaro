@@ -399,6 +399,78 @@ Deletes the flyer image. Returns 204 No Content on success.
 
 ---
 
+### Releases Details
+
+**GET /artist-pages/{id}/releases**
+Returns all releases for the artist page, sorted by `release_date` descending (newest first).
+
+**Response**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "My New Album",
+      "release_date": "2026-03-15",
+      "url": "https://open.spotify.com/album/...",
+      "cover_path": "covers/xyz789.jpg",
+      "is_featured": true,
+      "position": 0
+    }
+  ]
+}
+```
+
+**POST /artist-pages/{id}/releases**
+```json
+{
+  "title": "My New Album",
+  "release_date": "2026-03-15",
+  "url": "https://open.spotify.com/album/...",  // optional
+  "is_featured": false  // optional, boolean
+}
+```
+
+**PATCH /artist-pages/{id}/releases/{releaseId}**
+```json
+{
+  "title": "Updated Album Title",
+  "release_date": "2026-03-20",
+  "url": "https://music.apple.com/album/...",
+  "is_featured": true
+}
+```
+
+**DELETE /artist-pages/{id}/releases/{releaseId}**
+Deletes the release and its cover image if exists. Returns `{"data": {"ok": true}}`.
+
+**POST /artist-pages/{id}/releases/reorder**
+```json
+{
+  "release_ids": [3, 1, 2]
+}
+```
+
+**POST /artist-pages/{id}/releases/{releaseId}/upload-cover**
+Multipart form data:
+- `cover`: Image file (jpeg, jpg, png, webp, max 5MB)
+
+Response:
+```json
+{
+  "data": {
+    "id": 1,
+    "cover_path": "covers/xyz789.jpg",
+    "cover_url": "https://api.example.com/storage/covers/xyz789.jpg"
+  }
+}
+```
+
+**DELETE /artist-pages/{id}/releases/{releaseId}/cover**
+Deletes the cover image. Returns 204 No Content on success.
+
+---
+
 ## Public Artist Page
 
 ### GET /p/{handle}

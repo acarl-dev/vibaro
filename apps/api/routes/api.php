@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ArtistPageController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\PublicArtistPageController;
+use App\Http\Controllers\Api\ReleaseController;
 use App\Http\Controllers\Api\ShowController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +56,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/artist-pages/{id}/shows/reorder', [ShowController::class, 'reorder']);
         Route::post('/artist-pages/{id}/shows/{showId}/upload-flyer', [ShowController::class, 'uploadFlyer']);
         Route::delete('/artist-pages/{id}/shows/{showId}/flyer', [ShowController::class, 'deleteFlyer']);
+
+        // Releases (private CRUD)
+        Route::get('/artist-pages/{id}/releases', [ReleaseController::class, 'index']);
+        Route::post('/artist-pages/{id}/releases', [ReleaseController::class, 'store']);
+        Route::patch('/artist-pages/{id}/releases/{releaseId}', [ReleaseController::class, 'update']);
+        Route::delete('/artist-pages/{id}/releases/{releaseId}', [ReleaseController::class, 'destroy']);
+        Route::post('/artist-pages/{id}/releases/reorder', [ReleaseController::class, 'reorder']);
+        Route::post('/artist-pages/{id}/releases/{releaseId}/upload-cover', [ReleaseController::class, 'uploadCover']);
+        Route::delete('/artist-pages/{id}/releases/{releaseId}/cover', [ReleaseController::class, 'deleteCover']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
