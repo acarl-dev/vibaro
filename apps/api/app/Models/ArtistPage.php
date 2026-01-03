@@ -61,4 +61,14 @@ class ArtistPage extends Model
     {
         return $this->hasMany(FeaturedTrack::class)->orderBy('position');
     }
+
+    public function videos(): HasMany
+    {
+        return $this->hasMany(Video::class)->orderBy('position');
+    }
+
+    public function galleryImages(): HasMany
+    {
+        return $this->hasMany(GalleryImage::class)->orderBy('position');
+    }
 }

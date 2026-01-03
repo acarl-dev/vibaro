@@ -78,6 +78,16 @@ class PublicArtistPageController extends Controller
                     'embed_id' => $track->embed_id,
                 ];
             })->toArray(),
+            'videos' => $page->videos->map(function ($video) {
+                return [
+                    'title' => $video->title,
+                    'platform' => $video->platform,
+                    'video_id' => $video->video_id,
+                    'url' => $video->url,
+                    'description' => $video->description,
+                    'thumbnail_url' => $video->thumbnail_url,
+                ];
+            })->toArray(),
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,

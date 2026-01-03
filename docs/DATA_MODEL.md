@@ -164,6 +164,39 @@ Kuratierte Auswahl von Tracks für den Music Player.
 
 ---
 
+## videos
+
+Musikvideos und andere Video-Content.
+
+| Feld | Typ | Hinweise |
+|----|----|-------|
+| id | bigint | PK |
+| artist_page_id | bigint | FK → artist_pages.id |
+| title | string | Video-Titel |
+| platform | string | `youtube` \| `vimeo` |
+| video_id | string | Extrahierte Video-ID |
+| url | string | Vollständiger URL zum Video |
+| description | text | nullable, Beschreibung |
+| thumbnail_url | string | nullable, auto-generiert oder custom |
+| position | int | Sortierung |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+**Indizes:**
+- index(artist_page_id, position)
+
+**Verhalten:**
+- Standard-Sortierung nach `position` (aufsteigend)
+- `video_id` wird automatisch aus `url` extrahiert
+- Maximal 8 Videos (Artist-Plan)
+- YouTube: `thumbnail_url` auto-generiert als `https://img.youtube.com/vi/{video_id}/hqdefault.jpg`
+- Vimeo: Thumbnail erfordert API-Call (optional)
+- Unterstützte URL-Formate:
+  - YouTube: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID
+  - Vimeo: vimeo.com/ID
+
+---
+
 ## releases (entfernt - post-MVP)
 
 | Feld | Typ |
@@ -189,6 +222,7 @@ Kuratierte Auswahl von Tracks für den Music Player.
 - ArtistPage **hasMany** Shows
 - ArtistPage **hasMany** Releases
 - ArtistPage **hasMany** FeaturedTracks
+- ArtistPage **hasMany** Videos
 
 ---
 

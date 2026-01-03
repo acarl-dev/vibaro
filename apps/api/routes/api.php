@@ -3,10 +3,12 @@
 use App\Http\Controllers\Api\ArtistPageController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FeaturedTrackController;
+use App\Http\Controllers\Api\GalleryImageController;
 use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\PublicArtistPageController;
 use App\Http\Controllers\Api\ReleaseController;
 use App\Http\Controllers\Api\ShowController;
+use App\Http\Controllers\Api\VideoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -73,6 +75,20 @@ Route::prefix('v1')->group(function () {
         Route::patch('/artist-pages/{id}/featured-tracks/{trackId}', [FeaturedTrackController::class, 'update']);
         Route::delete('/artist-pages/{id}/featured-tracks/{trackId}', [FeaturedTrackController::class, 'destroy']);
         Route::post('/artist-pages/{id}/featured-tracks/reorder', [FeaturedTrackController::class, 'reorder']);
+
+        // Videos (private CRUD)
+        Route::get('/studio/videos', [VideoController::class, 'index']);
+        Route::post('/studio/videos', [VideoController::class, 'store']);
+        Route::patch('/studio/videos/{id}', [VideoController::class, 'update']);
+        Route::delete('/studio/videos/{id}', [VideoController::class, 'destroy']);
+        Route::post('/studio/videos/reorder', [VideoController::class, 'reorder']);
+
+        // Gallery Images (private CRUD)
+        Route::get('/studio/gallery', [GalleryImageController::class, 'index']);
+        Route::post('/studio/gallery', [GalleryImageController::class, 'store']);
+        Route::patch('/studio/gallery/{id}', [GalleryImageController::class, 'update']);
+        Route::delete('/studio/gallery/{id}', [GalleryImageController::class, 'destroy']);
+        Route::post('/studio/gallery/reorder', [GalleryImageController::class, 'reorder']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

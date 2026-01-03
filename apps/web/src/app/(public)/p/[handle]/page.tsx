@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { PublicArtistPageData } from "../components/shared";
 import DarkEditorialTemplate from "../components/DarkEditorialTemplate";
+import DarkEditorialFullTemplate from "../components/DarkEditorialFullTemplate";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -66,5 +67,6 @@ export default async function PublicArtistPage({
   }
 
   // MVP: Single editorial template
-  return <DarkEditorialTemplate page={page} />;
+  // Use DarkEditorialFullTemplate to see the full Artist plan version
+  return <DarkEditorialFullTemplate page={page} />;
 }
