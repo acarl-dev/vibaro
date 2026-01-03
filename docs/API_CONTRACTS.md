@@ -471,6 +471,71 @@ Deletes the cover image. Returns 204 No Content on success.
 
 ---
 
+### Featured Tracks Details
+
+**GET /artist-pages/{id}/featured-tracks**
+Returns all featured tracks for the artist page, sorted by `position` ascending.
+
+**Response**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Lost in the City",
+      "artist_name": null,
+      "platform": "spotify",
+      "platform_url": "https://open.spotify.com/track/ABC123",
+      "embed_id": "ABC123",
+      "position": 0
+    },
+    {
+      "id": 2,
+      "title": "Late Night Drive",
+      "artist_name": "Emily J. ft. John Doe",
+      "platform": "youtube",
+      "platform_url": "https://www.youtube.com/watch?v=XYZ789",
+      "embed_id": "XYZ789",
+      "position": 1
+    }
+  ]
+}
+```
+
+**POST /artist-pages/{id}/featured-tracks**
+```json
+{
+  "title": "Lost in the City",
+  "artist_name": null,  // optional
+  "platform": "spotify",  // spotify | soundcloud | youtube
+  "platform_url": "https://open.spotify.com/track/ABC123",
+  "embed_id": null  // optional, auto-extracted if not provided
+}
+```
+
+**PATCH /artist-pages/{id}/featured-tracks/{trackId}**
+```json
+{
+  "title": "Lost in the City (Remix)",
+  "artist_name": "Emily J. ft. Jane Smith",
+  "platform": "spotify",
+  "platform_url": "https://open.spotify.com/track/DEF456",
+  "position": 2
+}
+```
+
+**DELETE /artist-pages/{id}/featured-tracks/{trackId}**
+Deletes the featured track. Returns 204 No Content.
+
+**POST /artist-pages/{id}/featured-tracks/reorder**
+```json
+{
+  "ids": [3, 1, 2]
+}
+```
+
+---
+
 ## Public Artist Page
 
 ### GET /p/{handle}
@@ -501,7 +566,16 @@ Public, no auth.
     },
     "links": [],
     "shows": [],
-    "releases": []
+    "releases": [],
+    "featured_tracks": [
+      {
+        "title": "Lost in the City",
+        "artist_name": null,
+        "platform": "spotify",
+        "platform_url": "https://open.spotify.com/track/ABC123",
+        "embed_id": "ABC123"
+      }
+    ]
   }
 }
 ```

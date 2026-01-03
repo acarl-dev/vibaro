@@ -56,4 +56,9 @@ class ArtistPage extends Model
     {
         return $this->hasMany(Release::class)->orderBy('release_date', 'desc');
     }
+
+    public function featuredTracks(): HasMany
+    {
+        return $this->hasMany(FeaturedTrack::class)->orderBy('position');
+    }
 }

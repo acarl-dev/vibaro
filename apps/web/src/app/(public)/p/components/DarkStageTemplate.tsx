@@ -11,6 +11,7 @@ import {
   getFocusItems,
   getOptionalSections,
 } from "./shared";
+import MusicPlayer from "./MusicPlayer";
 
 export default function DarkStageTemplate({
   page,
@@ -39,6 +40,13 @@ export default function DarkStageTemplate({
           shows={page.shows}
           releases={page.releases}
         />
+
+        {/* Music Player Section */}
+        {page.featured_tracks && page.featured_tracks.length > 0 && (
+          <Section title="Music">
+            <MusicPlayer tracks={page.featured_tracks} />
+          </Section>
+        )}
 
         {/* Optional Sections - stage-inspired layout */}
         {optionalSections.map((section) => (

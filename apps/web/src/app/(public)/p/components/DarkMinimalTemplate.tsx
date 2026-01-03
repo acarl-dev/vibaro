@@ -11,6 +11,7 @@ import {
   getFocusItems,
   getOptionalSections,
 } from "./shared";
+import MusicPlayer from "./MusicPlayer";
 
 export default function DarkMinimalTemplate({
   page,
@@ -39,6 +40,13 @@ export default function DarkMinimalTemplate({
           shows={page.shows}
           releases={page.releases}
         />
+
+        {/* Music Player Section */}
+        {page.featured_tracks && page.featured_tracks.length > 0 && (
+          <Section title="Music">
+            <MusicPlayer tracks={page.featured_tracks} />
+          </Section>
+        )}
 
         {/* Optional Sections - minimal spacing */}
         {optionalSections.map((section) => (

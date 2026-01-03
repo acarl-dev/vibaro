@@ -24,6 +24,14 @@ export type ReleaseItem = {
   release_date?: string;
 };
 
+export type FeaturedTrackItem = {
+  title: string;
+  artist_name: string | null;
+  platform: "spotify" | "soundcloud" | "youtube";
+  platform_url: string;
+  embed_id: string | null;
+};
+
 export type PublicArtistPageData = {
   handle: string;
   display_name: string;
@@ -39,6 +47,7 @@ export type PublicArtistPageData = {
   links: LinkItem[];
   shows: ShowItem[];
   releases: ReleaseItem[];
+  featured_tracks: FeaturedTrackItem[];
   theme?: {
     key: string | null;
     variant: string | null;

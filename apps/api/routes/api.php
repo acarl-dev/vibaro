@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ArtistPageController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\FeaturedTrackController;
 use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\PublicArtistPageController;
 use App\Http\Controllers\Api\ReleaseController;
@@ -65,6 +66,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/artist-pages/{id}/releases/reorder', [ReleaseController::class, 'reorder']);
         Route::post('/artist-pages/{id}/releases/{releaseId}/upload-cover', [ReleaseController::class, 'uploadCover']);
         Route::delete('/artist-pages/{id}/releases/{releaseId}/cover', [ReleaseController::class, 'deleteCover']);
+
+        // Featured Tracks (private CRUD)
+        Route::get('/artist-pages/{id}/featured-tracks', [FeaturedTrackController::class, 'index']);
+        Route::post('/artist-pages/{id}/featured-tracks', [FeaturedTrackController::class, 'store']);
+        Route::patch('/artist-pages/{id}/featured-tracks/{trackId}', [FeaturedTrackController::class, 'update']);
+        Route::delete('/artist-pages/{id}/featured-tracks/{trackId}', [FeaturedTrackController::class, 'destroy']);
+        Route::post('/artist-pages/{id}/featured-tracks/reorder', [FeaturedTrackController::class, 'reorder']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

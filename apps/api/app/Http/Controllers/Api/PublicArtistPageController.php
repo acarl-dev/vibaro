@@ -16,7 +16,7 @@ class PublicArtistPageController extends Controller
     {
         $page = ArtistPage::where('handle', $handle)
             ->where('is_published', true)
-            ->with(['links', 'shows', 'releases'])
+            ->with(['links', 'shows', 'releases', 'featuredTracks'])
             ->first();
 
         if (!$page) {
@@ -67,6 +67,15 @@ class PublicArtistPageController extends Controller
                     'cover_url' => $release->cover_path ? $appUrl . Storage::url($release->cover_path) : null,
                     'url' => $release->url,
                     'release_date' => $release->release_date->toDateString(),
+                ];
+            })->toArray(),
+            'featured_tracks' => $page->featuredTracks->map(function ($track) {
+                return [
+                    'title' => $track->title,
+                    'artist_name' => $track->artist_name,
+                    'platform' => $track->platform,
+                    'platform_url' => $track->platform_url,
+                    'embed_id' => $track->embed_id,
                 ];
             })->toArray(),
             'theme' => [

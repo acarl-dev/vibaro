@@ -11,6 +11,7 @@ import {
   getFocusItems,
   getOptionalSections,
 } from "./shared";
+import MusicPlayer from "./MusicPlayer";
 
 export default function DarkEditorialTemplate({
   page,
@@ -41,6 +42,15 @@ export default function DarkEditorialTemplate({
         shows={page.shows}
         releases={page.releases}
       />
+
+      {/* Music Player Section */}
+      {page.featured_tracks && page.featured_tracks.length > 0 && (
+        <main className="mx-auto pb-16" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px) 4rem' }}>
+          <Section title="Music">
+            <MusicPlayer tracks={page.featured_tracks} />
+          </Section>
+        </main>
+      )}
 
       {/* Optional Sections */}
       {optionalSections.length > 0 && (

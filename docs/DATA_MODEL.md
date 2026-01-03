@@ -134,6 +134,36 @@ Zentrale Entität für Musiker-Seiten.
 
 ---
 
+## featured_tracks
+
+Kuratierte Auswahl von Tracks für den Music Player.
+
+| Feld | Typ | Hinweise |
+|----|----|-------|
+| id | bigint | PK |
+| artist_page_id | bigint | FK → artist_pages.id |
+| title | string | Track-Titel |
+| artist_name | string | nullable, für Features/Collabs |
+| platform | string | `spotify` \| `soundcloud` \| `youtube` |
+| platform_url | string | Vollständiger URL zum Track |
+| embed_id | string | nullable, extrahierte ID für Embeds |
+| position | int | Sortierung |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+**Indizes:**
+- index(artist_page_id)
+
+**Verhalten:**
+- Standard-Sortierung nach `position` (aufsteigend)
+- `embed_id` wird automatisch aus `platform_url` extrahiert
+- Maximal 5-7 Tracks empfohlen für optimale UX
+- Spotify: Embed via Track ID
+- SoundCloud: Embed via vollständiger URL
+- YouTube: Embed via Video ID
+
+---
+
 ## releases (entfernt - post-MVP)
 
 | Feld | Typ |
@@ -158,6 +188,7 @@ Zentrale Entität für Musiker-Seiten.
 - ArtistPage **hasMany** Links
 - ArtistPage **hasMany** Shows
 - ArtistPage **hasMany** Releases
+- ArtistPage **hasMany** FeaturedTracks
 
 ---
 
