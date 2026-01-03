@@ -53,12 +53,32 @@ class GalleryImageController extends Controller
             return $this->error('LIMIT_EXCEEDED', 'Maximum 16 gallery images allowed.', 400);
         }
 
+        // Log request details for debugging
+        \Log::info('Gallery image store request', [
+            'content-type' => $request->header('content-type'),
+            'all_keys' => array_keys($request->all()),
+            'has_file' => $request->hasFile('image'),
+            'file_exists' => isset($_FILES['image']),
+            'files_dump' => count($_FILES),
+            'request_method' => $_SERVER['REQUEST_METHOD'],
+            'content_length' => $_SERVER['CONTENT_LENGTH'] ?? 'not set',
+        ]);
+
         try {
             $validated = $request->validate([
                 'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // 5MB
                 'title' => ['nullable', 'string', 'max:255'],
             ]);
         } catch (ValidationException $e) {
+            $file = $request->file('image');
+            \Log::warning('Gallery image validation failed', [
+                'errors' => $e->errors(),
+                'file' => $file ? [
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'originalExtension' => $file->getClientOriginalExtension(),
+                ] : 'no file',
+            ]);
             return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
         }
 

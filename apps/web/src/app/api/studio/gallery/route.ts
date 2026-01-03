@@ -60,23 +60,67 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const formData = await request.formData();
-
-    const response = await backendFetch("/api/v1/studio/gallery", {
-      method: "POST",
-      body: formData,
-      // Don't set Content-Type header - let fetch set it with boundary
+    const token = await getTokenFromCookies();
+    
+    // Read the entire request body as a buffer to preserve the exact multipart encoding
+    const bodyBuffer = await request.arrayBuffer();
+    
+    console.log("[Gallery POST] Forwarding request to backend", {
+      token: token ? "present" : "missing",
+      contentType: request.headers.get("content-type"),
+      bodySize: bodyBuffer.byteLength,
     });
 
-    const data = await response.json();
+    // Forward the entire body buffer with the original Content-Type header
+    const response = await backendFetch("/api/v1/studio/gallery", {
+      method: "POST",
+      headers: {
+        "Content-Type": request.headers.get("content-type") || "application/octet-stream",
+      },
+      body: bodyBuffer,
+      duplex: "half" as any,
+    });
+
+    // Get response text first to debug HTML errors
+    const responseText = await response.text();
     
-    // Return full error details if validation failed
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      // Response is not JSON - likely an error page
+      console.error("[Gallery Upload] Backend returned non-JSON response:", {
+        status: response.status,
+        contentType: response.headers.get("content-type"),
+        responsePreview: responseText.substring(0, 500),
+      });
+      
+      return NextResponse.json(
+        {
+          error: {
+            code: "UPSTREAM_ERROR",
+            message: `Backend error: ${response.statusText}`,
+          },
+        },
+        { status: response.status || 500 }
+      );
+    }
+    
+    console.log("[Gallery Upload]", {
+      status: response.status,
+      ok: response.ok,
+      errorCode: data.error?.code,
+      errorMessage: data.error?.message,
+      uploadedId: data.data?.id,
+    });
+    
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });
     }
     
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
+    console.error("[Gallery Upload Error]", error);
     return NextResponse.json(
       {
         error: {

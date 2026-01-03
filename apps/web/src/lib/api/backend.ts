@@ -39,8 +39,12 @@ export async function backendFetch(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  // Add Content-Type if body exists and not already set (but NOT for FormData)
-  if (init?.body && !headers.has("Content-Type") && !(init.body instanceof FormData)) {
+  // Add Content-Type if body exists and not already set (but NOT for FormData or streams with explicit Content-Type)
+  if (
+    init?.body &&
+    !headers.has("Content-Type") &&
+    !(init.body instanceof FormData)
+  ) {
     headers.set("Content-Type", "application/json");
   }
 
