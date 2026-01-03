@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 type Template = {
   key: string;
   name: string;
@@ -23,15 +21,13 @@ const TEMPLATES: Template[] = [
     key: "dark-minimal",
     name: "Dark Minimal",
     description: "Minimalistisches Design mit cleaner Ästhetik",
-    locked: true,
-    planRequired: "Artist",
+    locked: false,
   },
   {
     key: "dark-stage",
     name: "Dark Stage",
     description: "Bühnen-inspiriertes Layout mit Fokus auf Visuals",
-    locked: true,
-    planRequired: "Artist",
+    locked: false,
   },
 ];
 
@@ -60,26 +56,29 @@ export default function AppearanceClient({
     const saveSettings = async () => {
       setIsSaving(true);
       try {
-        const token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("vibaro_token="))
-          ?.split("=")[1];
+        console.log("[Appearance] Saving theme:", { themeKey, themeVariant, artistPageId });
 
-        if (!token) return;
-
-        await fetch(`${API_BASE_URL}/api/v1/artist-pages/${artistPageId}`, {
+        const response = await fetch(`/api/studio/artist-pages/${artistPageId}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             theme_key: themeKey,
             theme_variant: themeVariant,
           }),
         });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error("[Appearance] Failed to save:", response.status, errorData);
+          return;
+        }
+
+        const data = await response.json();
+        console.log("[Appearance] Saved successfully:", data);
       } catch (error) {
-        console.error("Failed to save settings:", error);
+        console.error("[Appearance] Error saving settings:", error);
       } finally {
         setIsSaving(false);
       }

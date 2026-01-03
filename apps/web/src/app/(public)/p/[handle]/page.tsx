@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { PublicArtistPageData } from "../components/shared";
 import DarkEditorialTemplate from "../components/DarkEditorialTemplate";
 import DarkEditorialFullTemplate from "../components/DarkEditorialFullTemplate";
+import DarkMinimalTemplate from "../components/DarkMinimalTemplate";
+import DarkStageTemplate from "../components/DarkStageTemplate";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -66,7 +68,18 @@ export default async function PublicArtistPage({
     notFound();
   }
 
-  // MVP: Single editorial template
-  // Use DarkEditorialFullTemplate to see the full Artist plan version
-  return <DarkEditorialFullTemplate page={page} />;
+  // Select template based on theme_key
+  const themeKey = page.theme?.key || "dark-editorial";
+
+  switch (themeKey) {
+    case "dark-minimal":
+      return <DarkMinimalTemplate page={page} />;
+    case "dark-stage":
+      return <DarkStageTemplate page={page} />;
+    case "dark-editorial-full":
+      return <DarkEditorialFullTemplate page={page} />;
+    case "dark-editorial":
+    default:
+      return <DarkEditorialTemplate page={page} />;
+  }
 }

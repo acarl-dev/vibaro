@@ -33,6 +33,20 @@ export type FeaturedTrackItem = {
   embed_id: string | null;
 };
 
+export type VideoItem = {
+  title: string;
+  platform: "youtube" | "vimeo";
+  video_id: string;
+  url: string;
+  description?: string | null;
+  thumbnail_url?: string | null;
+};
+
+export type GalleryImageItem = {
+  title?: string | null;
+  image_url: string;
+};
+
 export type PublicArtistPageData = {
   handle: string;
   display_name: string;
@@ -49,6 +63,12 @@ export type PublicArtistPageData = {
   shows: ShowItem[];
   releases: ReleaseItem[];
   featured_tracks: FeaturedTrackItem[];
+  videos?: VideoItem[];
+  gallery_images?: GalleryImageItem[];
+  booking_email?: string | null;
+  management_email?: string | null;
+  press_email?: string | null;
+  whatsapp_number?: string | null;
   theme?: {
     key: string | null;
     variant: string | null;

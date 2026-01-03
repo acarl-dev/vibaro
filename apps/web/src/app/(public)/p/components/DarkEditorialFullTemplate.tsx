@@ -114,41 +114,45 @@ export default function DarkEditorialFullTemplate({
       </nav>
 
       {/* Featured Content */}
-      <section className="py-20 border-b border-zinc-900">
-        <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">New Release</span>
-              <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4">Echoes of Tomorrow</h2>
-              <p className="text-zinc-400 text-lg mb-6">
-                Das neue Album vereint elektronische Klänge mit organischen Elementen zu einer einzigartigen
-                musikalischen Reise.
-              </p>
-              <div className="flex gap-3">
-                <a
-                  href="#"
-                  className="px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors"
-                >
-                  Jetzt streamen
-                </a>
-                <a
-                  href="#"
-                  className="px-6 py-3 border border-zinc-700 text-zinc-100 font-semibold rounded-lg hover:bg-zinc-800 transition-colors"
-                >
-                  Vinyl kaufen
-                </a>
+      {page.releases && page.releases.length > 0 && (() => {
+        const featuredRelease = page.releases.find((r) => r.is_featured) || page.releases[0];
+        return (
+          <section className="py-20 border-b border-zinc-900">
+            <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">New Release</span>
+                  <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4">{featuredRelease.title}</h2>
+                  {featuredRelease.release_date && (
+                    <p className="text-zinc-400 text-lg mb-6">
+                      Released {new Date(featuredRelease.release_date).toLocaleDateString("de", { year: "numeric", month: "long", day: "numeric" })}
+                    </p>
+                  )}
+                  {featuredRelease.url && (
+                    <div className="flex gap-3">
+                      <a
+                        href={featuredRelease.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors"
+                      >
+                        Jetzt streamen
+                      </a>
+                    </div>
+                  )}
+                </div>
+                <div className="relative aspect-square rounded-xl overflow-hidden">
+                  <img
+                    src={featuredRelease.cover_url || "https://placehold.co/600x600/1a1a1a/666666?text=Album+Cover"}
+                    alt={featuredRelease.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
-            <div className="relative aspect-square rounded-xl overflow-hidden">
-              <img
-                src="https://placehold.co/600x600/1a1a1a/666666?text=Album+Cover"
-                alt="Album cover"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* Music Section */}
       <section id="music" className="py-20 border-b border-zinc-900">
@@ -185,17 +189,26 @@ export default function DarkEditorialFullTemplate({
           )}
 
           {/* Streaming Platforms */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {["Spotify", "Apple Music", "SoundCloud", "Bandcamp"].map((platform) => (
-              <a
-                key={platform}
-                href="#"
-                className="flex items-center justify-center gap-2 px-6 py-4 border border-zinc-800 rounded-lg hover:bg-zinc-800/50 transition-colors"
-              >
-                <span className="text-sm font-medium">{platform}</span>
-              </a>
-            ))}
-          </div>
+          {page.links && page.links.length > 0 && (() => {
+            const musicLinks = page.links.filter((link) => 
+              ["spotify", "applemusic", "soundcloud", "bandcamp", "youtube"].includes(link.type || "")
+            );
+            return musicLinks.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {musicLinks.map((link) => (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-6 py-4 border border-zinc-800 rounded-lg hover:bg-zinc-800/50 transition-colors"
+                  >
+                    <span className="text-sm font-medium">{link.title}</span>
+                  </a>
+                ))}
+              </div>
+            ) : null;
+          })()}
         </div>
       </section>
 
@@ -245,67 +258,18 @@ export default function DarkEditorialFullTemplate({
         </div>
       </section>
 
-      {/* New Release Section - Featured */}
-      {page.releases && page.releases.length > 0 && (() => {
-        const featuredRelease = page.releases.find((r) => r.is_featured);
-        return featuredRelease ? (
-          <section id="new-release" className="py-20 border-b border-zinc-900">
-            <div className="mx-auto" style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}>
-              <h2 className="text-3xl font-bold mb-8">New Release</h2>
-              
-              <a
-                href={featuredRelease.url || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block"
-              >
-                <div className="grid md:grid-cols-2 gap-8 items-center">
-                  {/* Cover Image */}
-                  <div className="relative aspect-square w-full overflow-hidden rounded-lg">
-                    {featuredRelease.cover_url ? (
-                      <img
-                        src={featuredRelease.cover_url}
-                        alt={featuredRelease.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                        <span className="text-6xl text-zinc-700">♪</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Release Info */}
-                  <div>
-                    <h3 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-3">
-                      {featuredRelease.title}
-                    </h3>
-                    {featuredRelease.release_date && (
-                      <p className="text-sm text-zinc-500 mb-6">{featuredRelease.release_date}</p>
-                    )}
-                    {featuredRelease.url && (
-                      <span className="inline-block px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg transition-colors group-hover:bg-zinc-100">
-                        Jetzt anhören
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </a>
-            </div>
-          </section>
-        ) : null;
-      })()}
+
 
       {/* Releases Section - Discography */}
       <section id="releases" className="py-20 border-b border-zinc-900">
         <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
           <h2 className="text-3xl font-bold mb-8">Discography</h2>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {page.releases && page.releases.length > 0 ? (
-              page.releases.map((release) => (
+          {page.releases && page.releases.length > 0 ? (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {page.releases.map((release, idx) => (
                 <a
-                  key={release.title}
+                  key={idx}
                   href={release.url || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -321,80 +285,84 @@ export default function DarkEditorialFullTemplate({
                   <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
                     {release.title}
                   </h3>
-                  <p className="text-sm text-zinc-500">{release.release_date}</p>
+                  {release.release_date && (
+                    <p className="text-sm text-zinc-500">
+                      {new Date(release.release_date).toLocaleDateString("de", { year: "numeric", month: "long" })}
+                    </p>
+                  )}
                 </a>
-              ))
-            ) : (
-              <>
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i}>
-                    <div className="aspect-square rounded-lg overflow-hidden bg-zinc-900 mb-3">
-                      <img
-                        src={`https://placehold.co/400x400/1a1a1a/666666?text=Release+${i}`}
-                        alt={`Release ${i}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="font-semibold text-zinc-100">Release Title {i}</h3>
-                    <p className="text-sm text-zinc-500">2024</p>
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-zinc-500">
+              <p>Keine Releases vorhanden</p>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Videos Section */}
-      <section id="videos" className="py-20 border-b border-zinc-900">
-        <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
-          <h2 className="text-3xl font-bold mb-8">Videos</h2>
+      {page.videos && page.videos.length > 0 && (
+        <section id="videos" className="py-20 border-b border-zinc-900">
+          <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
+            <h2 className="text-3xl font-bold mb-8">Videos</h2>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="group cursor-pointer">
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-900 mb-3">
-                  <img
-                    src={`https://placehold.co/640x360/1a1a1a/666666?text=Video+${i}`}
-                    alt={`Video ${i}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
-                    <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
-                      <svg className="w-8 h-8 text-zinc-950 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                      </svg>
+            <div className="grid md:grid-cols-2 gap-6">
+              {page.videos.map((video, idx) => (
+                <a
+                  key={idx}
+                  href={video.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group"
+                >
+                  <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-900 mb-3">
+                    <img
+                      src={video.thumbnail_url || `https://placehold.co/640x360/1a1a1a/666666?text=${encodeURIComponent(video.title)}`}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
+                      <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
+                        <svg className="w-8 h-8 text-zinc-950 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
-                  Video Title {i}
-                </h3>
-                <p className="text-sm text-zinc-500">Official Music Video</p>
-              </div>
-            ))}
+                  <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
+                    {video.title}
+                  </h3>
+                  {video.description && (
+                    <p className="text-sm text-zinc-500 line-clamp-2">{video.description}</p>
+                  )}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Gallery Section */}
-      <section id="gallery" className="py-20 border-b border-zinc-900">
-        <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
-          <h2 className="text-3xl font-bold mb-8">Gallery</h2>
+      {page.gallery_images && page.gallery_images.length > 0 && (
+        <section id="gallery" className="py-20 border-b border-zinc-900">
+          <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
+            <h2 className="text-3xl font-bold mb-8">Gallery</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="aspect-square rounded-lg overflow-hidden bg-zinc-900 cursor-pointer group">
-                <img
-                  src={`https://placehold.co/400x400/1a1a1a/666666?text=Photo+${i}`}
-                  alt={`Gallery ${i}`}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-              </div>
-            ))}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {page.gallery_images.map((image, idx) => (
+                <div key={idx} className="aspect-square rounded-lg overflow-hidden bg-zinc-900 cursor-pointer group">
+                  <img
+                    src={image.image_url}
+                    alt={image.title || `Gallery image ${idx + 1}`}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* About Section */}
       <section id="about" className="py-20 border-b border-zinc-900">
@@ -403,45 +371,11 @@ export default function DarkEditorialFullTemplate({
 
           <div className="grid md:grid-cols-[2fr_1fr] gap-12">
             <div className="space-y-6 text-zinc-300 leading-relaxed">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat.
-              </p>
-              <p>
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                laborum.
-              </p>
-
-              {/* Press Quotes */}
-              <div className="mt-8 space-y-4">
-                <h3 className="text-xl font-semibold text-zinc-100">Press</h3>
-                <blockquote className="border-l-2 border-zinc-700 pl-4 italic text-zinc-400">
-                  "Eine der spannendsten Acts der deutschen Musikszene." — Rolling Stone
-                </blockquote>
-                <blockquote className="border-l-2 border-zinc-700 pl-4 italic text-zinc-400">
-                  "Meisterhaft produziert und emotional packend." — Musikexpress
-                </blockquote>
-              </div>
-
-              {/* Press Kit Download */}
-              <div className="mt-8">
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  Press Kit herunterladen
-                </a>
-              </div>
+              {page.bio ? (
+                <div className="whitespace-pre-wrap">{page.bio}</div>
+              ) : (
+                <p className="text-zinc-500">Keine Bio vorhanden</p>
+              )}
             </div>
 
             <div>
@@ -486,24 +420,38 @@ export default function DarkEditorialFullTemplate({
             <div>
               <h2 className="text-3xl font-bold mb-4">Contact</h2>
               <div className="space-y-4 text-zinc-300">
-                <div>
-                  <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Booking</p>
-                  <a href="mailto:booking@example.com" className="hover:text-white transition-colors">
-                    booking@example.com
-                  </a>
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Management</p>
-                  <a href="mailto:management@example.com" className="hover:text-white transition-colors">
-                    management@example.com
-                  </a>
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Press</p>
-                  <a href="mailto:press@example.com" className="hover:text-white transition-colors">
-                    press@example.com
-                  </a>
-                </div>
+                {page.booking_email && (
+                  <div>
+                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Booking</p>
+                    <a href={`mailto:${page.booking_email}`} className="hover:text-white transition-colors">
+                      {page.booking_email}
+                    </a>
+                  </div>
+                )}
+                {page.management_email && (
+                  <div>
+                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Management</p>
+                    <a href={`mailto:${page.management_email}`} className="hover:text-white transition-colors">
+                      {page.management_email}
+                    </a>
+                  </div>
+                )}
+                {page.press_email && (
+                  <div>
+                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Press</p>
+                    <a href={`mailto:${page.press_email}`} className="hover:text-white transition-colors">
+                      {page.press_email}
+                    </a>
+                  </div>
+                )}
+                {page.whatsapp_number && (
+                  <div>
+                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">WhatsApp</p>
+                    <a href={`https://wa.me/${page.whatsapp_number.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                      {page.whatsapp_number}
+                    </a>
+                  </div>
+                )}
 
                 {/* Social Links */}
                 <div className="pt-4">
