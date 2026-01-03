@@ -6,6 +6,7 @@ import {
   LinkList,
   ShowList,
   ReleaseList,
+  FeaturedReleaseSection,
   Footer,
   getSectionTitle,
   getFocusItems,
@@ -24,6 +25,7 @@ export default function DarkMinimalTemplate({
 
   const focusItems = getFocusItems(page, focusType, focusLimit);
   const optionalSections = getOptionalSections(page, focusType);
+  const featuredRelease = page.releases.find((r: ReleaseItem) => r.is_featured);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -41,6 +43,9 @@ export default function DarkMinimalTemplate({
           releases={page.releases}
         />
 
+        {/* Featured Release Section */}
+        {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
+
         {/* Music Player Section */}
         {page.featured_tracks && page.featured_tracks.length > 0 && (
           <Section title="Music">
@@ -50,7 +55,7 @@ export default function DarkMinimalTemplate({
 
         {/* Optional Sections - minimal spacing */}
         {optionalSections.map((section) => (
-          <Section key={section.type} title={getSectionTitle(section.type)}>
+          <Section key={section.type} title={getSectionTitle(section.type === "releases" ? "Discography" : section.type)}>
             {section.type === "links" && <LinkList items={page.links} />}
             {section.type === "shows" && <ShowList items={page.shows} />}
             {section.type === "releases" && <ReleaseList items={page.releases} />}

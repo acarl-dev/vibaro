@@ -22,6 +22,7 @@ export type ReleaseItem = {
   cover_url?: string;
   url?: string;
   release_date?: string;
+  is_featured?: boolean;
 };
 
 export type FeaturedTrackItem = {
@@ -367,6 +368,55 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
   );
 }
 
+export function FeaturedReleaseSection({ release }: { release: ReleaseItem }) {
+  return (
+    <section className="mx-auto" style={{ maxWidth: '980px', padding: '48px clamp(16px, 4vw, 48px)' }}>
+      <h2 className="text-[10px] font-medium uppercase tracking-widest text-zinc-600 mb-6">
+        New Release
+      </h2>
+      
+      <a
+        href={release.url ?? "#"}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block"
+      >
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          {/* Cover Image */}
+          <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+            {release.cover_url ? (
+              <img
+                src={release.cover_url}
+                alt={release.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+            ) : (
+              <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                <span className="text-6xl text-zinc-700">♪</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Release Info */}
+          <div>
+            <h3 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-3">
+              {release.title}
+            </h3>
+            {release.release_date && (
+              <p className="text-sm text-zinc-500 mb-6">{release.release_date}</p>
+            )}
+            {release.url && (
+              <span className="inline-block px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg transition-colors group-hover:bg-zinc-100">
+                Jetzt anhören
+              </span>
+            )}
+          </div>
+        </div>
+      </a>
+    </section>
+  );
+}
+
 // -----------------------------------------------------------------------------
 // Footer
 // -----------------------------------------------------------------------------
@@ -388,11 +438,12 @@ export function Footer({ displayName }: { displayName: string }) {
 // Helpers
 // -----------------------------------------------------------------------------
 
-export function getSectionTitle(type: "links" | "shows" | "releases"): string {
+export function getSectionTitle(type: "links" | "shows" | "releases" | "Discography"): string {
   const titles: Record<string, string> = {
     links: "Links",
     shows: "Shows",
     releases: "Releases",
+    Discography: "Discography",
   };
   return titles[type];
 }

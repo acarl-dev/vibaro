@@ -6,6 +6,7 @@ import {
   LinkList,
   ShowList,
   ReleaseList,
+  FeaturedReleaseSection,
   Footer,
   getSectionTitle,
   getFocusItems,
@@ -29,6 +30,9 @@ export default function DarkEditorialTemplate({
   // Get optional sections (max 2, excluding focus type, only if has items)
   const optionalSections = getOptionalSections(page, focusType);
 
+  // Find featured release
+  const featuredRelease = page.releases.find((r: ReleaseItem) => r.is_featured);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       {/* Full-bleed Hero with overlay text */}
@@ -43,6 +47,9 @@ export default function DarkEditorialTemplate({
         releases={page.releases}
       />
 
+      {/* Featured Release Section */}
+      {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
+
       {/* Music Player Section */}
       {page.featured_tracks && page.featured_tracks.length > 0 && (
         <main className="mx-auto pb-16" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px) 4rem' }}>
@@ -56,7 +63,7 @@ export default function DarkEditorialTemplate({
       {optionalSections.length > 0 && (
         <main className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
           {optionalSections.map((section) => (
-            <Section key={section.type} title={getSectionTitle(section.type)}>
+            <Section key={section.type} title={getSectionTitle(section.type === "releases" ? "Discography" : section.type)}>
               {section.type === "links" && <LinkList items={page.links} />}
               {section.type === "shows" && <ShowList items={page.shows} />}
               {section.type === "releases" && <ReleaseList items={page.releases} />}

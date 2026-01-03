@@ -245,7 +245,58 @@ export default function DarkEditorialFullTemplate({
         </div>
       </section>
 
-      {/* Releases Section */}
+      {/* New Release Section - Featured */}
+      {page.releases && page.releases.length > 0 && (() => {
+        const featuredRelease = page.releases.find((r) => r.is_featured);
+        return featuredRelease ? (
+          <section id="new-release" className="py-20 border-b border-zinc-900">
+            <div className="mx-auto" style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}>
+              <h2 className="text-3xl font-bold mb-8">New Release</h2>
+              
+              <a
+                href={featuredRelease.url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+              >
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  {/* Cover Image */}
+                  <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+                    {featuredRelease.cover_url ? (
+                      <img
+                        src={featuredRelease.cover_url}
+                        alt={featuredRelease.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                        <span className="text-6xl text-zinc-700">♪</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Release Info */}
+                  <div>
+                    <h3 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-3">
+                      {featuredRelease.title}
+                    </h3>
+                    {featuredRelease.release_date && (
+                      <p className="text-sm text-zinc-500 mb-6">{featuredRelease.release_date}</p>
+                    )}
+                    {featuredRelease.url && (
+                      <span className="inline-block px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg transition-colors group-hover:bg-zinc-100">
+                        Jetzt anhören
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </a>
+            </div>
+          </section>
+        ) : null;
+      })()}
+
+      {/* Releases Section - Discography */}
       <section id="releases" className="py-20 border-b border-zinc-900">
         <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
           <h2 className="text-3xl font-bold mb-8">Discography</h2>
@@ -270,7 +321,7 @@ export default function DarkEditorialFullTemplate({
                   <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
                     {release.title}
                   </h3>
-                  <p className="text-sm text-zinc-500">{release.year}</p>
+                  <p className="text-sm text-zinc-500">{release.release_date}</p>
                 </a>
               ))
             ) : (
