@@ -38,6 +38,10 @@ Zentrale Entität für Musiker-Seiten.
 | theme_variant | string | z.B. `auto`, `stage-blue` |
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
+| booking_email | string | nullable, Buchungsanfragen |
+| management_email | string | nullable, Management-Kontakt |
+| press_email | string | nullable, Presseanfragen |
+| whatsapp_number | string | nullable, WhatsApp Business |
 | is_published | boolean | default false |
 | published_at | timestamp | nullable, gesetzt beim ersten Publish |
 | created_at | timestamp | |
@@ -46,6 +50,11 @@ Zentrale Entität für Musiker-Seiten.
 **Indizes**
 - unique(handle)
 - index(user_id)
+
+**Kontaktfelder (Artist-Plan):**
+- Alle Kontaktfelder sind optional und werden nur auf veröffentlichten Seiten angezeigt
+- E-Mail-Felder werden validiert (email format)
+- WhatsApp-Nummer: max. 50 Zeichen, kein Format-Check (internationale Nummern unterschiedlich)
 
 ---
 

@@ -94,6 +94,12 @@ class PublicArtistPageController extends Controller
                     'image_url' => $appUrl . Storage::url($image->image_path),
                 ];
             })->toArray(),
+            'contact' => [
+                'booking_email' => $page->booking_email,
+                'management_email' => $page->management_email,
+                'press_email' => $page->press_email,
+                'whatsapp_number' => $page->whatsapp_number,
+            ],
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,

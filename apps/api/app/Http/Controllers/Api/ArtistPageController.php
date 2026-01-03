@@ -87,6 +87,10 @@ class ArtistPageController extends Controller
                 'theme_variant' => ['sometimes', 'string', 'max:255'],
                 'accent_mode' => ['sometimes', 'string', 'in:auto,manual'],
                 'accent_color' => ['sometimes', 'nullable', 'regex:/^#?[0-9A-Fa-f]{6}$/', 'required_with:accent_mode'],
+                'booking_email' => ['sometimes', 'nullable', 'email', 'max:255'],
+                'management_email' => ['sometimes', 'nullable', 'email', 'max:255'],
+                'press_email' => ['sometimes', 'nullable', 'email', 'max:255'],
+                'whatsapp_number' => ['sometimes', 'nullable', 'string', 'max:50'],
                 'is_published' => ['sometimes', 'boolean'],
             ]);
         } catch (ValidationException $e) {
@@ -200,6 +204,10 @@ class ArtistPageController extends Controller
             'theme_key' => $page->theme_key,
             'theme_variant' => $page->theme_variant,
             'accent_color' => $page->accent_color,
+            'booking_email' => $page->booking_email,
+            'management_email' => $page->management_email,
+            'press_email' => $page->press_email,
+            'whatsapp_number' => $page->whatsapp_number,
             'is_published' => $page->is_published,
             'published_at' => $page->published_at?->toIso8601String(),
         ];

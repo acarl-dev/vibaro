@@ -25,6 +25,10 @@ class ArtistPage extends Model
         'theme_variant',
         'accent_mode',
         'accent_color',
+        'booking_email',
+        'management_email',
+        'press_email',
+        'whatsapp_number',
         'is_published',
         'published_at',
     ];
