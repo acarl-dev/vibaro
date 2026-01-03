@@ -24,6 +24,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
 
+    // Artist Search (public)
+    Route::get('/artist-pages/search', [ArtistPageController::class, 'search']);
+
     // Auth (protected)
     Route::middleware('auth:sanctum')->group(function () {
         // Artist Page (private)
@@ -50,6 +53,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('/artist-pages/{id}/shows/{showId}', [ShowController::class, 'update']);
         Route::delete('/artist-pages/{id}/shows/{showId}', [ShowController::class, 'destroy']);
         Route::post('/artist-pages/{id}/shows/reorder', [ShowController::class, 'reorder']);
+        Route::post('/artist-pages/{id}/shows/{showId}/upload-flyer', [ShowController::class, 'uploadFlyer']);
+        Route::delete('/artist-pages/{id}/shows/{showId}/flyer', [ShowController::class, 'deleteFlyer']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

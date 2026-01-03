@@ -266,4 +266,36 @@ class ArtistPageController extends Controller
 
         return $this->success($this->transform($page));
     }
+
+    /**
+     * GET /artist-pages/search
+     * Search for published artist pages by handle or display name
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $query = $request->input('q', '');
+
+        if (strlen($query) < 2) {
+            return $this->success([]);
+        }
+
+        $pages = ArtistPage::where('is_published', true)
+            ->where(function ($q) use ($query) {
+                $q->where('handle', 'like', "%{$query}%")
+                  ->orWhere('display_name', 'like', "%{$query}%");
+            })
+            ->limit(10)
+            ->get(['id', 'handle', 'display_name', 'avatar_path']);
+
+        $results = $pages->map(function ($page) {
+            return [
+                'id' => $page->id,
+                'handle' => $page->handle,
+                'display_name' => $page->display_name,
+                'avatar_url' => $page->avatar_path ? Storage::disk('public')->url($page->avatar_path) : null,
+            ];
+        });
+
+        return $this->success($results);
+    }
 }

@@ -228,6 +228,33 @@ Auth required.
 
 ---
 
+## Artist Search
+
+### GET /artist-pages/search
+
+Public endpoint. Searches published artist pages by handle or display name.
+
+**Query Parameters:**
+- `q`: Search query (min 2 characters)
+
+**Response**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "handle": "emily-j",
+      "display_name": "Emily J.",
+      "avatar_url": "https://cdn.example.com/avatars/abc.jpg"
+    }
+  ]
+}
+```
+
+**Use Case:** Autocomplete for Support Acts field
+
+---
+
 ## Links / Shows / Releases (Private CRUD)
 
 ### Endpoints
@@ -351,6 +378,24 @@ Returns 204 No Content on success.
   "ids": [3, 1, 2]
 }
 ```
+
+**POST /artist-pages/{id}/shows/{showId}/upload-flyer**
+Multipart form data:
+- `flyer`: Image file (jpeg, jpg, png, webp, max 5MB)
+
+Response:
+```json
+{
+  "data": {
+    "id": 1,
+    "flyer_path": "flyers/abc123.jpg",
+    "flyer_url": "https://api.example.com/storage/flyers/abc123.jpg"
+  }
+}
+```
+
+**DELETE /artist-pages/{id}/shows/{showId}/flyer**
+Deletes the flyer image. Returns 204 No Content on success.
 
 ---
 

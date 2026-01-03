@@ -7,6 +7,8 @@ use App\Models\ArtistPage;
 use App\Models\Show;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class ShowController extends Controller
 {
@@ -168,6 +170,70 @@ class ShowController extends Controller
 
         foreach ($showIds as $index => $showId) {
             $artistPage->shows()->where('id', $showId)->update(['position' => $index]);
+        }
+
+        return response()->json([
+            'data' => ['ok' => true]
+        ]);
+    }
+
+    /**
+     * POST /artist-pages/{id}/shows/{showId}/upload-flyer
+     */
+    public function uploadFlyer(Request $request, int $id, int $showId)
+    {
+        $artistPage = ArtistPage::findOrFail($id);
+        Gate::authorize('update', $artistPage);
+
+        $show = $artistPage->shows()->findOrFail($showId);
+
+        try {
+            $validated = $request->validate([
+                'flyer' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // 5MB max
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => [
+                    'code' => 'VALIDATION_ERROR',
+                    'message' => 'Validation failed',
+                    'details' => $e->errors(),
+                ]
+            ], 422);
+        }
+
+        // Delete old flyer if exists
+        if ($show->flyer_path) {
+            Storage::disk('public')->delete($show->flyer_path);
+        }
+
+        // Store new flyer
+        $path = $request->file('flyer')->store('flyers', 'public');
+        $show->flyer_path = $path;
+        $show->save();
+
+        return response()->json([
+            'data' => [
+                'id' => $show->id,
+                'flyer_path' => $show->flyer_path,
+                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
+            ]
+        ]);
+    }
+
+    /**
+     * DELETE /artist-pages/{id}/shows/{showId}/flyer
+     */
+    public function deleteFlyer(int $id, int $showId)
+    {
+        $artistPage = ArtistPage::findOrFail($id);
+        Gate::authorize('update', $artistPage);
+
+        $show = $artistPage->shows()->findOrFail($showId);
+
+        if ($show->flyer_path) {
+            Storage::disk('public')->delete($show->flyer_path);
+            $show->flyer_path = null;
+            $show->save();
         }
 
         return response()->json([

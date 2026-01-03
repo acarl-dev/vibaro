@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+
+type ArtistSuggestion = {
+  id: number;
+  handle: string;
+  display_name: string;
+  avatar_url: string | null;
+};
 
 type Show = {
   id: number;
@@ -38,6 +45,12 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
     support_acts: "",
   });
   const [error, setError] = useState("");
+  const [uploadingFlyer, setUploadingFlyer] = useState<number | null>(null);
+  const [supportActSuggestions, setSupportActSuggestions] = useState<ArtistSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [flyerFile, setFlyerFile] = useState<File | null>(null);
+  const [flyerPreview, setFlyerPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreate = async () => {
     if (!formData.date || !formData.time || !formData.venue || !formData.city) {
@@ -69,11 +82,26 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
 
       if (res.ok) {
         const json = await res.json();
-        const newShow = json.data;
+        let newShow = json.data;
+        
+        // Upload flyer if selected
+        if (flyerFile) {
+          await handleFlyerUpload(newShow.id, flyerFile);
+          // Refresh show data to get flyer_path
+          const refreshRes = await fetch(`/api/studio/shows`);
+          if (refreshRes.ok) {
+            const refreshJson = await refreshRes.json();
+            const updatedShow = refreshJson.data.find((s: Show) => s.id === newShow.id);
+            if (updatedShow) newShow = updatedShow;
+          }
+        }
+        
         setShows([...shows, newShow].sort((a, b) => 
           new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
         ));
         setFormData({ date: "", time: "", venue: "", city: "", address: "", ticket_url: "", price: "", is_free: false, support_acts: "" });
+        setFlyerFile(null);
+        setFlyerPreview(null);
         setIsCreating(false);
         setError("");
       } else {
@@ -114,12 +142,27 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
 
       if (res.ok) {
         const json = await res.json();
-        const updatedShow = json.data;
+        let updatedShow = json.data;
+        
+        // Upload flyer if selected
+        if (flyerFile) {
+          await handleFlyerUpload(showId, flyerFile);
+          // Refresh show data to get flyer_path
+          const refreshRes = await fetch(`/api/studio/shows`);
+          if (refreshRes.ok) {
+            const refreshJson = await refreshRes.json();
+            const refreshedShow = refreshJson.data.find((s: Show) => s.id === showId);
+            if (refreshedShow) updatedShow = refreshedShow;
+          }
+        }
+        
         setShows(shows.map((s) => (s.id === showId ? updatedShow : s)).sort((a, b) => 
           new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
         ));
         setEditingId(null);
         setFormData({ date: "", time: "", venue: "", city: "", address: "", ticket_url: "", price: "", is_free: false, support_acts: "" });
+        setFlyerFile(null);
+        setFlyerPreview(null);
         setError("");
       } else {
         setError("Aktualisieren fehlgeschlagen");
@@ -161,6 +204,8 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
     });
     setIsCreating(false);
     setError("");
+    setFlyerFile(null);
+    setFlyerPreview(null);
   };
 
   const cancelEdit = () => {
@@ -168,6 +213,99 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
     setIsCreating(false);
     setFormData({ date: "", time: "", venue: "", city: "", address: "", ticket_url: "", price: "", is_free: false, support_acts: "" });
     setError("");
+    setSupportActSuggestions([]);
+    setShowSuggestions(false);
+    setFlyerFile(null);
+    setFlyerPreview(null);
+  };
+
+  const handleFlyerSelect = (file: File) => {
+    setFlyerFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFlyerPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFlyerUpload = async (showId: number, file: File) => {
+    setUploadingFlyer(showId);
+    const formData = new FormData();
+    formData.append("flyer", file);
+
+    try {
+      const res = await fetch(`/api/studio/shows/${showId}/upload-flyer`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setShows(shows.map((s) => 
+          s.id === showId ? { ...s, flyer_path: json.data.flyer_path } : s
+        ));
+      }
+    } catch {
+      // Silent error handling
+    } finally {
+      setUploadingFlyer(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleFlyerDelete = async (showId: number) => {
+    try {
+      const res = await fetch(`/api/studio/shows/${showId}/flyer`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setShows(shows.map((s) => 
+          s.id === showId ? { ...s, flyer_path: null } : s
+        ));
+      }
+    } catch {
+      // Silent error handling
+    }
+  };
+
+  const searchArtists = async (query: string) => {
+    if (query.length < 2) {
+      setSupportActSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/artist-pages/search?q=${encodeURIComponent(query)}`);
+      if (res.ok) {
+        const json = await res.json();
+        setSupportActSuggestions(json.data || []);
+        setShowSuggestions(true);
+      }
+    } catch {
+      setSupportActSuggestions([]);
+    }
+  };
+
+  const handleSupportActsChange = (value: string) => {
+    setFormData({ ...formData, support_acts: value });
+    const lastComma = value.lastIndexOf(",");
+    const currentInput = lastComma >= 0 ? value.slice(lastComma + 1).trim() : value.trim();
+    searchArtists(currentInput);
+  };
+
+  const addSupportAct = (displayName: string) => {
+    const current = formData.support_acts;
+    const lastComma = current.lastIndexOf(",");
+    const newValue = lastComma >= 0 
+      ? current.slice(0, lastComma + 1) + " " + displayName + ", "
+      : displayName + ", ";
+    setFormData({ ...formData, support_acts: newValue });
+    setSupportActSuggestions([]);
+    setShowSuggestions(false);
   };
 
   const formatShowDate = (dateString: string) => {
@@ -275,13 +413,76 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                   />
                 )}
               </div>
-              <input
-                type="text"
-                placeholder="Support Acts (kommagetrennt, optional)"
-                value={formData.support_acts}
-                onChange={(e) => setFormData({ ...formData, support_acts: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Support Acts (Name eintippen für Vorschläge, kommagetrennt)"
+                  value={formData.support_acts}
+                  onChange={(e) => handleSupportActsChange(e.target.value)}
+                  onFocus={() => formData.support_acts && searchArtists(formData.support_acts.split(",").pop()?.trim() || "")}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                />
+                {showSuggestions && supportActSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 rounded-lg border border-zinc-800 bg-zinc-950 shadow-lg max-h-48 overflow-y-auto">
+                    {supportActSuggestions.map((artist) => (
+                      <button
+                        key={artist.id}
+                        type="button"
+                        onClick={() => addSupportAct(artist.display_name)}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800 transition-colors"
+                      >
+                        {artist.avatar_url && (
+                          <img src={artist.avatar_url} alt={artist.display_name} className="w-6 h-6 rounded-full object-cover" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{artist.display_name}</p>
+                          <p className="text-xs text-zinc-500 truncate">@{artist.handle}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Flyer Upload */}
+              <div className="space-y-2">
+                <label className="text-xs text-zinc-400">Flyer (optional)</label>
+                {flyerPreview ? (
+                  <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
+                    <img src={flyerPreview} alt="Flyer preview" className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => {
+                        setFlyerFile(null);
+                        setFlyerPreview(null);
+                      }}
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFlyerSelect(file);
+                      }}
+                      className="hidden"
+                      id="flyer-create"
+                    />
+                    <label
+                      htmlFor="flyer-create"
+                      className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-600 cursor-pointer transition-colors"
+                    >
+                      📎 Flyer hinzufügen
+                    </label>
+                  </div>
+                )}
+              </div>
+
               <div className="flex gap-2">
                 <button
                   onClick={handleCreate}
@@ -381,13 +582,90 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                         />
                       )}
                     </div>
-                    <input
-                      type="text"
-                      placeholder="Support Acts (kommagetrennt, optional)"
-                      value={formData.support_acts}
-                      onChange={(e) => setFormData({ ...formData, support_acts: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Support Acts (Name eintippen für Vorschläge, kommagetrennt)"
+                        value={formData.support_acts}
+                        onChange={(e) => handleSupportActsChange(e.target.value)}
+                        onFocus={() => formData.support_acts && searchArtists(formData.support_acts.split(",").pop()?.trim() || "")}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                      />
+                      {showSuggestions && supportActSuggestions.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 rounded-lg border border-zinc-800 bg-zinc-950 shadow-lg max-h-48 overflow-y-auto">
+                          {supportActSuggestions.map((artist) => (
+                            <button
+                              key={artist.id}
+                              type="button"
+                              onClick={() => addSupportAct(artist.display_name)}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800 transition-colors"
+                            >
+                              {artist.avatar_url && (
+                                <img src={artist.avatar_url} alt={artist.display_name} className="w-6 h-6 rounded-full object-cover" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{artist.display_name}</p>
+                                <p className="text-xs text-zinc-500 truncate">@{artist.handle}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Flyer Upload in Edit */}
+                    <div className="space-y-2">
+                      <label className="text-xs text-zinc-400">Flyer (optional)</label>
+                      {show.flyer_path && !flyerPreview ? (
+                        <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
+                          <img 
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${show.flyer_path}`}
+                            alt="Current flyer" 
+                            className="w-full h-full object-cover" 
+                          />
+                          <button
+                            onClick={() => handleFlyerDelete(show.id)}
+                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : flyerPreview ? (
+                        <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
+                          <img src={flyerPreview} alt="Flyer preview" className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => {
+                              setFlyerFile(null);
+                              setFlyerPreview(null);
+                            }}
+                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFlyerSelect(file);
+                            }}
+                            className="hidden"
+                            id={`flyer-edit-${show.id}`}
+                          />
+                          <label
+                            htmlFor={`flyer-edit-${show.id}`}
+                            className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-600 cursor-pointer transition-colors"
+                          >
+                            📎 Flyer hinzufügen
+                          </label>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleUpdate(show.id)}
@@ -405,6 +683,22 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                   </div>
                 ) : (
                   <div className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
+                    {show.flyer_path && (
+                      <div className="relative w-20 h-28 shrink-0 rounded overflow-hidden bg-zinc-950">
+                        <img 
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${show.flyer_path}`}
+                          alt="Show flyer"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          onClick={() => handleFlyerDelete(show.id)}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-xs flex items-center justify-center"
+                          title="Flyer löschen"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-zinc-500 mb-1">{formatShowDate(show.starts_at)}</p>
                       <p className="text-sm font-medium text-zinc-100">{show.venue}</p>
@@ -438,6 +732,27 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                         >
                           🎟️ Tickets
                         </a>
+                      )}
+                      {!show.flyer_path && (
+                        <div className="mt-2">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFlyerUpload(show.id, file);
+                            }}
+                            className="hidden"
+                            id={`flyer-upload-${show.id}`}
+                          />
+                          <label
+                            htmlFor={`flyer-upload-${show.id}`}
+                            className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block"
+                          >
+                            {uploadingFlyer === show.id ? "⏳ Hochladen..." : "📎 Flyer hinzufügen"}
+                          </label>
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center gap-1">
