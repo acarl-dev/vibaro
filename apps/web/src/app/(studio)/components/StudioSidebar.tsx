@@ -28,6 +28,7 @@ export default function StudioSidebar({ page }: StudioSidebarProps) {
         <NavLink href="/studio/shows">Shows</NavLink>
         <NavLink href="/studio/releases">Releases</NavLink>
         <NavLink href="/studio/videos">Videos</NavLink>
+        <NavLink href="/studio/gallery">Gallery</NavLink>
         <div className="pt-2">
           <NavLink href="/studio/settings">Einstellungen</NavLink>
         </div>

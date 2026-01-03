@@ -197,6 +197,33 @@ Musikvideos und andere Video-Content.
 
 ---
 
+## gallery_images
+
+Foto-Gallery für Press Photos, Live Shots, etc.
+
+| Feld | Typ | Hinweise |
+|----|----|-------|
+| id | bigint | PK |
+| artist_page_id | bigint | FK → artist_pages.id |
+| title | string | nullable, optionaler Titel/Caption |
+| image_path | string | Pfad zum gespeicherten Bild |
+| position | int | Sortierung |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+**Indizes:**
+- index(artist_page_id, position)
+
+**Verhalten:**
+- Standard-Sortierung nach `position` (aufsteigend)
+- Maximal 16 Bilder (Artist-Plan)
+- Erlaubte Formate: JPEG, PNG, WebP
+- Max. Dateigröße: 5MB
+- Bilder werden in `storage/app/public/gallery` gespeichert
+- Beim Löschen wird auch das Bild aus dem Storage entfernt
+
+---
+
 ## releases (entfernt - post-MVP)
 
 | Feld | Typ |
@@ -223,6 +250,7 @@ Musikvideos und andere Video-Content.
 - ArtistPage **hasMany** Releases
 - ArtistPage **hasMany** FeaturedTracks
 - ArtistPage **hasMany** Videos
+- ArtistPage **hasMany** GalleryImages
 
 ---
 

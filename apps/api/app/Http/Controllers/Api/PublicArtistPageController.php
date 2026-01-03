@@ -88,6 +88,12 @@ class PublicArtistPageController extends Controller
                     'thumbnail_url' => $video->thumbnail_url,
                 ];
             })->toArray(),
+            'gallery' => $page->galleryImages->map(function ($image) use ($appUrl) {
+                return [
+                    'title' => $image->title,
+                    'image_url' => $appUrl . Storage::url($image->image_path),
+                ];
+            })->toArray(),
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,
