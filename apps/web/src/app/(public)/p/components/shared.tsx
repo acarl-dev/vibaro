@@ -63,7 +63,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
   const hasAvatar = !!page.images.avatar_url;
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: 'clamp(520px, 72vh, 860px)' }}>
+    <section className="relative w-full overflow-hidden" style={{ height: '100vh' }}>
       {/* Full-bleed hero image */}
       {hasHeroImage ? (
         <>
@@ -72,13 +72,15 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
             alt={`${page.display_name} hero image`}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ 
-              objectPosition: '50% 15%',
-              maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.92) 70%, rgba(0,0,0,0.70) 82%, rgba(0,0,0,0.35) 92%, rgba(0,0,0,0) 100%)',
-              maskSize: '100% 100%',
-              maskRepeat: 'no-repeat',
-              WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.92) 70%, rgba(0,0,0,0.70) 82%, rgba(0,0,0,0.35) 92%, rgba(0,0,0,0) 100%)',
-              WebkitMaskSize: '100% 100%',
-              WebkitMaskRepeat: 'no-repeat'
+              objectPosition: '50% 0%'
+            }}
+          />
+          
+          {/* Dark gradient overlay - bottom 50% */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.75) 85%, rgba(0,0,0,0.95) 100%)'
             }}
           />
           
