@@ -36,6 +36,7 @@ export type ShowItem = {
   venue: string;
   date: string;
   url?: string;
+  flyer_url?: string | null;
 };
 
 export type ReleaseItem = {
@@ -402,29 +403,78 @@ export function ShowList({ items }: { items: ShowItem[] }) {
   if (items.length === 0) return <EmptyShowsState />;
 
   return (
-    <ul className="space-y-4">
+    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
       {items.map((show, index) => (
         <li
           key={index}
-          className="flex items-start justify-between gap-6 py-3 border-b border-zinc-800/30"
+          className="h-full"
         >
-          <div className="min-w-0 flex-1">
-            <p className="text-base text-zinc-200">{show.title}</p>
-            <p className="text-sm text-zinc-500 mt-1">{show.venue}</p>
-          </div>
-          <div className="flex flex-col items-end gap-2 shrink-0">
-            <time className="text-sm text-zinc-500 whitespace-nowrap">{formatDate(show.date)}</time>
-            {show.url && (
-              <a
-                href={show.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors border-b border-zinc-800 hover:border-zinc-600"
+          {(() => {
+            const Wrapper = (show.url ? "a" : "div") as "a" | "div";
+            const linkProps = show.url
+              ? { href: show.url, target: "_blank", rel: "noopener noreferrer" }
+              : {};
+
+            return (
+              <Wrapper
+                {...(linkProps as any)}
+                className="group block h-full rounded-xl border border-zinc-800/50 bg-zinc-900/40 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-all duration-200 hover:-translate-y-1 hover:border-zinc-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               >
-                Info
-              </a>
-            )}
-          </div>
+                <div className="flex h-full">
+                  <div className="relative w-24 sm:w-28 md:w-32 shrink-0 aspect-[3/4] bg-zinc-900">
+                    {show.flyer_url ? (
+                      <img
+                        src={show.flyer_url}
+                        alt={`${show.title} Flyer`}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center text-zinc-600 text-4xl">
+                        ♪
+                      </div>
+                    )}
+
+                    <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 text-white text-[11px] font-medium">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M7 11h5v5H7z" opacity=".35" />
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.7 0-3 1.3-3 3v10c0 1.7 1.3 3 3 3h14c1.7 0 3-1.3 3-3V7c0-1.7-1.3-3-3-3zm1 13c0 .6-.4 1-1 1H5c-.6 0-1-.4-1-1V10h16v7zm0-9H4V7c0-.6.4-1 1-1h1v1h2V6h8v1h2V6h1c.6 0 1 .4 1 1v1z" />
+                      </svg>
+                      <time>{formatDate(show.date)}</time>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 p-4 sm:p-5 flex flex-col gap-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-base sm:text-lg font-semibold text-zinc-100 truncate">{show.title}</p>
+                        <p className="text-sm text-zinc-400 truncate">{show.venue}</p>
+                      </div>
+                      <span className="hidden sm:inline-flex text-xs text-zinc-500 whitespace-nowrap bg-zinc-800/70 px-2 py-1 rounded-full">
+                        {formatDate(show.date)}
+                      </span>
+                    </div>
+
+                    <div className="mt-auto flex items-center justify-between gap-3 text-xs sm:text-sm text-zinc-400">
+                      <span className="inline-flex items-center gap-2 text-zinc-300">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.15)]" aria-hidden="true"></span>
+                        Live
+                      </span>
+                      {show.url && (
+                        <span className="inline-flex items-center gap-2 text-accent font-medium">
+                          Mehr Infos
+                          <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                            <path d="M5 12h14" />
+                            <path d="M13 6l6 6-6 6" />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Wrapper>
+            );
+          })()}
         </li>
       ))}
     </ul>

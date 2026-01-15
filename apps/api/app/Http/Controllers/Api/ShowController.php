@@ -34,6 +34,7 @@ class ShowController extends Controller
                 'is_free' => $show->is_free,
                 'support_acts' => $show->support_acts,
                 'flyer_path' => $show->flyer_path,
+                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
                 'status' => $show->status,
                 'position' => $show->position,
             ])
@@ -88,6 +89,7 @@ class ShowController extends Controller
                 'is_free' => $show->is_free,
                 'support_acts' => $show->support_acts,
                 'flyer_path' => $show->flyer_path,
+                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
                 'status' => $show->status,
                 'position' => $show->position,
             ]
@@ -131,6 +133,7 @@ class ShowController extends Controller
                 'is_free' => $show->is_free,
                 'support_acts' => $show->support_acts,
                 'flyer_path' => $show->flyer_path,
+                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
                 'status' => $show->status,
                 'position' => $show->position,
             ]

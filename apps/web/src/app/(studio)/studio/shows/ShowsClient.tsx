@@ -22,6 +22,7 @@ type Show = {
   is_free: boolean;
   support_acts: string[] | null;
   flyer_path: string | null;
+  flyer_url?: string | null;
   status: string;
 };
 
@@ -241,8 +242,9 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
 
       if (res.ok) {
         const json = await res.json();
+        const flyerSrc = json.data.flyer_url || (json.data.flyer_path ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${json.data.flyer_path}` : null);
         setShows(shows.map((s) => 
-          s.id === showId ? { ...s, flyer_path: json.data.flyer_path } : s
+          s.id === showId ? { ...s, flyer_path: json.data.flyer_path, flyer_url: flyerSrc } : s
         ));
       }
     } catch {
@@ -311,6 +313,15 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
   const formatShowDate = (dateString: string) => {
     const date = new Date(dateString);
     return format(date, "EEE, d. MMM yyyy • HH:mm", { locale: de });
+  };
+
+  const getFlyerSrc = (show: Show): string | null => {
+    if (show.flyer_url) return show.flyer_url;
+    if (show.flyer_path) {
+      const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+      return base ? `${base}/storage/${show.flyer_path}` : `/storage/${show.flyer_path}`;
+    }
+    return null;
   };
 
   return (
@@ -619,11 +630,13 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                       <label className="text-xs text-zinc-400">Flyer (optional)</label>
                       {show.flyer_path && !flyerPreview ? (
                         <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
-                          <img 
-                            src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${show.flyer_path}`}
-                            alt="Current flyer" 
-                            className="w-full h-full object-cover" 
-                          />
+                          {getFlyerSrc(show) && (
+                            <img 
+                              src={getFlyerSrc(show)!}
+                              alt="Current flyer" 
+                              className="w-full h-full object-cover" 
+                            />
+                          )}
                           <button
                             onClick={() => handleFlyerDelete(show.id)}
                             className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
@@ -685,11 +698,13 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                   <div className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
                     {show.flyer_path && (
                       <div className="relative w-20 h-28 shrink-0 rounded overflow-hidden bg-zinc-950">
-                        <img 
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${show.flyer_path}`}
-                          alt="Show flyer"
-                          className="w-full h-full object-cover"
-                        />
+                        {getFlyerSrc(show) && (
+                          <img 
+                            src={getFlyerSrc(show)!}
+                            alt="Show flyer"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                         <button
                           onClick={() => handleFlyerDelete(show.id)}
                           className="absolute top-1 right-1 w-5 h-5 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-xs flex items-center justify-center"

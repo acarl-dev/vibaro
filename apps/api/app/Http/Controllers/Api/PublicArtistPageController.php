@@ -53,12 +53,13 @@ class PublicArtistPageController extends Controller
                 'limit' => 3,
             ],
             'links' => $links,
-            'shows' => $page->shows->map(function ($show) {
+            'shows' => $page->shows->map(function ($show) use ($appUrl) {
                 return [
                     'title' => $show->venue . ' - ' . $show->city,
                     'venue' => $show->venue,
                     'date' => $show->starts_at->toIso8601String(),
                     'url' => $show->ticket_url,
+                    'flyer_url' => $show->flyer_path ? $appUrl . Storage::url($show->flyer_path) : null,
                 ];
             })->toArray(),
             'releases' => $page->releases->map(function ($release) use ($appUrl) {

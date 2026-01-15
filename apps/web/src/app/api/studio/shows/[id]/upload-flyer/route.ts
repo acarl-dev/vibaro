@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
+import { backendFetch, getTokenFromCookies, getBackendBaseUrl } from "@/lib/api/backend";
 
 async function getMyArtistPageId(): Promise<number> {
   const response = await backendFetch("/api/v1/artist-pages/me");
@@ -26,7 +26,7 @@ export async function POST(
     const formData = await request.formData();
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/artist-pages/${artistPageId}/shows/${id}/upload-flyer`,
+      `${getBackendBaseUrl()}/api/v1/artist-pages/${artistPageId}/shows/${id}/upload-flyer`,
       {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
