@@ -442,7 +442,7 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
             href={release.url ?? "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="group block rounded-md border border-zinc-800/50 bg-zinc-900/30 overflow-hidden transition-all hover:border-zinc-700/70"
+            className="group block rounded-md border border-zinc-800/50 bg-zinc-900/30 overflow-hidden transition-all hover:border-zinc-700/70 hover:shadow-lg hover:shadow-zinc-900/50 cursor-pointer active:scale-[0.98]"
           >
             {release.cover_url ? (
               <div className="relative aspect-square w-full overflow-hidden">
@@ -450,19 +450,38 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
                   src={release.cover_url}
                   alt={release.title}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
                 />
+                {/* Play Icon Badge - always visible on mobile, overlay on desktop */}
+                <div className="absolute bottom-2 right-2 md:inset-0 bg-black/70 md:bg-black/0 md:group-hover:bg-black/30 rounded-full md:rounded-none p-2 md:p-0 transition-all duration-300 flex items-center justify-center">
+                  <svg className="w-6 h-6 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white drop-shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity transition-transform duration-300 md:group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
               </div>
             ) : (
-              <div className="aspect-square w-full bg-zinc-900 flex items-center justify-center">
+              <div className="relative aspect-square w-full bg-zinc-900 flex items-center justify-center">
                 <span className="text-4xl text-zinc-700">♪</span>
+                {/* Play Icon Badge for no-cover case */}
+                <div className="absolute bottom-2 right-2 md:inset-0 bg-black/70 md:bg-black/0 md:group-hover:bg-black/30 rounded-full md:rounded-none p-2 md:p-0 transition-all duration-300 flex items-center justify-center">
+                  <svg className="w-6 h-6 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white drop-shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity transition-transform duration-300 md:group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
               </div>
             )}
-            <div className="p-4">
-              <p className="text-sm font-medium text-zinc-100 truncate">{release.title}</p>
+            <div className="p-3 sm:p-4">
+              <p className="text-sm font-medium text-zinc-100 truncate group-hover:text-white transition-colors">{release.title}</p>
               {release.release_date && (
                 <p className="text-xs text-zinc-500 mt-1.5">{release.release_date}</p>
               )}
+              {/* "Anhören" text - always visible on mobile, hover on desktop */}
+              <p className="text-xs text-accent mt-2 flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                Anhören
+              </p>
             </div>
           </a>
         </li>
