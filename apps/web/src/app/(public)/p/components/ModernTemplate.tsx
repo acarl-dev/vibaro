@@ -6,7 +6,6 @@ import {
   ShowList,
   ReleaseList,
   OptionalSections,
-  MusicSection,
   Footer,
   ReleaseItem,
   SectionHeader,
