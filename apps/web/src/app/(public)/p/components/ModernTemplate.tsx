@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   PublicArtistPageData,
   Hero,
@@ -33,16 +34,19 @@ export default function ModernTemplate({
   page: PublicArtistPageData;
 }) {
   // Find featured release (if any)
-  const featuredRelease = page.releases.find((r) => r.is_featured);
+  const featuredRelease = useMemo(
+    () => page.releases?.find((r) => r?.is_featured) || page.releases?.[0],
+    [page.releases]
+  );
   
   // Check what content is available
-  const hasLinks = page.links.length > 0;
-  const hasShows = page.shows.length > 0;
-  const hasReleases = page.releases.length > 0;
-  const hasFeaturedTracks = page.featured_tracks && page.featured_tracks.length > 0;
+  const hasLinks = (page.links?.length ?? 0) > 0;
+  const hasShows = (page.shows?.length ?? 0) > 0;
+  const hasReleases = (page.releases?.length ?? 0) > 0;
+  const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+    <div className="min-h-screen bg-page text-primary">
       {/* Hero Section */}
       <Hero page={page} />
 
@@ -54,7 +58,7 @@ export default function ModernTemplate({
 
         {/* Links Section */}
         {hasLinks && (
-          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-default`}>
             <SectionHeader title="Links" variant="medium" />
             <LinkList items={page.links} />
           </section>
@@ -65,7 +69,7 @@ export default function ModernTemplate({
 
         {/* Music Player Section */}
         {hasFeaturedTracks && (
-          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-default`}>
             <SectionHeader title="Music" variant="medium" />
             <MusicPlayer tracks={page.featured_tracks} />
           </section>
@@ -73,7 +77,7 @@ export default function ModernTemplate({
 
         {/* Shows Section */}
         {hasShows && (
-          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-default`}>
             <SectionHeader title="Shows" variant="medium" />
             <ShowList items={page.shows} />
           </section>
@@ -81,7 +85,7 @@ export default function ModernTemplate({
 
         {/* Releases/Discography Section */}
         {hasReleases && (
-          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-default`}>
             <SectionHeader title="Releases" variant="medium" />
             <ReleaseList items={page.releases} />
           </section>
@@ -92,7 +96,7 @@ export default function ModernTemplate({
       </main>
 
       {/* Footer */}
-      <Footer displayName={page.display_name} />
+      <Footer displayName={page.display_name || "Artist"} />
     </div>
   );
 }
@@ -103,9 +107,9 @@ export default function ModernTemplate({
 
 function FeaturedReleaseHero({ release }: { release: ReleaseItem }) {
   return (
-    <section className="py-10 md:py-14 border-b border-zinc-800/40">
-      <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/20 p-5 sm:p-6 md:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
-        <span className="inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest bg-zinc-800/70 text-zinc-300 rounded-full mb-6">
+    <section className="py-10 md:py-14 border-b border-default">
+      <div className="rounded-2xl border border-default bg-surface p-5 sm:p-6 md:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+        <span className="inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest bg-surface-hover text-secondary rounded-full mb-6">
           New Release
         </span>
 
@@ -116,34 +120,35 @@ function FeaturedReleaseHero({ release }: { release: ReleaseItem }) {
           className="group flex flex-col sm:flex-row gap-5 sm:gap-7 items-start"
         >
           {/* Cover Image - bigger & more dominant */}
-          <div className="relative shrink-0 w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 overflow-hidden rounded-2xl shadow-xl ring-1 ring-white/5">
+          <div className="relative shrink-0 w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 overflow-hidden rounded-2xl shadow-xl border border-default">
             {release.cover_url ? (
               <img
                 src={release.cover_url}
                 alt={release.title}
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
               />
             ) : (
-              <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                <span className="text-5xl text-zinc-700">♪</span>
+              <div className="w-full h-full bg-surface flex items-center justify-center">
+                <span className="text-5xl text-muted">♪</span>
               </div>
             )}
           </div>
 
           {/* Release Info */}
           <div className="flex-1 min-w-0 pt-1">
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-50 leading-tight">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary leading-tight">
               {release.title}
             </h3>
 
             {release.release_date && (
-              <p className="mt-2 text-sm md:text-base text-zinc-400">
+              <p className="mt-2 text-sm md:text-base text-muted">
                 {formatReleaseDate(release.release_date)}
               </p>
             )}
 
             {release.url && (
-              <span className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white text-zinc-950 font-semibold text-sm rounded-full transition-colors group-hover:bg-zinc-100">
+              <span className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-accent text-accent-contrast font-semibold text-sm rounded-full transition-colors">
                 Listen Now
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
