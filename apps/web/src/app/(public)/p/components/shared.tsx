@@ -435,7 +435,7 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
   if (items.length === 0) return <EmptyReleasesState />;
 
   return (
-    <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <ul className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {items.map((release, index) => (
         <li key={index}>
           <a
