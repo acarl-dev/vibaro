@@ -223,27 +223,24 @@ export default function DarkEditorialFullTemplate({
                   key={show.date + show.venue}
                   className="grid md:grid-cols-[auto_1fr_auto] gap-6 items-center p-6 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors"
                 >
-                  <div className="text-center min-w-[80px]">
+                  <div className="text-center min-w-20">
                     <div className="text-3xl font-bold">{new Date(show.date).getDate()}</div>
                     <div className="text-sm text-zinc-500 uppercase">
                       {new Date(show.date).toLocaleDateString("de", { month: "short" })}
                     </div>
                   </div>
                   <div>
-                    <p className="font-semibold text-lg">{show.venue}</p>
-                    <p className="text-zinc-400">{show.city}</p>
-                    {show.support_acts && (
-                      <p className="text-sm text-zinc-500 mt-1">Support: {show.support_acts}</p>
-                    )}
+                    <p className="font-semibold text-lg">{show.title}</p>
+                    <p className="text-zinc-400">{show.venue}</p>
                   </div>
-                  {show.ticket_url && (
+                  {show.url && (
                     <a
-                      href={show.ticket_url}
+                      href={show.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-6 py-2 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors whitespace-nowrap"
                     >
-                      Tickets
+                      Info
                     </a>
                   )}
                 </div>
@@ -306,7 +303,7 @@ export default function DarkEditorialFullTemplate({
           <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
             <h2 className="text-3xl font-bold mb-8">Videos</h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
               {page.videos.map((video, idx) => (
                 <div key={idx} className="group">
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-900 mb-3">

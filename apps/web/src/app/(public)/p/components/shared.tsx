@@ -400,7 +400,7 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+    <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {items.map((release, index) => (
         <li key={index}>
           <a
@@ -453,7 +453,7 @@ export function VideoList({ items }: { items: VideoItem[] }) {
   };
 
   return (
-    <ul className="grid gap-6 grid-cols-1 md:grid-cols-2">
+    <ul className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
       {items.map((video, index) => (
         <li key={index}>
           <div className="block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70">
