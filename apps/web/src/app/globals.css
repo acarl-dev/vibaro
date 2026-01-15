@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../styles/themes.css";
 
 @font-face {
   font-family: "Inter";
@@ -32,4 +33,28 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Utility: Hide scrollbar for mobile navigation */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Accessibility: Enhanced focus visibility */
+*:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Ensure interactive elements have visible focus states */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }

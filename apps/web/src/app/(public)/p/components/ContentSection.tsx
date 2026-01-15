@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, memo } from "react";
 import { containerStyle, SECTION_PADDING_Y_LARGE, BORDER_DARK } from "./constants";
 
 type ContentSectionProps = {
@@ -12,8 +12,9 @@ type ContentSectionProps = {
 /**
  * ContentSection - Standardized content section wrapper
  * Provides consistent spacing, borders, and container widths
++ * Memoized to prevent unnecessary re-renders
  */
-export function ContentSection({
+export const ContentSection = memo(function ContentSection({
   id,
   title,
   children,
@@ -24,11 +25,14 @@ export function ContentSection({
     <section
       id={id}
       className={`${SECTION_PADDING_Y_LARGE} ${noBorder ? "" : `border-b ${BORDER_DARK}`}`}
+      aria-labelledby={`${id}-heading`}
     >
       <div className="mx-auto" style={containerStyle(containerWidth)}>
-        <h2 className="text-3xl font-bold mb-8">{title}</h2>
+        <h2 id={`${id}-heading`} className="text-3xl font-bold mb-8">
+          {title}
+        </h2>
         {children}
       </div>
     </section>
   );
-}
+});

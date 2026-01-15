@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { ImageModal } from "./ImageModal";
 import MusicPlayer from "./MusicPlayer";
+import { useLazyLoad } from "../hooks/useLazyLoad";
+import {
+  EmptyLinksState,
+  EmptyShowsState,
+  EmptyReleasesState,
+  EmptyVideosState,
+  EmptyGalleryState,
+} from "./EmptyStates";
 import {
   containerStyle,
   bioTextStyle,
@@ -295,7 +303,7 @@ function EmptyState() {
 // -----------------------------------------------------------------------------
 
 export function LinkList({ items }: { items: LinkItem[] }) {
-  if (items.length === 0) return null;
+  if (items.length === 0) return <EmptyLinksState />;
 
   // Dynamic import for icons to avoid bundling issues
   const getSocialIcon = (type?: string) => {
@@ -391,7 +399,7 @@ export function LinkList({ items }: { items: LinkItem[] }) {
 }
 
 export function ShowList({ items }: { items: ShowItem[] }) {
-  if (items.length === 0) return null;
+  if (items.length === 0) return <EmptyShowsState />;
 
   return (
     <ul className="space-y-4">
@@ -424,7 +432,7 @@ export function ShowList({ items }: { items: ShowItem[] }) {
 }
 
 export function ReleaseList({ items }: { items: ReleaseItem[] }) {
-  if (items.length === 0) return null;
+  if (items.length === 0) return <EmptyReleasesState />;
 
   return (
     <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -441,6 +449,7 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
                 <img
                   src={release.cover_url}
                   alt={release.title}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
@@ -463,7 +472,9 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
 }
 
 export function VideoList({ items }: { items: VideoItem[] }) {
-  if (items.length === 0) return null;
+  const [ref, isVisible] = useLazyLoad<HTMLUListElement>();
+
+  if (items.length === 0) return <EmptyVideosState />;
 
   const getEmbedSrc = (video: VideoItem): string | null => {
     if (!video.video_id) return null;
@@ -480,12 +491,12 @@ export function VideoList({ items }: { items: VideoItem[] }) {
   };
 
   return (
-    <ul className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
+    <ul ref={ref} className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
       {items.map((video, index) => (
         <li key={index}>
           <div className="block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70">
             <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
-              {getEmbedSrc(video) ? (
+              {isVisible && getEmbedSrc(video) ? (
                 <iframe
                   src={getEmbedSrc(video)!}
                   title={video.title}
@@ -495,6 +506,9 @@ export function VideoList({ items }: { items: VideoItem[] }) {
                   loading="lazy"
                   className="absolute left-0 top-0 h-full w-full"
                 />
+              ) : !isVisible ? (
+                // Skeleton placeholder while not visible
+                <div className="w-full h-full bg-zinc-900 animate-pulse" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center p-6 text-center">
                   <div>
@@ -531,7 +545,7 @@ export function GalleryGrid({ items }: { items: GalleryImageItem[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  if (items.length === 0) return null;
+  if (items.length === 0) return <EmptyGalleryState />;
 
   const handleImageClick = (index: number) => {
     setSelectedIndex(index);

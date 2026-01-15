@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   ContactInquiryButton,
   Footer,
@@ -17,6 +17,8 @@ import { StickyNavigationBar } from "./StickyNavigationBar";
 import { FeaturedReleaseHero } from "./FeaturedReleaseHero";
 import { ContentSection } from "./ContentSection";
 import { SCROLL_THRESHOLD_NAV } from "./constants";
+import { useThrottledScroll } from "../hooks/useThrottledScroll";
+import { useActiveSectionObserver } from "../hooks/useActiveSectionObserver";
 
 export default function DarkEditorialFullTemplate({
   page,
@@ -26,30 +28,64 @@ export default function DarkEditorialFullTemplate({
   const [activeSection, setActiveSection] = useState("music");
   const [showNav, setShowNav] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowNav(window.scrollY > SCROLL_THRESHOLD_NAV);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  // Optimized scroll handler with throttling and passive listener
+  const handleScroll = useCallback((scrollY: number) => {
+    setShowNav(scrollY > SCROLL_THRESHOLD_NAV);
   }, []);
 
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setActiveSection(id);
-  };
+  useThrottledScroll(handleScroll, 100);
 
-  const featuredRelease = page.releases?.find((r) => r.is_featured) || page.releases?.[0];
-  const musicLinks = page.links?.filter((link) =>
-    ["spotify", "applemusic", "soundcloud", "bandcamp", "youtube"].includes(link.type || "")
+  // Define available sections based on page data
+  const availableSections = useMemo(() => {
+    const sections = ["music"];
+    if (page.shows?.length > 0) sections.push("shows");
+    if (page.releases?.length > 0) sections.push("releases");
+    if (page.videos?.length > 0) sections.push("videos");
+    if (page.gallery_images?.length > 0) sections.push("gallery");
+    if (page.bio || page.images.avatar_url) sections.push("about");
+    sections.push("contact");
+    return sections;
+  }, [page]);
+
+  // Track active section with Intersection Observer
+  const handleSectionChange = useCallback((sectionId: string) => {
+    setActiveSection(sectionId);
+  }, []);
+
+  useActiveSectionObserver(availableSections, handleSectionChange);
+
+  // Scroll to section with smooth behavior
+  const scrollToSection = useCallback((id: string) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+    
+    element.scrollIntoView({ behavior: "smooth" });
+    // Manually update active section for immediate feedback
+    setActiveSection(id);
+  }, []);
+
+  // Defensive null checks for public data - memoize to prevent re-filtering
+  const featuredRelease = useMemo(
+    () => page.releases?.find((r) => r?.is_featured) || page.releases?.[0],
+    [page.releases]
+  );
+
+  const musicLinks = useMemo(
+    () =>
+      page.links?.filter(
+        (link) =>
+          link?.type &&
+          ["spotify", "applemusic", "soundcloud", "bandcamp", "youtube"].includes(link.type)
+      ) || [],
+    [page.links]
   );
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+    <div className="min-h-screen bg-page text-primary">
       {/* Hero Section */}
       <FullHeroSection
-        displayName={page.display_name}
-        heroImageUrl={page.images.hero_image_url}
+        displayName={page.display_name || "Artist"}
+        heroImageUrl={page.images?.hero_image_url}
         bio={page.bio}
         onScrollToSection={scrollToSection}
       />
@@ -57,7 +93,7 @@ export default function DarkEditorialFullTemplate({
       {/* Sticky Navigation */}
       <StickyNavigationBar
         displayName={page.display_name}
-        sections={["music", "shows", "releases", "videos", "gallery", "about", "contact"]}
+        sections={availableSections}
         activeSection={activeSection}
         isVisible={showNav}
         onSectionClick={scrollToSection}
@@ -74,7 +110,7 @@ export default function DarkEditorialFullTemplate({
           </div>
         )}
 
-        {musicLinks && musicLinks.length > 0 && <LinkList items={musicLinks} />}
+        {musicLinks.length > 0 && <LinkList items={musicLinks} />}
       </ContentSection>
 
       {/* Shows Section */}
@@ -106,21 +142,21 @@ export default function DarkEditorialFullTemplate({
       )}
 
       {/* About Section */}
-      {(page.bio || page.images.avatar_url) && (
+      {(page.bio || page.images?.avatar_url) && (
         <ContentSection id="about" title="About">
           <div className="grid md:grid-cols-[2fr_1fr] gap-12">
             {page.bio && (
-              <div className="space-y-6 text-zinc-300 leading-relaxed">
+              <div className="space-y-6 text-secondary leading-relaxed">
                 <div className="whitespace-pre-wrap">{page.bio}</div>
               </div>
             )}
 
-            {page.images.avatar_url && (
+            {page.images?.avatar_url && (
               <div>
-                <div className="aspect-square rounded-lg overflow-hidden bg-zinc-900">
+                <div className="aspect-square rounded-lg overflow-hidden bg-surface">
                   <img
                     src={page.images.avatar_url}
-                    alt="Press photo"
+                    alt={`${page.display_name || "Artist"} press photo`}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -141,7 +177,7 @@ export default function DarkEditorialFullTemplate({
       </ContentSection>
 
       {/* Footer */}
-      <Footer displayName={page.display_name} />
+      <Footer displayName={page.display_name || "Artist"} />
     </div>
   );
 }

@@ -1,0 +1,198 @@
+/**
+ * Vibaro Public Artist Page Themes
+ * 
+ * Theme system based on CSS variables for consistent, customizable styling
+ * Every public page must define these variables for all templates to work correctly
+ * 
+ * CRITICAL: Never use hardcoded colors (e.g., bg-zinc-950) in components.
+ * Always use CSS variable classes or create new semantic variables if needed.
+ */
+
+/* =============================================================================
+   DEFAULT THEME: Dark Editorial (MVP Baseline)
+   ============================================================================= */
+
+:root,
+[data-theme="dark-editorial"] {
+  /* Backgrounds */
+  --bg-page: 9 9 11;              /* Main page background (zinc-950) */
+  --bg-surface: 24 24 27;         /* Card/surface background (zinc-900) */
+  --bg-surface-hover: 39 39 42;   /* Hover state for surfaces (zinc-800) */
+  
+  /* Text */
+  --text-primary: 250 250 250;    /* Main text (zinc-50) */
+  --text-secondary: 212 212 216;  /* Secondary text (zinc-300) */
+  --text-muted: 161 161 170;      /* Muted/disabled text (zinc-400) */
+  
+  /* Borders */
+  --border-default: 39 39 42;     /* Standard border (zinc-800) */
+  --border-subtle: 24 24 27;      /* Subtle border (zinc-900) */
+  
+  /* Accent (can be overridden by variant) */
+  --accent: 250 250 250;          /* White accent for dark theme */
+  --accent-contrast: 9 9 11;      /* Text on accent (dark) */
+}
+
+/* =============================================================================
+   THEME VARIANTS (MVP)
+   Apply with data-variant="variant-name"
+   ============================================================================= */
+
+/* Stage Blue Variant */
+[data-theme="dark-editorial"][data-variant="stage-blue"],
+[data-variant="stage-blue"] {
+  --accent: 59 130 246;           /* blue-500 */
+  --accent-contrast: 255 255 255; /* white */
+}
+
+/* Warm Amber Variant */
+[data-theme="dark-editorial"][data-variant="warm-amber"],
+[data-variant="warm-amber"] {
+  --accent: 251 146 60;           /* amber-500 */
+  --accent-contrast: 9 9 11;      /* zinc-950 */
+}
+
+/* Pulse Rose Variant */
+[data-theme="dark-editorial"][data-variant="pulse-rose"],
+[data-variant="pulse-rose"] {
+  --accent: 244 114 182;          /* pink-400 */
+  --accent-contrast: 9 9 11;      /* zinc-950 */
+}
+
+/* Muted Mint Variant */
+[data-theme="dark-editorial"][data-variant="muted-mint"],
+[data-variant="muted-mint"] {
+  --accent: 52 211 153;           /* emerald-400 */
+  --accent-contrast: 9 9 11;      /* zinc-950 */
+}
+
+/* =============================================================================
+   UTILITY CLASSES (Use these in components)
+   ============================================================================= */
+
+.bg-page {
+  background-color: rgb(var(--bg-page));
+}
+
+.bg-surface {
+  background-color: rgb(var(--bg-surface));
+}
+
+.bg-surface-hover {
+  background-color: rgb(var(--bg-surface-hover));
+}
+
+.text-primary {
+  color: rgb(var(--text-primary));
+}
+
+.text-secondary {
+  color: rgb(var(--text-secondary));
+}
+
+.text-muted {
+  color: rgb(var(--text-muted));
+}
+
+.border-default {
+  border-color: rgb(var(--border-default));
+}
+
+.border-subtle {
+  border-color: rgb(var(--border-subtle));
+}
+
+.bg-accent {
+  background-color: rgb(var(--accent));
+}
+
+.text-accent {
+  color: rgb(var(--accent));
+}
+
+.border-accent {
+  border-color: rgb(var(--accent));
+}
+
+.text-accent-contrast {
+  color: rgb(var(--accent-contrast));
+}
+
+/* =============================================================================
+   GRADIENTS & OVERLAYS
+   ============================================================================= */
+
+.gradient-overlay-hero {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(var(--bg-page), 0.4) 65%,
+    rgba(var(--bg-page), 0.75) 85%,
+    rgba(var(--bg-page), 0.95) 100%
+  );
+}
+
+.gradient-fade-mobile {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 60%,
+    rgb(var(--bg-page)) 100%
+  );
+}
+
+/* =============================================================================
+   FUTURE THEMES (Post-MVP)
+   ============================================================================= */
+
+/* Warm Neutral Theme */
+[data-theme="warm-neutral"] {
+  --bg-page: 28 25 23;            /* stone-900 */
+  --bg-surface: 41 37 36;         /* stone-800 */
+  --bg-surface-hover: 68 64 60;   /* stone-700 */
+  
+  --text-primary: 250 250 249;    /* stone-50 */
+  --text-secondary: 231 229 228;  /* stone-200 */
+  --text-muted: 168 162 158;      /* stone-400 */
+  
+  --border-default: 68 64 60;     /* stone-700 */
+  --border-subtle: 41 37 36;      /* stone-800 */
+  
+  --accent: 251 146 60;           /* amber-500 */
+  --accent-contrast: 28 25 23;    /* stone-900 */
+}
+
+/* Soft Light Theme */
+[data-theme="soft-light"] {
+  --bg-page: 250 250 250;         /* zinc-50 */
+  --bg-surface: 244 244 245;      /* zinc-100 */
+  --bg-surface-hover: 228 228 231; /* zinc-200 */
+  
+  --text-primary: 24 24 27;       /* zinc-900 */
+  --text-secondary: 63 63 70;     /* zinc-700 */
+  --text-muted: 113 113 122;      /* zinc-500 */
+  
+  --border-default: 228 228 231;  /* zinc-200 */
+  --border-subtle: 244 244 245;   /* zinc-100 */
+  
+  --accent: 59 130 246;           /* blue-500 */
+  --accent-contrast: 255 255 255; /* white */
+}
+
+/* Monochrome Theme */
+[data-theme="monochrome"] {
+  --bg-page: 0 0 0;               /* black */
+  --bg-surface: 23 23 23;         /* neutral-900 */
+  --bg-surface-hover: 38 38 38;   /* neutral-800 */
+  
+  --text-primary: 255 255 255;    /* white */
+  --text-secondary: 212 212 212;  /* neutral-300 */
+  --text-muted: 163 163 163;      /* neutral-400 */
+  
+  --border-default: 64 64 64;     /* neutral-700 */
+  --border-subtle: 38 38 38;      /* neutral-800 */
+  
+  --accent: 255 255 255;          /* white */
+  --accent-contrast: 0 0 0;       /* black */
+}
