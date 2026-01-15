@@ -26,14 +26,13 @@ export default function DarkEditorialFullTemplate({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
-      {/* Hero Section - 100vh */}
-      <section className="relative w-full overflow-hidden" style={{ height: "100vh" }}>
+      {/* Hero Section - Full width, auto height */}
+      <section className="relative w-full">
         {/* Hero Image */}
         <img
           src={page.images.hero_image_url || "https://placehold.co/1920x1080/1a1a1a/666666?text=Hero+Image"}
           alt={page.display_name}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "50% 0%" }}
+          className="block w-full h-auto"
         />
 
         {/* Dark gradient overlay - bottom 50% */}

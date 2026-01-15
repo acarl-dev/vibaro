@@ -84,53 +84,100 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
   const hasAvatar = !!page.images.avatar_url;
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: '100vh' }}>
-      {/* Full-bleed hero image */}
+    <section className="w-full bg-zinc-950">
       {hasHeroImage ? (
-        <>
-          <img
-            src={page.images.hero_image_url!}
-            alt={`${page.display_name} hero image`}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ 
-              objectPosition: '50% 0%'
-            }}
-          />
-          
-          {/* Dark gradient overlay - bottom 50% */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
+        <header>
+          {/* Hero image: mobile = full image (auto height), desktop = full-bleed cover */}
+          <div className="relative w-full overflow-hidden bg-zinc-950 md:h-screen">
+            <img
+              src={page.images.hero_image_url!}
+              alt={`${page.display_name} hero image`}
+              className="block w-full h-auto md:absolute md:inset-0 md:w-full md:h-full md:object-cover"
+              style={{ objectPosition: "50% 0%" }}
+            />
+
+            {/* Mobile-only subtle fade into page background */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-24 pointer-events-none md:hidden"
+              style={{
+                background:
+                  "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 60%, rgb(9, 9, 11) 100%)",
+              }}
+            />
+
+            {/* Desktop-only gradient overlay for readability */}
+            <div
+              className="hidden md:block absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.75) 85%, rgba(0,0,0,0.95) 100%)",
+              }}
+            />
+
+            {/* Desktop-only text overlay (unchanged layout) */}
+            <div
+              className="hidden md:block absolute"
+              style={{
+                top: "68%",
+                left: 0,
+                right: 0,
+                transform: "translateY(-5%)",
+                paddingBottom: "2rem",
+              }}
+            >
+              <div
+                className="mx-auto"
+                style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}
+              >
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
+                  {page.display_name}
+                </h1>
+
+                {page.bio && (
+                  <p
+                    className="mt-3 text-zinc-200 text-base md:text-lg leading-relaxed"
+                    style={{ maxWidth: "60ch" }}
+                  >
+                    {page.bio}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile-only: name & bio below image (no overlay) */}
+          <div
+            className="md:hidden relative bg-zinc-950"
             style={{
-              background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.75) 85%, rgba(0,0,0,0.95) 100%)'
-            }}
-          />
-          
-          {/* Text overlay - lower third */}
-          <div 
-            className="absolute"
-            style={{
-              top: '68%',
-              left: 0,
-              right: 0,
-              transform: 'translateY(-5%)',
-              paddingBottom: '2rem'
+              marginTop: "-1px",
+              padding: "clamp(10px, 3vw, 28px) clamp(16px, 4vw, 48px)",
             }}
           >
-            <div className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
+            <div className="mx-auto" style={{ maxWidth: "980px" }}>
+              <h1 className="text-4xl font-semibold tracking-tight leading-tight text-white">
                 {page.display_name}
               </h1>
-              
+
               {page.bio && (
-                <p className="mt-3 text-zinc-200 text-base md:text-lg leading-relaxed" style={{ maxWidth: '60ch' }}>
+                <p
+                  className="mt-3 text-zinc-300 text-base leading-relaxed"
+                  style={{ maxWidth: "60ch" }}
+                >
                   {page.bio}
                 </p>
               )}
             </div>
           </div>
-        </>
+        </header>
       ) : (
-        <div className="relative w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(to bottom, rgb(24, 24, 27), rgb(9, 9, 11))' }}>
+        <header
+          className="relative w-full flex items-center justify-center"
+          style={{
+            minHeight: "min(45vh, 360px)",
+            padding: "clamp(40px, 8vh, 80px) clamp(16px, 4vw, 48px)",
+            background: "linear-gradient(to bottom, rgb(24, 24, 27), rgb(9, 9, 11))",
+          }}
+        >
           {hasAvatar ? (
             <div className="relative h-40 w-40 overflow-hidden rounded-full ring-1 ring-zinc-800/50">
               <img
@@ -146,7 +193,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
               </span>
             </div>
           )}
-        </div>
+        </header>
       )}
     </section>
   );
@@ -385,6 +432,175 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+export function VideoList({ items }: { items: VideoItem[] }) {
+  if (items.length === 0) return null;
+
+  return (
+    <ul className="grid gap-6 grid-cols-1 md:grid-cols-2">
+      {items.map((video, index) => (
+        <li key={index}>
+          <a
+            href={video.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70"
+          >
+            <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
+              {video.thumbnail_url ? (
+                <img
+                  src={video.thumbnail_url}
+                  alt={video.title}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <svg className="w-16 h-16 text-zinc-700" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              )}
+              {/* Play overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-zinc-950 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div className="p-4">
+              <p className="text-sm font-medium text-zinc-100 line-clamp-2">{video.title}</p>
+              {video.description && (
+                <p className="text-xs text-zinc-500 mt-2 line-clamp-2">{video.description}</p>
+              )}
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function GalleryGrid({ items }: { items: GalleryImageItem[] }) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {items.map((image, index) => (
+        <div
+          key={index}
+          className="group relative aspect-square overflow-hidden rounded-lg bg-zinc-900 border border-zinc-800/50 hover:border-zinc-700/70 transition-all cursor-pointer"
+        >
+          <img
+            src={image.image_url}
+            alt={image.title || `Gallery image ${index + 1}`}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          {image.title && (
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-sm text-white font-medium">{image.title}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ContactSection({
+  booking_email,
+  management_email,
+  press_email,
+  whatsapp_number,
+}: {
+  booking_email?: string | null;
+  management_email?: string | null;
+  press_email?: string | null;
+  whatsapp_number?: string | null;
+}) {
+  const hasAnyContact = booking_email || management_email || press_email || whatsapp_number;
+  
+  if (!hasAnyContact) return null;
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {booking_email && (
+        <div className="group p-6 rounded-lg border border-zinc-800/50 bg-zinc-900/30 hover:border-zinc-700/70 transition-all">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">Bookings</h3>
+              <a href={`mailto:${booking_email}`} className="text-sm text-zinc-200 hover:text-white transition-colors break-all">
+                {booking_email}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {management_email && (
+        <div className="group p-6 rounded-lg border border-zinc-800/50 bg-zinc-900/30 hover:border-zinc-700/70 transition-all">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">Management</h3>
+              <a href={`mailto:${management_email}`} className="text-sm text-zinc-200 hover:text-white transition-colors break-all">
+                {management_email}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {press_email && (
+        <div className="group p-6 rounded-lg border border-zinc-800/50 bg-zinc-900/30 hover:border-zinc-700/70 transition-all">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">Press</h3>
+              <a href={`mailto:${press_email}`} className="text-sm text-zinc-200 hover:text-white transition-colors break-all">
+                {press_email}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {whatsapp_number && (
+        <div className="group p-6 rounded-lg border border-zinc-800/50 bg-zinc-900/30 hover:border-zinc-700/70 transition-all">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">WhatsApp</h3>
+              <a href={`https://wa.me/${whatsapp_number.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-200 hover:text-white transition-colors break-all">
+                {whatsapp_number}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

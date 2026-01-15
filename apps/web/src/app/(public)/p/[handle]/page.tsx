@@ -1,12 +1,35 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { PublicArtistPageData } from "../components/shared";
+import ModernTemplate from "../components/ModernTemplate";
 import DarkEditorialTemplate from "../components/DarkEditorialTemplate";
 import DarkEditorialFullTemplate from "../components/DarkEditorialFullTemplate";
 import DarkMinimalTemplate from "../components/DarkMinimalTemplate";
 import DarkStageTemplate from "../components/DarkStageTemplate";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+type PublicPageApiData = Record<string, unknown>;
+
+function normalizePublicPageData(data: PublicPageApiData): PublicArtistPageData {
+  const raw = data as Record<string, unknown>;
+  const booking_email = raw.booking_email ?? raw.bookingEmail ?? null;
+  const management_email = raw.management_email ?? raw.managementEmail ?? null;
+  const press_email = raw.press_email ?? raw.pressEmail ?? null;
+  const whatsapp_number = raw.whatsapp_number ?? raw.whatsappNumber ?? null;
+  const videos = raw.videos ?? raw.videoItems ?? raw.video_items ?? undefined;
+  const gallery_images = raw.gallery_images ?? raw.galleryImages ?? raw.gallery_items ?? undefined;
+
+  return {
+    ...(data as PublicArtistPageData),
+    booking_email: booking_email as PublicArtistPageData["booking_email"],
+    management_email: management_email as PublicArtistPageData["management_email"],
+    press_email: press_email as PublicArtistPageData["press_email"],
+    whatsapp_number: whatsapp_number as PublicArtistPageData["whatsapp_number"],
+    videos: videos as PublicArtistPageData["videos"],
+    gallery_images: gallery_images as PublicArtistPageData["gallery_images"],
+  };
+}
 
 // -----------------------------------------------------------------------------
 // Data Fetching
@@ -24,7 +47,9 @@ async function fetchPublicPage(handle: string): Promise<PublicArtistPageData | n
     if (!res.ok) return null;
 
     const json = await res.json();
-    return json?.data ?? null;
+    const data = json?.data as PublicPageApiData | null;
+    if (!data) return null;
+    return normalizePublicPageData(data);
   } catch {
     return null;
   }
@@ -68,8 +93,8 @@ export default async function PublicArtistPage({
     notFound();
   }
 
-  // Select template based on theme_key
-  const themeKey = page.theme?.key || "dark-editorial";
+  // Select template based on theme_key (default: modern)
+  const themeKey = page.theme?.key || "modern";
 
   switch (themeKey) {
     case "dark-minimal":
@@ -79,7 +104,9 @@ export default async function PublicArtistPage({
     case "dark-editorial-full":
       return <DarkEditorialFullTemplate page={page} />;
     case "dark-editorial":
-    default:
       return <DarkEditorialTemplate page={page} />;
+    case "modern":
+    default:
+      return <ModernTemplate page={page} />;
   }
 }

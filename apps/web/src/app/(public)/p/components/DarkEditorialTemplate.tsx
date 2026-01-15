@@ -6,6 +6,10 @@ import {
   LinkList,
   ShowList,
   ReleaseList,
+  VideoList,
+  GalleryGrid,
+  ContactSection,
+  ReleaseItem,
   FeaturedReleaseSection,
   Footer,
   getSectionTitle,
@@ -32,6 +36,11 @@ export default function DarkEditorialTemplate({
 
   // Find featured release
   const featuredRelease = page.releases.find((r: ReleaseItem) => r.is_featured);
+
+  const hasVideos = page.videos && page.videos.length > 0;
+  const hasGallery = page.gallery_images && page.gallery_images.length > 0;
+  const hasContact =
+    page.booking_email || page.management_email || page.press_email || page.whatsapp_number;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -69,6 +78,33 @@ export default function DarkEditorialTemplate({
               {section.type === "releases" && <ReleaseList items={page.releases} />}
             </Section>
           ))}
+        </main>
+      )}
+
+      {(hasVideos || hasGallery || hasContact) && (
+        <main className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
+          {hasVideos && (
+            <Section title="Videos">
+              <VideoList items={page.videos!} />
+            </Section>
+          )}
+
+          {hasGallery && (
+            <Section title="Gallery">
+              <GalleryGrid items={page.gallery_images!} />
+            </Section>
+          )}
+
+          {hasContact && (
+            <Section title="Contact">
+              <ContactSection
+                booking_email={page.booking_email}
+                management_email={page.management_email}
+                press_email={page.press_email}
+                whatsapp_number={page.whatsapp_number}
+              />
+            </Section>
+          )}
         </main>
       )}
 

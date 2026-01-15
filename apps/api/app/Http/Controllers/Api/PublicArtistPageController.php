@@ -16,7 +16,7 @@ class PublicArtistPageController extends Controller
     {
         $page = ArtistPage::where('handle', $handle)
             ->where('is_published', true)
-            ->with(['links', 'shows', 'releases', 'featuredTracks'])
+            ->with(['links', 'shows', 'releases', 'featuredTracks', 'videos', 'galleryImages'])
             ->first();
 
         if (!$page) {
@@ -67,6 +67,7 @@ class PublicArtistPageController extends Controller
                     'cover_url' => $release->cover_path ? $appUrl . Storage::url($release->cover_path) : null,
                     'url' => $release->url,
                     'release_date' => $release->release_date->toDateString(),
+                    'is_featured' => $release->is_featured,
                 ];
             })->toArray(),
             'featured_tracks' => $page->featuredTracks->map(function ($track) {
@@ -88,18 +89,16 @@ class PublicArtistPageController extends Controller
                     'thumbnail_url' => $video->thumbnail_url,
                 ];
             })->toArray(),
-            'gallery' => $page->galleryImages->map(function ($image) use ($appUrl) {
+            'gallery_images' => $page->galleryImages->map(function ($image) use ($appUrl) {
                 return [
                     'title' => $image->title,
                     'image_url' => $appUrl . Storage::url($image->image_path),
                 ];
             })->toArray(),
-            'contact' => [
-                'booking_email' => $page->booking_email,
-                'management_email' => $page->management_email,
-                'press_email' => $page->press_email,
-                'whatsapp_number' => $page->whatsapp_number,
-            ],
+            'booking_email' => $page->booking_email,
+            'management_email' => $page->management_email,
+            'press_email' => $page->press_email,
+            'whatsapp_number' => $page->whatsapp_number,
             'theme' => [
                 'key' => $page->theme_key,
                 'variant' => $page->theme_variant,

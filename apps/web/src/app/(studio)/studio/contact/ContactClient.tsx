@@ -26,7 +26,7 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
     setError("");
 
     try {
-      const res = await fetch(`/api/artist-pages/${artistPageId}`, {
+      const res = await fetch(`/api/studio/artist-pages/${artistPageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
