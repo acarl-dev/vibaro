@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type GalleryImageItem = {
   image_url: string;
@@ -20,46 +20,76 @@ export function ImageModal({
 }) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
-  if (!isOpen || images.length === 0) return null;
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+
+  const hasImages = images.length > 0;
+  const maxIndex = Math.max(images.length - 1, 0);
+
+  const goToPrevious = () => {
+    setCurrentIndex((i) => Math.max(0, i - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((i) => Math.min(maxIndex, i + 1));
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !hasImages) return;
+
+    // Focus overlay so screen readers have a stable context.
+    overlayRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setCurrentIndex((i) => Math.max(0, i - 1));
+        return;
+      }
+
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setCurrentIndex((i) => Math.min(maxIndex, i + 1));
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, hasImages, onClose, maxIndex]);
+
+  if (!isOpen || !hasImages) return null;
 
   const currentImage = images[currentIndex];
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === images.length - 1;
 
-  const goToPrevious = () => {
-    if (!isFirst) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  const goToNext = () => {
-    if (!isLast) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowLeft") {
-      goToPrevious();
-    } else if (e.key === "ArrowRight") {
-      goToNext();
-    } else if (e.key === "Escape") {
-      onClose();
-    }
-  };
-
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+      ref={overlayRef}
+      tabIndex={-1}
+      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 outline-none"
       onClick={onClose}
-      onKeyDown={handleKeyDown}
       role="dialog"
       aria-modal="true"
     >
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 text-white/70 hover:text-white transition-colors"
+        className="absolute top-4 right-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 backdrop-blur-sm transition-colors hover:text-white"
         aria-label="Modal schließen"
       >
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,61 +99,65 @@ export function ImageModal({
 
       {/* Main content with fixed height */}
       <div
-        className="flex flex-col items-center justify-between max-w-4xl w-full h-[80vh] max-h-[80vh]"
+        className="relative flex max-w-5xl w-full h-[82vh] max-h-[82vh] items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Image container with fixed height */}
-        <div className="flex-1 w-full flex items-center justify-center min-h-0">
+        {/* Desktop side navigation */}
+        <button
+          onClick={goToPrevious}
+          disabled={isFirst}
+          className={`absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-sm transition-colors ${
+            isFirst
+              ? "border-white/5 bg-white/5 text-white/25 cursor-not-allowed"
+              : "border-white/10 bg-black/40 text-white/80 hover:text-white"
+          }`}
+          aria-label="Vorheriges Bild"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <button
+          onClick={goToNext}
+          disabled={isLast}
+          className={`absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-sm transition-colors ${
+            isLast
+              ? "border-white/5 bg-white/5 text-white/25 cursor-not-allowed"
+              : "border-white/10 bg-black/40 text-white/80 hover:text-white"
+          }`}
+          aria-label="Nächstes Bild"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        {/* Image */}
+        <div className="flex h-full w-full items-center justify-center px-14 md:px-20">
           <img
             src={currentImage.image_url}
             alt={currentImage.title || `Gallery image ${currentIndex + 1}`}
-            className="max-w-full max-h-full object-contain rounded-lg"
+            className="max-w-full max-h-full object-contain rounded-xl"
           />
         </div>
 
-        {/* Title and counter */}
-        <div className="text-center py-4 flex-shrink-0">
-          {currentImage.title && (
-            <p className="text-lg text-white font-medium mb-2">{currentImage.title}</p>
-          )}
-          <p className="text-sm text-zinc-400">
-            {currentIndex + 1} / {images.length}
-          </p>
-        </div>
-
-        {/* Navigation buttons */}
-        <div className="flex gap-6 items-center flex-shrink-0 pb-4">
-          <button
-            onClick={goToPrevious}
-            disabled={isFirst}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-              isFirst
-                ? "bg-zinc-900/50 text-zinc-600 cursor-not-allowed"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-            aria-label="Vorheriges Bild"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Zurück
-          </button>
-
-          <button
-            onClick={goToNext}
-            disabled={isLast}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-              isLast
-                ? "bg-zinc-900/50 text-zinc-600 cursor-not-allowed"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-            aria-label="Nächstes Bild"
-          >
-            Weiter
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+        {/* Caption */}
+        <div className="absolute bottom-3 left-3 right-3 md:left-6 md:right-6 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            {currentImage.title && (
+              <p className="text-sm md:text-base text-white font-medium truncate">
+                {currentImage.title}
+              </p>
+            )}
+            <p className="text-xs text-white/60">
+              {currentIndex + 1} / {images.length}
+            </p>
+          </div>
+          <div className="hidden md:flex items-center gap-2">
+            <span className="text-xs text-white/40">← →</span>
+            <span className="text-xs text-white/40">Esc</span>
+          </div>
         </div>
       </div>
     </div>

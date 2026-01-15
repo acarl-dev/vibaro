@@ -518,35 +518,66 @@ export function GalleryGrid({ items }: { items: GalleryImageItem[] }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="columns-2 md:columns-3 lg:columns-4 gap-4 [column-fill:balance]">
         {items.map((image, index) => (
-          <div
+          <button
             key={index}
             onClick={() => handleImageClick(index)}
-            className="group relative aspect-square overflow-hidden rounded-lg bg-zinc-900 border border-zinc-800/50 hover:border-zinc-700/70 transition-all cursor-pointer"
+            type="button"
+            className="group mb-4 block w-full break-inside-avoid text-left"
+            aria-label={image.title ? `Bild öffnen: ${image.title}` : `Bild öffnen ${index + 1}`}
           >
-            <img
-              src={image.image_url}
-              alt={image.title || `Gallery image ${index + 1}`}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-            {image.title && (
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="text-sm text-white font-medium">{image.title}</p>
+            <div className="overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/30 transition-colors group-hover:border-zinc-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500/40">
+              <div className="relative">
+                <img
+                  src={image.image_url}
+                  alt={image.title || `Gallery image ${index + 1}`}
+                  loading="lazy"
+                  className="block w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/45 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" />
+
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white/90 backdrop-blur-sm">
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M21 21l-4.35-4.35" />
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M11 8v6" />
+                      <path d="M8 11h6" />
+                    </svg>
+                    Öffnen
+                  </span>
                 </div>
               </div>
-            )}
-          </div>
+
+              {image.title && (
+                <div className="border-t border-zinc-800/50 px-3 py-2">
+                  <p className="text-xs text-zinc-300 line-clamp-2">{image.title}</p>
+                </div>
+              )}
+            </div>
+          </button>
         ))}
       </div>
 
-      <ImageModal
-        isOpen={isModalOpen}
-        images={items}
-        initialIndex={selectedIndex}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {isModalOpen && (
+        <ImageModal
+          isOpen={isModalOpen}
+          images={items}
+          initialIndex={selectedIndex}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </>
   );
 }
