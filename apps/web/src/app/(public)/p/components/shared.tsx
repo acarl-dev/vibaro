@@ -110,7 +110,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
               className="hidden md:block absolute inset-0 pointer-events-none"
               style={{
                 background:
-                  "linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.75) 85%, rgba(0,0,0,0.95) 100%)",
+                  "linear-gradient(to bottom, rgba(9,9,11,0) 0%, rgba(9,9,11,0) 45%, rgba(9,9,11,0.35) 55%, rgba(9,9,11,0.65) 70%, rgba(9,9,11,0.85) 82%, rgba(9,9,11,0.95) 92%, rgba(9,9,11,0.98) 100%)",
               }}
             />
 

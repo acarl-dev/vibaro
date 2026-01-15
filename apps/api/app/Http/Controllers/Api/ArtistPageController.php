@@ -50,7 +50,7 @@ class ArtistPageController extends Controller
             'handle' => $handle,
             'display_name' => $validated['display_name'],
             'bio' => null,
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,

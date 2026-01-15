@@ -1,6 +1,6 @@
-import Image from "next/image";
 import {
   PublicArtistPageData,
+  Hero,
   LinkList,
   ShowList,
   ReleaseList,
@@ -140,104 +140,6 @@ export default function ModernTemplate({
       {/* Footer */}
       <Footer displayName={page.display_name} />
     </div>
-  );
-}
-
-// -----------------------------------------------------------------------------
-// Hero Component (Compact, Mobile-First)
-// -----------------------------------------------------------------------------
-
-function Hero({ page }: { page: PublicArtistPageData }) {
-  const hasHeroImage = !!page.images.hero_image_url;
-  const hasAvatar = !!page.images.avatar_url;
-
-  if (hasHeroImage) {
-    return (
-      <header>
-        {/* Hero Image Container - Compact with aspect ratio */}
-        <div className="relative w-full bg-zinc-950">
-          <Image
-            src={page.images.hero_image_url!}
-            alt=""
-            width={1920}
-            height={1080}
-            className="block w-full h-auto"
-            priority
-          />
-          
-          {/* Subtle gradient fade to content area */}
-          <div 
-            className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.6) 60%, rgb(9,9,11) 100%)'
-            }}
-          />
-        </div>
-        
-        {/* Name & Bio - Below image for better readability */}
-        <div 
-          className="relative bg-zinc-950"
-          style={{ 
-            marginTop: '-1px',
-            padding: 'clamp(20px, 5vw, 40px) clamp(16px, 4vw, 48px)'
-          }}
-        >
-          <div className="mx-auto" style={{ maxWidth: '800px' }}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
-              {page.display_name}
-            </h1>
-            
-            {page.bio && (
-              <p 
-                className="mt-4 text-base md:text-lg text-zinc-400 leading-relaxed"
-                style={{ maxWidth: '55ch' }}
-              >
-                {page.bio}
-              </p>
-            )}
-          </div>
-        </div>
-      </header>
-    );
-  }
-
-  // Fallback: No Hero Image - Compact centered layout
-  return (
-    <header 
-      className="relative w-full flex flex-col items-center justify-center text-center"
-      style={{ 
-        minHeight: 'min(45vh, 320px)',
-        padding: 'clamp(40px, 8vh, 80px) clamp(16px, 4vw, 48px)',
-        background: 'linear-gradient(to bottom, rgb(24, 24, 27), rgb(9, 9, 11))' 
-      }}
-    >
-      {hasAvatar && (
-        <div className="mb-6">
-          <div className="relative h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full ring-2 ring-zinc-800/50">
-            <Image
-              src={page.images.avatar_url!}
-              alt=""
-              width={112}
-              height={112}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      )}
-      
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
-        {page.display_name}
-      </h1>
-      
-      {page.bio && (
-        <p 
-          className="mt-4 text-base md:text-lg text-zinc-400 leading-relaxed mx-auto"
-          style={{ maxWidth: '55ch' }}
-        >
-          {page.bio}
-        </p>
-      )}
-    </header>
   );
 }
 

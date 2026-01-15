@@ -23,7 +23,7 @@ export default async function AppearancePage() {
   return (
     <AppearanceClient
       artistPageId={page.id}
-      initialThemeKey={page.theme_key || "dark-editorial"}
+      initialThemeKey={page.theme_key || "modern"}
       initialThemeVariant={page.theme_variant || "auto"}
     />
   );

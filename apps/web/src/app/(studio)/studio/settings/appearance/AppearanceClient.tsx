@@ -12,22 +12,38 @@ type Template = {
 
 const TEMPLATES: Template[] = [
   {
+    key: "modern",
+    name: "Modern (Default)",
+    description: "Cleanes, ruhiges Layout – ideal als Standard",
+    locked: false,
+  },
+  {
     key: "dark-editorial",
     name: "Dark Editorial",
     description: "Klassisches Layout mit Fokus auf Text und Links",
-    locked: false,
+    locked: true,
+    planRequired: "Artist",
   },
   {
     key: "dark-minimal",
     name: "Dark Minimal",
     description: "Minimalistisches Design mit cleaner Ästhetik",
-    locked: false,
+    locked: true,
+    planRequired: "Artist",
   },
   {
     key: "dark-stage",
     name: "Dark Stage",
     description: "Bühnen-inspiriertes Layout mit Fokus auf Visuals",
-    locked: false,
+    locked: true,
+    planRequired: "Artist",
+  },
+  {
+    key: "dark-editorial-full",
+    name: "Dark Editorial Full",
+    description: "Full-bleed Editorial Layout (mehr visuell)",
+    locked: true,
+    planRequired: "Artist",
   },
 ];
 
@@ -43,7 +59,7 @@ export default function AppearanceClient({
   initialThemeVariant,
 }: AppearanceClientProps) {
   const [themeKey, setThemeKey] = useState(initialThemeKey);
-  const [themeVariant, setThemeVariant] = useState(initialThemeVariant);
+  const [themeVariant] = useState(initialThemeVariant);
   const [isSaving, setIsSaving] = useState(false);
 
   // Auto-save on change

@@ -43,7 +43,7 @@ async function fetchArtistPage(): Promise<ArtistPageData | null> {
       is_published: Boolean(data.is_published),
       avatar_url: data.avatar_url ?? null,
       hero_image_url: data.hero_image_url ?? null,
-      theme_key: data.theme_key ?? "dark-editorial",
+      theme_key: data.theme_key ?? "modern",
       theme_variant: data.theme_variant ?? "auto",
     };
   } catch {

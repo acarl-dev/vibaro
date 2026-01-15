@@ -16,7 +16,7 @@ type LivePreviewProps = {
 
 export default function LivePreview({ page, links }: LivePreviewProps) {
   // Get theme key with fallback
-  const themeKey = page.theme_key || "dark-editorial";
+  const themeKey = page.theme_key || "modern";
 
   // Determine max-width based on template
   const maxWidthClass =
@@ -99,10 +99,14 @@ export default function LivePreview({ page, links }: LivePreviewProps) {
 
 function getTemplateName(themeKey: string): string {
   switch (themeKey) {
+    case "modern":
+      return "Modern";
     case "dark-minimal":
       return "Minimal";
     case "dark-stage":
       return "Stage";
+    case "dark-editorial-full":
+      return "Editorial Full";
     case "dark-editorial":
     default:
       return "Editorial";
