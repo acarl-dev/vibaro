@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PublicArtistPageData } from "./shared";
+import {
+  ContactSection,
+  Footer,
+  GalleryGrid,
+  LinkList,
+  PublicArtistPageData,
+  ReleaseList,
+  ShowList,
+  VideoList,
+} from "./shared";
+import MusicPlayer from "./MusicPlayer";
 
 export default function DarkEditorialFullTemplate({
   page,
@@ -160,53 +170,17 @@ export default function DarkEditorialFullTemplate({
 
           {/* Featured Tracks */}
           {page.featured_tracks && page.featured_tracks.length > 0 && (
-            <div className="space-y-4 mb-12">
-              {page.featured_tracks.map((track, idx) => (
-                <div key={idx} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-zinc-800 rounded flex-shrink-0 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-zinc-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-zinc-100 truncate">{track.title}</p>
-                      <p className="text-sm text-zinc-500">{track.artist_name || page.display_name}</p>
-                    </div>
-                    <a
-                      href={track.platform_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 text-sm border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors"
-                    >
-                      Play on {track.platform}
-                    </a>
-                  </div>
-                </div>
-              ))}
+            <div className="mb-12">
+              <MusicPlayer tracks={page.featured_tracks} />
             </div>
           )}
 
           {/* Streaming Platforms */}
           {page.links && page.links.length > 0 && (() => {
-            const musicLinks = page.links.filter((link) => 
+            const musicLinks = page.links.filter((link) =>
               ["spotify", "applemusic", "soundcloud", "bandcamp", "youtube"].includes(link.type || "")
             );
-            return musicLinks.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {musicLinks.map((link) => (
-                  <a
-                    key={link.url}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-6 py-4 border border-zinc-800 rounded-lg hover:bg-zinc-800/50 transition-colors"
-                  >
-                    <span className="text-sm font-medium">{link.title}</span>
-                  </a>
-                ))}
-              </div>
-            ) : null;
+            return musicLinks.length > 0 ? <LinkList items={musicLinks} /> : null;
           })()}
         </div>
       </section>
@@ -217,35 +191,7 @@ export default function DarkEditorialFullTemplate({
           <h2 className="text-3xl font-bold mb-8">Upcoming Shows</h2>
 
           {page.shows && page.shows.length > 0 ? (
-            <div className="space-y-4">
-              {page.shows.map((show) => (
-                <div
-                  key={show.date + show.venue}
-                  className="grid md:grid-cols-[auto_1fr_auto] gap-6 items-center p-6 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors"
-                >
-                  <div className="text-center min-w-20">
-                    <div className="text-3xl font-bold">{new Date(show.date).getDate()}</div>
-                    <div className="text-sm text-zinc-500 uppercase">
-                      {new Date(show.date).toLocaleDateString("de", { month: "short" })}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg">{show.title}</p>
-                    <p className="text-zinc-400">{show.venue}</p>
-                  </div>
-                  {show.url && (
-                    <a
-                      href={show.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-6 py-2 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors whitespace-nowrap"
-                    >
-                      Info
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
+            <ShowList items={page.shows} />
           ) : (
             <div className="text-center py-12 text-zinc-500">
               <p>Keine anstehenden Shows</p>
@@ -262,33 +208,7 @@ export default function DarkEditorialFullTemplate({
           <h2 className="text-3xl font-bold mb-8">Discography</h2>
 
           {page.releases && page.releases.length > 0 ? (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {page.releases.map((release, idx) => (
-                <a
-                  key={idx}
-                  href={release.url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group"
-                >
-                  <div className="aspect-square rounded-lg overflow-hidden bg-zinc-900 mb-3">
-                    <img
-                      src={release.cover_url || "https://placehold.co/400x400/1a1a1a/666666?text=Album"}
-                      alt={release.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
-                    {release.title}
-                  </h3>
-                  {release.release_date && (
-                    <p className="text-sm text-zinc-500">
-                      {new Date(release.release_date).toLocaleDateString("de", { year: "numeric", month: "long" })}
-                    </p>
-                  )}
-                </a>
-              ))}
-            </div>
+            <ReleaseList items={page.releases} />
           ) : (
             <div className="text-center py-12 text-zinc-500">
               <p>Keine Releases vorhanden</p>
@@ -303,58 +223,7 @@ export default function DarkEditorialFullTemplate({
           <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
             <h2 className="text-3xl font-bold mb-8">Videos</h2>
 
-            <div className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
-              {page.videos.map((video, idx) => (
-                <div key={idx} className="group">
-                  <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-900 mb-3">
-                    {video.platform === "youtube" && video.video_id ? (
-                      <iframe
-                        src={`https://www.youtube-nocookie.com/embed/${video.video_id}`}
-                        title={video.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        loading="lazy"
-                        className="absolute left-0 top-0 h-full w-full"
-                      />
-                    ) : video.platform === "vimeo" && video.video_id ? (
-                      <iframe
-                        src={`https://player.vimeo.com/video/${video.video_id}`}
-                        title={video.title}
-                        frameBorder="0"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                        loading="lazy"
-                        className="absolute left-0 top-0 h-full w-full"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center p-6 text-center">
-                        <div>
-                          <p className="text-sm font-medium text-zinc-100">{video.title}</p>
-                          <p className="mt-2 text-xs text-zinc-500">Video kann nicht eingebettet werden.</p>
-                          {video.url && (
-                            <a
-                              href={video.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs font-medium transition-colors hover:bg-zinc-800"
-                            >
-                              Extern öffnen
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
-                    {video.title}
-                  </h3>
-                  {video.description && (
-                    <p className="text-sm text-zinc-500 line-clamp-2">{video.description}</p>
-                  )}
-                </div>
-              ))}
-            </div>
+            <VideoList items={page.videos} />
           </div>
         </section>
       )}
@@ -365,17 +234,7 @@ export default function DarkEditorialFullTemplate({
           <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(16px, 4vw, 48px)" }}>
             <h2 className="text-3xl font-bold mb-8">Gallery</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {page.gallery_images.map((image, idx) => (
-                <div key={idx} className="aspect-square rounded-lg overflow-hidden bg-zinc-900 cursor-pointer group">
-                  <img
-                    src={image.image_url}
-                    alt={image.title || `Gallery image ${idx + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
+            <GalleryGrid items={page.gallery_images} />
           </div>
         </section>
       )}
@@ -410,103 +269,19 @@ export default function DarkEditorialFullTemplate({
       {/* Contact/Newsletter Section */}
       <section id="contact" className="py-20">
         <div className="mx-auto" style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}>
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Newsletter */}
-            <div>
-              <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
-              <p className="text-zinc-400 mb-6">
-                Erhalte News zu neuen Releases, Tour-Dates und exklusiven Content direkt in dein Postfach.
-              </p>
-              <form className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="Deine E-Mail-Adresse"
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                />
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors"
-                >
-                  Abonnieren
-                </button>
-              </form>
-            </div>
+          <h2 className="text-3xl font-bold mb-8">Contact</h2>
 
-            {/* Contact */}
-            <div>
-              <h2 className="text-3xl font-bold mb-4">Contact</h2>
-              <div className="space-y-4 text-zinc-300">
-                {page.booking_email && (
-                  <div>
-                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Booking</p>
-                    <a href={`mailto:${page.booking_email}`} className="hover:text-white transition-colors">
-                      {page.booking_email}
-                    </a>
-                  </div>
-                )}
-                {page.management_email && (
-                  <div>
-                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Management</p>
-                    <a href={`mailto:${page.management_email}`} className="hover:text-white transition-colors">
-                      {page.management_email}
-                    </a>
-                  </div>
-                )}
-                {page.press_email && (
-                  <div>
-                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">Press</p>
-                    <a href={`mailto:${page.press_email}`} className="hover:text-white transition-colors">
-                      {page.press_email}
-                    </a>
-                  </div>
-                )}
-                {page.whatsapp_number && (
-                  <div>
-                    <p className="text-sm text-zinc-500 uppercase tracking-wider mb-1">WhatsApp</p>
-                    <a href={`https://wa.me/${page.whatsapp_number.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                      {page.whatsapp_number}
-                    </a>
-                  </div>
-                )}
-
-                {/* Social Links */}
-                <div className="pt-4">
-                  <p className="text-sm text-zinc-500 uppercase tracking-wider mb-3">Social Media</p>
-                  <div className="flex gap-4">
-                    {page.links &&
-                      page.links.slice(0, 4).map((link) => (
-                        <a
-                          key={link.url}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 bg-zinc-900 border border-zinc-800 rounded-full flex items-center justify-center hover:bg-zinc-800 transition-colors"
-                        >
-                          <span className="text-xs">🔗</span>
-                        </a>
-                      ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ContactSection
+            booking_email={page.booking_email}
+            management_email={page.management_email}
+            press_email={page.press_email}
+            whatsapp_number={page.whatsapp_number}
+          />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-zinc-900">
-        <div className="mx-auto text-center" style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}>
-          <p className="text-sm text-zinc-600">
-            © {new Date().getFullYear()} {page.display_name}. All rights reserved.
-          </p>
-          <p className="text-xs text-zinc-700 mt-2">
-            Powered by{" "}
-            <a href="https://vibaro.com" className="hover:text-zinc-500 transition-colors">
-              Vibaro
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer displayName={page.display_name} />
     </div>
   );
 }
