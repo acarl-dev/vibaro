@@ -547,6 +547,7 @@ Public, no auth.
 * `404` if handle unknown
 * `404` if `is_published = false`
 * Keine internen IDs
+* **KONTAKT-DATEN SIND PRIVATE**: `booking_email`, `management_email`, `press_email`, `whatsapp_number` werden NICHT ausgeliefert
 
 **Response**
 
@@ -579,6 +580,8 @@ Public, no auth.
   }
 }
 ```
+
+**WICHTIG**: Kontakt-Daten sind nicht in Response enthalten! Sie sind Studio-only und bleiben private.
 
 ---
 

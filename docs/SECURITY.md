@@ -36,6 +36,8 @@ Sie ist verbindlich für Implementierung, Reviews und Copilot.
 - Public Endpoint `/api/v1/p/{handle}`:
   - darf nur veröffentlichte Daten ausliefern
   - niemals `user_id`, `email`, interne IDs des Users
+  - **Kontakt-Daten (booking_email, management_email, press_email) sind PRIVATE** und werden nicht in Public Response ausgeliefert
+  - Besucher können über "Get in Touch"-Button eine Anfrage einreichen (Besucher-Email wird nicht erfasst)
 
 ---
 

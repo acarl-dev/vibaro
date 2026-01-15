@@ -8,7 +8,7 @@ import {
   ReleaseList,
   VideoList,
   GalleryGrid,
-  ContactSection,
+  ContactInquiryButton,
   ReleaseItem,
   FeaturedReleaseSection,
   Footer,
@@ -97,7 +97,7 @@ export default function DarkEditorialTemplate({
 
           {hasContact && (
             <Section title="Contact">
-              <ContactSection
+              <ContactInquiryButton
                 booking_email={page.booking_email}
                 management_email={page.management_email}
                 press_email={page.press_email}

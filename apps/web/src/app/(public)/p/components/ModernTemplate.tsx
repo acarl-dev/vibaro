@@ -6,7 +6,7 @@ import {
   ReleaseList,
   VideoList,
   GalleryGrid,
-  ContactSection,
+  ContactInquiryButton,
   Footer,
   ReleaseItem,
 } from "./shared";
@@ -126,7 +126,7 @@ export default function ModernTemplate({
             <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
               Contact
             </h2>
-            <ContactSection
+            <ContactInquiryButton
               booking_email={page.booking_email}
               management_email={page.management_email}
               press_email={page.press_email}

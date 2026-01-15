@@ -38,10 +38,10 @@ Zentrale Entität für Musiker-Seiten.
 | theme_variant | string | z.B. `auto`, `stage-blue` |
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
-| booking_email | string | nullable, Buchungsanfragen |
-| management_email | string | nullable, Management-Kontakt |
-| press_email | string | nullable, Presseanfragen |
-| whatsapp_number | string | nullable, WhatsApp Business |
+| booking_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
+| management_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
+| press_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
+| whatsapp_number | string | nullable, **PRIVATE** - nur Studio sichtbar |
 | is_published | boolean | default false |
 | published_at | timestamp | nullable, gesetzt beim ersten Publish |
 | created_at | timestamp | |
@@ -51,10 +51,12 @@ Zentrale Entität für Musiker-Seiten.
 - unique(handle)
 - index(user_id)
 
-**Kontaktfelder (Artist-Plan):**
-- Alle Kontaktfelder sind optional und werden nur auf veröffentlichten Seiten angezeigt
+**Kontaktfelder (Studio-only, PRIVATE):**
+- Alle Kontaktfelder sind optional und Studio-only
+- **WICHTIG**: Werden NICHT in Public API Response ausgeliefert (siehe docs/SECURITY.md, docs/API_CONTRACTS.md)
 - E-Mail-Felder werden validiert (email format)
 - WhatsApp-Nummer: max. 50 Zeichen, kein Format-Check (internationale Nummern unterschiedlich)
+- Public Page zeigt nur "Get in Touch"-Button, keine E-Mail-Adressen
 
 ---
 

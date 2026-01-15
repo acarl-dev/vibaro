@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import {
-  ContactSection,
+  ContactInquiryButton,
   Footer,
   GalleryGrid,
   LinkList,
@@ -275,7 +275,7 @@ export default function DarkEditorialFullTemplate({
         <div className="mx-auto" style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}>
           <h2 className="text-3xl font-bold mb-8">Contact</h2>
 
-          <ContactSection
+          <ContactInquiryButton
             booking_email={page.booking_email}
             management_email={page.management_email}
             press_email={page.press_email}

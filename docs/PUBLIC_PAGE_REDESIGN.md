@@ -52,10 +52,12 @@ Das neue **ModernTemplate** ist ein umfassendes, responsives Template für die p
 - Ideal für Press Photos, Live Shots
 
 ### 9. **Contact Section** (NEU)
-- Strukturierte Kontaktinformationen
-- Icons für visuelle Unterscheidung
-- Booking, Management, Press, WhatsApp
+- **"Get in Touch" Button** (keine Email-Adressen sichtbar!)
+- Modal/Form mit Auswahl: Booking | Management | Press | WhatsApp
+- Besucher können direkt anschreiben ohne E-Mail zu sehen
+- WhatsApp-Links öffnen den Chat direkt (nur Nummer erforderlich)
 - Nur sichtbar, wenn Kontaktdaten hinterlegt
+- **WICHTIG**: Kontakt-Adressen bleiben private Information (siehe docs/SECURITY.md)
 
 ## Responsive Design
 
@@ -85,7 +87,7 @@ shared.tsx                  # Geteilte Komponenten
   ├─ ReleaseList            # Release-Grid
   ├─ VideoList              # Video-Grid (NEU)
   ├─ GalleryGrid            # Foto-Gallery (NEU)
-  ├─ ContactSection         # Kontakt-Cards (NEU)
+  ├─ ContactInquiryButton   # "Get in Touch" Button + Modal (NEU)
   ├─ MusicPlayer            # Embedded Tracks
   └─ Footer                 # Footer mit Vibaro-Branding
 ```
@@ -106,15 +108,20 @@ type PublicArtistPageData = {
   featured_tracks: FeaturedTrackItem[];
   videos?: VideoItem[];              // NEU
   gallery_images?: GalleryImageItem[]; // NEU
-  booking_email?: string | null;     // NEU
-  management_email?: string | null;  // NEU
-  press_email?: string | null;       // NEU
-  whatsapp_number?: string | null;   // NEU
+  videos?: VideoItem[];              // NEU
+  gallery_images?: GalleryImageItem[]; // NEU
+  booking_email?: string | null;     // NEU (PRIVATE - nur Backend)
+  management_email?: string | null;  // NEU (PRIVATE - nur Backend)
+  press_email?: string | null;       // NEU (PRIVATE - nur Backend)
+  whatsapp_number?: string | null;   // NEU (PRIVATE - nur Backend)
   theme?: {
     key: string | null;
     variant: string | null;
   };
 };
+```
+
+**WICHTIG**: `booking_email`, `management_email`, `press_email`, `whatsapp_number` sind **PRIVATE** und werden in der API Response NICHT ausgeliefert. Sie sind nur für den Studio-Backend sichtbar. Die public page nutzt nur den `ContactInquiryButton` als einfachen "Get in Touch" Button.
 ```
 
 ## Design Principles
