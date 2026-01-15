@@ -8,25 +8,21 @@ import {
   ReleaseItem,
   FeaturedReleaseSection,
   Footer,
-  getFocusItems,
+  setupFocus,
   getOptionalSections,
 } from "./shared";
+import { containerStyle } from "./constants";
 
 export default function DarkEditorialTemplate({
   page,
 }: {
   page: PublicArtistPageData;
 }) {
-  // MVP: Free plan = links focus by default
-  const focus = page.focus ?? { type: "links" as const, limit: 3 };
-  const focusType = focus.type;
-  const focusLimit = focus.limit;
-
-  // Get focus items
-  const focusItems = getFocusItems(page, focusType, focusLimit);
+  // Setup focus (MVP: Free plan = links focus by default)
+  const focus = setupFocus(page);
 
   // Get optional sections (max 2, excluding focus type, only if has items)
-  const optionalSections = getOptionalSections(page, focusType);
+  const optionalSections = getOptionalSections(page, focus.type);
 
   // Find featured release
   const featuredRelease = page.releases.find((r: ReleaseItem) => r.is_featured);
@@ -38,11 +34,8 @@ export default function DarkEditorialTemplate({
 
       {/* First section: Links (directly after hero) */}
       <FocusSection
-        type={focusType}
-        items={focusItems}
-        links={page.links}
-        shows={page.shows}
-        releases={page.releases}
+        type={focus.type}
+        items={focus.items}
       />
 
       {/* Featured Release Section */}
@@ -51,20 +44,14 @@ export default function DarkEditorialTemplate({
       {/* Music Player Section */}
       {<MusicSection page={page} />}
 
-      {/* Optional Sections */}
-      {optionalSections.length > 0 && (
-        <main className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
-          {optionalSections.map((section) => (
-            <OptionalSectionRenderer key={section.type} section={section} page={page} />
-          ))}
-        </main>
-      )}
-
-      {(getAvailableSections(page).hasVideos || getAvailableSections(page).hasGallery || getAvailableSections(page).hasContact) && (
-        <main className="mx-auto" style={{ maxWidth: '980px', padding: '0 clamp(16px, 4vw, 48px)' }}>
-          <OptionalSections page={page} />
-        </main>
-      )}
+      {/* Optional Sections (max 2, excluding focus) + Videos/Gallery/Contact */}
+      <main className="mx-auto" style={containerStyle()}>
+        {optionalSections.map((section) => (
+          <OptionalSectionRenderer key={section.type} section={section} page={page} />
+        ))}
+        
+        <OptionalSections page={page} />
+      </main>
 
       {/* Footer */}
       <Footer displayName={page.display_name} />

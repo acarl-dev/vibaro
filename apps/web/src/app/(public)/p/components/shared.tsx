@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { ImageModal } from "./ImageModal";
 import MusicPlayer from "./MusicPlayer";
+import {
+  containerStyle,
+  bioTextStyle,
+  PADDING_HERO_NO_IMAGE,
+  PADDING_HERO_MOBILE,
+  PADDING_SECTION_FULL,
+} from "./constants";
 
 // Image component removed - using native img for localhost compatibility
 
@@ -98,8 +105,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
             <img
               src={page.images.hero_image_url!}
               alt={`${page.display_name} hero image`}
-              className="block w-full h-auto md:absolute md:inset-0 md:w-full md:h-full md:object-cover"
-              style={{ objectPosition: "50% 0%" }}
+              className="block w-full h-auto md:absolute md:inset-0 md:w-full md:h-full md:object-cover md:object-[50%_0%]"
             />
 
             {/* Mobile-only subtle fade into page background */}
@@ -133,7 +139,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
             >
               <div
                 className="mx-auto"
-                style={{ maxWidth: "980px", padding: "0 clamp(16px, 4vw, 48px)" }}
+                style={containerStyle()}
               >
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
                   {page.display_name}
@@ -142,7 +148,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
                 {page.bio && (
                   <p
                     className="mt-3 text-zinc-200 text-base md:text-lg leading-relaxed"
-                    style={{ maxWidth: "60ch" }}
+                    style={bioTextStyle()}
                   >
                     {page.bio}
                   </p>
@@ -156,10 +162,10 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
             className="md:hidden relative bg-zinc-950"
             style={{
               marginTop: "-1px",
-              padding: "clamp(10px, 3vw, 28px) clamp(16px, 4vw, 48px)",
+              padding: PADDING_HERO_MOBILE,
             }}
           >
-            <div className="mx-auto" style={{ maxWidth: "980px" }}>
+            <div className="mx-auto" style={containerStyle()}>
               <h1 className="text-4xl font-semibold tracking-tight leading-tight text-white">
                 {page.display_name}
               </h1>
@@ -167,7 +173,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
               {page.bio && (
                 <p
                   className="mt-3 text-zinc-300 text-base leading-relaxed"
-                  style={{ maxWidth: "60ch" }}
+                  style={bioTextStyle()}
                 >
                   {page.bio}
                 </p>
@@ -180,7 +186,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
           className="relative w-full flex items-center justify-center"
           style={{
             minHeight: "min(45vh, 360px)",
-            padding: "clamp(40px, 8vh, 80px) clamp(16px, 4vw, 48px)",
+            padding: PADDING_HERO_NO_IMAGE,
             background: "linear-gradient(to bottom, rgb(24, 24, 27), rgb(9, 9, 11))",
           }}
         >
@@ -209,6 +215,31 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
 // Section Components
 // -----------------------------------------------------------------------------
 
+/**
+ * SectionHeader - Reusable section heading component
+ * @param title - Section title text
+ * @param variant - Size variant: "xs" (12px), "small" (10px), "medium" (11px)
+ */
+export function SectionHeader({
+  title,
+  variant = "xs",
+}: {
+  title: string;
+  variant?: "xs" | "small" | "medium";
+}) {
+  const sizeClasses = {
+    xs: "text-xs text-zinc-500",      // 12px - used in Section component
+    small: "text-[10px] text-zinc-600", // 10px - used in FocusSection
+    medium: "text-[11px] text-zinc-500", // 11px - used in ModernTemplate
+  };
+
+  return (
+    <h2 className={`${sizeClasses[variant]} font-medium uppercase tracking-widest mb-6`}>
+      {title}
+    </h2>
+  );
+}
+
 export function Section({
   title,
   children,
@@ -218,9 +249,7 @@ export function Section({
 }) {
   return (
     <section className="mt-20 pt-12 border-t border-zinc-800/20">
-      <h2 className="text-xs font-medium uppercase tracking-widest text-zinc-500 mb-6">
-        {title}
-      </h2>
+      <SectionHeader title={title} variant="xs" />
       {children}
     </section>
   );
@@ -229,31 +258,23 @@ export function Section({
 export function FocusSection({
   type,
   items,
-  links,
-  shows,
-  releases,
 }: {
   type: "links" | "shows" | "releases";
-  items: unknown[];
-  links: LinkItem[];
-  shows: ShowItem[];
-  releases: ReleaseItem[];
+  items: LinkItem[] | ShowItem[] | ReleaseItem[];
 }) {
   const isEmpty = items.length === 0;
 
   return (
-    <section className="mx-auto" style={{ maxWidth: '980px', padding: '48px clamp(16px, 4vw, 48px)' }}>
-      <h2 className="text-[10px] font-medium uppercase tracking-widest text-zinc-600 mb-6">
-        {getSectionTitle(type)}
-      </h2>
+    <section className="mx-auto" style={{ maxWidth: containerStyle().maxWidth, padding: PADDING_SECTION_FULL }}>
+      <SectionHeader title={getSectionTitle(type)} variant="small" />
 
       {isEmpty ? (
         <EmptyState />
       ) : (
         <>
-          {type === "links" && <LinkList items={links} />}
-          {type === "shows" && <ShowList items={shows.slice(0, items.length)} />}
-          {type === "releases" && <ReleaseList items={releases.slice(0, items.length)} />}
+          {type === "links" && <LinkList items={items as LinkItem[]} />}
+          {type === "shows" && <ShowList items={items as ShowItem[]} />}
+          {type === "releases" && <ReleaseList items={items as ReleaseItem[]} />}
         </>
       )}
     </section>
@@ -733,10 +754,8 @@ function ContactInquiryModal({
 
 export function FeaturedReleaseSection({ release }: { release: ReleaseItem }) {
   return (
-    <section className="mx-auto" style={{ maxWidth: '980px', padding: '48px clamp(16px, 4vw, 48px)' }}>
-      <h2 className="text-[10px] font-medium uppercase tracking-widest text-zinc-600 mb-6">
-        New Release
-      </h2>
+    <section className="mx-auto" style={{ maxWidth: containerStyle().maxWidth, padding: PADDING_SECTION_FULL }}>
+      <SectionHeader title="New Release" variant="small" />
       
       <a
         href={release.url ?? "#"}
@@ -815,7 +834,7 @@ export function getFocusItems(
   page: PublicArtistPageData,
   focusType: "links" | "shows" | "releases",
   limit: number
-): unknown[] {
+): LinkItem[] | ShowItem[] | ReleaseItem[] {
   const items =
     focusType === "links"
       ? page.links
@@ -850,6 +869,23 @@ export function getOptionalSections(
   }
 
   return sections;
+}
+
+/**
+ * Setup focus configuration with defaults
+ * MVP: Free plan = links focus by default (limit: 3)
+ */
+export function setupFocus(page: PublicArtistPageData) {
+  const focus = page.focus ?? { type: "links" as const, limit: 3 };
+  const focusType = focus.type;
+  const focusLimit = focus.limit;
+  const focusItems = getFocusItems(page, focusType, focusLimit);
+
+  return {
+    type: focusType,
+    limit: focusLimit,
+    items: focusItems,
+  };
 }
 
 // New Refactored Helpers for cleaner templates

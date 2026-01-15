@@ -8,8 +8,10 @@ import {
   MusicSection,
   Footer,
   ReleaseItem,
+  SectionHeader,
 } from "./shared";
 import MusicPlayer from "./MusicPlayer";
+import { containerStyleNarrow, SECTION_PADDING_Y_MODERN } from "./constants";
 
 /**
  * ModernTemplate - Comprehensive responsive artist page template
@@ -47,18 +49,13 @@ export default function ModernTemplate({
       {/* Main Content Container - tighter max-width for better readability */}
       <main 
         className="mx-auto pb-8"
-        style={{ 
-          maxWidth: '800px', 
-          padding: '0 clamp(16px, 4vw, 32px)' 
-        }}
+        style={containerStyleNarrow()}
       >
 
         {/* Links Section */}
         {hasLinks && (
-          <section className="py-10 md:py-12 border-b border-zinc-800/40">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Links
-            </h2>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+            <SectionHeader title="Links" variant="medium" />
             <LinkList items={page.links} />
           </section>
         )}
@@ -68,37 +65,30 @@ export default function ModernTemplate({
 
         {/* Music Player Section */}
         {hasFeaturedTracks && (
-          <section className="py-10 md:py-12 border-b border-zinc-800/40">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Music
-            </h2>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+            <SectionHeader title="Music" variant="medium" />
             <MusicPlayer tracks={page.featured_tracks} />
           </section>
         )}
 
         {/* Shows Section */}
         {hasShows && (
-          <section className="py-10 md:py-12 border-b border-zinc-800/40">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Shows
-            </h2>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+            <SectionHeader title="Shows" variant="medium" />
             <ShowList items={page.shows} />
           </section>
         )}
 
         {/* Releases/Discography Section */}
         {hasReleases && (
-          <section className="py-10 md:py-12 border-b border-zinc-800/40">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Releases
-            </h2>
+          <section className={`${SECTION_PADDING_Y_MODERN} border-b border-zinc-800/40`}>
+            <SectionHeader title="Releases" variant="medium" />
             <ReleaseList items={page.releases} />
           </section>
         )}
 
-        {/* Music Player Section */}\n        <MusicSection page={page} />
-
-        {/* Videos, Gallery, Contact Sections */}\n        <OptionalSections page={page} />
+        {/* Videos, Gallery, Contact Sections */}
+        <OptionalSections page={page} />
       </main>
 
       {/* Footer */}

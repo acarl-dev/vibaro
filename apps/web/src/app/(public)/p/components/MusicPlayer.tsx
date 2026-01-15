@@ -46,7 +46,7 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
           )}
           
           {track.platform === "youtube" && track.embed_id && (
-            <div className="relative" style={{ paddingBottom: "56.25%" }}>
+            <div className="relative aspect-video">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${track.embed_id}`}
                 title={track.title}
