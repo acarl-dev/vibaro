@@ -438,38 +438,54 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
 export function VideoList({ items }: { items: VideoItem[] }) {
   if (items.length === 0) return null;
 
+  const getEmbedSrc = (video: VideoItem): string | null => {
+    if (!video.video_id) return null;
+
+    if (video.platform === "youtube") {
+      return `https://www.youtube-nocookie.com/embed/${video.video_id}`;
+    }
+
+    if (video.platform === "vimeo") {
+      return `https://player.vimeo.com/video/${video.video_id}`;
+    }
+
+    return null;
+  };
+
   return (
     <ul className="grid gap-6 grid-cols-1 md:grid-cols-2">
       {items.map((video, index) => (
         <li key={index}>
-          <a
-            href={video.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70"
-          >
+          <div className="block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70">
             <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
-              {video.thumbnail_url ? (
-                <img
-                  src={video.thumbnail_url}
-                  alt={video.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              {getEmbedSrc(video) ? (
+                <iframe
+                  src={getEmbedSrc(video)!}
+                  title={video.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                  className="absolute left-0 top-0 h-full w-full"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <svg className="w-16 h-16 text-zinc-700" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                <div className="w-full h-full flex items-center justify-center p-6 text-center">
+                  <div>
+                    <p className="text-sm font-medium text-zinc-100">{video.title}</p>
+                    <p className="mt-2 text-xs text-zinc-500">Video kann nicht eingebettet werden.</p>
+                    {video.url && (
+                      <a
+                        href={video.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs font-medium transition-colors hover:bg-zinc-800"
+                      >
+                        Extern öffnen
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
-              {/* Play overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-zinc-950 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
             </div>
             <div className="p-4">
               <p className="text-sm font-medium text-zinc-100 line-clamp-2">{video.title}</p>
@@ -477,7 +493,7 @@ export function VideoList({ items }: { items: VideoItem[] }) {
                 <p className="text-xs text-zinc-500 mt-2 line-clamp-2">{video.description}</p>
               )}
             </div>
-          </a>
+          </div>
         </li>
       ))}
     </ul>

@@ -308,26 +308,46 @@ export default function DarkEditorialFullTemplate({
 
             <div className="grid md:grid-cols-2 gap-6">
               {page.videos.map((video, idx) => (
-                <a
-                  key={idx}
-                  href={video.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group"
-                >
+                <div key={idx} className="group">
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-zinc-900 mb-3">
-                    <img
-                      src={video.thumbnail_url || `https://placehold.co/640x360/1a1a1a/666666?text=${encodeURIComponent(video.title)}`}
-                      alt={video.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
-                      <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-zinc-950 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                        </svg>
+                    {video.platform === "youtube" && video.video_id ? (
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${video.video_id}`}
+                        title={video.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        loading="lazy"
+                        className="absolute left-0 top-0 h-full w-full"
+                      />
+                    ) : video.platform === "vimeo" && video.video_id ? (
+                      <iframe
+                        src={`https://player.vimeo.com/video/${video.video_id}`}
+                        title={video.title}
+                        frameBorder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        loading="lazy"
+                        className="absolute left-0 top-0 h-full w-full"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center p-6 text-center">
+                        <div>
+                          <p className="text-sm font-medium text-zinc-100">{video.title}</p>
+                          <p className="mt-2 text-xs text-zinc-500">Video kann nicht eingebettet werden.</p>
+                          {video.url && (
+                            <a
+                              href={video.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs font-medium transition-colors hover:bg-zinc-800"
+                            >
+                              Extern öffnen
+                            </a>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                   <h3 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">
                     {video.title}
@@ -335,7 +355,7 @@ export default function DarkEditorialFullTemplate({
                   {video.description && (
                     <p className="text-sm text-zinc-500 line-clamp-2">{video.description}</p>
                   )}
-                </a>
+                </div>
               ))}
             </div>
           </div>
