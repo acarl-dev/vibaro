@@ -57,9 +57,6 @@ export default function ModernTemplate({
           padding: '0 clamp(16px, 4vw, 32px)' 
         }}
       >
-        
-        {/* Featured Release Banner (if exists) */}
-        {featuredRelease && <FeaturedReleaseHero release={featuredRelease} />}
 
         {/* Links Section */}
         {hasLinks && (
@@ -70,6 +67,9 @@ export default function ModernTemplate({
             <LinkList items={page.links} />
           </section>
         )}
+
+        {/* Featured Release Banner (if exists) */}
+        {featuredRelease && <FeaturedReleaseHero release={featuredRelease} />}
 
         {/* Music Player Section */}
         {hasFeaturedTracks && (
@@ -149,53 +149,57 @@ export default function ModernTemplate({
 
 function FeaturedReleaseHero({ release }: { release: ReleaseItem }) {
   return (
-    <section className="py-8 md:py-10 border-b border-zinc-800/40">
-      <span className="inline-block px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest bg-zinc-800/80 text-zinc-400 rounded-full mb-5">
-        New Release
-      </span>
-      
-      <a
-        href={release.url ?? "#"}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group flex gap-4 sm:gap-6 items-start"
-      >
-        {/* Cover Image - Fixed size, doesn't dominate on mobile */}
-        <div className="relative shrink-0 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 overflow-hidden rounded-xl shadow-lg">
-          {release.cover_url ? (
-            <img
-              src={release.cover_url}
-              alt={release.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-              <span className="text-4xl text-zinc-700">♪</span>
-            </div>
-          )}
-        </div>
-        
-        {/* Release Info */}
-        <div className="flex-1 min-w-0 py-1">
-          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-50 leading-tight truncate">
-            {release.title}
-          </h3>
-          
-          {release.release_date && (
-            <p className="mt-1.5 text-sm text-zinc-500">{formatReleaseDate(release.release_date)}</p>
-          )}
-          
-          {release.url && (
-            <span className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white text-zinc-950 font-medium text-sm rounded-full transition-colors group-hover:bg-zinc-100">
-              Listen Now
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </span>
-          )}
-        </div>
-      </a>
+    <section className="py-10 md:py-14 border-b border-zinc-800/40">
+      <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/20 p-5 sm:p-6 md:p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+        <span className="inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest bg-zinc-800/70 text-zinc-300 rounded-full mb-6">
+          New Release
+        </span>
+
+        <a
+          href={release.url ?? "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col sm:flex-row gap-5 sm:gap-7 items-start"
+        >
+          {/* Cover Image - bigger & more dominant */}
+          <div className="relative shrink-0 w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 overflow-hidden rounded-2xl shadow-xl ring-1 ring-white/5">
+            {release.cover_url ? (
+              <img
+                src={release.cover_url}
+                alt={release.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                <span className="text-5xl text-zinc-700">♪</span>
+              </div>
+            )}
+          </div>
+
+          {/* Release Info */}
+          <div className="flex-1 min-w-0 pt-1">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-50 leading-tight">
+              {release.title}
+            </h3>
+
+            {release.release_date && (
+              <p className="mt-2 text-sm md:text-base text-zinc-400">
+                {formatReleaseDate(release.release_date)}
+              </p>
+            )}
+
+            {release.url && (
+              <span className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white text-zinc-950 font-semibold text-sm rounded-full transition-colors group-hover:bg-zinc-100">
+                Listen Now
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </span>
+            )}
+          </div>
+        </a>
+      </div>
     </section>
   );
 }
