@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   ContactSection,
   Footer,
@@ -39,10 +40,13 @@ export default function DarkEditorialFullTemplate({
       {/* Hero Section - Full width, auto height */}
       <section className="relative w-full">
         {/* Hero Image */}
-        <img
+        <Image
           src={page.images.hero_image_url || "https://placehold.co/1920x1080/1a1a1a/666666?text=Hero+Image"}
           alt={page.display_name}
+          width={1920}
+          height={1080}
           className="block w-full h-auto"
+          priority
         />
 
         {/* Dark gradient overlay - bottom 50% */}

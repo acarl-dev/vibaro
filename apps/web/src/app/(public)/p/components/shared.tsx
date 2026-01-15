@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { ImageModal } from "./ImageModal";
+
 // Image component removed - using native img for localhost compatibility
 
 // -----------------------------------------------------------------------------
@@ -501,30 +506,48 @@ export function VideoList({ items }: { items: VideoItem[] }) {
 }
 
 export function GalleryGrid({ items }: { items: GalleryImageItem[] }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   if (items.length === 0) return null;
 
+  const handleImageClick = (index: number) => {
+    setSelectedIndex(index);
+    setIsModalOpen(true);
+  };
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {items.map((image, index) => (
-        <div
-          key={index}
-          className="group relative aspect-square overflow-hidden rounded-lg bg-zinc-900 border border-zinc-800/50 hover:border-zinc-700/70 transition-all cursor-pointer"
-        >
-          <img
-            src={image.image_url}
-            alt={image.title || `Gallery image ${index + 1}`}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-          {image.title && (
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-sm text-white font-medium">{image.title}</p>
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {items.map((image, index) => (
+          <div
+            key={index}
+            onClick={() => handleImageClick(index)}
+            className="group relative aspect-square overflow-hidden rounded-lg bg-zinc-900 border border-zinc-800/50 hover:border-zinc-700/70 transition-all cursor-pointer"
+          >
+            <img
+              src={image.image_url}
+              alt={image.title || `Gallery image ${index + 1}`}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            {image.title && (
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <p className="text-sm text-white font-medium">{image.title}</p>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <ImageModal
+        isOpen={isModalOpen}
+        images={items}
+        initialIndex={selectedIndex}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 }
 

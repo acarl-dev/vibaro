@@ -8,7 +8,6 @@ import {
   GalleryGrid,
   ContactSection,
   Footer,
-  getSectionTitle,
   ReleaseItem,
 } from "./shared";
 import MusicPlayer from "./MusicPlayer";
@@ -62,7 +61,7 @@ export default function ModernTemplate({
         {hasLinks && (
           <section className="py-10 md:py-12 border-b border-zinc-800/40">
             <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              {getSectionTitle("links")}
+              Links
             </h2>
             <LinkList items={page.links} />
           </section>
@@ -85,7 +84,7 @@ export default function ModernTemplate({
         {hasShows && (
           <section className="py-10 md:py-12 border-b border-zinc-800/40">
             <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              {getSectionTitle("shows")}
+              Shows
             </h2>
             <ShowList items={page.shows} />
           </section>
