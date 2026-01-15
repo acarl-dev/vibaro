@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImageModal } from "./ImageModal";
+import MusicPlayer from "./MusicPlayer";
 
 // Image component removed - using native img for localhost compatibility
 
@@ -851,8 +852,93 @@ export function getOptionalSections(
   return sections;
 }
 
+// New Refactored Helpers for cleaner templates
+
+/**
+ * Checks which optional sections are available
+ */
+export function getAvailableSections(page: PublicArtistPageData) {
+  return {
+    hasVideos: (page.videos?.length ?? 0) > 0,
+    hasGallery: (page.gallery_images?.length ?? 0) > 0,
+    hasContact: !!(page.booking_email || page.management_email || page.press_email || page.whatsapp_number),
+    hasMusicPlayer: (page.featured_tracks?.length ?? 0) > 0,
+  };
+}
+
+/**
+ * Renders Videos, Gallery, and Contact sections
+ * Replaces repetitive conditional rendering in templates
+ */
+export function OptionalSections({ page }: { page: PublicArtistPageData }) {
+  const { hasVideos, hasGallery, hasContact } = getAvailableSections(page);
+
+  return (
+    <>
+      {hasVideos && (
+        <Section title="Videos">
+          <VideoList items={page.videos!} />
+        </Section>
+      )}
+
+      {hasGallery && (
+        <Section title="Gallery">
+          <GalleryGrid items={page.gallery_images!} />
+        </Section>
+      )}
+
+      {hasContact && (
+        <Section title="Contact">
+          <ContactInquiryButton
+            booking_email={page.booking_email}
+            management_email={page.management_email}
+            press_email={page.press_email}
+            whatsapp_number={page.whatsapp_number}
+          />
+        </Section>
+      )}
+    </>
+  );
+}
+
+/**
+ * Renders a single optional section (for use in .map)
+ * Used by optional sections that vary per template
+ */
+export function OptionalSectionRenderer({
+  section,
+  page,
+}: {
+  section: { type: "links" | "shows" | "releases" };
+  page: PublicArtistPageData;
+}) {
+  return (
+    <Section key={section.type} title={getSectionTitle(section.type === "releases" ? "Discography" : section.type)}>
+      {section.type === "links" && <LinkList items={page.links} />}
+      {section.type === "shows" && <ShowList items={page.shows} />}
+      {section.type === "releases" && <ReleaseList items={page.releases} />}
+    </Section>
+  );
+}
+
+/**
+ * Renders music player section if featured tracks exist
+ */
+export function MusicSection({ page }: { page: PublicArtistPageData }) {
+  const { hasMusicPlayer } = getAvailableSections(page);
+
+  if (!hasMusicPlayer) return null;
+
+  return (
+    <Section title="Music">
+      <MusicPlayer tracks={page.featured_tracks!} />
+    </Section>
+  );
+}
+
 function getInitials(name: string): string {
   const words = name.trim().split(/\s+/);
+
   if (words.length === 1) {
     return words[0].slice(0, 2).toUpperCase();
   }

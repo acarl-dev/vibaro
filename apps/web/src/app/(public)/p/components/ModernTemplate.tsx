@@ -4,9 +4,8 @@ import {
   LinkList,
   ShowList,
   ReleaseList,
-  VideoList,
-  GalleryGrid,
-  ContactInquiryButton,
+  OptionalSections,
+  MusicSection,
   Footer,
   ReleaseItem,
 } from "./shared";
@@ -39,9 +38,6 @@ export default function ModernTemplate({
   const hasShows = page.shows.length > 0;
   const hasReleases = page.releases.length > 0;
   const hasFeaturedTracks = page.featured_tracks && page.featured_tracks.length > 0;
-  const hasVideos = page.videos && page.videos.length > 0;
-  const hasGallery = page.gallery_images && page.gallery_images.length > 0;
-  const hasContact = page.booking_email || page.management_email || page.press_email || page.whatsapp_number;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -100,40 +96,9 @@ export default function ModernTemplate({
           </section>
         )}
 
-        {/* Videos Section */}
-        {hasVideos && (
-          <section className="py-10 md:py-12 border-b border-zinc-800/40">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Videos
-            </h2>
-            <VideoList items={page.videos!} />
-          </section>
-        )}
+        {/* Music Player Section */}\n        <MusicSection page={page} />
 
-        {/* Gallery Section */}
-        {hasGallery && (
-          <section className="py-10 md:py-12 border-b border-zinc-800/40">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Gallery
-            </h2>
-            <GalleryGrid items={page.gallery_images!} />
-          </section>
-        )}
-
-        {/* Contact Section */}
-        {hasContact && (
-          <section className="py-10 md:py-12">
-            <h2 className="text-[11px] font-medium uppercase tracking-widest text-zinc-500 mb-6">
-              Contact
-            </h2>
-            <ContactInquiryButton
-              booking_email={page.booking_email}
-              management_email={page.management_email}
-              press_email={page.press_email}
-              whatsapp_number={page.whatsapp_number}
-            />
-          </section>
-        )}
+        {/* Videos, Gallery, Contact Sections */}\n        <OptionalSections page={page} />
       </main>
 
       {/* Footer */}
