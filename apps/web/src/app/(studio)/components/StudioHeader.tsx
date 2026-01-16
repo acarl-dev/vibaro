@@ -82,18 +82,10 @@ export default function StudioHeader({ page }: StudioHeaderProps) {
           </div>
 
           <Link
-            href={page.is_published ? `/p/${page.handle}` : "#"}
-            target={page.is_published ? "_blank" : undefined}
-            rel={page.is_published ? "noopener noreferrer" : undefined}
-            className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
-              page.is_published
-                ? "border-zinc-700 bg-zinc-900 text-zinc-200 hover:border-zinc-600 hover:bg-zinc-800"
-                : "border-zinc-800 bg-zinc-900/50 text-zinc-500 cursor-not-allowed"
-            }`}
-            {...(!page.is_published && {
-              onClick: (e: React.MouseEvent) => e.preventDefault(),
-              title: "Veröffentliche deine Seite, um die Vorschau zu sehen",
-            })}
+            href={`/p/${page.handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
             Vorschau
           </Link>

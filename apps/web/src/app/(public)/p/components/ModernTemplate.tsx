@@ -11,6 +11,7 @@ import {
   SectionHeader,
 } from "./shared";
 import MusicPlayer from "./MusicPlayer";
+import { PreviewBanner } from "./PreviewBanner";
 import { containerStyleNarrow, SECTION_PADDING_Y_MODERN } from "./constants";
 
 /**
@@ -54,9 +55,11 @@ export default function ModernTemplate({
   const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0;
 
   return (
-    <div className="min-h-screen bg-page text-primary">
-      {/* Hero Section */}
-      <Hero page={page} />
+    <>
+      <PreviewBanner isPublished={page.is_published} />
+      <div className="min-h-screen bg-page text-primary" style={page.is_published === false ? { marginTop: '52px' } : undefined}>
+        {/* Hero Section */}
+        <Hero page={page} />
 
       {/* Main Content Container - tighter max-width for better readability */}
       <main 
@@ -105,7 +108,8 @@ export default function ModernTemplate({
 
       {/* Footer */}
       <Footer displayName={page.display_name || "Artist"} />
-    </div>
+      </div>
+    </>
   );
 }
 

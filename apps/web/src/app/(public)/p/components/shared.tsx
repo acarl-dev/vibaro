@@ -79,6 +79,7 @@ export type PublicArtistPageData = {
   handle: string;
   display_name: string;
   bio: string | null;
+  is_published?: boolean;
   images: {
     avatar_url: string | null;
     hero_image_url: string | null;

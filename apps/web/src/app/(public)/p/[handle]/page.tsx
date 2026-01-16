@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { cookies } from "next/headers";
 import { PublicArtistPageData } from "../components/shared";
 import ModernTemplate from "../components/ModernTemplate";
 import DarkEditorialTemplate from "../components/DarkEditorialTemplate";
@@ -35,12 +36,18 @@ function normalizePublicPageData(data: PublicPageApiData): PublicArtistPageData 
 // Data Fetching
 // -----------------------------------------------------------------------------
 
-async function fetchPublicPage(handle: string): Promise<PublicArtistPageData | null> {
+async function fetchPublicPage(handle: string, token?: string): Promise<PublicArtistPageData | null> {
   if (!API_BASE_URL) return null;
 
   try {
+    const headers: HeadersInit = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const res = await fetch(`${API_BASE_URL}/api/v1/p/${handle}`, {
       cache: "no-store",
+      headers,
     });
 
     if (res.status === 404) return null;
@@ -65,7 +72,9 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  const page = await fetchPublicPage(handle);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("vibaro_token")?.value;
+  const page = await fetchPublicPage(handle, token);
 
   if (!page) {
     return { title: "Not Found" };
@@ -87,7 +96,9 @@ export default async function PublicArtistPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const page = await fetchPublicPage(handle);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("vibaro_token")?.value;
+  const page = await fetchPublicPage(handle, token);
 
   if (!page) {
     notFound();
