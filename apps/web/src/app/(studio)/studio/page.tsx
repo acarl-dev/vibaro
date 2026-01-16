@@ -20,6 +20,14 @@ type Link = {
   position: number;
 };
 
+type ContentCounts = {
+  releases: number;
+  shows: number;
+  videos: number;
+  gallery: number;
+  links: number;
+};
+
 async function fetchArtistPage(): Promise<ArtistPage | null> {
   try {
     const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
@@ -55,6 +63,29 @@ async function fetchLinks(): Promise<Link[]> {
   }
 }
 
+async function fetchContentCounts(artistPageId: number): Promise<ContentCounts> {
+  // Fetch all content counts in parallel
+  const [releasesRes, showsRes, videosRes, galleryRes] = await Promise.all([
+    backendFetch(`/api/v1/artist-pages/${artistPageId}/releases`, { cache: "no-store" }).catch(() => null),
+    backendFetch(`/api/v1/artist-pages/${artistPageId}/shows`, { cache: "no-store" }).catch(() => null),
+    backendFetch(`/api/v1/studio/videos`, { cache: "no-store" }).catch(() => null),
+    backendFetch(`/api/v1/studio/gallery`, { cache: "no-store" }).catch(() => null),
+  ]);
+
+  const releases = releasesRes?.ok ? (await releasesRes.json())?.data ?? [] : [];
+  const shows = showsRes?.ok ? (await showsRes.json())?.data ?? [] : [];
+  const videos = videosRes?.ok ? (await videosRes.json())?.data ?? [] : [];
+  const gallery = galleryRes?.ok ? (await galleryRes.json())?.data ?? [] : [];
+
+  return {
+    releases: Array.isArray(releases) ? releases.length : 0,
+    shows: Array.isArray(shows) ? shows.length : 0,
+    videos: Array.isArray(videos) ? videos.length : 0,
+    gallery: Array.isArray(gallery) ? gallery.length : 0,
+    links: 0, // Will be set separately
+  };
+}
+
 export default async function StudioOverviewPage() {
   const page = await fetchArtistPage();
 
@@ -63,6 +94,8 @@ export default async function StudioOverviewPage() {
   }
 
   const links = await fetchLinks();
+  const contentCounts = await fetchContentCounts(page.id);
+  contentCounts.links = links.length;
 
-  return <OverviewClient initialPage={page} initialLinks={links} />;
+  return <OverviewClient initialPage={page} initialLinks={links} contentCounts={contentCounts} />;
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import LivePreview from "../components/LivePreview";
+import Link from "next/link";
 
 type ArtistPage = {
   id: number;
@@ -13,353 +12,380 @@ type ArtistPage = {
   hero_image_url: string | null;
 };
 
-type Link = {
+type LinkType = {
   id: number;
   title: string;
   url: string;
   position: number;
 };
 
-type OverviewClientProps = {
-  initialPage: ArtistPage;
-  initialLinks: Link[];
+type ContentCounts = {
+  releases: number;
+  shows: number;
+  videos: number;
+  gallery: number;
+  links: number;
 };
 
-export default function OverviewClient({ initialPage, initialLinks }: OverviewClientProps) {
-  const [displayName, setDisplayName] = useState(initialPage.display_name);
-  const [bio, setBio] = useState(initialPage.bio ?? "");
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
-  const [logoUploading, setLogoUploading] = useState(false);
-  const [heroUploading, setHeroUploading] = useState(false);
+type OverviewClientProps = {
+  initialPage: ArtistPage;
+  initialLinks: LinkType[];
+  contentCounts: ContentCounts;
+};
 
-  // Debounced autosave with race condition prevention
-  useEffect(() => {
-    const controller = new AbortController();
-    
-    const timeout = setTimeout(async () => {
-      const hasChanges =
-        displayName !== initialPage.display_name ||
-        bio !== (initialPage.bio ?? "");
-
-      if (!hasChanges) return;
-
-      setSaveStatus("saving");
-      try {
-        const res = await fetch("/api/studio/artist-page", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            display_name: displayName,
-            bio: bio || null,
-          }),
-          signal: controller.signal,
-        });
-
-        if (res.ok && !controller.signal.aborted) {
-          setSaveStatus("saved");
-          setTimeout(() => {
-            if (!controller.signal.aborted) {
-              setSaveStatus("idle");
-            }
-          }, 2000);
-        } else if (!controller.signal.aborted) {
-          setSaveStatus("idle");
-        }
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          setSaveStatus("idle");
-        }
-      }
-    }, 600);
-
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [displayName, bio, initialPage.display_name, initialPage.bio]);
-
-  const isReady = !!(
+export default function OverviewClient({ initialPage, initialLinks, contentCounts }: OverviewClientProps) {
+  const isProfileComplete = !!(
     initialPage.handle &&
-    displayName.trim().length > 0 &&
-    bio.trim().length > 0
+    initialPage.display_name?.trim() &&
+    initialPage.bio?.trim()
   );
 
-  const previewPage: ArtistPage = {
-    ...initialPage,
-    display_name: displayName,
-    bio,
+  const hasContent = {
+    releases: contentCounts.releases > 0,
+    shows: contentCounts.shows > 0,
+    videos: contentCounts.videos > 0,
+    gallery: contentCounts.gallery > 0,
+    links: contentCounts.links > 0,
   };
 
-  const handleLogoUpload = async (file: File) => {
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Datei zu gro\u00df. Maximal 2 MB erlaubt.");
-      return;
-    }
+  const completionItems = [
+    { label: "Profil ausgefüllt", completed: isProfileComplete, link: "/studio/profile" },
+    { label: "Releases hochgeladen", completed: hasContent.releases, link: "/studio/releases" },
+    { label: "Shows hinzugefügt", completed: hasContent.shows, link: "/studio/shows" },
+    { label: "Links verknüpft", completed: hasContent.links, link: "/studio/links" },
+    { label: "Videos hochgeladen", completed: hasContent.videos, link: "/studio/videos" },
+    { label: "Galerie befüllt", completed: hasContent.gallery, link: "/studio/gallery" },
+  ];
 
-    setLogoUploading(true);
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      const res = await fetch("/api/studio/upload-avatar", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        const error = await res.json().catch(() => ({ error: "Unknown error" }));
-        console.error("Upload error:", error);
-        alert(`Upload fehlgeschlagen: ${JSON.stringify(error)}`);
-      }
-    } catch (err) {
-      console.error("Network error:", err);
-      alert("Netzwerkfehler. Bitte versuche es erneut.");
-    } finally {
-      setLogoUploading(false);
-    }
-  };
-
-  const handleHeroUpload = async (file: File) => {
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Datei zu gro\u00df. Maximal 2 MB erlaubt.");
-      return;
-    }
-
-    setHeroUploading(true);
-    const formData = new FormData();
-    formData.append("hero_image", file);
-
-    try {
-      const res = await fetch("/api/studio/upload-hero", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        const error = await res.json().catch(() => ({ error: "Unknown error" }));
-        console.error("Upload error:", error);
-        alert(`Upload fehlgeschlagen: ${JSON.stringify(error)}`);
-      }
-    } catch (err) {
-      console.error("Network error:", err);
-      alert("Netzwerkfehler. Bitte versuche es erneut.");
-    } finally {
-      setHeroUploading(false);
-    }
-  };
+  const publicUrl = initialPage.handle ? `/p/${initialPage.handle}` : null;
+  const completedCount = completionItems.filter(item => item.completed).length;
+  const totalCount = completionItems.length;
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Deine Seite</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Übersicht</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Bearbeite deine Inhalte und sieh dir das Ergebnis direkt an.
+          Dein Dashboard für alle wichtigen Informationen und Aktionen.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Editor Column */}
-        <div className="space-y-6">
+      {/* Main Grid Layout */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left Column - 2/3 width */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Publishing Status & Public Link */}
           <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-            <h2 className="text-sm font-medium text-zinc-300 mb-4">Profil-Basics</h2>
-
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="displayName"
-                  className="block text-xs font-medium text-zinc-400 mb-1"
-                >
-                  Display Name *
-                </label>
-                <input
-                  type="text"
-                  id="displayName"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                  placeholder="Dein Name"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="bio"
-                  className="block text-xs font-medium text-zinc-400 mb-1"
-                >
-                  Bio * <span className="text-zinc-600">(max. 300 Zeichen)</span>
-                </label>
-                <textarea
-                  id="bio"
-                  rows={4}
-                  maxLength={300}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 resize-none"
-                  placeholder="Erzähl kurz über dich..."
-                />
-                <div className="mt-1 flex items-center justify-between text-xs text-zinc-600">
-                  <span>
-                    {saveStatus === "saving" && "Speichert..."}
-                    {saveStatus === "saved" && "Gespeichert"}
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm font-medium text-zinc-300 mb-1">Veröffentlichungs-Status</h2>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className={`h-2 w-2 rounded-full ${initialPage.is_published ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
+                  <span className="text-sm text-zinc-400">
+                    {initialPage.is_published ? 'Veröffentlicht' : 'Nicht veröffentlicht'}
                   </span>
-                  <span>{bio.length}/300</span>
                 </div>
+
+                {publicUrl && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-zinc-500">Deine öffentliche Seite:</span>
+                    </div>
+                    <Link 
+                      href={publicUrl}
+                      target="_blank"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                    >
+                      vibaro.com{publicUrl}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
-                  Logo
-                </label>
-                {initialPage.avatar_url ? (
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={initialPage.avatar_url}
-                      alt="Logo"
-                      className="h-16 w-16 rounded-lg object-cover border border-zinc-800"
-                    />
-                    <div className="flex-1">
-                      <p className="text-xs text-zinc-500 mb-2">Logo hochgeladen</p>
-                      <label className="inline-block">
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          disabled={logoUploading}
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleLogoUpload(file);
-                          }}
-                        />
-                        <span className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-300 transition-colors">
-                          {logoUploading ? "Lädt hoch..." : "Ändern"}
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                ) : (
-                  <label className="block">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      disabled={logoUploading}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleLogoUpload(file);
-                      }}
-                    />
-                    <div className="cursor-pointer flex items-center justify-center h-24 rounded-lg border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50 transition-colors">
-                      <span className="text-xs text-zinc-500">
-                        {logoUploading ? "Lädt hoch..." : "+ Logo hochladen"}
-                      </span>
-                    </div>
-                  </label>
-                )}
-                <p className="mt-2 text-xs text-zinc-600">JPG, PNG oder WebP (max. 2 MB)</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
-                  Header-Bild
-                </label>
-                {initialPage.hero_image_url ? (
-                  <div>
-                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden border border-zinc-800 mb-2">
-                      <img
-                        src={initialPage.hero_image_url}
-                        alt="Header-Bild"
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <label className="inline-block">
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="hidden"
-                        disabled={heroUploading}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleHeroUpload(file);
-                        }}
-                      />
-                      <span className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-300 transition-colors">
-                        {heroUploading ? "Lädt hoch..." : "Ändern"}
-                      </span>
-                    </label>
-                  </div>
-                ) : (
-                  <label className="block">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      disabled={heroUploading}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleHeroUpload(file);
-                      }}
-                    />
-                    <div className="cursor-pointer flex items-center justify-center aspect-[16/9] rounded-lg border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50 transition-colors">
-                      <span className="text-xs text-zinc-500">
-                        {heroUploading ? "Lädt hoch..." : "+ Header-Bild hochladen"}
-                      </span>
-                    </div>
-                  </label>
-                )}
-                <p className="mt-2 text-xs text-zinc-600">JPG, PNG oder WebP (max. 2 MB)</p>
-              </div>
+              {!initialPage.is_published && isProfileComplete && (
+                <Link
+                  href="/studio/settings"
+                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors whitespace-nowrap"
+                >
+                  Jetzt veröffentlichen
+                </Link>
+              )}
             </div>
           </div>
 
-          {/* Publishing Readiness */}
+          {/* Quick Stats - Placeholder for Analytics */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard 
+              label="Seitenaufrufe" 
+              value="—" 
+              subtext="Bald verfügbar"
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+            />
+            <StatCard 
+              label="Link-Klicks" 
+              value="—" 
+              subtext="Bald verfügbar"
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              }
+            />
+            <StatCard 
+              label="Gesamt-Inhalte" 
+              value={(contentCounts.releases + contentCounts.shows + contentCounts.videos + contentCounts.gallery + contentCounts.links).toString()} 
+              subtext="Einträge"
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              }
+            />
+          </div>
+
+          {/* Completion Checklist */}
           <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-            <h2 className="text-sm font-medium text-zinc-300 mb-4">
-              Veröffentlichungs-Status
-            </h2>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                {initialPage.handle ? (
-                  <span className="text-emerald-400">✓</span>
-                ) : (
-                  <span className="text-zinc-600">✕</span>
-                )}
-                <span className="text-zinc-400">Handle</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {displayName ? (
-                  <span className="text-emerald-400">✓</span>
-                ) : (
-                  <span className="text-zinc-600">✕</span>
-                )}
-                <span className="text-zinc-400">Display Name</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {bio ? (
-                  <span className="text-emerald-400">✓</span>
-                ) : (
-                  <span className="text-zinc-600">✕</span>
-                )}
-                <span className="text-zinc-400">Bio</span>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-medium text-zinc-300">Vervollständige deine Seite</h2>
+              <span className="text-xs text-zinc-500">
+                {completedCount}/{totalCount} erledigt
+              </span>
             </div>
 
-            {!isReady && (
-              <p className="mt-4 text-xs text-zinc-600">
-                Fülle die erforderlichen Felder aus, um zu veröffentlichen.
-              </p>
-            )}
+            {/* Progress Bar */}
+            <div className="mb-6 h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-emerald-500 transition-all duration-300"
+                style={{ width: `${(completedCount / totalCount) * 100}%` }}
+              />
+            </div>
+
+            {/* Checklist Items */}
+            <div className="space-y-3">
+              {completionItems.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.link}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+                >
+                  <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                    item.completed 
+                      ? 'bg-emerald-500/20 text-emerald-400' 
+                      : 'bg-zinc-800 text-zinc-600'
+                  }`}>
+                    {item.completed ? (
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-2 h-2 rounded-full bg-zinc-600" />
+                    )}
+                  </div>
+                  <span className={`text-sm flex-1 ${
+                    item.completed ? 'text-zinc-400' : 'text-zinc-300'
+                  }`}>
+                    {item.label}
+                  </span>
+                  <svg 
+                    className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Preview Column */}
-        <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)]">
-          <LivePreview page={previewPage} links={initialLinks} />
+        {/* Right Column - 1/3 width */}
+        <div className="space-y-6">
+          {/* Quick Actions */}
+          <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+            <h2 className="text-sm font-medium text-zinc-300 mb-4">Schnellaktionen</h2>
+            <div className="space-y-2">
+              <QuickActionButton 
+                href="/studio/releases"
+                label="Release hinzufügen"
+                icon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  </svg>
+                }
+              />
+              <QuickActionButton 
+                href="/studio/shows"
+                label="Show eintragen"
+                icon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                }
+              />
+              <QuickActionButton 
+                href="/studio/links"
+                label="Link hinzufügen"
+                icon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                }
+              />
+              <QuickActionButton 
+                href="/studio/videos"
+                label="Video hochladen"
+                icon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                }
+              />
+              <QuickActionButton 
+                href="/studio/gallery"
+                label="Galerie-Bild"
+                icon={
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                }
+              />
+            </div>
+          </div>
+
+          {/* Account Info */}
+          <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+            <h2 className="text-sm font-medium text-zinc-300 mb-4">Dein Account</h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                {initialPage.avatar_url ? (
+                  <img
+                    src={initialPage.avatar_url}
+                    alt="Avatar"
+                    className="w-12 h-12 rounded-full object-cover border border-zinc-800"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-zinc-300 truncate">
+                    {initialPage.display_name || 'Kein Name'}
+                  </p>
+                  <p className="text-xs text-zinc-500 truncate">
+                    @{initialPage.handle || 'kein-handle'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="pt-3 border-t border-zinc-800">
+                <Link
+                  href="/studio/settings"
+                  className="text-xs text-zinc-400 hover:text-zinc-300 transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Einstellungen
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Plan Info */}
+          <div className="rounded-xl border border-emerald-900/50 bg-emerald-900/10 p-6">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <h3 className="text-sm font-medium text-emerald-400">Free Plan</h3>
+                <p className="text-xs text-zinc-500 mt-1">Alle Basis-Features</p>
+              </div>
+              <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <Link
+              href="/studio/settings"
+              className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors inline-flex items-center gap-1"
+            >
+              Mehr erfahren
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Helper Components
+function StatCard({ 
+  label, 
+  value, 
+  subtext, 
+  icon 
+}: { 
+  label: string; 
+  value: string; 
+  subtext: string; 
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-4">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="text-zinc-500">
+          {icon}
+        </div>
+        <span className="text-xs text-zinc-500">{label}</span>
+      </div>
+      <div className="text-2xl font-semibold text-zinc-200">{value}</div>
+      <div className="text-xs text-zinc-600 mt-1">{subtext}</div>
+    </div>
+  );
+}
+
+function QuickActionButton({ 
+  href, 
+  label, 
+  icon 
+}: { 
+  href: string; 
+  label: string; 
+  icon: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+    >
+      <div className="text-zinc-500 group-hover:text-zinc-400 transition-colors">
+        {icon}
+      </div>
+      <span className="text-sm text-zinc-300 group-hover:text-zinc-200 transition-colors flex-1">
+        {label}
+      </span>
+      <svg 
+        className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </Link>
   );
 }
