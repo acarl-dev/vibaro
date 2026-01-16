@@ -8,8 +8,6 @@ type FeaturedTrack = {
   artist_name: string | null;
   platform:
     | "spotify"
-    | "applemusic"
-    | "primemusic"
     | "youtubemusic"
     | "soundcloud";
   platform_url: string;
@@ -23,11 +21,12 @@ type MusicClientProps = {
 
 const platformLabels = {
   spotify: "Spotify",
-  applemusic: "Apple Music",
-  primemusic: "Prime Music",
   youtubemusic: "YouTube Music",
   soundcloud: "SoundCloud",
 };
+
+const buildDefaultTitle = (platform: FeaturedTrack["platform"]) =>
+  `${platformLabels[platform]} Track`;
 
 export default function MusicClient({ initialTracks }: MusicClientProps) {
   const [tracks, setTracks] = useState<FeaturedTrack[]>(initialTracks);
@@ -38,8 +37,6 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     artist_name: "",
     platform: "spotify" as
       | "spotify"
-      | "applemusic"
-      | "primemusic"
       | "youtubemusic"
       | "soundcloud",
     platform_url: "",
@@ -47,18 +44,20 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
   const [error, setError] = useState("");
 
   const handleCreate = async () => {
-    if (!formData.title || !formData.platform_url) {
-      setError("Titel und URL sind erforderlich");
+    if (!formData.platform_url) {
+      setError("URL ist erforderlich");
       return;
     }
+
+    const resolvedTitle = formData.title?.trim() || buildDefaultTitle(formData.platform);
 
     try {
       const res = await fetch(`/api/studio/featured-tracks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: formData.title,
-          artist_name: formData.artist_name || null,
+          title: resolvedTitle,
+          artist_name: null,
           platform: formData.platform,
           platform_url: formData.platform_url,
         }),
@@ -67,7 +66,12 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
       if (res.ok) {
         const json = await res.json();
         setTracks([...tracks, json.data].sort((a, b) => a.position - b.position));
-        setFormData({ title: "", artist_name: "", platform: "spotify", platform_url: "" });
+        setFormData({
+          title: "",
+          artist_name: "",
+          platform: "spotify",
+          platform_url: "",
+        });
         setIsCreating(false);
         setError("");
       } else {
@@ -80,18 +84,19 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
   };
 
   const handleUpdate = async (trackId: number) => {
-    if (!formData.title || !formData.platform_url) {
-      setError("Titel und URL sind erforderlich");
+    if (!formData.platform_url) {
+      setError("URL ist erforderlich");
       return;
     }
+
+    const resolvedTitle = formData.title?.trim() || buildDefaultTitle(formData.platform);
 
     try {
       const res = await fetch(`/api/studio/featured-tracks/${trackId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: formData.title,
-          artist_name: formData.artist_name || null,
+          title: resolvedTitle,
           platform: formData.platform,
           platform_url: formData.platform_url,
         }),
@@ -101,7 +106,12 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
         const json = await res.json();
         setTracks(tracks.map((t) => (t.id === trackId ? json.data : t)));
         setEditingId(null);
-        setFormData({ title: "", artist_name: "", platform: "spotify", platform_url: "" });
+        setFormData({
+          title: "",
+          artist_name: "",
+          platform: "spotify",
+          platform_url: "",
+        });
         setError("");
       } else {
         setError("Aktualisierung fehlgeschlagen");
@@ -150,6 +160,18 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     setError("");
   };
 
+  const startCreatingFor = (platform: FeaturedTrack["platform"]) => {
+    if (editingId) return;
+    setIsCreating(true);
+    setFormData({
+      title: buildDefaultTitle(platform),
+      artist_name: "",
+      platform,
+      platform_url: "",
+    });
+    setError("");
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-zinc-100">
       <div className="mx-auto max-w-4xl px-6 py-12">
@@ -168,14 +190,33 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
           </div>
         )}
 
-        {/* Create Button */}
+        {/* Create Buttons */}
         {!isCreating && !editingId && (
-          <button
-            onClick={() => setIsCreating(true)}
-            className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
-          >
-            + Track hinzufügen
-          </button>
+          <div className="mb-6">
+            <p className="mb-3 text-sm text-zinc-400">
+              Wähle die Plattform, für die du einen Player hinzufügen möchtest.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => startCreatingFor("spotify")}
+                className="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+              >
+                Spotify
+              </button>
+              <button
+                onClick={() => startCreatingFor("youtubemusic")}
+                className="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+              >
+                YouTube Music
+              </button>
+              <button
+                onClick={() => startCreatingFor("soundcloud")}
+                className="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+              >
+                SoundCloud
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Create Form */}
@@ -183,28 +224,6 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
           <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/30 p-6">
             <h3 className="mb-4 text-lg font-medium">Neuer Track</h3>
             <div className="space-y-4">
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Titel *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
-                  placeholder="Lost in the City"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Artist Name (optional)</label>
-                <input
-                  type="text"
-                  value={formData.artist_name}
-                  onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
-                  placeholder="Emily J. ft. John Doe"
-                />
-              </div>
-
               <div>
                 <label className="mb-2 block text-sm text-zinc-400">Plattform *</label>
                 <select
@@ -214,17 +233,19 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                       ...formData,
                       platform: e.target.value as
                         | "spotify"
-                        | "applemusic"
-                        | "primemusic"
                         | "youtubemusic"
                         | "soundcloud",
+                      title:
+                        formData.title?.trim() === buildDefaultTitle(formData.platform)
+                          ? buildDefaultTitle(
+                              e.target.value as FeaturedTrack["platform"]
+                            )
+                          : formData.title,
                     })
                   }
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
                 >
                   <option value="spotify">Spotify</option>
-                  <option value="applemusic">Apple Music</option>
-                  <option value="primemusic">Prime Music</option>
                   <option value="youtubemusic">YouTube Music</option>
                   <option value="soundcloud">SoundCloud</option>
                 </select>
@@ -239,6 +260,9 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
                   placeholder="https://open.spotify.com/track/..."
                 />
+                <p className="mt-2 text-xs text-zinc-500">
+                  Wir erzeugen den Player automatisch aus der URL.
+                </p>
               </div>
 
               <div className="flex gap-3 pt-2">
@@ -275,26 +299,6 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Track bearbeiten</h3>
                     <div>
-                      <label className="mb-2 block text-sm text-zinc-400">Titel *</label>
-                      <input
-                        type="text"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm text-zinc-400">Artist Name</label>
-                      <input
-                        type="text"
-                        value={formData.artist_name}
-                        onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
                       <label className="mb-2 block text-sm text-zinc-400">Plattform *</label>
                       <select
                         value={formData.platform}
@@ -303,17 +307,19 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                             ...formData,
                             platform: e.target.value as
                               | "spotify"
-                              | "applemusic"
-                              | "primemusic"
                               | "youtubemusic"
                               | "soundcloud",
+                            title:
+                              formData.title?.trim() === buildDefaultTitle(formData.platform)
+                                ? buildDefaultTitle(
+                                    e.target.value as FeaturedTrack["platform"]
+                                  )
+                                : formData.title,
                           })
                         }
                         className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
                       >
                         <option value="spotify">Spotify</option>
-                        <option value="applemusic">Apple Music</option>
-                        <option value="primemusic">Prime Music</option>
                         <option value="youtubemusic">YouTube Music</option>
                         <option value="soundcloud">SoundCloud</option>
                       </select>
@@ -329,6 +335,9 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                         }
                         className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
                       />
+                      <p className="mt-2 text-xs text-zinc-500">
+                        Wir erzeugen den Player automatisch aus der URL.
+                      </p>
                     </div>
 
                     <div className="flex gap-3 pt-2">

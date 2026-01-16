@@ -507,7 +507,7 @@ Returns all featured tracks for the artist page, sorted by `position` ascending.
 {
   "title": "Lost in the City",
   "artist_name": null,  // optional
-  "platform": "spotify",  // spotify | applemusic | primemusic | youtubemusic | soundcloud
+  "platform": "spotify",  // spotify | youtubemusic | soundcloud
   "platform_url": "https://open.spotify.com/track/ABC123",
   "embed_id": null  // optional, auto-extracted if not provided
 }

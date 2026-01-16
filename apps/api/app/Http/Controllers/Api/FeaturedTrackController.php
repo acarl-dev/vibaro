@@ -44,7 +44,7 @@ class FeaturedTrackController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'artist_name' => 'nullable|string|max:255',
-            'platform' => 'required|string|in:spotify,applemusic,primemusic,youtubemusic,soundcloud',
+            'platform' => 'required|string|in:spotify,youtubemusic,soundcloud',
             'platform_url' => 'required|url|max:500',
             'embed_id' => 'nullable|string|max:255',
         ]);
@@ -89,7 +89,7 @@ class FeaturedTrackController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'artist_name' => 'nullable|string|max:255',
-            'platform' => 'sometimes|string|in:spotify,applemusic,primemusic,youtubemusic,soundcloud',
+            'platform' => 'sometimes|string|in:spotify,youtubemusic,soundcloud',
             'platform_url' => 'sometimes|url|max:500',
             'embed_id' => 'nullable|string|max:255',
             'position' => 'sometimes|integer|min:0',
@@ -160,7 +160,9 @@ class FeaturedTrackController extends Controller
         switch ($platform) {
             case 'spotify':
                 // https://open.spotify.com/track/ABC123...
-                if (preg_match('/spotify\.com\/track\/([a-zA-Z0-9]+)/', $url, $matches)) {
+                // https://open.spotify.com/intl-de/track/ABC123...
+                // https://open.spotify.com/embed/track/ABC123
+                if (preg_match('/spotify\.com\/(?:intl-[a-z]{2}(?:-[A-Z]{2})?|[a-z]{2}(?:-[A-Z]{2})?)?\/(?:embed\/)?track\/([a-zA-Z0-9]+)/', $url, $matches)) {
                     return $matches[1];
                 }
                 break;

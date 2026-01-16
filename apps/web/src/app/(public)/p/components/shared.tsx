@@ -58,8 +58,6 @@ export type FeaturedTrackItem = {
   artist_name: string | null;
   platform:
     | "spotify"
-    | "applemusic"
-    | "primemusic"
     | "youtubemusic"
     | "soundcloud";
   platform_url: string;

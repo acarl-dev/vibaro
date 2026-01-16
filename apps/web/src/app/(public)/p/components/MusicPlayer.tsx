@@ -7,8 +7,6 @@ type FeaturedTrack = {
   artist_name: string | null;
   platform:
     | "spotify"
-    | "applemusic"
-    | "primemusic"
     | "youtubemusic"
     | "soundcloud";
   platform_url: string;
@@ -23,10 +21,37 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
   const [ref, isVisible] = useLazyLoad<HTMLDivElement>();
   const platformLabels: Record<FeaturedTrack["platform"], string> = {
     spotify: "Spotify",
-    applemusic: "Apple Music",
-    primemusic: "Prime Music",
     youtubemusic: "YouTube Music",
     soundcloud: "SoundCloud",
+  };
+
+  const getEmbedId = (track: FeaturedTrack) => {
+    if (track.embed_id) return track.embed_id;
+
+    if (track.platform === "spotify") {
+      const match = track.platform_url.match(
+        /spotify\.com\/(?:intl-[a-z]{2}(?:-[A-Z]{2})?|[a-z]{2}(?:-[A-Z]{2})?)?\/(?:embed\/)?track\/([a-zA-Z0-9]+)/
+      );
+      return match?.[1] ?? null;
+    }
+
+    if (track.platform === "youtubemusic") {
+      const match = track.platform_url.match(/music\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+      return match?.[1] ?? null;
+    }
+
+    return null;
+  };
+
+  const getSpotifyEmbedSrc = (track: FeaturedTrack) => {
+    const embedId = getEmbedId(track);
+    if (embedId) {
+      return `https://open.spotify.com/embed/track/${embedId}?utm_source=generator&theme=0`;
+    }
+
+    return `https://open.spotify.com/embed?url=${encodeURIComponent(
+      track.platform_url
+    )}`;
   };
 
   if (!tracks || tracks.length === 0) return null;
@@ -36,9 +61,9 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
       {isVisible ? (
         tracks.map((track, index) => (
           <div key={index} className="overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30">
-            {track.platform === "spotify" && track.embed_id && (
+            {track.platform === "spotify" && (
               <iframe
-                src={`https://open.spotify.com/embed/track/${track.embed_id}?utm_source=generator&theme=0`}
+                src={getSpotifyEmbedSrc(track)}
                 width="100%"
                 height="152"
                 frameBorder="0"
@@ -62,10 +87,10 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
               />
             )}
             
-            {track.platform === "youtubemusic" && track.embed_id && (
+            {track.platform === "youtubemusic" && getEmbedId(track) && (
               <div className="relative aspect-video">
                 <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${track.embed_id}`}
+                  src={`https://www.youtube-nocookie.com/embed/${getEmbedId(track)}`}
                   title={track.title}
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -77,7 +102,7 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
             )}
             
             {/* Fallback: Link button if embed fails */}
-            {!track.embed_id && (
+            {!getEmbedId(track) && track.platform !== "spotify" && (
               <div className="p-4">
                 <h3 className="text-sm font-medium text-zinc-100">{track.title}</h3>
                 {track.artist_name && (
