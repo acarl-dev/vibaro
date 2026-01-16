@@ -19,6 +19,7 @@ type ProfileClientProps = {
 
 export default function ProfileClient({ initialPage }: ProfileClientProps) {
   const router = useRouter();
+  const maxBioLength = 400;
   const [displayName, setDisplayName] = useState(initialPage.display_name);
   const [bio, setBio] = useState(initialPage.bio ?? "");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -217,10 +218,10 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               <div
                 className="absolute"
                 style={{
-                  top: "68%",
+                  top: "50%",
                   left: 0,
                   right: 0,
-                  transform: "translateY(-5%)",
+                  transform: "translate(20%, -5%)",
                   paddingBottom: "2rem",
                 }}
               >
@@ -232,7 +233,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                   }}
                 >
                   {/* Display Name - Editable */}
-                  <div className="mb-3">
+                  <div className="mb-1.5">
                     {editingName ? (
                       <input
                         ref={nameInputRef}
@@ -247,13 +248,13 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                             setEditingName(false);
                           }
                         }}
-                        className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2 w-full"
+                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2 w-full"
                         placeholder="Dein Name"
                       />
                     ) : (
                       <h1
                         onClick={() => setEditingName(true)}
-                        className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
+                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
                       >
                         {displayName || "Dein Name"}
                       </h1>
@@ -269,22 +270,24 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                           value={bio}
                           onChange={(e) => setBio(e.target.value)}
                           onBlur={() => setEditingBio(false)}
-                          maxLength={300}
+                          maxLength={maxBioLength}
                           rows={1}
-                          className="w-full rounded-lg border-2 border-emerald-500 bg-black/40 backdrop-blur-sm px-4 py-3 text-sm leading-relaxed text-zinc-200 focus:outline-none resize-none overflow-hidden placeholder:text-zinc-400"
-                          style={{ maxWidth: "60ch" }}
+                          className="w-full rounded-lg border-2 border-emerald-500 bg-black/40 backdrop-blur-sm px-4 py-3 text-xs leading-relaxed text-zinc-200 focus:outline-none resize-none overflow-hidden placeholder:text-zinc-400"
+                          style={{ maxWidth: "72ch" }}
                           placeholder="Erzähl kurz über dich..."
                         />
                         <div className="flex items-center justify-between text-xs text-white/70 bg-black/40 backdrop-blur-sm rounded px-3 py-1">
-                          <span>Enter = Neue Zeile • ESC = Abbrechen</span>
-                          <span>{bio.length}/300</span>
+                          <span>
+                            Enter = Neue Zeile • ESC = Abbrechen • Noch {Math.max(0, maxBioLength - bio.length)} Zeichen
+                          </span>
+                          <span>{bio.length}/{maxBioLength}</span>
                         </div>
                       </div>
                     ) : (
                       <p
                         onClick={() => setEditingBio(true)}
-                        className="mt-3 text-zinc-200 text-sm leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap w-full"
-                        style={{ maxWidth: "60ch" }}
+                        className="mt-1.5 text-zinc-200 text-[11px] leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap w-full"
+                        style={{ maxWidth: "50.4ch" }}
                       >
                         {bio || <span className="text-white/60 italic">Klicke hier, um deine Bio hinzuzufügen...</span>}
                       </p>
