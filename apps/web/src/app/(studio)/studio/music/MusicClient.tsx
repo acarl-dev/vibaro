@@ -376,11 +376,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                 ) : (
                   <div>
                     <div className="mb-4 space-y-3">
-                      <div className="text-xs text-zinc-500">
-                        {platformLabels[track.platform]} • {track.platform_url}
-                      </div>
-
-                      <div className="overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30">
+                      <div className="h-[152px] overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30">
                         {track.platform === "spotify" && (
                           <iframe
                             src={`https://open.spotify.com/embed/track/${getEmbedId(
@@ -389,7 +385,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                               track.embed_id
                             )}?utm_source=generator&theme=0`}
                             width="100%"
-                            height="120"
+                            height="152"
                             frameBorder="0"
                             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                             loading="lazy"
@@ -401,7 +397,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                         {track.platform === "soundcloud" && (
                           <iframe
                             width="100%"
-                            height="120"
+                            height="152"
                             scrolling="no"
                             frameBorder="no"
                             allow="autoplay"
@@ -421,7 +417,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                               track.embed_id
                             )}`}
                             width="100%"
-                            height="120"
+                            height="152"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
