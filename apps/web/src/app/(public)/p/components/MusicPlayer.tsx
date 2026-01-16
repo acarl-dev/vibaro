@@ -88,17 +88,17 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
             )}
             
             {track.platform === "youtubemusic" && getEmbedId(track) && (
-              <div className="relative aspect-video">
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${getEmbedId(track)}`}
-                  title={track.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute left-0 top-0 h-full w-full"
-                  loading="lazy"
-                />
-              </div>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${getEmbedId(track)}`}
+                width="100%"
+                height="152"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+                title={track.title}
+                className="w-full"
+              />
             )}
             
             {/* Fallback: Link button if embed fails */}
