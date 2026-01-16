@@ -429,7 +429,7 @@ export function ShowList({ items }: { items: ShowItem[] }) {
                     src={show.flyer_url}
                     alt={`${show.title} Flyer`}
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain bg-zinc-950"
                   />
                 ) : (
                   <div className="h-full w-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center text-zinc-600 text-4xl">
