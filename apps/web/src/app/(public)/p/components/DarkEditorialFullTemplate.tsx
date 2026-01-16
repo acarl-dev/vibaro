@@ -10,6 +10,7 @@ import {
   ReleaseList,
   ShowList,
   VideoList,
+  getUpcomingShows,
 } from "./shared";
 import MusicPlayer from "./MusicPlayer";
 import { FullHeroSection } from "./FullHeroSection";
@@ -116,7 +117,7 @@ export default function DarkEditorialFullTemplate({
       {/* Shows Section */}
       {page.shows && page.shows.length > 0 && (
         <ContentSection id="shows" title="Upcoming Shows">
-          <ShowList items={page.shows} />
+          <ShowList items={getUpcomingShows(page.shows)} />
         </ContentSection>
       )}
 

@@ -566,7 +566,20 @@ Public, no auth.
       "limit": 3
     },
     "links": [],
-    "shows": [],
+    "shows": [
+      {
+        "title": "Club XYZ - Berlin",
+        "venue": "Club XYZ",
+        "city": "Berlin",
+        "date": "2026-02-15T20:00:00Z",
+        "time": "20:00",
+        "price": 15.00,
+        "is_free": false,
+        "support_acts": ["Band A", "Band B"],
+        "url": "https://tickets.com/show123",
+        "flyer_url": "https://cdn.../flyers/abc123.jpg"
+      }
+    ],
     "releases": [],
     "featured_tracks": [
       {

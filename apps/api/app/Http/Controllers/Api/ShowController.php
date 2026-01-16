@@ -25,7 +25,7 @@ class ShowController extends Controller
         return response()->json([
             'data' => $shows->map(fn($show) => [
                 'id' => $show->id,
-                'starts_at' => $show->starts_at->toIso8601String(),
+                'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
                 'venue' => $show->venue,
                 'city' => $show->city,
                 'address' => $show->address,
@@ -64,6 +64,7 @@ class ShowController extends Controller
 
         $maxPosition = $artistPage->shows()->max('position') ?? -1;
 
+        // Treat input as local time, don't let Laravel convert it
         $show = $artistPage->shows()->create([
             'starts_at' => $validated['starts_at'],
             'venue' => $validated['venue'],
@@ -80,7 +81,7 @@ class ShowController extends Controller
         return response()->json([
             'data' => [
                 'id' => $show->id,
-                'starts_at' => $show->starts_at->toIso8601String(),
+                'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
                 'venue' => $show->venue,
                 'city' => $show->city,
                 'address' => $show->address,
@@ -124,7 +125,7 @@ class ShowController extends Controller
         return response()->json([
             'data' => [
                 'id' => $show->id,
-                'starts_at' => $show->starts_at->toIso8601String(),
+                'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
                 'venue' => $show->venue,
                 'city' => $show->city,
                 'address' => $show->address,

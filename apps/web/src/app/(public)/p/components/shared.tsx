@@ -34,7 +34,13 @@ export type LinkItem = {
 export type ShowItem = {
   title: string;
   venue: string;
+  city: string;
+  address?: string | null;
   date: string;
+  time?: string;
+  price?: number | null;
+  is_free?: boolean;
+  support_acts?: string[];
   url?: string;
   flyer_url?: string | null;
 };
@@ -407,74 +413,123 @@ export function ShowList({ items }: { items: ShowItem[] }) {
       {items.map((show, index) => (
         <li
           key={index}
-          className="h-full"
+          className="h-full flex flex-col"
         >
-          {(() => {
-            const Wrapper = (show.url ? "a" : "div") as "a" | "div";
-            const linkProps = show.url
-              ? { href: show.url, target: "_blank", rel: "noopener noreferrer" }
-              : {};
-
-            return (
-              <Wrapper
-                {...(linkProps as any)}
-                className="group block h-full rounded-xl border border-zinc-800/50 bg-zinc-900/40 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-all duration-200 hover:-translate-y-1 hover:border-zinc-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-              >
-                <div className="flex h-full">
-                  <div className="relative w-24 sm:w-28 md:w-32 shrink-0 aspect-[3/4] bg-zinc-900">
-                    {show.flyer_url ? (
-                      <img
-                        src={show.flyer_url}
-                        alt={`${show.title} Flyer`}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center text-zinc-600 text-4xl">
-                        ♪
-                      </div>
-                    )}
-
-                    <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 text-white text-[11px] font-medium">
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M7 11h5v5H7z" opacity=".35" />
-                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.7 0-3 1.3-3 3v10c0 1.7 1.3 3 3 3h14c1.7 0 3-1.3 3-3V7c0-1.7-1.3-3-3-3zm1 13c0 .6-.4 1-1 1H5c-.6 0-1-.4-1-1V10h16v7zm0-9H4V7c0-.6.4-1 1-1h1v1h2V6h8v1h2V6h1c.6 0 1 .4 1 1v1z" />
-                      </svg>
-                      <time>{formatDate(show.date)}</time>
-                    </div>
+          <div
+            className="group h-full rounded-xl border border-zinc-800/50 bg-zinc-900/40 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-all duration-200 hover:border-zinc-700/70"
+          >
+            <div className="flex h-full">
+              <div className="relative w-24 sm:w-28 md:w-32 shrink-0 aspect-[3/4] bg-zinc-900">
+                {show.flyer_url ? (
+                  <img
+                    src={show.flyer_url}
+                    alt={`${show.title} Flyer`}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center text-zinc-600 text-4xl">
+                    ♪
                   </div>
+                )}
+              </div>
 
-                  <div className="flex-1 p-4 sm:p-5 flex flex-col gap-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-base sm:text-lg font-semibold text-zinc-100 truncate">{show.title}</p>
-                        <p className="text-sm text-zinc-400 truncate">{show.venue}</p>
-                      </div>
-                      <span className="hidden sm:inline-flex text-xs text-zinc-500 whitespace-nowrap bg-zinc-800/70 px-2 py-1 rounded-full">
-                        {formatDate(show.date)}
-                      </span>
-                    </div>
-
-                    <div className="mt-auto flex items-center justify-between gap-3 text-xs sm:text-sm text-zinc-400">
-                      <span className="inline-flex items-center gap-2 text-zinc-300">
-                        <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.15)]" aria-hidden="true"></span>
-                        Live
-                      </span>
-                      {show.url && (
-                        <span className="inline-flex items-center gap-2 text-accent font-medium">
-                          Mehr Infos
-                          <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                            <path d="M5 12h14" />
-                            <path d="M13 6l6 6-6 6" />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
+              <div className="flex-1 p-4 sm:p-5 flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-base sm:text-lg font-semibold text-zinc-100 truncate">{show.venue}</p>
+                    <p className="text-sm text-zinc-400 truncate">{show.city}</p>
                   </div>
+                  <span className="hidden sm:inline-flex text-xs text-white whitespace-nowrap bg-black/70 px-2 py-1 rounded-full">
+                    {formatDate(show.date)}
+                  </span>
                 </div>
-              </Wrapper>
-            );
-          })()}
+
+                {/* Time, Price, Support Acts */}
+                <div className="flex flex-col gap-2 text-xs sm:text-sm text-zinc-400">
+                  {/* Time */}
+                  {show.time && (
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      <span>{show.time} Uhr</span>
+                    </div>
+                  )}
+
+                  {/* Price */}
+                  {(show.is_free || show.price) && (
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="1" />
+                        <path d="M12 2v4m0 8v4M4.22 4.22l2.83 2.83m3.95 3.95l2.83 2.83M2 12h4m8 0h4M4.22 19.78l2.83-2.83m3.95-3.95l2.83-2.83M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+                      </svg>
+                      <span className="text-zinc-300 font-medium">
+                        {show.is_free ? "Kostenlos" : `${parseFloat(String(show.price)).toFixed(2)}€`}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Support Acts */}
+                  {show.support_acts && show.support_acts.length > 0 && (
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                      <span className="text-zinc-300 line-clamp-2">
+                        mit {show.support_acts.join(", ")}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Location */}
+                  {show.address && (
+                    <button
+                      onClick={() => window.open(`https://www.google.com/maps/search/${encodeURIComponent(show.address)}`, '_blank')}
+                      className="flex gap-2 hover:text-accent transition-colors bg-none border-none cursor-pointer p-0 items-start"
+                    >
+                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      <div className="text-zinc-300 text-xs leading-snug">
+                        {show.address.split(',').map((part, idx) => (
+                          <div key={idx} className="whitespace-nowrap">
+                            {part.trim()}
+                          </div>
+                        ))}
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-auto flex items-center justify-between gap-3 text-xs sm:text-sm text-zinc-400">
+                  <span className="inline-flex items-center gap-2 text-zinc-300">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.15)]" aria-hidden="true"></span>
+                    Live
+                  </span>
+                  {show.url && (
+                    <a
+                      href={show.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-accent font-medium hover:text-accent/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 rounded px-1 py-0.5"
+                    >
+                      Tickets
+                      <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path d="M5 12h14" />
+                        <path d="M13 6l6 6-6 6" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </li>
       ))}
     </ul>
@@ -1062,6 +1117,15 @@ function getInitials(name: string): string {
     return words[0].slice(0, 2).toUpperCase();
   }
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+}
+
+// Filter out past shows
+export function getUpcomingShows(shows: ShowItem[]): ShowItem[] {
+  const now = new Date();
+  return shows.filter(show => {
+    const showDate = new Date(show.date);
+    return showDate >= now;
+  });
 }
 
 function formatDate(dateString: string): string {

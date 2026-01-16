@@ -37,10 +37,19 @@ export default function ModernTemplate({
     () => page.releases?.find((r) => r?.is_featured) || page.releases?.[0],
     [page.releases]
   );
+
+  // Filter to only upcoming shows
+  const upcomingShows = useMemo(() => {
+    const now = new Date();
+    return (page.shows || []).filter(show => {
+      const showDate = new Date(show.date);
+      return showDate >= now;
+    });
+  }, [page.shows]);
   
   // Check what content is available
   const hasLinks = (page.links?.length ?? 0) > 0;
-  const hasShows = (page.shows?.length ?? 0) > 0;
+  const hasShows = (upcomingShows?.length ?? 0) > 0;
   const hasReleases = (page.releases?.length ?? 0) > 0;
   const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0;
 
@@ -77,8 +86,8 @@ export default function ModernTemplate({
         {/* Shows Section */}
         {hasShows && (
           <section className={`${SECTION_PADDING_Y_MODERN} border-b border-default`}>
-            <SectionHeader title="Shows" variant="medium" />
-            <ShowList items={page.shows} />
+            <SectionHeader title="Upcoming Shows" variant="medium" />
+            <ShowList items={upcomingShows} />
           </section>
         )}
 

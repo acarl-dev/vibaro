@@ -57,7 +57,13 @@ class PublicArtistPageController extends Controller
                 return [
                     'title' => $show->venue . ' - ' . $show->city,
                     'venue' => $show->venue,
+                    'city' => $show->city,
+                    'address' => $show->address,
                     'date' => $show->starts_at->toIso8601String(),
+                    'time' => $show->starts_at->format('H:i'),
+                    'price' => $show->price,
+                    'is_free' => $show->is_free,
+                    'support_acts' => $show->support_acts ?? [],
                     'url' => $show->ticket_url,
                     'flyer_url' => $show->flyer_path ? $appUrl . Storage::url($show->flyer_path) : null,
                 ];

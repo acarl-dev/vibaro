@@ -59,7 +59,10 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       return;
     }
 
+    // Send time as naive string (no timezone conversion)
+    // This way local time = stored time
     const starts_at = `${formData.date}T${formData.time}:00`;
+    
     const support_acts_array = formData.support_acts
       .split(",")
       .map((s) => s.trim())
@@ -119,6 +122,8 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       return;
     }
 
+    // Send time as naive string (no timezone conversion)
+    // This way local time = stored time
     const starts_at = `${formData.date}T${formData.time}:00`;
     const support_acts_array = formData.support_acts
       .split(",")
@@ -331,6 +336,9 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
         <p className="mt-1 text-sm text-zinc-500">
           Verwalte deine kommenden Konzerte und Auftritte.
         </p>
+        <div className="mt-3 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
+          💡 <span className="font-medium">Info:</span> Shows werden auf deiner öffentlichen Seite nicht mehr angezeigt, sobald das Veranstaltungsdatum vorbei ist.
+        </div>
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
