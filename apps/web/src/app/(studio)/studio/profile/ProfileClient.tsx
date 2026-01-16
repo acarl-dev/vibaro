@@ -85,9 +85,20 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
 
   useEffect(() => {
     if (editingBio && bioTextareaRef.current) {
-      bioTextareaRef.current.focus();
+      const textarea = bioTextareaRef.current;
+      textarea.focus();
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
   }, [editingBio]);
+
+  useEffect(() => {
+    if (editingBio && bioTextareaRef.current) {
+      const textarea = bioTextareaRef.current;
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [bio, editingBio]);
 
   const handleHeroUpload = async (file: File) => {
     if (file.size > 2 * 1024 * 1024) {
@@ -162,7 +173,13 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 alt="Hero"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/0 via-zinc-950/0 to-zinc-950/60" />
+              <div
+                className="hidden md:block absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    "linear-gradient(to bottom, rgba(9,9,11,0) 0%, rgba(9,9,11,0) 45%, rgba(9,9,11,0.35) 55%, rgba(9,9,11,0.65) 70%, rgba(9,9,11,0.85) 82%, rgba(9,9,11,0.95) 92%, rgba(9,9,11,0.98) 100%)",
+                }}
+              />
 
               {/* Edit Button */}
               <label className="absolute top-4 right-4 cursor-pointer z-10">
@@ -200,12 +217,20 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               <div
                 className="absolute"
                 style={{
-                  top: "52%",
-                  left: "48%",
-                  transform: "translate(-50%, 0)",
+                  top: "68%",
+                  left: 0,
+                  right: 0,
+                  transform: "translateY(-5%)",
+                  paddingBottom: "2rem",
                 }}
               >
-                <div className="mx-auto px-8 max-w-5xl">
+                <div
+                  className="mx-auto"
+                  style={{
+                    maxWidth: "980px",
+                    padding: "0 clamp(16px, 4vw, 48px)",
+                  }}
+                >
                   {/* Display Name - Editable */}
                   <div className="mb-3">
                     {editingName ? (
@@ -222,13 +247,13 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                             setEditingName(false);
                           }
                         }}
-                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2 w-full"
+                        className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2 w-full"
                         placeholder="Dein Name"
                       />
                     ) : (
                       <h1
                         onClick={() => setEditingName(true)}
-                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
+                        className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
                       >
                         {displayName || "Dein Name"}
                       </h1>
@@ -245,8 +270,9 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                           onChange={(e) => setBio(e.target.value)}
                           onBlur={() => setEditingBio(false)}
                           maxLength={300}
-                          rows={6}
-                          className="w-full rounded-lg border-2 border-emerald-500 bg-black/40 backdrop-blur-sm px-4 py-3 text-xs leading-relaxed text-zinc-200 focus:outline-none resize-none placeholder:text-zinc-400"
+                          rows={1}
+                          className="w-full rounded-lg border-2 border-emerald-500 bg-black/40 backdrop-blur-sm px-4 py-3 text-sm leading-relaxed text-zinc-200 focus:outline-none resize-none overflow-hidden placeholder:text-zinc-400"
+                          style={{ maxWidth: "60ch" }}
                           placeholder="Erzähl kurz über dich..."
                         />
                         <div className="flex items-center justify-between text-xs text-white/70 bg-black/40 backdrop-blur-sm rounded px-3 py-1">
@@ -257,7 +283,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                     ) : (
                       <p
                         onClick={() => setEditingBio(true)}
-                        className="mt-3 text-zinc-200 text-xs leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap w-full"
+                        className="mt-3 text-zinc-200 text-sm leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap w-full"
+                        style={{ maxWidth: "60ch" }}
                       >
                         {bio || <span className="text-white/60 italic">Klicke hier, um deine Bio hinzuzufügen...</span>}
                       </p>
