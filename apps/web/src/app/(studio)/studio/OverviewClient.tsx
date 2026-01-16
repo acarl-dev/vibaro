@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type ArtistPage = {
   id: number;
@@ -34,6 +36,9 @@ type OverviewClientProps = {
 };
 
 export default function OverviewClient({ initialPage, initialLinks, contentCounts }: OverviewClientProps) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const isProfileComplete = !!(
     initialPage.handle &&
     initialPage.display_name?.trim() &&
@@ -46,6 +51,32 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
     videos: contentCounts.videos > 0,
     gallery: contentCounts.gallery > 0,
     links: contentCounts.links > 0,
+  };
+
+  const handlePublishToggle = async () => {
+    setIsLoading(true);
+    try {
+      const endpoint = initialPage.is_published 
+        ? '/api/studio/unpublish' 
+        : '/api/studio/publish';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        // Refresh the page to get updated data
+        router.refresh();
+      } else {
+        const error = await response.json().catch(() => ({ error: { message: 'Unbekannter Fehler' } }));
+        alert(`Fehler: ${error.error?.message || 'Aktion fehlgeschlagen'}`);
+      }
+    } catch (err) {
+      console.error('Toggle publish error:', err);
+      alert('Netzwerkfehler. Bitte versuche es erneut.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const completionItems = [
@@ -78,10 +109,14 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
           <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="flex-1 min-w-0">
-                <h2 className="text-sm font-medium text-zinc-300 mb-1">Veröffentlichungs-Status</h2>
+                <h2 className="text-sm font-medium text-zinc-300 mb-3">Veröffentlichungs-Status</h2>
                 <div className="flex items-center gap-2 mb-4">
-                  <div className={`h-2 w-2 rounded-full ${initialPage.is_published ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
-                  <span className="text-sm text-zinc-400">
+                  <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                    initialPage.is_published 
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  }`}>
+                    <div className={`h-1.5 w-1.5 rounded-full ${initialPage.is_published ? 'bg-emerald-400' : 'bg-red-400'}`} />
                     {initialPage.is_published ? 'Veröffentlicht' : 'Nicht veröffentlicht'}
                   </span>
                 </div>
@@ -107,16 +142,35 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
                     </p>
                   </div>
                 )}
+
+                {!initialPage.is_published && publicUrl && (
+                  <p className="text-xs text-zinc-500">
+                    Deine Seite ist noch nicht öffentlich sichtbar. Veröffentliche sie, wenn du bereit bist.
+                  </p>
+                )}
               </div>
 
-              {!initialPage.is_published && isProfileComplete && (
-                <Link
-                  href="/studio/settings"
-                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors whitespace-nowrap"
-                >
-                  Jetzt veröffentlichen
-                </Link>
-              )}
+              <button
+                onClick={handlePublishToggle}
+                disabled={isLoading}
+                className={`px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors whitespace-nowrap ${
+                  initialPage.is_published
+                    ? 'bg-red-600 hover:bg-red-500 disabled:bg-red-600/50'
+                    : 'bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50'
+                } disabled:cursor-not-allowed`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Wird verarbeitet...
+                  </span>
+                ) : (
+                  initialPage.is_published ? 'Zurückziehen' : 'Jetzt veröffentlichen'
+                )}
+              </button>
             </div>
           </div>
 
