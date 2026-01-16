@@ -360,10 +360,10 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
           </div>
         )}
 
-        <div className="space-y-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {/* Create Form */}
           {isCreating && (
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+            <div className="col-span-full rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="date"
@@ -521,7 +521,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
 
           {/* Shows List */}
           {shows.length === 0 && !isCreating ? (
-            <div className="rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
+            <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
               <p className="text-xs text-zinc-600 mb-2">Noch keine Shows hinzugefügt</p>
               <button
                 onClick={() => setIsCreating(true)}
@@ -532,7 +532,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
             </div>
           ) : (
             shows.map((show) => (
-              <div key={show.id}>
+              <div key={show.id} className={editingId === show.id ? "col-span-full" : ""}>
                 {editingId === show.id ? (
                   <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
                     <div className="grid grid-cols-2 gap-3">
@@ -703,61 +703,40 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
-                    {show.flyer_path && (
-                      <div className="relative w-20 h-28 shrink-0 rounded overflow-hidden bg-zinc-950">
-                        {getFlyerSrc(show) && (
-                          <img 
-                            src={getFlyerSrc(show)!}
-                            alt="Show flyer"
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                        <button
-                          onClick={() => handleFlyerDelete(show.id)}
-                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-xs flex items-center justify-center"
-                          title="Flyer löschen"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col">
+                    <div className="mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
+                      {getFlyerSrc(show) ? (
+                        <img
+                          src={getFlyerSrc(show)!}
+                          alt="Show flyer"
+                          className="h-56 w-full object-contain"
+                        />
+                      ) : (
+                        <div className="h-56 w-full bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">
+                          ♪
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-zinc-500 mb-1">{formatShowDate(show.starts_at)}</p>
-                      <p className="text-sm font-medium text-zinc-100">{show.venue}</p>
-                      <p className="text-xs text-zinc-500">{show.city}</p>
-                      {show.address && (
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(show.address)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-zinc-400 hover:text-zinc-200 mt-1 inline-block"
-                        >
-                          📍 Route planen
-                        </a>
-                      )}
+                      <p className="text-sm font-medium text-zinc-100 truncate">{show.venue}</p>
+                      <p className="text-xs text-zinc-500 truncate">{show.city}</p>
                       {show.price !== null || show.is_free ? (
                         <p className="text-xs text-zinc-500 mt-1">
                           {show.is_free ? "Freier Eintritt" : `${show.price} €`}
                         </p>
                       ) : null}
                       {show.support_acts && show.support_acts.length > 0 && (
-                        <p className="text-xs text-zinc-500 mt-1">
+                        <p className="text-xs text-zinc-500 mt-1 line-clamp-2">
                           Support: {show.support_acts.join(", ")}
                         </p>
                       )}
-                      {show.ticket_url && (
-                        <a
-                          href={show.ticket_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-zinc-400 hover:text-zinc-200 underline mt-1 inline-block"
-                        >
-                          🎟️ Tickets
-                        </a>
-                      )}
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between gap-2">
                       {!show.flyer_path && (
-                        <div className="mt-2">
+                        <div>
                           <input
                             ref={fileInputRef}
                             type="file"
@@ -777,22 +756,29 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                           </label>
                         </div>
                       )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => startEdit(show)}
-                        className="text-xs text-zinc-500 hover:text-zinc-300 p-1"
-                        title="Bearbeiten"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        onClick={() => handleDelete(show.id)}
-                        className="text-xs text-zinc-500 hover:text-red-400 p-1"
-                        title="Löschen"
-                      >
-                        ✕
-                      </button>
+                      {show.flyer_path && (
+                        <button
+                          onClick={() => handleFlyerDelete(show.id)}
+                          className="text-xs text-zinc-400 hover:text-red-400"
+                          title="Flyer löschen"
+                        >
+                          Flyer löschen
+                        </button>
+                      )}
+                      <div className="ml-auto flex items-center gap-2">
+                        <button
+                          onClick={() => startEdit(show)}
+                          className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
+                        >
+                          Bearbeiten
+                        </button>
+                        <button
+                          onClick={() => handleDelete(show.id)}
+                          className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition-colors hover:border-red-500/50 hover:bg-red-500/20"
+                        >
+                          Löschen
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
