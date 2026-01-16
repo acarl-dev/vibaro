@@ -493,8 +493,8 @@ Returns all featured tracks for the artist page, sorted by `position` ascending.
       "id": 2,
       "title": "Late Night Drive",
       "artist_name": "Emily J. ft. John Doe",
-      "platform": "youtube",
-      "platform_url": "https://www.youtube.com/watch?v=XYZ789",
+      "platform": "youtubemusic",
+      "platform_url": "https://music.youtube.com/watch?v=XYZ789",
       "embed_id": "XYZ789",
       "position": 1
     }
@@ -507,7 +507,7 @@ Returns all featured tracks for the artist page, sorted by `position` ascending.
 {
   "title": "Lost in the City",
   "artist_name": null,  // optional
-  "platform": "spotify",  // spotify | soundcloud | youtube
+  "platform": "spotify",  // spotify | applemusic | primemusic | youtubemusic | soundcloud
   "platform_url": "https://open.spotify.com/track/ABC123",
   "embed_id": null  // optional, auto-extracted if not provided
 }

@@ -44,7 +44,7 @@ class FeaturedTrackController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'artist_name' => 'nullable|string|max:255',
-            'platform' => 'required|string|in:spotify,soundcloud,youtube',
+            'platform' => 'required|string|in:spotify,applemusic,primemusic,youtubemusic,soundcloud',
             'platform_url' => 'required|url|max:500',
             'embed_id' => 'nullable|string|max:255',
         ]);
@@ -89,7 +89,7 @@ class FeaturedTrackController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'artist_name' => 'nullable|string|max:255',
-            'platform' => 'sometimes|string|in:spotify,soundcloud,youtube',
+            'platform' => 'sometimes|string|in:spotify,applemusic,primemusic,youtubemusic,soundcloud',
             'platform_url' => 'sometimes|url|max:500',
             'embed_id' => 'nullable|string|max:255',
             'position' => 'sometimes|integer|min:0',
@@ -169,9 +169,9 @@ class FeaturedTrackController extends Controller
                 // SoundCloud requires full URL for embed
                 return $url;
 
-            case 'youtube':
-                // https://www.youtube.com/watch?v=ABC123 or https://youtu.be/ABC123
-                if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $matches)) {
+            case 'youtubemusic':
+                // https://music.youtube.com/watch?v=ABC123
+                if (preg_match('/music\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $url, $matches)) {
                     return $matches[1];
                 }
                 break;

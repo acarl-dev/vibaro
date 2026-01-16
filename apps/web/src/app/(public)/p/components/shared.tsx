@@ -56,7 +56,12 @@ export type ReleaseItem = {
 export type FeaturedTrackItem = {
   title: string;
   artist_name: string | null;
-  platform: "spotify" | "soundcloud" | "youtube";
+  platform:
+    | "spotify"
+    | "applemusic"
+    | "primemusic"
+    | "youtubemusic"
+    | "soundcloud";
   platform_url: string;
   embed_id: string | null;
 };

@@ -155,7 +155,7 @@ Kuratierte Auswahl von Tracks für den Music Player.
 | artist_page_id | bigint | FK → artist_pages.id |
 | title | string | Track-Titel |
 | artist_name | string | nullable, für Features/Collabs |
-| platform | string | `spotify` \| `soundcloud` \| `youtube` |
+| platform | string | `spotify` \| `applemusic` \| `primemusic` \| `youtubemusic` \| `soundcloud` |
 | platform_url | string | Vollständiger URL zum Track |
 | embed_id | string | nullable, extrahierte ID für Embeds |
 | position | int | Sortierung |
@@ -171,7 +171,8 @@ Kuratierte Auswahl von Tracks für den Music Player.
 - Maximal 5-7 Tracks empfohlen für optimale UX
 - Spotify: Embed via Track ID
 - SoundCloud: Embed via vollständiger URL
-- YouTube: Embed via Video ID
+- YouTube Music: Embed via Video ID
+- Apple Music / Prime Music: kein Embed (Fallback-Link)
 
 ---
 

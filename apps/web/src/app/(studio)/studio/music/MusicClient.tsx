@@ -6,7 +6,12 @@ type FeaturedTrack = {
   id: number;
   title: string;
   artist_name: string | null;
-  platform: "spotify" | "soundcloud" | "youtube";
+  platform:
+    | "spotify"
+    | "applemusic"
+    | "primemusic"
+    | "youtubemusic"
+    | "soundcloud";
   platform_url: string;
   embed_id: string | null;
   position: number;
@@ -18,8 +23,10 @@ type MusicClientProps = {
 
 const platformLabels = {
   spotify: "Spotify",
+  applemusic: "Apple Music",
+  primemusic: "Prime Music",
+  youtubemusic: "YouTube Music",
   soundcloud: "SoundCloud",
-  youtube: "YouTube",
 };
 
 export default function MusicClient({ initialTracks }: MusicClientProps) {
@@ -29,7 +36,12 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
   const [formData, setFormData] = useState({
     title: "",
     artist_name: "",
-    platform: "spotify" as "spotify" | "soundcloud" | "youtube",
+    platform: "spotify" as
+      | "spotify"
+      | "applemusic"
+      | "primemusic"
+      | "youtubemusic"
+      | "soundcloud",
     platform_url: "",
   });
   const [error, setError] = useState("");
@@ -200,14 +212,21 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      platform: e.target.value as "spotify" | "soundcloud" | "youtube",
+                      platform: e.target.value as
+                        | "spotify"
+                        | "applemusic"
+                        | "primemusic"
+                        | "youtubemusic"
+                        | "soundcloud",
                     })
                   }
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
                 >
                   <option value="spotify">Spotify</option>
+                  <option value="applemusic">Apple Music</option>
+                  <option value="primemusic">Prime Music</option>
+                  <option value="youtubemusic">YouTube Music</option>
                   <option value="soundcloud">SoundCloud</option>
-                  <option value="youtube">YouTube</option>
                 </select>
               </div>
 
@@ -282,14 +301,21 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            platform: e.target.value as "spotify" | "soundcloud" | "youtube",
+                            platform: e.target.value as
+                              | "spotify"
+                              | "applemusic"
+                              | "primemusic"
+                              | "youtubemusic"
+                              | "soundcloud",
                           })
                         }
                         className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
                       >
                         <option value="spotify">Spotify</option>
+                        <option value="applemusic">Apple Music</option>
+                        <option value="primemusic">Prime Music</option>
+                        <option value="youtubemusic">YouTube Music</option>
                         <option value="soundcloud">SoundCloud</option>
-                        <option value="youtube">YouTube</option>
                       </select>
                     </div>
 

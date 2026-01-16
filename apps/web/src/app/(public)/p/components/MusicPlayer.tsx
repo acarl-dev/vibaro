@@ -5,7 +5,12 @@ import { useLazyLoad } from "../hooks/useLazyLoad";
 type FeaturedTrack = {
   title: string;
   artist_name: string | null;
-  platform: "spotify" | "soundcloud" | "youtube";
+  platform:
+    | "spotify"
+    | "applemusic"
+    | "primemusic"
+    | "youtubemusic"
+    | "soundcloud";
   platform_url: string;
   embed_id: string | null;
 };
@@ -16,6 +21,13 @@ type MusicPlayerProps = {
 
 export default function MusicPlayer({ tracks }: MusicPlayerProps) {
   const [ref, isVisible] = useLazyLoad<HTMLDivElement>();
+  const platformLabels: Record<FeaturedTrack["platform"], string> = {
+    spotify: "Spotify",
+    applemusic: "Apple Music",
+    primemusic: "Prime Music",
+    youtubemusic: "YouTube Music",
+    soundcloud: "SoundCloud",
+  };
 
   if (!tracks || tracks.length === 0) return null;
 
@@ -50,7 +62,7 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
               />
             )}
             
-            {track.platform === "youtube" && track.embed_id && (
+            {track.platform === "youtubemusic" && track.embed_id && (
               <div className="relative aspect-video">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${track.embed_id}`}
@@ -81,7 +93,7 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Play on {track.platform.charAt(0).toUpperCase() + track.platform.slice(1)}
+                  Play on {platformLabels[track.platform]}
                 </a>
               </div>
             )}

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('artist_page_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('artist_name')->nullable();
-            $table->string('platform'); // spotify | soundcloud | youtube
+            $table->string('platform'); // spotify | applemusic | primemusic | youtubemusic | soundcloud
             $table->string('platform_url');
             $table->string('embed_id')->nullable();
             $table->integer('position')->default(0);
