@@ -28,6 +28,24 @@ const platformLabels = {
 const buildDefaultTitle = (platform: FeaturedTrack["platform"]) =>
   `${platformLabels[platform]} Track`;
 
+const getEmbedId = (platform: FeaturedTrack["platform"], url: string, embedId?: string | null) => {
+  if (embedId) return embedId;
+
+  if (platform === "spotify") {
+    const match = url.match(
+      /spotify\.com\/(?:intl-[a-z]{2}(?:-[A-Z]{2})?|[a-z]{2}(?:-[A-Z]{2})?)?\/(?:embed\/)?track\/([a-zA-Z0-9]+)/
+    );
+    return match?.[1] ?? null;
+  }
+
+  if (platform === "youtubemusic") {
+    const match = url.match(/music\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+    return match?.[1] ?? null;
+  }
+
+  return null;
+};
+
 export default function MusicClient({ initialTracks }: MusicClientProps) {
   const [tracks, setTracks] = useState<FeaturedTrack[]>(initialTracks);
   const [isCreating, setIsCreating] = useState(false);
@@ -289,7 +307,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
             <p className="text-sm text-zinc-400">Noch keine Tracks hinzugefügt.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid gap-4 md:grid-cols-2">
             {tracks.map((track) => (
               <div
                 key={track.id}
@@ -357,14 +375,62 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                   </div>
                 ) : (
                   <div>
-                    <div className="mb-4">
-                      <h3 className="text-lg font-medium">{track.title}</h3>
-                      {track.artist_name && (
-                        <p className="text-sm text-zinc-400">{track.artist_name}</p>
-                      )}
-                      <p className="mt-2 text-xs text-zinc-500">
+                    <div className="mb-4 space-y-3">
+                      <div className="text-xs text-zinc-500">
                         {platformLabels[track.platform]} • {track.platform_url}
-                      </p>
+                      </div>
+
+                      <div className="overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30">
+                        {track.platform === "spotify" && (
+                          <iframe
+                            src={`https://open.spotify.com/embed/track/${getEmbedId(
+                              track.platform,
+                              track.platform_url,
+                              track.embed_id
+                            )}?utm_source=generator&theme=0`}
+                            width="100%"
+                            height="120"
+                            frameBorder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy"
+                            title={track.title}
+                            className="w-full"
+                          />
+                        )}
+
+                        {track.platform === "soundcloud" && (
+                          <iframe
+                            width="100%"
+                            height="120"
+                            scrolling="no"
+                            frameBorder="no"
+                            allow="autoplay"
+                            src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(
+                              track.platform_url
+                            )}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`}
+                            title={track.title}
+                            className="w-full"
+                          />
+                        )}
+
+                        {track.platform === "youtubemusic" && getEmbedId(track.platform, track.platform_url, track.embed_id) && (
+                          <iframe
+                            src={`https://www.youtube-nocookie.com/embed/${getEmbedId(
+                              track.platform,
+                              track.platform_url,
+                              track.embed_id
+                            )}`}
+                            width="100%"
+                            height="120"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            loading="lazy"
+                            title={track.title}
+                            className="w-full"
+                          />
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex gap-3">
