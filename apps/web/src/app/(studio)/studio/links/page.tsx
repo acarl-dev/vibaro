@@ -63,5 +63,5 @@ export default async function StudioLinksPage() {
 
   const links = await fetchLinks();
 
-  return <LinksClient initialPage={page} initialLinks={links} />;
+  return <LinksClient initialLinks={links} />;
 }

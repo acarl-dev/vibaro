@@ -1,18 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import LivePreview from "../../components/LivePreview";
 import { getSocialIcon, getPlatformName, type SocialPlatform } from "@/lib/social-icons";
-
-type ArtistPage = {
-  id: number;
-  handle: string;
-  display_name: string;
-  bio: string | null;
-  is_published: boolean;
-  avatar_url: string | null;
-  hero_image_url: string | null;
-};
 
 type Link = {
   id: number;
@@ -23,7 +12,6 @@ type Link = {
 };
 
 type LinksClientProps = {
-  initialPage: ArtistPage;
   initialLinks: Link[];
 };
 
@@ -41,7 +29,7 @@ const SOCIAL_PLATFORMS: SocialPlatform[] = [
   "website",
 ];
 
-export default function LinksClient({ initialPage, initialLinks }: LinksClientProps) {
+export default function LinksClient({ initialLinks }: LinksClientProps) {
   const [links, setLinks] = useState<Link[]>(initialLinks);
   const [error, setError] = useState("");
 
@@ -79,84 +67,75 @@ export default function LinksClient({ initialPage, initialLinks }: LinksClientPr
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Editor Column */}
-        <div className="space-y-6">
-          {/* Social Media Section */}
-          <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-            <div className="mb-4">
-              <h2 className="text-sm font-medium text-zinc-300">Social Media & Musik</h2>
-              <p className="text-xs text-zinc-600 mt-1">
-                Trage einfach deine URLs ein. Leere Felder werden nicht angezeigt.
-              </p>
+      <div className="space-y-6">
+        {/* Social Media Section */}
+        <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+          <div className="mb-4">
+            <h2 className="text-sm font-medium text-zinc-300">Social Media & Musik</h2>
+            <p className="text-xs text-zinc-600 mt-1">
+              Trage einfach deine URLs ein. Leere Felder werden nicht angezeigt.
+            </p>
+          </div>
+
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
+              {error}
             </div>
+          )}
 
-            {error && (
-              <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-3">
-              {socialLinks.map((link) => (
-                <div
-                  key={link.id}
-                  className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3"
-                >
-                  {/* Icon */}
+          <div className="space-y-3">
+            {socialLinks.map((link) => (
+              <div
+                key={link.id}
+                className="flex flex-col gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:flex-row sm:items-center"
+              >
+                {/* Icon */}
+                <div className="flex items-center gap-3 sm:gap-2">
                   <div className="flex-shrink-0 text-zinc-400">
                     {getSocialIcon(link.type as SocialPlatform, "w-5 h-5")}
                   </div>
 
                   {/* Platform Name */}
-                  <div className="w-32 flex-shrink-0">
+                  <div className="min-w-0 sm:w-32 sm:flex-shrink-0">
                     <p className="text-sm font-medium text-zinc-300">
                       {link.title || getPlatformName(link.type as SocialPlatform)}
                     </p>
                   </div>
+                </div>
 
-                  {/* URL Input */}
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    value={link.url || ""}
-                    onChange={(e) => handleUpdateLink(link.id, e.target.value)}
-                    onBlur={(e) => handleUpdateLink(link.id, e.target.value)}
-                    className="flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                  />
+                {/* URL Input */}
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  value={link.url || ""}
+                  onChange={(e) => handleUpdateLink(link.id, e.target.value)}
+                  onBlur={(e) => handleUpdateLink(link.id, e.target.value)}
+                  className="w-full flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Custom Links Section (Future) */}
+        {customLinks.length > 0 && (
+          <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+            <div className="mb-4">
+              <h2 className="text-sm font-medium text-zinc-300">Eigene Links</h2>
+            </div>
+            <div className="space-y-3">
+              {customLinks.map((link) => (
+                <div
+                  key={link.id}
+                  className="rounded-lg border border-zinc-800 bg-zinc-900 p-3"
+                >
+                  <p className="text-sm font-medium text-zinc-100">{link.title}</p>
+                  <p className="text-xs text-zinc-500 truncate">{link.url}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Custom Links Section (Future) */}
-          {customLinks.length > 0 && (
-            <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-              <div className="mb-4">
-                <h2 className="text-sm font-medium text-zinc-300">Eigene Links</h2>
-              </div>
-              <div className="space-y-3">
-                {customLinks.map((link) => (
-                  <div
-                    key={link.id}
-                    className="rounded-lg border border-zinc-800 bg-zinc-900 p-3"
-                  >
-                    <p className="text-sm font-medium text-zinc-100">{link.title}</p>
-                    <p className="text-xs text-zinc-500 truncate">{link.url}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Preview Column */}
-        <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)]">
-          <LivePreview 
-            page={initialPage} 
-            links={links.filter((l) => l.url && l.url.trim() !== "")} 
-          />
-        </div>
+        )}
       </div>
     </div>
   );
