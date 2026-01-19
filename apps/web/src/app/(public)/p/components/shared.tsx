@@ -652,22 +652,22 @@ export function GalleryGrid({ items }: { items: GalleryImageItem[] }) {
 
   return (
     <>
-      <div className="columns-2 md:columns-3 lg:columns-4 gap-4 [column-fill:balance]">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {items.map((image, index) => (
           <button
             key={index}
             onClick={() => handleImageClick(index)}
             type="button"
-            className="group mb-4 block w-full break-inside-avoid text-left"
+            className="group block w-full text-left"
             aria-label={image.title ? `Bild öffnen: ${image.title}` : `Bild öffnen ${index + 1}`}
           >
             <div className="overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/30 transition-colors group-hover:border-zinc-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500/40">
-              <div className="relative">
+              <div className="relative aspect-square">
                 <img
                   src={image.image_url}
                   alt={image.title || `Gallery image ${index + 1}`}
                   loading="lazy"
-                  className="block w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/45 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" />

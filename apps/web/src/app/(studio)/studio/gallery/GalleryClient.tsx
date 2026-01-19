@@ -19,8 +19,11 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
@@ -159,14 +162,22 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
     setUploading(true);
     setError("");
+    setUploadProgress({ current: 0, total: filesToUpload.length });
 
-    // Upload all files in parallel
-    const uploadPromises = filesToUpload.map(file => handleUpload(file));
-    const results = await Promise.all(uploadPromises);
+    // Upload files sequentially to show progress
+    const successfulUploads: GalleryImage[] = [];
+    const errors: string[] = [];
 
-    // Collect successful uploads and errors
-    const successfulUploads = results.filter(r => r.success).map(r => r.data!);
-    const errors = results.filter(r => !r.success).map(r => r.error!);
+    for (let i = 0; i < filesToUpload.length; i++) {
+      setUploadProgress({ current: i + 1, total: filesToUpload.length });
+      const result = await handleUpload(filesToUpload[i]);
+      
+      if (result.success) {
+        successfulUploads.push(result.data!);
+      } else {
+        errors.push(result.error!);
+      }
+    }
 
     // Update images with successful uploads
     if (successfulUploads.length > 0) {
@@ -182,6 +193,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
     }
 
     setUploading(false);
+    setUploadProgress(null);
   };
 
   const handleUpdateTitle = async (imageId: number, newTitle: string) => {
@@ -240,6 +252,67 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
     setError("");
   };
 
+  // Drag & Drop Reordering
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOverItem = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedIndex === null) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeaveItem = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDropItem = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    // Reorder locally
+    const reorderedImages = [...images];
+    const [removed] = reorderedImages.splice(draggedIndex, 1);
+    reorderedImages.splice(dropIndex, 0, removed);
+
+    // Update positions
+    const updatedImages = reorderedImages.map((img, idx) => ({
+      ...img,
+      position: idx,
+    }));
+
+    setImages(updatedImages);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    // Save new order to backend
+    try {
+      const imageIds = updatedImages.map(img => img.id);
+      await fetch('/api/studio/gallery/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_ids: imageIds }),
+      });
+    } catch (err) {
+      console.error('Failed to save order:', err);
+      setError('Reihenfolge konnte nicht gespeichert werden');
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-8">
@@ -251,7 +324,14 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium text-zinc-300">Deine Bilder ({images.length}/16)</h2>
+          <div>
+            <h2 className="text-sm font-medium text-zinc-300">Deine Bilder ({images.length}/16)</h2>
+            {images.length > 1 && (
+              <p className="text-xs text-zinc-500 mt-1">
+                💡 Ziehe Bilder, um die Reihenfolge zu ändern
+              </p>
+            )}
+          </div>
           {images.length < 16 && (
             <div>
               <input
@@ -278,12 +358,22 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
                   setUploading(true);
                   setError("");
+                  setUploadProgress({ current: 0, total: filesToUpload.length });
 
-                  const uploadPromises = filesToUpload.map(file => handleUpload(file));
-                  const results = await Promise.all(uploadPromises);
+                  // Upload files sequentially to show progress
+                  const successfulUploads: GalleryImage[] = [];
+                  const errors: string[] = [];
 
-                  const successfulUploads = results.filter(r => r.success).map(r => r.data!);
-                  const errors = results.filter(r => !r.success).map(r => r.error!);
+                  for (let i = 0; i < filesToUpload.length; i++) {
+                    setUploadProgress({ current: i + 1, total: filesToUpload.length });
+                    const result = await handleUpload(filesToUpload[i]);
+                    
+                    if (result.success) {
+                      successfulUploads.push(result.data!);
+                    } else {
+                      errors.push(result.error!);
+                    }
+                  }
 
                   if (successfulUploads.length > 0) {
                     setImages([...images, ...successfulUploads]);
@@ -297,6 +387,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
                   }
 
                   setUploading(false);
+                  setUploadProgress(null);
                 }}
                 className="hidden"
                 id="gallery-upload"
@@ -309,7 +400,11 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
                     : "text-zinc-400 hover:text-zinc-100 hover:border-zinc-600"
                 }`}
               >
-                {uploading ? "⏳ Hochladen..." : "+ Bild hinzufügen"}
+                {uploading && uploadProgress
+                  ? `⏳ ${uploadProgress.current}/${uploadProgress.total}`
+                  : uploading
+                  ? "⏳ Hochladen..."
+                  : "+ Bilder hinzufügen"}
               </label>
             </div>
           )}
@@ -370,15 +465,36 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
               </div>
             )}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {images.map((image) => (
+              {images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="group relative aspect-square rounded-lg overflow-hidden bg-zinc-900 border border-zinc-800"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={(e) => handleDragOverItem(e, index)}
+                  onDragLeave={handleDragLeaveItem}
+                  onDrop={(e) => handleDropItem(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`group relative aspect-square rounded-lg overflow-hidden bg-zinc-900 border transition-all cursor-move ${
+                    draggedIndex === index
+                      ? "opacity-50 scale-95"
+                      : dragOverIndex === index
+                      ? "border-emerald-500 ring-2 ring-emerald-500/50"
+                      : "border-zinc-800"
+                  }`}
                 >
+                  {/* Drag handle indicator */}
+                  <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </div>
+                  </div>
+
                   <img
                     src={image.image_url}
                     alt={image.title || "Gallery image"}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover pointer-events-none"
                   />
 
                   {/* Overlay with actions */}
@@ -401,7 +517,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
                   {/* Title overlay at bottom */}
                   {image.title && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 pointer-events-none">
                       <p className="text-xs text-white truncate">{image.title}</p>
                     </div>
                   )}
