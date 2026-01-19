@@ -7,6 +7,7 @@ type ContactData = {
   management_email: string | null;
   press_email: string | null;
   whatsapp_number: string | null;
+  contact_message: string | null;
 };
 
 type ContactClientProps = {
@@ -34,6 +35,7 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
           management_email: formData.management_email || null,
           press_email: formData.press_email || null,
           whatsapp_number: formData.whatsapp_number || null,
+          contact_message: formData.contact_message || null,
         }),
       });
 
@@ -138,6 +140,24 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
           />
           <p className="mt-1 text-xs text-zinc-500">
             Optional: WhatsApp Business Nummer (mit Ländervorwahl, z.B. +49)
+          </p>
+        </div>
+
+        {/* Contact Message */}
+        <div>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">
+            Kontakt-Nachricht
+          </label>
+          <textarea
+            placeholder="Ich melde mich so schnell wie möglich bei dir."
+            value={formData.contact_message || ""}
+            onChange={(e) => setFormData({ ...formData, contact_message: e.target.value })}
+            rows={3}
+            maxLength={500}
+            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 resize-none"
+          />
+          <p className="mt-1 text-xs text-zinc-500">
+            Persönliche Nachricht im Kontakt-Modal (max. 500 Zeichen). Standard: "Ich melde mich so schnell wie möglich bei dir."
           </p>
         </div>
 

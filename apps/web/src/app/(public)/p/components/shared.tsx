@@ -103,6 +103,7 @@ export type PublicArtistPageData = {
   management_email?: string | null;
   press_email?: string | null;
   whatsapp_number?: string | null;
+  contact_message?: string | null;
   theme?: {
     key: string | null;
     variant: string | null;
@@ -750,11 +751,13 @@ export function ContactInquiryButton({
   management_email,
   press_email,
   whatsapp_number,
+  contact_message,
 }: {
   booking_email?: string | null;
   management_email?: string | null;
   press_email?: string | null;
   whatsapp_number?: string | null;
+  contact_message?: string | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const hasAnyContact = booking_email || management_email || press_email || whatsapp_number;
@@ -779,6 +782,7 @@ export function ContactInquiryButton({
           management_email={management_email}
           press_email={press_email}
           whatsapp_number={whatsapp_number}
+          contact_message={contact_message}
           onClose={() => setIsOpen(false)}
         />
       )}
@@ -792,12 +796,14 @@ function ContactInquiryModal({
   management_email,
   press_email,
   whatsapp_number,
+  contact_message,
   onClose,
 }: {
   booking_email?: string | null;
   management_email?: string | null;
   press_email?: string | null;
   whatsapp_number?: string | null;
+  contact_message?: string | null;
   onClose: () => void;
 }) {
   const contacts = [
@@ -814,6 +820,9 @@ function ContactInquiryModal({
     }
     return `mailto:${contact.email}`;
   };
+
+  const defaultMessage = "Ich melde mich so schnell wie möglich bei dir.";
+  const displayMessage = contact_message || defaultMessage;
 
   return (
     <>
@@ -864,7 +873,7 @@ function ContactInquiryModal({
           {/* Footer note */}
           <div className="px-6 py-4 border-t border-zinc-800 bg-zinc-900/50">
             <p className="text-xs text-zinc-500 text-center">
-              We'll get back to you as soon as possible
+              {displayMessage}
             </p>
           </div>
         </div>
@@ -1051,6 +1060,7 @@ export function OptionalSections({ page }: { page: PublicArtistPageData }) {
             management_email={page.management_email}
             press_email={page.press_email}
             whatsapp_number={page.whatsapp_number}
+            contact_message={page.contact_message}
           />
         </Section>
       )}

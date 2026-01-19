@@ -29,6 +29,7 @@ class ArtistPage extends Model
         'management_email',
         'press_email',
         'whatsapp_number',
+        'contact_message',
         'is_published',
         'published_at',
     ];

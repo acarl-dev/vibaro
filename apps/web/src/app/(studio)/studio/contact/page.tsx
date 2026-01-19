@@ -8,6 +8,7 @@ type ArtistPage = {
   management_email: string | null;
   press_email: string | null;
   whatsapp_number: string | null;
+  contact_message: string | null;
 };
 
 async function fetchArtistPage(): Promise<ArtistPage | null> {
@@ -24,6 +25,7 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
       management_email: data.management_email ?? null,
       press_email: data.press_email ?? null,
       whatsapp_number: data.whatsapp_number ?? null,
+      contact_message: data.contact_message ?? null,
     };
   } catch {
     return null;
@@ -44,6 +46,7 @@ export default async function StudioContactPage() {
         management_email: page.management_email,
         press_email: page.press_email,
         whatsapp_number: page.whatsapp_number,
+        contact_message: page.contact_message,
       }}
       artistPageId={page.id}
     />

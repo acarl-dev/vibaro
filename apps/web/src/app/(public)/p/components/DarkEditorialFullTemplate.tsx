@@ -174,6 +174,7 @@ export default function DarkEditorialFullTemplate({
           management_email={page.management_email}
           press_email={page.press_email}
           whatsapp_number={page.whatsapp_number}
+          contact_message={page.contact_message}
         />
       </ContentSection>
 

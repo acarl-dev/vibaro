@@ -42,6 +42,7 @@ Zentrale Entität für Musiker-Seiten.
 | management_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
 | press_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
 | whatsapp_number | string | nullable, **PRIVATE** - nur Studio sichtbar |
+| contact_message | string | nullable, max 500 Zeichen, änderbar im Studio |
 | is_published | boolean | default false |
 | published_at | timestamp | nullable, gesetzt beim ersten Publish |
 | created_at | timestamp | |
@@ -56,6 +57,7 @@ Zentrale Entität für Musiker-Seiten.
 - **WICHTIG**: Werden NICHT in Public API Response ausgeliefert (siehe docs/SECURITY.md, docs/API_CONTRACTS.md)
 - E-Mail-Felder werden validiert (email format)
 - WhatsApp-Nummer: max. 50 Zeichen, kein Format-Check (internationale Nummern unterschiedlich)
+- `contact_message`: Persönliche Nachricht im Kontakt-Modal (max. 500 Zeichen), Standard: "Ich melde mich so schnell wie möglich bei dir."
 - Public Page zeigt nur "Get in Touch"-Button, keine E-Mail-Adressen
 
 ---
