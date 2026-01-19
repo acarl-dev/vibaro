@@ -53,13 +53,11 @@ export default async function StudioSettingsPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">Einstellungen</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Verwalte deine Seiten-Einstellungen und dein Konto.
+          Verwalte deine Seite und dein Konto
         </p>
       </div>
 
-      <div className="space-y-6">
-        <SettingsClient handle={page.handle} isPublished={page.is_published} />
-      </div>
+      <SettingsClient handle={page.handle} isPublished={page.is_published} />
     </div>
   );
 }
