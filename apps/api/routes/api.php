@@ -84,6 +84,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/studio/videos/{id}', [VideoController::class, 'update']);
         Route::delete('/studio/videos/{id}', [VideoController::class, 'destroy']);
         Route::post('/studio/videos/reorder', [VideoController::class, 'reorder']);
+        Route::post('/studio/videos/{id}/featured', [VideoController::class, 'toggleFeatured']);
 
         // Gallery Images (private CRUD)
         Route::get('/studio/gallery', [GalleryImageController::class, 'index']);

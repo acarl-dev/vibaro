@@ -72,6 +72,7 @@ export type VideoItem = {
   url: string;
   description?: string | null;
   thumbnail_url?: string | null;
+  is_featured?: boolean;
 };
 
 export type GalleryImageItem = {

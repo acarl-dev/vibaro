@@ -33,6 +33,7 @@ class VideoController extends Controller
             'description' => $video->description,
             'thumbnail_url' => $video->thumbnail_url,
             'position' => $video->position,
+            'is_featured' => $video->is_featured ?? false,
         ])->toArray());
     }
 
@@ -94,6 +95,7 @@ class VideoController extends Controller
             'description' => $video->description,
             'thumbnail_url' => $video->thumbnail_url,
             'position' => $video->position,
+            'is_featured' => $video->is_featured ?? false,
         ]);
     }
 
@@ -152,6 +154,7 @@ class VideoController extends Controller
             'description' => $video->description,
             'thumbnail_url' => $video->thumbnail_url,
             'position' => $video->position,
+            'is_featured' => $video->is_featured ?? false,
         ]);
     }
 
@@ -209,6 +212,44 @@ class VideoController extends Controller
         }
 
         return $this->success(null);
+    }
+
+    /**
+     * Toggle featured status for a video
+     * Only one video can be featured per artist page
+     */
+    public function toggleFeatured(Request $request, int $id): JsonResponse
+    {
+        $video = Video::find($id);
+
+        if (!$video) {
+            return $this->error('NOT_FOUND', 'Video not found.', 404);
+        }
+
+        $page = $request->user()->artistPage;
+
+        if (!$page || $video->artist_page_id !== $page->id) {
+            return $this->error('FORBIDDEN', 'Access denied.', 403);
+        }
+
+        $this->authorize('update', $page);
+
+        // If marking as featured, unmark all other videos
+        if (!$video->is_featured) {
+            Video::where('artist_page_id', $page->id)
+                ->where('id', '!=', $video->id)
+                ->update(['is_featured' => false]);
+
+            $video->update(['is_featured' => true]);
+        } else {
+            // Unmarking featured
+            $video->update(['is_featured' => false]);
+        }
+
+        return $this->success([
+            'id' => $video->id,
+            'is_featured' => $video->is_featured,
+        ]);
     }
 
     /**

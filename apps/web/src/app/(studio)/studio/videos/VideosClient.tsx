@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type Video = {
   id: number;
@@ -11,6 +11,7 @@ type Video = {
   description: string | null;
   thumbnail_url: string | null;
   position: number;
+  is_featured: boolean;
 };
 
 type VideosClientProps = {
@@ -21,6 +22,8 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
   const [videos, setVideos] = useState<Video[]>(initialVideos);
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     url: "",
@@ -130,6 +133,85 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
     setError("");
   };
 
+  const handleToggleFeatured = async (videoId: number) => {
+    try {
+      const res = await fetch(`/api/studio/videos/${videoId}/featured`, {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setVideos(videos.map((v) => ({
+          ...v,
+          is_featured: v.id === videoId ? json.data.is_featured : false,
+        })));
+      }
+    } catch {
+      setError("Featured-Status konnte nicht geändert werden");
+    }
+  };
+
+  // Drag & Drop Reordering
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOverItem = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedIndex === null) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeaveItem = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDropItem = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    // Reorder locally
+    const reorderedVideos = [...videos];
+    const [removed] = reorderedVideos.splice(draggedIndex, 1);
+    reorderedVideos.splice(dropIndex, 0, removed);
+
+    // Update positions
+    const updatedVideos = reorderedVideos.map((vid, idx) => ({
+      ...vid,
+      position: idx,
+    }));
+
+    setVideos(updatedVideos);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    // Save new order to backend
+    try {
+      const videoIds = updatedVideos.map(v => v.id);
+      await fetch('/api/studio/videos/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ video_ids: videoIds }),
+      });
+    } catch (err) {
+      console.error('Failed to save order:', err);
+      setError('Reihenfolge konnte nicht gespeichert werden');
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-8">
@@ -141,7 +223,14 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium text-zinc-300">Deine Videos ({videos.length}/8)</h2>
+          <div>
+            <h2 className="text-sm font-medium text-zinc-300">Deine Videos ({videos.length}/8)</h2>
+            {videos.length > 1 && (
+              <p className="text-xs text-zinc-500 mt-1">
+                💡 Ziehe Videos, um die Reihenfolge zu ändern
+              </p>
+            )}
+          </div>
           {!isCreating && !editingId && videos.length < 8 && (
             <button
               onClick={() => setIsCreating(true)}
@@ -222,8 +311,23 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
-              {videos.map((video) => (
-                <div key={video.id}>
+              {videos.map((video, index) => (
+                <div 
+                  key={video.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={(e) => handleDragOverItem(e, index)}
+                  onDragLeave={handleDragLeaveItem}
+                  onDrop={(e) => handleDropItem(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`transition-all ${
+                    draggedIndex === index
+                      ? "opacity-50 scale-95"
+                      : dragOverIndex === index
+                      ? "ring-2 ring-emerald-500/50"
+                      : ""
+                  }`}
+                >
                   {editingId === video.id ? (
                     <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
                       <input
@@ -269,9 +373,18 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                       </div>
                     </div>
                   ) : (
-                    <div className="rounded-lg border border-zinc-800 bg-zinc-900 overflow-hidden group">
+                    <div className="rounded-lg border border-zinc-800 bg-zinc-900 overflow-hidden group cursor-move relative">
+                      {/* Drag handle indicator */}
+                      <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </div>
+                      </div>
+
                       {/* Thumbnail */}
-                      <div className="relative aspect-video bg-zinc-950">
+                      <div className="relative aspect-video bg-zinc-950 pointer-events-none">
                         {video.thumbnail_url ? (
                           <img
                             src={video.thumbnail_url}
@@ -285,6 +398,20 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                             </svg>
                           </div>
                         )}
+                        
+                        {/* Featured Badge */}
+                        {video.is_featured && (
+                          <div className="absolute top-3 left-12 flex items-center gap-2 bg-black/70 backdrop-blur-md rounded-full px-3 py-1.5 border border-emerald-500/30">
+                            <div className="relative">
+                              <div className="absolute inset-0 rounded-full bg-emerald-400/30 blur-md animate-pulse" />
+                              <div className="relative w-2 h-2 rounded-full bg-emerald-400" />
+                            </div>
+                            <span className="text-[10px] font-medium tracking-wider uppercase text-emerald-400/90">
+                              Hero
+                            </span>
+                          </div>
+                        )}
+                        
                         {/* Platform Badge */}
                         <div className="absolute top-2 right-2 px-2 py-1 rounded bg-zinc-950/80 text-xs text-zinc-300">
                           {video.platform}
@@ -292,7 +419,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                       </div>
 
                       {/* Content */}
-                      <div className="p-3">
+                      <div className="p-3 pointer-events-auto">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-sm text-zinc-100 truncate">{video.title}</p>
@@ -301,6 +428,17 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                             )}
                           </div>
                           <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleToggleFeatured(video.id)}
+                              className={`text-xs p-1 transition-colors ${
+                                video.is_featured 
+                                  ? 'text-emerald-400 hover:text-emerald-300' 
+                                  : 'text-zinc-600 hover:text-emerald-400'
+                              }`}
+                              title={video.is_featured ? "Als Hero entfernen" : "Als Hero markieren"}
+                            >
+                              ★
+                            </button>
                             <button
                               onClick={() => startEdit(video)}
                               className="text-xs text-zinc-500 hover:text-zinc-300 p-1"

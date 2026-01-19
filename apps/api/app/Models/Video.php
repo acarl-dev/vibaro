@@ -22,6 +22,7 @@ class Video extends Model
         'description',
         'thumbnail_url',
         'position',
+        'is_featured',
     ];
 
     /**
@@ -29,6 +30,7 @@ class Video extends Model
      */
     protected $casts = [
         'position' => 'integer',
+        'is_featured' => 'boolean',
     ];
 
     public function artistPage(): BelongsTo
