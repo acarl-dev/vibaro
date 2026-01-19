@@ -121,6 +121,15 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
                   </span>
                 </div>
 
+                {initialPage.is_published && (
+                  <div className="mb-4 rounded-lg bg-zinc-900 border border-zinc-800 p-3">
+                    <p className="text-xs text-zinc-400">
+                      <strong className="text-zinc-300">Hinweis zum Zurückziehen:</strong><br />
+                      Deine Seite ist dann nicht mehr öffentlich erreichbar, bleibt aber bestehen und kann jederzeit wieder veröffentlicht werden.
+                    </p>
+                  </div>
+                )}
+
                 {publicUrl && (
                   <div className="space-y-2">
                     <Link 

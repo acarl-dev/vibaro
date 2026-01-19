@@ -113,6 +113,15 @@ export default function SettingsClient({ handle, isPublished }: SettingsClientPr
               : 'Deine Seite ist noch nicht öffentlich sichtbar. Veröffentliche sie, wenn du bereit bist.'
             }
           </p>
+
+          {isPublished && (
+            <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-3">
+              <p className="text-xs text-zinc-400">
+                <strong className="text-zinc-300">Hinweis zum Zurückziehen:</strong><br />
+                Deine Seite ist dann nicht mehr öffentlich erreichbar, bleibt aber bestehen und kann jederzeit wieder veröffentlicht werden.
+              </p>
+            </div>
+          )}
           
           <button
             onClick={handlePublishToggle}

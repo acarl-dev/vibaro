@@ -376,7 +376,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               <div>
                 <p className="text-sm text-zinc-300 font-medium mb-1">So sieht dein Profil aus</p>
                 <p className="text-xs text-zinc-500">
-                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio im Hero-Bild, um sie zu bearbeiten. Das Logo wird als rundes Bild über dem Header angezeigt. Änderungen werden automatisch gespeichert.
+                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio im 
+                  Hero-Bild, um sie zu bearbeiten.Änderungen werden automatisch gespeichert.
                 </p>
               </div>
             </div>
@@ -399,11 +400,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
           </li>
           <li className="flex gap-2">
             <span className="text-emerald-400">✓</span>
-            <span>Nutze deinen echten Künstlernamen als Display Name</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="text-emerald-400">✓</span>
-            <span>Das Logo wird über dem Header-Bild angezeigt (wie bei Facebook)</span>
+            <span>Nutze deinen echten Künstlernamen oder Bandnamen als Display Name</span>
           </li>
         </ul>
       </div>
