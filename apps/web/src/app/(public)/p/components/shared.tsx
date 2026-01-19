@@ -593,8 +593,16 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
                 </div>
               )}
               {release.is_featured && (
-                <div className="absolute top-2 right-2 text-2xl text-yellow-400">
-                  ★
+                <div className="absolute top-3 right-3 flex items-center gap-2">
+                  <div className="relative">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 rounded-full bg-emerald-400/30 blur-md animate-pulse" />
+                    {/* Dot */}
+                    <div className="relative w-2 h-2 rounded-full bg-emerald-400" />
+                  </div>
+                  <span className="text-[10px] font-medium tracking-wider uppercase text-emerald-400/90 drop-shadow-sm">
+                    New
+                  </span>
                 </div>
               )}
             </div>

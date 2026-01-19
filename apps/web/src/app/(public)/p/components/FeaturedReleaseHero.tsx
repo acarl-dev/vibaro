@@ -15,10 +15,18 @@ export function FeaturedReleaseHero({ release }: FeaturedReleaseHeroProps) {
       <div className="mx-auto" style={containerStyle("wide")}>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-              New Release
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4">{release.title}</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative">
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-full bg-emerald-400/30 blur-lg" />
+                {/* Dot */}
+                <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
+              <span className="text-xs font-medium tracking-[0.2em] uppercase text-emerald-400/90">
+                New Release
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">{release.title}</h2>
             {release.release_date && (
               <p className="text-zinc-400 text-lg mb-6">
                 Released{" "}
