@@ -562,53 +562,47 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
   if (items.length === 0) return <EmptyReleasesState />;
 
   return (
-    <ul className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <ul className="grid gap-5 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
       {items.map((release, index) => (
         <li key={index}>
           <a
             href={release.url ?? "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="group block rounded-md border border-zinc-800/50 bg-zinc-900/30 overflow-hidden transition-all hover:border-zinc-700/70 hover:shadow-lg hover:shadow-zinc-900/50 cursor-pointer active:scale-[0.98]"
+            className="group block rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col transition-all hover:border-zinc-700 hover:bg-zinc-900/50"
           >
-            {release.cover_url ? (
-              <div className="relative aspect-square w-full overflow-hidden">
-                <img
-                  src={release.cover_url}
-                  alt={release.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
-                />
-                {/* Play Icon Badge - always visible on mobile, overlay on desktop */}
-                <div className="absolute bottom-2 right-2 md:inset-0 bg-black/70 md:bg-black/0 md:group-hover:bg-black/30 rounded-full md:rounded-none p-2 md:p-0 transition-all duration-300 flex items-center justify-center">
-                  <svg className="w-6 h-6 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white drop-shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity transition-transform duration-300 md:group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </div>
+            <div className="relative mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
+              <div className="relative w-full pb-[100%]">
+                {release.cover_url ? (
+                  <img
+                    src={release.cover_url}
+                    alt={release.title}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">
+                    ♪
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="relative aspect-square w-full bg-zinc-900 flex items-center justify-center">
-                <span className="text-4xl text-zinc-700">♪</span>
-                {/* Play Icon Badge for no-cover case */}
-                <div className="absolute bottom-2 right-2 md:inset-0 bg-black/70 md:bg-black/0 md:group-hover:bg-black/30 rounded-full md:rounded-none p-2 md:p-0 transition-all duration-300 flex items-center justify-center">
-                  <svg className="w-6 h-6 md:w-12 md:h-12 lg:w-16 lg:h-16 text-white drop-shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity transition-transform duration-300 md:group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
+              {release.release_type && (
+                <div className="absolute top-2 left-2 rounded bg-zinc-900/80 px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-200">
+                  {release.release_type}
                 </div>
-              </div>
-            )}
-            <div className="p-3 sm:p-4">
+              )}
+              {release.is_featured && (
+                <div className="absolute top-2 right-2 text-2xl text-yellow-400">
+                  ★
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-zinc-100 truncate group-hover:text-white transition-colors">{release.title}</p>
               {release.release_date && (
-                <p className="text-xs text-zinc-500 mt-1.5">{release.release_date}</p>
+                <p className="text-xs text-zinc-500 mt-1">{release.release_date}</p>
               )}
-              {/* "Anhören" text - always visible on mobile, hover on desktop */}
-              <p className="text-xs text-accent mt-2 flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-                Anhören
-              </p>
             </div>
           </a>
         </li>
