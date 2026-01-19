@@ -282,7 +282,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                             setEditingName(false);
                           }
                         }}
-                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2 w-full"
+                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2"
+                        style={{ width: "auto", minWidth: "300px", maxWidth: "100%" }}
                         placeholder="Dein Name"
                       />
                     ) : (
