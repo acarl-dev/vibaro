@@ -340,7 +340,8 @@ class ReleaseController extends Controller
             return;
         }
 
-        $inferred = $this->inferReleaseTypeFromUrl($url);
+        $host = strtolower(parse_url($url, PHP_URL_HOST) ?? '');
+        $inferred = $this->fetchReleaseTypeFromUrl($url, $host) ?? $this->inferReleaseTypeFromUrl($url);
         if (!$inferred) {
             return;
         }
@@ -351,6 +352,49 @@ class ReleaseController extends Controller
 
         $release->release_type = $inferred;
         $release->save();
+    }
+
+    private function fetchReleaseTypeFromUrl(string $url, string $host): ?string
+    {
+        if (!Str::endsWith($host, ['spotify.com', 'spotify.link'])) {
+            return null;
+        }
+
+        try {
+            $response = Http::retry(2, 100, throw: false)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (compatible; VibaroBot/1.0; +https://vibaro.app)',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                ])
+                ->get($url);
+
+            if (!$response->successful()) {
+                return null;
+            }
+
+            $html = $response->body();
+            if (!$html) {
+                return null;
+            }
+
+            return $this->extractReleaseTypeFromHtml($html);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function extractReleaseTypeFromHtml(string $html): ?string
+    {
+        if (!preg_match('/"album_type"\s*:\s*"([^"]+)"/i', $html, $matches)) {
+            return null;
+        }
+
+        $type = strtolower(trim($matches[1] ?? ''));
+        return match ($type) {
+            'single' => 'single',
+            'album', 'compilation' => 'album',
+            default => null,
+        };
     }
 
     private function tryAutoReleaseDateFromUrl(Release $release, ?string $url, ?array $oembed = null): void

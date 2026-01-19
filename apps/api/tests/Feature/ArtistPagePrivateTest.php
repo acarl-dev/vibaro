@@ -87,7 +87,7 @@ class ArtistPagePrivateTest extends TestCase
             'user_id' => $user->id,
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,

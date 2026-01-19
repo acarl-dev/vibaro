@@ -38,7 +38,11 @@ class PublicArtistPageTest extends TestCase
                 'bio' => 'Berlin artist',
                 'images' => [
                     'avatar_url' => null,
-                    'header_url' => null,
+                    'hero_image_url' => null,
+                ],
+                'focus' => [
+                    'type' => 'links',
+                    'limit' => 3,
                 ],
                 'links' => [],
                 'shows' => [],
