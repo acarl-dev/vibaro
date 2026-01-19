@@ -28,6 +28,14 @@ type ContentCounts = {
   links: number;
 };
 
+function normalizeArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, T>);
+  }
+  return [];
+}
+
 async function fetchArtistPage(): Promise<ArtistPage | null> {
   try {
     const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
@@ -78,10 +86,10 @@ async function fetchContentCounts(artistPageId: number): Promise<ContentCounts> 
   const gallery = galleryRes?.ok ? (await galleryRes.json())?.data ?? [] : [];
 
   return {
-    releases: Array.isArray(releases) ? releases.length : 0,
-    shows: Array.isArray(shows) ? shows.length : 0,
-    videos: Array.isArray(videos) ? videos.length : 0,
-    gallery: Array.isArray(gallery) ? gallery.length : 0,
+    releases: normalizeArray(releases).length,
+    shows: normalizeArray(shows).length,
+    videos: normalizeArray(videos).length,
+    gallery: normalizeArray(gallery).length,
     links: 0, // Will be set separately
   };
 }

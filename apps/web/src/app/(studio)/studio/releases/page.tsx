@@ -11,6 +11,14 @@ type Release = {
   is_featured: boolean;
 };
 
+function normalizeArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, T>);
+  }
+  return [];
+}
+
 async function fetchArtistPageId(): Promise<number | null> {
   try {
     const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
@@ -30,7 +38,7 @@ async function fetchReleases(artistPageId: number): Promise<Release[]> {
     );
     if (!res.ok) return [];
     const json = await res.json();
-    return json?.data ?? [];
+    return normalizeArray<Release>(json?.data);
   } catch {
     return [];
   }

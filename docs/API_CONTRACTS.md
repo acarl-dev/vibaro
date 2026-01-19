@@ -411,9 +411,10 @@ Returns all releases for the artist page, sorted by `release_date` descending (n
     {
       "id": 1,
       "title": "My New Album",
-      "release_date": "2026-03-15",
+      "release_date": "2026-03-15", // nullable
       "url": "https://open.spotify.com/album/...",
       "cover_path": "covers/xyz789.jpg",
+      "release_type": "album",
       "is_featured": true,
       "position": 0
     }
@@ -425,21 +426,33 @@ Returns all releases for the artist page, sorted by `release_date` descending (n
 ```json
 {
   "title": "My New Album",
-  "release_date": "2026-03-15",
+  "release_date": "2026-03-15", // optional
   "url": "https://open.spotify.com/album/...",  // optional
   "is_featured": false  // optional, boolean
 }
 ```
 
+**Hinweis (MVP):** Wenn `url` auf Spotify, Apple Music, SoundCloud, YouTube Music oder Bandcamp zeigt und **kein** Cover hochgeladen wurde,
+versucht die API automatisch ein Cover über oEmbed zu übernehmen.
+Wenn `title` leer ist, versucht die API den Titel aus oEmbed zu übernehmen (nur unterstützte Provider).
+Wenn `release_type` leer ist, versucht die API es aus der URL abzuleiten (`album` \| `single`).
+Wenn `release_date` leer ist, versucht die API (best-effort) das Datum aus Provider-Metadaten zu extrahieren.
+
 **PATCH /artist-pages/{id}/releases/{releaseId}**
 ```json
 {
   "title": "Updated Album Title",
-  "release_date": "2026-03-20",
+  "release_date": "2026-03-20", // optional
   "url": "https://music.apple.com/album/...",
   "is_featured": true
 }
 ```
+
+**Hinweis (MVP):** Bei `url`-Änderung versucht die API automatisch ein Cover zu übernehmen,
+falls noch kein Cover gesetzt ist und die URL eine Spotify-, Apple Music-, SoundCloud-, YouTube Music- oder Bandcamp-URL ist.
+Wenn `title` leer ist, versucht die API den Titel aus oEmbed zu übernehmen (nur unterstützte Provider).
+Wenn `release_type` leer ist, versucht die API es aus der URL abzuleiten (`album` \| `single`).
+Wenn `release_date` leer ist, versucht die API (best-effort) das Datum aus Provider-Metadaten zu extrahieren.
 
 **DELETE /artist-pages/{id}/releases/{releaseId}**
 Deletes the release and its cover image if exists. Returns `{"data": {"ok": true}}`.

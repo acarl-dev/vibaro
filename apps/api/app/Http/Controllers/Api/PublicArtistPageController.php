@@ -88,7 +88,7 @@ class PublicArtistPageController extends Controller
                     'title' => $release->title,
                     'cover_url' => $release->cover_path ? $appUrl . Storage::url($release->cover_path) : null,
                     'url' => $release->url,
-                    'release_date' => $release->release_date->toDateString(),
+                    'release_date' => $release->release_date?->toDateString(),
                     'is_featured' => $release->is_featured,
                 ];
             })->toArray(),

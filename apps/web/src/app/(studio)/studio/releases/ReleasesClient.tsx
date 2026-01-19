@@ -1,21 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 
 type Release = {
   id: number;
   title: string;
-  release_date: string;
+  release_date: string | null;
   url: string | null;
   cover_path: string | null;
+  release_type?: "album" | "single" | null;
   is_featured: boolean;
 };
 
 type ReleasesClientProps = {
   initialReleases: Release[];
 };
+
+function normalizeArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, T>);
+  }
+  return [];
+}
 
 export default function ReleasesClient({ initialReleases }: ReleasesClientProps) {
   const [releases, setReleases] = useState<Release[]>(initialReleases);
@@ -33,9 +42,37 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (initialReleases.length > 0) return;
+
+    let isMounted = true;
+
+    const loadReleases = async () => {
+      try {
+        const res = await fetch("/api/studio/releases", { method: "GET" });
+        if (!res.ok) return;
+        const json = await res.json();
+        const items = normalizeArray<Release>(json?.data);
+        if (isMounted) {
+          setReleases(items);
+        }
+      } catch {
+        // Silent fail
+      }
+    };
+
+    void loadReleases();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialReleases.length]);
+
   const handleCreate = async () => {
-    if (!formData.title || !formData.release_date) {
-      setError("Titel und Release-Datum sind erforderlich");
+    const title = formData.title.trim();
+    const url = formData.url.trim();
+    if (!title && !url) {
+      setError("Titel oder Link sind erforderlich");
       return;
     }
 
@@ -44,9 +81,9 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: formData.title,
-          release_date: formData.release_date,
-          url: formData.url || null,
+          title: title || null,
+          release_date: formData.release_date || null,
+          url: url || null,
           is_featured: formData.is_featured,
         }),
       });
@@ -84,8 +121,10 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   };
 
   const handleUpdate = async (releaseId: number) => {
-    if (!formData.title || !formData.release_date) {
-      setError("Titel und Release-Datum sind erforderlich");
+    const title = formData.title.trim();
+    const url = formData.url.trim();
+    if (!title && !url) {
+      setError("Titel oder Link sind erforderlich");
       return;
     }
 
@@ -94,9 +133,9 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: formData.title,
-          release_date: formData.release_date,
-          url: formData.url || null,
+          title: title || null,
+          release_date: formData.release_date || null,
+          url: url || null,
           is_featured: formData.is_featured,
         }),
       });
@@ -225,8 +264,16 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   };
 
   const formatReleaseDate = (dateString: string) => {
+    if (!dateString) return null;
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return null;
     return format(date, "d. MMMM yyyy", { locale: de });
+  };
+
+  const getCoverSrc = (release: Release): string | null => {
+    if (!release.cover_path) return null;
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+    return base ? `${base}/storage/${release.cover_path}` : `/storage/${release.cover_path}`;
   };
 
   return (
@@ -236,6 +283,9 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
         <p className="mt-1 text-sm text-zinc-500">
           Präsentiere deine Alben, EPs und Singles.
         </p>
+        <div className="mt-3 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
+          💡 <span className="font-medium">Info:</span> Markierte Releases erscheinen als "New Release" ganz oben auf deiner Künstlerseite.
+        </div>
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -257,10 +307,10 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
           </div>
         )}
 
-        <div className="space-y-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {/* Create Form */}
           {isCreating && (
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+            <div className="col-span-full rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
               <input
                 type="text"
                 placeholder="Titel (z.B. 'Mein neues Album')"
@@ -353,7 +403,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
 
           {/* Releases List */}
           {releases.length === 0 && !isCreating ? (
-            <div className="rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
+            <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
               <p className="text-xs text-zinc-600 mb-2">Noch keine Releases hinzugefügt</p>
               <button
                 onClick={() => setIsCreating(true)}
@@ -363,8 +413,10 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
               </button>
             </div>
           ) : (
-            releases.map((release) => (
-              <div key={release.id}>
+            releases.map((release) => {
+              const coverSrc = getCoverSrc(release);
+              return (
+                <div key={release.id} className={editingId === release.id ? "col-span-full" : ""}>
                 {editingId === release.id ? (
                   <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
                     <input
@@ -406,11 +458,13 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                       <label className="text-xs text-zinc-400">Cover (optional)</label>
                       {release.cover_path && !coverPreview ? (
                         <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-zinc-800">
-                          <img 
-                            src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${release.cover_path}`}
-                            alt="Current cover" 
-                            className="w-full h-full object-cover" 
-                          />
+                          {coverSrc && (
+                            <img 
+                              src={coverSrc}
+                              alt="Current cover" 
+                              className="w-full h-full object-cover" 
+                            />
+                          )}
                           <button
                             onClick={() => handleCoverDelete(release.id)}
                             className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
@@ -469,45 +523,43 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
-                    {release.cover_path && (
-                      <div className="relative w-20 h-20 shrink-0 rounded overflow-hidden bg-zinc-950">
-                        <img 
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${release.cover_path}`}
-                          alt="Release cover"
-                          className="w-full h-full object-cover"
-                        />
-                        <button
-                          onClick={() => handleCoverDelete(release.id)}
-                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-xs flex items-center justify-center"
-                          title="Cover löschen"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2">
-                        <p className="text-sm font-medium text-zinc-100 flex-1">{release.title}</p>
-                        {release.is_featured && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">
-                            ★ Featured
-                          </span>
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col">
+                    <div className="relative mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
+                      <div className="relative w-full pb-[100%]">
+                        {coverSrc ? (
+                          <img
+                            src={coverSrc}
+                            alt="Release cover"
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">
+                            ♪
+                          </div>
                         )}
                       </div>
-                      <p className="text-xs text-zinc-500 mt-1">{formatReleaseDate(release.release_date)}</p>
-                      {release.url && (
-                        <a
-                          href={release.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-zinc-400 hover:text-zinc-200 underline mt-1 inline-block"
-                        >
-                          🎵 Anhören
-                        </a>
+                      {release.release_type && (
+                        <div className="absolute top-2 left-2 rounded bg-zinc-900/80 px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-200">
+                          {release.release_type}
+                        </div>
                       )}
-                      {!release.cover_path && (
-                        <div className="mt-2">
+                      {release.is_featured && (
+                        <div className="absolute top-2 right-2 text-2xl text-yellow-400">
+                          ★
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-zinc-100 truncate">{release.title}</p>
+                      {formatReleaseDate(release.release_date ?? "") && (
+                        <p className="text-xs text-zinc-500 mt-1">{formatReleaseDate(release.release_date ?? "")}</p>
+                      )}
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      {!release.cover_path ? (
+                        <div>
                           <input
                             ref={fileInputRef}
                             type="file"
@@ -526,28 +578,35 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                             {uploadingCover === release.id ? "⏳ Hochladen..." : "🎨 Cover hinzufügen"}
                           </label>
                         </div>
+                      ) : (
+                        <button
+                          onClick={() => handleCoverDelete(release.id)}
+                          className="text-xs text-zinc-400 hover:text-red-400"
+                          title="Cover löschen"
+                        >
+                          Cover löschen
+                        </button>
                       )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => startEdit(release)}
-                        className="text-xs text-zinc-500 hover:text-zinc-300 p-1"
-                        title="Bearbeiten"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        onClick={() => handleDelete(release.id)}
-                        className="text-xs text-zinc-500 hover:text-red-400 p-1"
-                        title="Löschen"
-                      >
-                        ✕
-                      </button>
+                      <div className="ml-auto flex items-center gap-2">
+                        <button
+                          onClick={() => startEdit(release)}
+                          className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
+                        >
+                          Bearbeiten
+                        </button>
+                        <button
+                          onClick={() => handleDelete(release.id)}
+                          className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition-colors hover:border-red-500/50 hover:bg-red-500/20"
+                        >
+                          Löschen
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
-              </div>
-            ))
+                </div>
+              );
+            })
           )}
         </div>
       </div>

@@ -13,6 +13,7 @@ class Release extends Model
         'release_date',
         'url',
         'cover_path',
+        'release_type',
         'is_featured',
         'position',
     ];
@@ -21,6 +22,7 @@ class Release extends Model
         'release_date' => 'date',
         'is_featured' => 'boolean',
         'position' => 'integer',
+        'release_type' => 'string',
     ];
 
     /**

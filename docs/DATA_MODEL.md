@@ -126,9 +126,10 @@ Zentrale Entität für Musiker-Seiten.
 | id | bigint |
 | artist_page_id | bigint |
 | title | string |
-| release_date | date |
+| release_date | date | nullable |
 | url | string | nullable |
 | cover_path | string | nullable |
+| release_type | string | nullable (album \| single) |
 | is_featured | boolean |
 | position | int |
 | timestamps | |
@@ -142,6 +143,8 @@ Zentrale Entität für Musiker-Seiten.
 - `url` sollte auf Streaming-Plattformen verweisen (Spotify, Apple Music, etc.)
 - `is_featured` kann für hervorgehobene Releases verwendet werden
 - Cover-Upload ähnlich wie Flyer/Avatar
+- `release_type` wird, wenn möglich, automatisch aus dem `url` abgeleitet (album \| single)
+- `release_date` ist optional (z.B. wenn nur ein Link gepflegt wird)
 
 ---
 
