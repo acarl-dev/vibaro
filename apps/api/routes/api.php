@@ -41,6 +41,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/artist-pages/{id}/unpublish', [ArtistPageController::class, 'unpublish']);
         Route::post('/artist-pages/upload-avatar', [ArtistPageController::class, 'uploadAvatar']);
         Route::post('/artist-pages/upload-hero', [ArtistPageController::class, 'uploadHero']);
+        Route::delete('/artist-pages/delete-avatar', [ArtistPageController::class, 'deleteAvatar']);
+        Route::delete('/artist-pages/delete-hero', [ArtistPageController::class, 'deleteHero']);
         Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
 
         // Links (private CRUD)

@@ -145,7 +145,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
               }}
             />
 
-            {/* Desktop-only text overlay (unchanged layout) */}
+            {/* Desktop-only text overlay */}
             <div
               className="hidden md:block absolute"
               style={{
@@ -176,7 +176,7 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
             </div>
           </div>
 
-          {/* Mobile-only: name & bio below image (no overlay) */}
+          {/* Mobile-only: name & bio below image */}
           <div
             className="md:hidden relative bg-zinc-950"
             style={{
@@ -202,28 +202,46 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
         </header>
       ) : (
         <header
-          className="relative w-full flex items-center justify-center"
+          className="relative w-full"
           style={{
-            minHeight: "min(45vh, 360px)",
+            minHeight: "min(50vh, 480px)",
             padding: PADDING_HERO_NO_IMAGE,
             background: "linear-gradient(to bottom, rgb(24, 24, 27), rgb(9, 9, 11))",
           }}
         >
-          {hasAvatar ? (
-            <div className="relative h-40 w-40 overflow-hidden rounded-full ring-1 ring-zinc-800/50">
-              <img
-                src={page.images.avatar_url!}
-                alt={page.display_name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="flex h-40 w-40 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-zinc-800/50">
-              <span className="text-5xl font-light text-zinc-600">
-                {getInitials(page.display_name)}
-              </span>
-            </div>
-          )}
+          <div className="h-full flex flex-col items-center justify-center text-center mx-auto" style={containerStyle()}>
+            {/* Logo/Avatar */}
+            {hasAvatar ? (
+              <div className="relative h-40 w-40 md:h-48 md:w-48 lg:h-56 lg:w-56 overflow-hidden rounded-full ring-2 ring-zinc-800/50 shadow-2xl mb-8">
+                <img
+                  src={page.images.avatar_url!}
+                  alt={`${page.display_name} logo`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex h-40 w-40 md:h-48 md:w-48 items-center justify-center rounded-full bg-zinc-900 ring-2 ring-zinc-800/50 mb-8">
+                <span className="text-5xl md:text-6xl font-light text-zinc-600">
+                  {getInitials(page.display_name)}
+                </span>
+              </div>
+            )}
+
+            {/* Name */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
+              {page.display_name}
+            </h1>
+
+            {/* Bio */}
+            {page.bio && (
+              <p
+                className="mt-4 text-zinc-300 text-base md:text-lg leading-relaxed mx-auto"
+                style={bioTextStyle()}
+              >
+                {page.bio}
+              </p>
+            )}
+          </div>
         </header>
       )}
     </section>

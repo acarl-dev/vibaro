@@ -275,6 +275,46 @@ class ArtistPageController extends Controller
         return $this->success($this->transform($page));
     }
 
+    public function deleteAvatar(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        // Delete avatar file if exists
+        if ($page->avatar_path) {
+            Storage::disk('public')->delete($page->avatar_path);
+            $page->avatar_path = null;
+            $page->save();
+        }
+
+        return $this->success($this->transform($page));
+    }
+
+    public function deleteHero(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        // Delete hero image file if exists
+        if ($page->header_path) {
+            Storage::disk('public')->delete($page->header_path);
+            $page->header_path = null;
+            $page->save();
+        }
+
+        return $this->success($this->transform($page));
+    }
+
     /**
      * GET /artist-pages/search
      * Search for published artist pages by handle or display name

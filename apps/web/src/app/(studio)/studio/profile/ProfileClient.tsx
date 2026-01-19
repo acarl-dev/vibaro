@@ -130,6 +130,27 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
     }
   };
 
+  const handleHeroDelete = async () => {
+    if (!confirm("Hero-Bild wirklich entfernen?")) return;
+
+    setHeroUploading(true);
+    try {
+      const res = await fetch("/api/studio/delete-hero", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert("Löschen fehlgeschlagen");
+      }
+    } catch (err) {
+      alert("Netzwerkfehler");
+    } finally {
+      setHeroUploading(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
@@ -182,37 +203,50 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 }}
               />
 
-              {/* Edit Button */}
-              <label className="absolute top-4 right-4 cursor-pointer z-10">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
+              {/* Edit/Delete Buttons */}
+              <div className="absolute top-4 right-4 z-10 flex gap-2">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    disabled={heroUploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleHeroUpload(file);
+                    }}
+                  />
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 text-xs text-white hover:bg-black/80 transition-colors">
+                    {heroUploading ? (
+                      <>
+                        <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Lädt...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Ändern
+                      </>
+                    )}
+                  </div>
+                </label>
+
+                <button
+                  onClick={handleHeroDelete}
                   disabled={heroUploading}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleHeroUpload(file);
-                  }}
-                />
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 text-xs text-white hover:bg-black/80 transition-colors">
-                  {heroUploading ? (
-                    <>
-                      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Lädt...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Bild ändern
-                    </>
-                  )}
-                </div>
-              </label>
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/80 backdrop-blur-sm border border-red-500/20 text-xs text-white hover:bg-red-600 transition-colors disabled:opacity-50"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Entfernen
+                </button>
+              </div>
 
               {/* Name & Bio in Hero - Editable (positioned like on public page) */}
               <div
@@ -341,7 +375,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               <div>
                 <p className="text-sm text-zinc-300 font-medium mb-1">So sieht dein Profil aus</p>
                 <p className="text-xs text-zinc-500">
-                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio im Hero-Bild, um sie zu bearbeiten. Änderungen werden automatisch gespeichert.
+                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio im Hero-Bild, um sie zu bearbeiten. Das Logo wird als rundes Bild über dem Header angezeigt. Änderungen werden automatisch gespeichert.
                 </p>
               </div>
             </div>
@@ -357,6 +391,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
             <span className="text-emerald-400">✓</span>
             <span>Verwende ein professionelles Header-Bild (empfohlen: 2100x900px)</span>
           </li>
+
           <li className="flex gap-2">
             <span className="text-emerald-400">✓</span>
             <span>Schreibe eine prägnante Bio, die deine Musik und Persönlichkeit beschreibt</span>
@@ -367,7 +402,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
           </li>
           <li className="flex gap-2">
             <span className="text-emerald-400">✓</span>
-            <span>Klicke auf Name oder Bio im Hero-Bild, um sie direkt zu bearbeiten</span>
+            <span>Das Logo wird über dem Header-Bild angezeigt (wie bei Facebook)</span>
           </li>
         </ul>
       </div>
