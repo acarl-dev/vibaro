@@ -11,6 +11,7 @@ import {
   EmptyVideosState,
   EmptyGalleryState,
 } from "./EmptyStates";
+import LazyVideoEmbed from "./LazyVideoEmbed";
 import {
   containerStyle,
   bioTextStyle,
@@ -612,62 +613,19 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
 }
 
 export function VideoList({ items }: { items: VideoItem[] }) {
-  const [ref, isVisible] = useLazyLoad<HTMLUListElement>();
-
   if (items.length === 0) return <EmptyVideosState />;
 
-  const getEmbedSrc = (video: VideoItem): string | null => {
-    if (!video.video_id) return null;
-
-    if (video.platform === "youtube") {
-      return `https://www.youtube-nocookie.com/embed/${video.video_id}`;
-    }
-
-    if (video.platform === "vimeo") {
-      return `https://player.vimeo.com/video/${video.video_id}`;
-    }
-
-    return null;
-  };
-
   return (
-    <ul ref={ref} className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
+    <ul className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
       {items.map((video, index) => (
         <li key={index}>
           <div className="block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70">
-            <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
-              {isVisible && getEmbedSrc(video) ? (
-                <iframe
-                  src={getEmbedSrc(video)!}
-                  title={video.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
-                  className="absolute left-0 top-0 h-full w-full"
-                />
-              ) : !isVisible ? (
-                // Skeleton placeholder while not visible
-                <div className="w-full h-full bg-zinc-900 animate-pulse" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center p-6 text-center">
-                  <div>
-                    <p className="text-sm font-medium text-zinc-100">{video.title}</p>
-                    <p className="mt-2 text-xs text-zinc-500">Video kann nicht eingebettet werden.</p>
-                    {video.url && (
-                      <a
-                        href={video.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs font-medium transition-colors hover:bg-zinc-800"
-                      >
-                        Extern öffnen
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            <LazyVideoEmbed
+              videoId={video.video_id}
+              platform={video.platform}
+              title={video.title}
+              thumbnailUrl={video.thumbnail_url}
+            />
             <div className="p-4">
               <p className="text-sm font-medium text-zinc-100 line-clamp-2">{video.title}</p>
               {video.description && (
