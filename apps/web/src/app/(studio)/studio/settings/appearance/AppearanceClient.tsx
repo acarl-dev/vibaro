@@ -18,6 +18,12 @@ const TEMPLATES: Template[] = [
     locked: false,
   },
   {
+    key: "stage",
+    name: "Stage",
+    description: "Energiegeladenes Layout für Live-Bands (Rock, Metal, Punk)",
+    locked: false,
+  },
+  {
     key: "dark-editorial",
     name: "Dark Editorial",
     description: "Klassisches Layout mit Fokus auf Text und Links",
@@ -33,7 +39,7 @@ const TEMPLATES: Template[] = [
   },
   {
     key: "dark-stage",
-    name: "Dark Stage",
+    name: "Dark Stage (Legacy)",
     description: "Bühnen-inspiriertes Layout mit Fokus auf Visuals",
     locked: true,
     planRequired: "Artist",

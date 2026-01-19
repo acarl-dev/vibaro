@@ -7,6 +7,7 @@ import DarkEditorialTemplate from "../components/DarkEditorialTemplate";
 import DarkEditorialFullTemplate from "../components/DarkEditorialFullTemplate";
 import DarkMinimalTemplate from "../components/DarkMinimalTemplate";
 import DarkStageTemplate from "../components/DarkStageTemplate";
+import StageTemplate from "../components/StageTemplate";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -112,6 +113,8 @@ export default async function PublicArtistPage({
       return <DarkMinimalTemplate page={page} />;
     case "dark-stage":
       return <DarkStageTemplate page={page} />;
+    case "stage":
+      return <StageTemplate page={page} />;
     case "dark-editorial-full":
       return <DarkEditorialFullTemplate page={page} />;
     case "dark-editorial":
