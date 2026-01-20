@@ -93,8 +93,8 @@ export default function AppearanceClient({
   };
 
   const handleApplyTemplate = async (key: string) => {
-    // If switching from an active template, show confirmation hint
-    if (themeKey !== key && themeKey !== "modern") {
+    // If switching to a different template, show confirmation hint
+    if (themeKey !== key) {
       setPendingSwitch(key);
       setShowSwitchHint(true);
       return;
@@ -156,24 +156,31 @@ export default function AppearanceClient({
 
       {/* Switch Confirmation Hint */}
       {showSwitchHint && (
-        <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-          <p className="text-sm text-zinc-400 mb-3">
-            Beim Wechsel des Templates können Inhalte anders dargestellt werden.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={confirmSwitch}
-              disabled={isSaving}
-              className="px-3 py-1.5 text-sm text-zinc-200 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors disabled:opacity-50"
-            >
-              {isSaving ? "Wird angewendet..." : "Trotzdem wechseln"}
-            </button>
-            <button
-              onClick={cancelSwitch}
-              className="px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-            >
-              Abbrechen
-            </button>
+        <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+          <div className="flex gap-3 items-start">
+            <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p className="text-sm text-amber-200/90 mb-3">
+                Beim Wechsel des Templates können Inhalte anders dargestellt werden.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={confirmSwitch}
+                  disabled={isSaving}
+                  className="px-3 py-1.5 text-sm text-amber-100 bg-amber-600/80 hover:bg-amber-600 rounded-md transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? "Wird angewendet..." : "Trotzdem wechseln"}
+                </button>
+                <button
+                  onClick={cancelSwitch}
+                  className="px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -283,23 +290,35 @@ export default function AppearanceClient({
                       </div>
                     )}
 
-                    {/* Action Button */}
-                    {isActive ? (
-                      <span className="inline-flex items-center text-sm text-zinc-600">
-                        Aktiv
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleApplyTemplate(template.key)}
-                        disabled={isSaving}
-                        className="px-4 py-2 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-3">
+                      {isActive ? (
+                        <span className="inline-flex items-center text-sm text-zinc-600">
+                          Aktiv
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleApplyTemplate(template.key)}
+                          disabled={isSaving}
+                          className="px-4 py-2 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          {isSaving && pendingSwitch === template.key 
+                            ? "Wird angewendet..." 
+                            : "Template anwenden"
+                          }
+                        </button>
+                      )}
+                      
+                      {/* Preview Button */}
+                      <a
+                        href={`/p/preview/${template.key}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-colors"
                       >
-                        {isSaving && pendingSwitch === template.key 
-                          ? "Wird angewendet..." 
-                          : "Template anwenden"
-                        }
-                      </button>
-                    )}
+                        Vorschau ansehen
+                      </a>
+                    </div>
                   </div>
                 </div>
               )}
