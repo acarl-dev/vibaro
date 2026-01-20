@@ -101,14 +101,18 @@ function getTemplateName(themeKey: string): string {
   switch (themeKey) {
     case "modern":
       return "Modern";
+    case "stage":
+      return "Stage";
+    case "editorial":
+      return "Editorial";
     case "dark-minimal":
       return "Minimal";
     case "dark-stage":
-      return "Stage";
+      return "Dark Stage";
     case "dark-editorial-full":
       return "Editorial Full";
     case "dark-editorial":
     default:
-      return "Editorial";
+      return "Dark Editorial";
   }
 }

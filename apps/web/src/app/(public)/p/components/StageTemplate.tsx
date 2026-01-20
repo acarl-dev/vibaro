@@ -80,7 +80,7 @@ export default function StageTemplate({
         >
           {/* Shows - Highest Priority, directly after hero */}
           {hasShows && (
-            <section style={{ paddingTop: "40px", paddingBottom: "48px" }}>
+            <section id="shows" style={{ paddingTop: "40px", paddingBottom: "48px" }}>
               <StageSectionHeader title="Shows" />
               <StageShowList items={upcomingShows} />
             </section>
@@ -154,11 +154,20 @@ function StageHero({
 }) {
   const hasHeroImage = !!page.images.hero_image_url;
 
+  const handleScrollToShows = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const showsSection = document.getElementById("shows");
+    if (showsSection) {
+      showsSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <header
       className="relative w-full overflow-hidden"
       style={{
-        minHeight: hasHeroImage ? "85vh" : "50vh",
+        height: "100vh",
+        minHeight: "100vh",
         backgroundColor: "#0b0b0b",
       }}
     >
@@ -218,6 +227,7 @@ function StageHero({
               {hasShows && (
                 <a
                   href="#shows"
+                  onClick={handleScrollToShows}
                   className="inline-flex items-center gap-2 mt-6 px-6 py-3 font-semibold text-sm uppercase tracking-wider transition-all"
                   style={{
                     backgroundColor: "var(--stage-accent, #ffffff)",
@@ -253,7 +263,8 @@ function StageHero({
         <div
           className="h-full flex flex-col items-center justify-center text-center"
           style={{
-            minHeight: "50vh",
+            height: "100vh",
+            minHeight: "100vh",
             padding: "48px clamp(16px, 4vw, 32px)",
             background: "linear-gradient(to bottom, #111111, #0b0b0b)",
           }}
@@ -304,6 +315,7 @@ function StageHero({
           {hasShows && (
             <a
               href="#shows"
+              onClick={handleScrollToShows}
               className="inline-flex items-center gap-2 mt-8 px-6 py-3 font-semibold text-sm uppercase tracking-wider border-2 transition-all"
               style={{
                 borderColor: "rgba(255,255,255,0.3)",
@@ -360,7 +372,7 @@ function StageSectionHeader({ title }: { title: string }) {
 
 function StageShowList({ items }: { items: ShowItem[] }) {
   return (
-    <ul id="shows" className="divide-y" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+    <ul className="divide-y" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
       {items.map((show, index) => (
         <li
           key={index}

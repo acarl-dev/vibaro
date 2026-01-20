@@ -24,6 +24,12 @@ const TEMPLATES: Template[] = [
     locked: false,
   },
   {
+    key: "editorial",
+    name: "Editorial",
+    description: "Minimalistisch, typografisch, großzügig – Kunst statt Dekoration",
+    locked: false,
+  },
+  {
     key: "dark-editorial",
     name: "Dark Editorial",
     description: "Klassisches Layout mit Fokus auf Text und Links",
