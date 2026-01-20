@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import {
   PublicArtistPageData,
   ReleaseItem,
@@ -214,19 +215,22 @@ function MinimalHeader({ page }: { page: PublicArtistPageData }) {
         <div
           style={{
             marginTop: TOKENS.space[5],
+            position: "relative",
+            width: "100%",
+            maxWidth: "clamp(240px, 40vw, 360px)",
+            aspectRatio: "1 / 1",
           }}
         >
-          <img
+          <Image
             src={imageUrl}
             alt={page.display_name}
+            fill
             style={{
-              display: "block",
-              width: "100%",
-              maxWidth: "clamp(240px, 40vw, 360px)",
-              aspectRatio: "1 / 1",
               objectFit: "cover",
               // No border, no shadow, no border-radius
             }}
+            sizes="(max-width: 768px) 240px, 360px"
+            priority
           />
         </div>
       )}
