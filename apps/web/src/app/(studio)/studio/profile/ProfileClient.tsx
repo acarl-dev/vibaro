@@ -332,18 +332,19 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               </div>
             </div>
           ) : (
-            <label className="block aspect-[21/9] bg-zinc-900 cursor-pointer hover:bg-zinc-800/50 transition-colors">
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                disabled={heroUploading}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleHeroUpload(file);
-                }}
-              />
-              <div className="h-full flex flex-col items-center justify-center text-zinc-500">
+            <div className="relative aspect-[21/9] bg-zinc-900">
+              {/* Upload Area */}
+              <label className="absolute inset-0 cursor-pointer hover:bg-zinc-800/50 transition-colors flex flex-col items-center justify-center text-zinc-500">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={heroUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleHeroUpload(file);
+                  }}
+                />
                 {heroUploading ? (
                   <>
                     <svg className="animate-spin h-8 w-8 mb-3" fill="none" viewBox="0 0 24 24">
@@ -361,10 +362,77 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                     <span className="text-xs mt-1">JPG, PNG oder WebP (max. 2 MB)</span>
                   </>
                 )}
-              </div>
-            </label>
+              </label>
+            </div>
           )}
         </div>
+
+        {/* Name & Bio Section - Only visible when NO hero image (for templates without image) */}
+        {!initialPage.hero_image_url && (
+          <div className="p-6 border-b border-zinc-800">
+            <div className="mx-auto" style={{ maxWidth: "720px" }}>
+              {/* Display Name - Editable */}
+              <div className="mb-4">
+                <label className="block text-xs text-zinc-500 mb-2">Künstlername</label>
+                {editingName ? (
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    onBlur={() => setEditingName(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") setEditingName(false);
+                      if (e.key === "Escape") {
+                        setDisplayName(initialPage.display_name);
+                        setEditingName(false);
+                      }
+                    }}
+                    className="w-full text-xl font-semibold tracking-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2"
+                    placeholder="Dein Name"
+                  />
+                ) : (
+                  <h2
+                    onClick={() => setEditingName(true)}
+                    className="text-xl font-semibold tracking-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
+                  >
+                    {displayName || <span className="text-zinc-500">Klicke hier, um deinen Namen einzugeben...</span>}
+                  </h2>
+                )}
+              </div>
+
+              {/* Bio - Editable */}
+              <div>
+                <label className="block text-xs text-zinc-500 mb-2">Bio</label>
+                {editingBio ? (
+                  <div className="space-y-2">
+                    <textarea
+                      ref={bioTextareaRef}
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      onBlur={() => setEditingBio(false)}
+                      maxLength={maxBioLength}
+                      rows={3}
+                      className="w-full rounded-lg border-2 border-emerald-500 bg-zinc-800/50 px-4 py-3 text-sm leading-relaxed text-zinc-200 focus:outline-none resize-none overflow-hidden placeholder:text-zinc-400"
+                      placeholder="Erzähl kurz über dich..."
+                    />
+                    <div className="flex items-center justify-between text-xs text-zinc-500">
+                      <span>Enter = Neue Zeile • ESC = Abbrechen</span>
+                      <span>{bio.length}/{maxBioLength}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p
+                    onClick={() => setEditingBio(true)}
+                    className="text-sm text-zinc-300 leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap py-2 border-b-2 border-transparent hover:border-white/30 min-h-[60px]"
+                  >
+                    {bio || <span className="text-zinc-500 italic">Klicke hier, um deine Bio hinzuzufügen...</span>}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Info Box */}
         <div className="p-8">
@@ -376,8 +444,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               <div>
                 <p className="text-sm text-zinc-300 font-medium mb-1">So sieht dein Profil aus</p>
                 <p className="text-xs text-zinc-500">
-                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio im 
-                  Hero-Bild, um sie zu bearbeiten.Änderungen werden automatisch gespeichert.
+                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio, 
+                  um sie zu bearbeiten. Änderungen werden automatisch gespeichert.
                 </p>
               </div>
             </div>

@@ -30,32 +30,10 @@ const TEMPLATES: Template[] = [
     locked: false,
   },
   {
-    key: "dark-editorial",
-    name: "Dark Editorial",
-    description: "Klassisches Layout mit Fokus auf Text und Links",
-    locked: true,
-    planRequired: "Artist",
-  },
-  {
-    key: "dark-minimal",
-    name: "Dark Minimal",
-    description: "Minimalistisches Design mit cleaner Ästhetik",
-    locked: true,
-    planRequired: "Artist",
-  },
-  {
-    key: "dark-stage",
-    name: "Dark Stage (Legacy)",
-    description: "Bühnen-inspiriertes Layout mit Fokus auf Visuals",
-    locked: true,
-    planRequired: "Artist",
-  },
-  {
-    key: "dark-editorial-full",
-    name: "Dark Editorial Full",
-    description: "Full-bleed Editorial Layout (mehr visuell)",
-    locked: true,
-    planRequired: "Artist",
+    key: "minimal",
+    name: "Minimal",
+    description: "Ultra-reduziert, typografisch, nur Schwarz/Weiß – keine Dekoration",
+    locked: false,
   },
 ];
 

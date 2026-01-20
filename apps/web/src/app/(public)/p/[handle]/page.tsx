@@ -3,12 +3,9 @@ import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { PublicArtistPageData } from "../components/shared";
 import ModernTemplate from "../components/ModernTemplate";
-import DarkEditorialTemplate from "../components/DarkEditorialTemplate";
-import DarkEditorialFullTemplate from "../components/DarkEditorialFullTemplate";
-import DarkMinimalTemplate from "../components/DarkMinimalTemplate";
-import DarkStageTemplate from "../components/DarkStageTemplate";
 import StageTemplate from "../components/StageTemplate";
 import EditorialTemplate from "../components/EditorialTemplate";
+import MinimalTemplate from "../components/MinimalTemplate";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -110,16 +107,10 @@ export default async function PublicArtistPage({
   const themeKey = page.theme?.key || "modern";
 
   switch (themeKey) {
-    case "dark-minimal":
-      return <DarkMinimalTemplate page={page} />;
-    case "dark-stage":
-      return <DarkStageTemplate page={page} />;
+    case "minimal":
+      return <MinimalTemplate page={page} />;
     case "stage":
       return <StageTemplate page={page} />;
-    case "dark-editorial-full":
-      return <DarkEditorialFullTemplate page={page} />;
-    case "dark-editorial":
-      return <DarkEditorialTemplate page={page} />;
     case "editorial":
       return <EditorialTemplate page={page} />;
     case "modern":
