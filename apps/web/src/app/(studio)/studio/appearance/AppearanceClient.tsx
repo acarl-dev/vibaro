@@ -293,14 +293,17 @@ export default function AppearanceClient({
                     {/* Action Buttons */}
                     <div className="flex items-center gap-3">
                       {isActive ? (
-                        <span className="inline-flex items-center text-sm text-zinc-600">
+                        <span className="inline-flex items-center gap-1.5 text-sm text-emerald-400">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
                           Aktiv
                         </span>
                       ) : (
                         <button
                           onClick={() => handleApplyTemplate(template.key)}
                           disabled={isSaving}
-                          className="px-4 py-2 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
+                          className="px-4 py-2 text-sm font-medium text-white bg-zinc-100/10 hover:bg-zinc-100/20 border border-zinc-100/20 hover:border-zinc-100/30 rounded-lg transition-all disabled:opacity-50"
                         >
                           {isSaving && pendingSwitch === template.key 
                             ? "Wird angewendet..." 
@@ -314,7 +317,7 @@ export default function AppearanceClient({
                         href={`/p/preview/${template.key}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-colors"
+                        className="px-4 py-2 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all"
                       >
                         Vorschau ansehen
                       </a>
