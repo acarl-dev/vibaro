@@ -319,7 +319,7 @@ export default function AppearanceClient({
                         rel="noopener noreferrer"
                         className="px-4 py-2 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all"
                       >
-                        Vorschau ansehen
+                        Beispiel ansehen
                       </a>
                     </div>
                   </div>
