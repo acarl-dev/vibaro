@@ -22,6 +22,7 @@ export default function StudioSidebar({ page }: StudioSidebarProps) {
 
       <nav className="space-y-1 text-sm">
         <NavLink href="/studio">Übersicht</NavLink>
+        <NavLink href="/studio/appearance">Templates</NavLink>
         <NavLink href="/studio/profile">Profil</NavLink>
         <NavLink href="/studio/links">Links</NavLink>
         <NavLink href="/studio/music">Music</NavLink>

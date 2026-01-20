@@ -50,25 +50,6 @@ export default function SettingsClient({ handle, isPublished }: SettingsClientPr
         </div>
 
         <div className="space-y-4">
-          {/* Template & Style */}
-          <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-5">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-zinc-300 mb-1">Template & Style</h3>
-                <p className="text-xs text-zinc-500 mb-3">
-                  Wähle ein Template und Style für deine Seite
-                </p>
-              </div>
-              <a
-                href="/studio/settings/appearance"
-                className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
-              >
-                Bearbeiten
-                <span>→</span>
-              </a>
-            </div>
-          </div>
-
           {/* Domain / Handle */}
           <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-5">
             <div>

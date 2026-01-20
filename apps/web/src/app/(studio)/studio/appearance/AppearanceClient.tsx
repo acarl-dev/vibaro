@@ -102,7 +102,7 @@ export default function AppearanceClient({
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Appearance</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Templates</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Wähle ein Template und Style für deine Seite.
         </p>
