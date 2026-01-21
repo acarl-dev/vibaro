@@ -421,15 +421,20 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                   Freier Eintritt
                 </label>
                 {!formData.is_free && (
-                  <input
-                    type="number"
-                    placeholder="Preis (€)"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    step="0.01"
-                    min="0"
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                  />
+                  <div className="space-y-1">
+                    <input
+                      type="number"
+                      placeholder="Preis (€)"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      step="0.01"
+                      min="0"
+                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                    />
+                    <p className="text-[11px] text-zinc-600">
+                      Wird als „Abendkasse" angezeigt, wenn kein Ticket-Link angegeben ist
+                    </p>
+                  </div>
                 )}
               </div>
               <div className="relative">
@@ -590,15 +595,20 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                         Freier Eintritt
                       </label>
                       {!formData.is_free && (
-                        <input
-                          type="number"
-                          placeholder="Preis (€)"
-                          value={formData.price}
-                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                          step="0.01"
-                          min="0"
-                          className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                        />
+                        <div className="space-y-1">
+                          <input
+                            type="number"
+                            placeholder="Preis (€)"
+                            value={formData.price}
+                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                            step="0.01"
+                            min="0"
+                            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                          />
+                          <p className="text-[11px] text-zinc-600">
+                            Wird als „Abendkasse" angezeigt, wenn kein Ticket-Link angegeben ist
+                          </p>
+                        </div>
                       )}
                     </div>
                     <div className="relative">

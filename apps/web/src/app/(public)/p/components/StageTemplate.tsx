@@ -434,18 +434,43 @@ function StageShowList({ items }: { items: ShowItem[] }) {
                   e.currentTarget.style.opacity = "1";
                 }}
               >
-                Tickets
+                {show.is_free ? "Eintritt frei" : "Tickets"}
               </a>
+            ) : show.is_free ? (
+              <span
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wider"
+                style={{
+                  backgroundColor: "var(--stage-accent, #ffffff)",
+                  color: "#0b0b0b",
+                  borderRadius: "3px",
+                  opacity: 0.85,
+                }}
+              >
+                Eintritt frei
+              </span>
+            ) : show.price ? (
+              <span
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium tracking-wide"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.9)",
+                  borderRadius: "3px",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                }}
+              >
+                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px" }}>Abendkasse</span>
+                {show.price}€
+              </span>
             ) : (
               <span
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-wider"
                 style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  color: "rgba(255,255,255,0.6)",
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.5)",
                   borderRadius: "3px",
                 }}
               >
-                RSVP
+                TBA
               </span>
             )}
           </div>
