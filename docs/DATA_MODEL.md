@@ -1,9 +1,22 @@
-# Vibaro Data Model (MVP)
+# Vibaro Data Model (V1 + V2)
 
-Diese Datei beschreibt das **verbindliche Datenmodell** für Vibaro.
-Sie ist Grundlage für Migrations, Policies und API-Responses.
+This document contains:
+- Legacy V1 data model (Mini-Homepage system)
+- Active V2 extensions (Stage System)
+
+Active product rules: docs/PRODUCT_V2.md
+
+This file is the binding source for:
+- Migrations
+- Eloquent Models
+- Policies
+- API Responses
 
 ---
+
+# ===============================
+# V1 – Representation Layer
+# ===============================
 
 ## users
 
@@ -15,7 +28,7 @@ Authentifizierte Benutzer.
 | name | string | |
 | email | string | unique |
 | password | string | hashed |
-| is_admin | boolean | default false, internes Flag |
+| is_admin | boolean | default false |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -38,13 +51,13 @@ Zentrale Entität für Musiker-Seiten.
 | theme_variant | string | z.B. `auto`, `stage-blue` |
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
-| booking_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
-| management_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
-| press_email | string | nullable, **PRIVATE** - nur Studio sichtbar |
-| whatsapp_number | string | nullable, **PRIVATE** - nur Studio sichtbar |
-| contact_message | string | nullable, max 500 Zeichen, änderbar im Studio |
+| booking_email | string | nullable, PRIVATE |
+| management_email | string | nullable, PRIVATE |
+| press_email | string | nullable, PRIVATE |
+| whatsapp_number | string | nullable, PRIVATE |
+| contact_message | string | nullable, max 500 |
 | is_published | boolean | default false |
-| published_at | timestamp | nullable, gesetzt beim ersten Publish |
+| published_at | timestamp | nullable |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -52,72 +65,48 @@ Zentrale Entität für Musiker-Seiten.
 - unique(handle)
 - index(user_id)
 
-**Kontaktfelder (Studio-only, PRIVATE):**
-- Alle Kontaktfelder sind optional und Studio-only
-- **WICHTIG**: Werden NICHT in Public API Response ausgeliefert (siehe docs/SECURITY.md, docs/API_CONTRACTS.md)
-- E-Mail-Felder werden validiert (email format)
-- WhatsApp-Nummer: max. 50 Zeichen, kein Format-Check (internationale Nummern unterschiedlich)
-- `contact_message`: Persönliche Nachricht im Kontakt-Modal (max. 500 Zeichen), Standard: "Ich melde mich so schnell wie möglich bei dir."
-- Public Page zeigt nur "Get in Touch"-Button, keine E-Mail-Adressen
+**Wichtig**
+- Kontaktfelder sind Studio-only und niemals Teil der Public API.
+- Handle darf nicht geändert werden, wenn veröffentlicht.
+- Public Queries erfolgen immer über handle, nie über ID.
 
 ---
 
-## links (optional im MVP, empfohlen)
+## links
 
-| Feld | Typ | Hinweise |
-|----|----|----|
-| id | bigint | PK |
-| artist_page_id | bigint | FK |
-| type | string | facebook, instagram, tiktok, x, youtube, spotify, applemusic, soundcloud, bandcamp, website, custom |
-| title | string | nullable |
-| url | string | nullable (für Social Media vorgefertigt) |
-| position | int | sort order |
-| is_visible | boolean | |
-| created_at | timestamp | |
-| updated_at | timestamp | |
-
-**type-Werte:**
-- Social Media: `facebook`, `instagram`, `tiktok`, `x` (Twitter)
-- Music Platforms: `youtube`, `spotify`, `applemusic`, `soundcloud`, `bandcamp`
-- Other: `website`, `custom`
-
-**Verhalten:**
-- Bei ArtistPage-Erstellung werden vorgefertigte Social Media Links mit leeren URLs erstellt
-- Nur Links mit ausgefüllten URLs werden öffentlich angezeigt
-- Vorgefertigte Links haben feste titles basierend auf `type`
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| type | string |
+| title | string |
+| url | string |
+| position | int |
+| is_visible | boolean |
+| created_at | timestamp |
+| updated_at | timestamp |
 
 ---
 
 ## shows
 
-| Feld | Typ | Hinweise |
-|----|----|-------|
-| id | bigint | PK |
-| artist_page_id | bigint | FK → artist_pages.id |
-| starts_at | datetime | Konzertbeginn |
-| venue | string | Ort/Location |
-| city | string | Stadt |
-| address | text | nullable, vollständige Adresse für Routenplanung |
-| ticket_url | string | nullable |
-| price | decimal(8,2) | nullable, Eintrittspreis in € |
-| is_free | boolean | default false, true = freier Eintritt |
-| support_acts | json | nullable, Array von Artist-Namen/Handles |
-| flyer_path | string | nullable, Pfad zum Flyer-Bild |
-| status | string | `upcoming` \| `sold_out` \| `cancelled` |
-| position | int | sortierung |
-| created_at | timestamp | |
-| updated_at | timestamp | |
-
-**Indizes:**
-- index(artist_page_id)
-- index(starts_at) für chronologische Sortierung
-
-**Verhalten:**
-- Standard-Sortierung nach `starts_at` (aufsteigend für kommende Shows)
-- `address` wird für Google Maps Routenplanung verwendet
-- `is_free` überschreibt `price` - wenn true, wird `price` ignoriert
-- `support_acts` ist ein JSON-Array von Strings (Artist-Namen), später erweitert um Vibaro-Verlinkung
-- Optional: Flyer-Upload ähnlich wie Avatar/Hero
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| starts_at | datetime |
+| venue | string |
+| city | string |
+| address | text |
+| ticket_url | string |
+| price | decimal(8,2) |
+| is_free | boolean |
+| support_acts | json |
+| flyer_path | string |
+| status | string |
+| position | int |
+| created_at | timestamp |
+| updated_at | timestamp |
 
 ---
 
@@ -128,158 +117,189 @@ Zentrale Entität für Musiker-Seiten.
 | id | bigint |
 | artist_page_id | bigint |
 | title | string |
-| release_date | date | nullable |
-| url | string | nullable |
-| cover_path | string | nullable |
-| release_type | string | nullable (album \| single) |
+| release_date | date |
+| url | string |
+| cover_path | string |
+| release_type | string |
 | is_featured | boolean |
 | position | int |
-| timestamps | |
-
-**Indizes:**
-- index(artist_page_id)
-- index(artist_page_id, release_date) für chronologische Sortierung
-
-**Verhalten:**
-- Standard-Sortierung nach `release_date` (absteigend für neueste zuerst)
-- `url` sollte auf Streaming-Plattformen verweisen (Spotify, Apple Music, etc.)
-- `is_featured` kann für hervorgehobene Releases verwendet werden
-- Cover-Upload ähnlich wie Flyer/Avatar
-- `release_type` wird, wenn möglich, automatisch aus dem `url` abgeleitet (album \| single)
-- `release_date` ist optional (z.B. wenn nur ein Link gepflegt wird)
+| created_at | timestamp |
+| updated_at | timestamp |
 
 ---
 
 ## featured_tracks
 
-Kuratierte Auswahl von Tracks für den Music Player.
-
-| Feld | Typ | Hinweise |
-|----|----|-------|
-| id | bigint | PK |
-| artist_page_id | bigint | FK → artist_pages.id |
-| title | string | Track-Titel |
-| artist_name | string | nullable, für Features/Collabs |
-| platform | string | `spotify` \| `youtubemusic` \| `soundcloud` |
-| platform_url | string | Vollständiger URL zum Track |
-| embed_id | string | nullable, extrahierte ID für Embeds |
-| position | int | Sortierung |
-| created_at | timestamp | |
-| updated_at | timestamp | |
-
-**Indizes:**
-- index(artist_page_id)
-
-**Verhalten:**
-- Standard-Sortierung nach `position` (aufsteigend)
-- `embed_id` wird automatisch aus `platform_url` extrahiert
-- Maximal 5-7 Tracks empfohlen für optimale UX
-- Spotify: Embed via Track ID
-- SoundCloud: Embed via vollständiger URL
-- YouTube Music: Embed via Video ID
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| title | string |
+| artist_name | string |
+| platform | string |
+| platform_url | string |
+| embed_id | string |
+| position | int |
+| created_at | timestamp |
+| updated_at | timestamp |
 
 ---
 
 ## videos
 
-Musikvideos und andere Video-Content.
-
-| Feld | Typ | Hinweise |
-|----|----|-------|
-| id | bigint | PK |
-| artist_page_id | bigint | FK → artist_pages.id |
-| title | string | Video-Titel |
-| platform | string | `youtube` \| `vimeo` |
-| video_id | string | Extrahierte Video-ID |
-| url | string | Vollständiger URL zum Video |
-| description | text | nullable, Beschreibung |
-| thumbnail_url | string | nullable, auto-generiert oder custom |
-| position | int | Sortierung |
-| created_at | timestamp | |
-| updated_at | timestamp | |
-
-**Indizes:**
-- index(artist_page_id, position)
-
-**Verhalten:**
-- Standard-Sortierung nach `position` (aufsteigend)
-- `video_id` wird automatisch aus `url` extrahiert
-- Maximal 8 Videos (Artist-Plan)
-- YouTube: `thumbnail_url` auto-generiert als `https://img.youtube.com/vi/{video_id}/hqdefault.jpg`
-- Vimeo: Thumbnail erfordert API-Call (optional)
-- Unterstützte URL-Formate:
-  - YouTube: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID
-  - Vimeo: vimeo.com/ID
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| title | string |
+| platform | string |
+| video_id | string |
+| url | string |
+| description | text |
+| thumbnail_url | string |
+| position | int |
+| created_at | timestamp |
+| updated_at | timestamp |
 
 ---
 
 ## gallery_images
 
-Foto-Gallery für Press Photos, Live Shots, etc.
-
-| Feld | Typ | Hinweise |
-|----|----|-------|
-| id | bigint | PK |
-| artist_page_id | bigint | FK → artist_pages.id |
-| title | string | nullable, optionaler Titel/Caption |
-| image_path | string | Pfad zum gespeicherten Bild |
-| position | int | Sortierung |
-| created_at | timestamp | |
-| updated_at | timestamp | |
-
-**Indizes:**
-- index(artist_page_id, position)
-
-**Verhalten:**
-- Standard-Sortierung nach `position` (aufsteigend)
-- Maximal 16 Bilder (Artist-Plan)
-- Erlaubte Formate: JPEG, PNG, WebP
-- Max. Dateigröße: 5MB
-- Bilder werden in `storage/app/public/gallery` gespeichert
-- Beim Löschen wird auch das Bild aus dem Storage entfernt
-
----
-
-## releases (entfernt - post-MVP)
-
 | Feld | Typ |
 |----|----|
-
 | id | bigint |
 | artist_page_id | bigint |
 | title | string |
-| release_date | date |
-| url | string |
-| cover_path | string |
-| is_featured | boolean |
+| image_path | string |
 | position | int |
-| timestamps | |
+| created_at | timestamp |
+| updated_at | timestamp |
 
 ---
 
-## Beziehungen
+# ===============================
+# V2 – Stage System
+# ===============================
 
-- User **hasOne** ArtistPage
-- ArtistPage **belongsTo** User
-- ArtistPage **hasMany** Links
-- ArtistPage **hasMany** Shows
-- ArtistPage **hasMany** Releases
-- ArtistPage **hasMany** FeaturedTracks
-- ArtistPage **hasMany** Videos
-- ArtistPage **hasMany** GalleryImages
+V2 erweitert Vibaro um ein Spotlight-zentriertes Performance-Modell.
 
----
-
-## MVP Notes
-
-- MVP kann mit `users` + `artist_pages` starten
-- `links`, `shows` und `releases` sind nun implementiert
-- Weitere Features (z.B. AI, erweiterte Plans) post-MVP
+Leitprinzipien:
+- Server-side Tracking
+- Keine personenbezogenen Profile
+- Keine Fingerprints
+- Tracking ist kontextualisiert über Spotlight
 
 ---
 
-## Harte Regeln
+## spotlights
 
-- Handle darf nie geändert werden, wenn veröffentlicht
-- Public Queries immer über `handle`, nie über ID
-- FK-Constraints immer aktiv
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| title | string |
+| type | string |
+| status | string (`active` \| `scheduled` \| `ended`) |
+| starts_at | datetime |
+| ends_at | datetime |
+| primary_url | string |
+| description | text |
+| created_at | timestamp |
+| updated_at | timestamp |
+
+**Regeln**
+- Maximal ein `active` Spotlight pro artist_page.
+- `ends_at` darf nicht kleiner als `starts_at` sein.
+
+---
+
+## campaigns (Stage Pro)
+
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| spotlight_id | bigint |
+| name | string |
+| platform | string |
+| notes | text |
+| starts_at | datetime |
+| ends_at | datetime |
+| created_at | timestamp |
+| updated_at | timestamp |
+
+---
+
+## tracking_links
+
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| spotlight_id | bigint |
+| campaign_id | bigint |
+| module | string |
+| label | string |
+| target_url | string |
+| slug | string (unique) |
+| utm_source | string |
+| utm_medium | string |
+| utm_campaign | string |
+| utm_content | string |
+| utm_term | string |
+| is_active | boolean |
+| created_at | timestamp |
+| updated_at | timestamp |
+
+**Regeln**
+- Öffentliche Tracking-Route verwendet nur `slug`.
+- target_url wird serverseitig validiert (http/https only).
+
+---
+
+## click_events
+
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| tracking_link_id | bigint |
+| artist_page_id | bigint |
+| spotlight_id | bigint |
+| campaign_id | bigint |
+| module | string |
+| referrer_host | string |
+| country_code | string (optional, derived transiently from IP; IP is never stored) |
+| user_agent_hash | string (optional, abuse-only) |
+| occurred_at | datetime |
+| created_at | timestamp |
+
+**Privacy Rules**
+- IP addresses must never be stored.
+- IP may be used transiently to derive country_code, but must not be persisted.
+- No fingerprinting.
+- No personal user profiles.
+
+---
+
+## Optional: daily_rollups
+
+| Feld | Typ |
+|----|----|
+| id | bigint |
+| artist_page_id | bigint |
+| date | date |
+| spotlight_id | bigint |
+| campaign_id | bigint |
+| module | string |
+| referrer_host | string |
+| clicks | int |
+| created_at | timestamp |
+| updated_at | timestamp |
+
+---
+
+# Binding Rules
+
+- FK constraints must always be active.
+- Public queries must never expose internal IDs.
+- New development must align with PRODUCT_V2.md.

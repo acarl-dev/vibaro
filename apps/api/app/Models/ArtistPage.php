@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Spotlight;
+use App\Models\TrackingLink;
+use App\Models\ClickEvent;
 
 class ArtistPage extends Model
 {
@@ -75,5 +78,25 @@ class ArtistPage extends Model
     public function galleryImages(): HasMany
     {
         return $this->hasMany(GalleryImage::class)->orderBy('position');
+    }
+
+    public function spotlights(): HasMany
+    {
+        return $this->hasMany(Spotlight::class)->orderBy('starts_at', 'desc');
+    }
+
+    public function activeSpotlight()
+    {
+        return $this->hasOne(Spotlight::class)->where('status', 'active');
+    }
+
+    public function trackingLinks(): HasMany
+    {
+        return $this->hasMany(TrackingLink::class);
+    }
+
+    public function clickEvents(): HasMany
+    {
+        return $this->hasMany(ClickEvent::class);
     }
 }

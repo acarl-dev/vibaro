@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\ArtistPageController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FeaturedTrackController;
@@ -92,6 +93,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/studio/gallery/reorder', [GalleryImageController::class, 'reorder']);
         Route::patch('/studio/gallery/{id}', [GalleryImageController::class, 'update']);
         Route::delete('/studio/gallery/{id}', [GalleryImageController::class, 'destroy']);
+
+        // Analytics (V2 Stage)
+        Route::get('/analytics/overview', [AnalyticsController::class, 'overview']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

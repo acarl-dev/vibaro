@@ -1,52 +1,70 @@
-Ja 👍
-Ich habe deine Datei **inhaltlich nicht verändert**, sondern **sauber strukturiert, korrigiert und als gültige Markdown-Datei** aufbereitet.
-Du kannst sie **1:1 als `API_CONTRACTS.md` speichern**.
-
----
-
-```md
-# Vibaro API Contracts (v1)
+# Vibaro API Contracts (v1 + v2)
 
 Diese Datei ist die **verbindliche Quelle** für alle API-Endpunkte.  
 Frontend (`apps/web`) und Backend (`apps/api`) müssen sich exakt daran halten.
 
 Alle Responses folgen dem Standard aus `CONVENTIONS.md`.
 
+**Product Definition**
+- V1 (Legacy): Mini-Homepage / Free + Artist (historisch)
+- V2 (Active): Stage System (docs/PRODUCT_V2.md)
+
 ---
 
 ## Base URLs
 
 ### Development
-```
-
-[http://localhost:8000](http://localhost:8000)
-
-```
+- http://localhost:8000
 
 ### Production
-```
-
-[https://api](https://api).<your-domain>
-
-````
+- https://api.<your-domain>
 
 **API Prefix:** `/api/v1`
+
+---
+
+## Response Format
+
+Success:
+```json
+{ "data": {} }
+````
+
+Error:
+
+```json
+{ "error": { "code": "string", "message": "string", "details": {} } }
+```
+
+---
+
+# ===============================
+
+# V1 (Legacy) – Current Implementation Baseline
+
+# ===============================
+
+> ⚠️ Status: Legacy Product Definition
+> This section documents the existing endpoints as implemented for the original Vibaro MVP.
+> Active product definition is V2 (Stage System). New development should follow V2.
 
 ---
 
 ## Auth
 
 ### POST /auth/register
+
 Registriert einen neuen User.
 
-**Request**
+Request:
+
 ```json
 {
   "name": "Alan",
   "email": "alan@example.com",
   "password": "secret123"
 }
-````
+```
 
 ---
 
@@ -54,7 +72,7 @@ Registriert einen neuen User.
 
 Login eines bestehenden Users.
 
-**Request**
+Request:
 
 ```json
 {
@@ -69,7 +87,7 @@ Login eines bestehenden Users.
 
 Auth required.
 
-**Response**
+Response:
 
 ```json
 {
@@ -82,9 +100,9 @@ Auth required.
 ## GET /me
 
 Auth required.
-Wird für **Redirect- & Onboarding-Logik** genutzt.
+Wird für Redirect- & Onboarding-Logik genutzt.
 
-**Response**
+Response:
 
 ```json
 {
@@ -111,7 +129,7 @@ Wird für **Redirect- & Onboarding-Logik** genutzt.
 
 Auth required.
 
-**Response**
+Response:
 
 ```json
 {
@@ -130,14 +148,15 @@ Auth required.
 }
 ```
 
+> Note: `focus_type` is part of V1 product logic. In V2 it may be removed or repurposed.
+
 ---
 
 ### POST /artist-pages
 
-Erstellt eine Artist Page
-(MVP: **max. eine pro User**)
+Erstellt eine Artist Page (MVP: max. eine pro User)
 
-**Request**
+Request:
 
 ```json
 {
@@ -150,9 +169,9 @@ Erstellt eine Artist Page
 
 ### PATCH /artist-pages/{id}
 
-Partial Updates erlaubt.
+Partial updates erlaubt.
 
-**Request**
+Request:
 
 ```json
 {
@@ -170,13 +189,13 @@ Partial Updates erlaubt.
 
 Auth required.
 
-**Validierung**
+Validierung:
 
-* `handle` vorhanden
-* `display_name` vorhanden
-* `bio` vorhanden
+* handle vorhanden
+* display_name vorhanden
+* bio vorhanden
 
-**Response**
+Response:
 
 ```json
 {
@@ -191,13 +210,13 @@ Auth required.
 
 ### POST /artist-pages/{id}/unpublish
 
-**Response**
+Auth required.
+
+Response:
 
 ```json
 {
-  "data": {
-    "is_published": false
-  }
+  "data": { "is_published": false }
 }
 ```
 
@@ -207,15 +226,13 @@ Auth required.
 
 ### POST /handles/check
 
-**Request**
+Request:
 
 ```json
-{
-  "handle": "emily-j"
-}
+{ "handle": "emily-j" }
 ```
 
-**Response**
+Response:
 
 ```json
 {
@@ -234,10 +251,12 @@ Auth required.
 
 Public endpoint. Searches published artist pages by handle or display name.
 
-**Query Parameters:**
-- `q`: Search query (min 2 characters)
+Query params:
 
-**Response**
+* `q` (min 2 characters)
+
+Response:
+
 ```json
 {
   "data": [
@@ -251,301 +270,28 @@ Public endpoint. Searches published artist pages by handle or display name.
 }
 ```
 
-**Use Case:** Autocomplete for Support Acts field
+Use case: Autocomplete for Support Acts field
 
 ---
 
 ## Links / Shows / Releases (Private CRUD)
 
-### Endpoints
+Endpoints:
 
 * `/artist-pages/{id}/links`
 * `/artist-pages/{id}/shows`
 * `/artist-pages/{id}/releases`
 
-### Standard CRUD
+Standard CRUD:
 
-* `GET` – List
-* `POST` – Create
-* `PATCH /{resource_id}` – Update
-* `DELETE /{resource_id}` – Delete
+* `GET` list
+* `POST` create
+* `PATCH /{resource_id}` update
+* `DELETE /{resource_id}` delete
 
-### Optional
+Optional:
 
 * `POST /{resource}/reorder`
-
-### Links Details
-
-Bei ArtistPage-Erstellung werden automatisch vorgefertigte Social Media Links erstellt:
-- instagram, facebook, tiktok, x, youtube, spotify, applemusic, soundcloud, bandcamp, website
-- Diese haben anfangs `url: null`
-- User trägt URLs im Dashboard ein
-- **Nur Links mit ausgefüllten URLs werden öffentlich angezeigt**
-
-**POST /artist-pages/{id}/links**
-```json
-{
-  "type": "instagram",  // optional: facebook, tiktok, x, youtube, spotify, applemusic, soundcloud, bandcamp, website, custom
-  "title": "Instagram",  // optional, wird automatisch gesetzt für bekannte types
-  "url": "https://instagram.com/artist"  // optional, nullable
-}
-```
-
-**PATCH /artist-pages/{id}/links/{linkId}**
-```json
-{
-  "url": "https://instagram.com/artist"  // kann auch null sein um Link zu leeren
-}
-```
-
-**Response**
-```json
-{
-  "data": {
-    "id": 1,
-    "type": "instagram",
-    "title": "Instagram",
-    "url": "https://instagram.com/artist",
-    "position": 0,
-    "is_visible": true
-  }
-}
-```
-
----
-
-### Shows Details
-
-**GET /artist-pages/{id}/shows**
-Returns all shows for the artist page, sorted by `starts_at` ascending.
-
-**Response**
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "starts_at": "2026-02-15T20:00:00Z",
-      "venue": "Club XYZ",
-      "city": "Berlin",
-      "address": "Musterstraße 123, 10115 Berlin",
-      "ticket_url": "https://tickets.com/show123",
-      "price": 15.00,
-      "is_free": false,
-      "support_acts": ["Band A", "Band B"],
-      "flyer_path": "/storage/flyers/abc123.jpg",
-      "status": "upcoming",
-      "position": 0
-    }
-  ]
-}
-```
-
-**POST /artist-pages/{id}/shows**
-```json
-{
-  "starts_at": "2026-02-15T20:00:00",
-  "venue": "Club XYZ",
-  "city": "Berlin",
-  "address": "Musterstraße 123, 10115 Berlin",  // optional
-  "ticket_url": "https://tickets.com/show123",  // optional
-  "price": 15.00,  // optional, decimal
-  "is_free": false,  // optional, boolean
-  "support_acts": ["Band A", "Band B"]  // optional, array of strings
-}
-```
-
-**PATCH /artist-pages/{id}/shows/{showId}**
-```json
-{
-  "starts_at": "2026-02-15T21:00:00",
-  "venue": "Updated Venue",
-  "city": "Hamburg",
-  "address": "Neue Straße 456",
-  "ticket_url": null,
-  "price": null,
-  "is_free": true,
-  "support_acts": null
-}
-```
-
-**DELETE /artist-pages/{id}/shows/{showId}**
-Returns 204 No Content on success.
-
-**POST /artist-pages/{id}/shows/reorder**
-```json
-{
-  "ids": [3, 1, 2]
-}
-```
-
-**POST /artist-pages/{id}/shows/{showId}/upload-flyer**
-Multipart form data:
-- `flyer`: Image file (jpeg, jpg, png, webp, max 5MB)
-
-Response:
-```json
-{
-  "data": {
-    "id": 1,
-    "flyer_path": "flyers/abc123.jpg",
-    "flyer_url": "https://api.example.com/storage/flyers/abc123.jpg"
-  }
-}
-```
-
-**DELETE /artist-pages/{id}/shows/{showId}/flyer**
-Deletes the flyer image. Returns 204 No Content on success.
-
----
-
-### Releases Details
-
-**GET /artist-pages/{id}/releases**
-Returns all releases for the artist page, sorted by `release_date` descending (newest first).
-
-**Response**
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "title": "My New Album",
-      "release_date": "2026-03-15", // nullable
-      "url": "https://open.spotify.com/album/...",
-      "cover_path": "covers/xyz789.jpg",
-      "release_type": "album",
-      "is_featured": true,
-      "position": 0
-    }
-  ]
-}
-```
-
-**POST /artist-pages/{id}/releases**
-```json
-{
-  "title": "My New Album",
-  "release_date": "2026-03-15", // optional
-  "url": "https://open.spotify.com/album/...",  // optional
-  "is_featured": false  // optional, boolean
-}
-```
-
-**Hinweis (MVP):** Wenn `url` auf Spotify, Apple Music, SoundCloud, YouTube Music oder Bandcamp zeigt und **kein** Cover hochgeladen wurde,
-versucht die API automatisch ein Cover über oEmbed zu übernehmen.
-Wenn `title` leer ist, versucht die API den Titel aus oEmbed zu übernehmen (nur unterstützte Provider).
-Wenn `release_type` leer ist, versucht die API es aus der URL abzuleiten (`album` \| `single`).
-Wenn `release_date` leer ist, versucht die API (best-effort) das Datum aus Provider-Metadaten zu extrahieren.
-
-**PATCH /artist-pages/{id}/releases/{releaseId}**
-```json
-{
-  "title": "Updated Album Title",
-  "release_date": "2026-03-20", // optional
-  "url": "https://music.apple.com/album/...",
-  "is_featured": true
-}
-```
-
-**Hinweis (MVP):** Bei `url`-Änderung versucht die API automatisch ein Cover zu übernehmen,
-falls noch kein Cover gesetzt ist und die URL eine Spotify-, Apple Music-, SoundCloud-, YouTube Music- oder Bandcamp-URL ist.
-Wenn `title` leer ist, versucht die API den Titel aus oEmbed zu übernehmen (nur unterstützte Provider).
-Wenn `release_type` leer ist, versucht die API es aus der URL abzuleiten (`album` \| `single`).
-Wenn `release_date` leer ist, versucht die API (best-effort) das Datum aus Provider-Metadaten zu extrahieren.
-
-**DELETE /artist-pages/{id}/releases/{releaseId}**
-Deletes the release and its cover image if exists. Returns `{"data": {"ok": true}}`.
-
-**POST /artist-pages/{id}/releases/reorder**
-```json
-{
-  "release_ids": [3, 1, 2]
-}
-```
-
-**POST /artist-pages/{id}/releases/{releaseId}/upload-cover**
-Multipart form data:
-- `cover`: Image file (jpeg, jpg, png, webp, max 5MB)
-
-Response:
-```json
-{
-  "data": {
-    "id": 1,
-    "cover_path": "covers/xyz789.jpg",
-    "cover_url": "https://api.example.com/storage/covers/xyz789.jpg"
-  }
-}
-```
-
-**DELETE /artist-pages/{id}/releases/{releaseId}/cover**
-Deletes the cover image. Returns 204 No Content on success.
-
----
-
-### Featured Tracks Details
-
-**GET /artist-pages/{id}/featured-tracks**
-Returns all featured tracks for the artist page, sorted by `position` ascending.
-
-**Response**
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "title": "Lost in the City",
-      "artist_name": null,
-      "platform": "spotify",
-      "platform_url": "https://open.spotify.com/track/ABC123",
-      "embed_id": "ABC123",
-      "position": 0
-    },
-    {
-      "id": 2,
-      "title": "Late Night Drive",
-      "artist_name": "Emily J. ft. John Doe",
-      "platform": "youtubemusic",
-      "platform_url": "https://music.youtube.com/watch?v=XYZ789",
-      "embed_id": "XYZ789",
-      "position": 1
-    }
-  ]
-}
-```
-
-**POST /artist-pages/{id}/featured-tracks**
-```json
-{
-  "title": "Lost in the City",
-  "artist_name": null,  // optional
-  "platform": "spotify",  // spotify | youtubemusic | soundcloud
-  "platform_url": "https://open.spotify.com/track/ABC123",
-  "embed_id": null  // optional, auto-extracted if not provided
-}
-```
-
-**PATCH /artist-pages/{id}/featured-tracks/{trackId}**
-```json
-{
-  "title": "Lost in the City (Remix)",
-  "artist_name": "Emily J. ft. Jane Smith",
-  "platform": "spotify",
-  "platform_url": "https://open.spotify.com/track/DEF456",
-  "position": 2
-}
-```
-
-**DELETE /artist-pages/{id}/featured-tracks/{trackId}**
-Deletes the featured track. Returns 204 No Content.
-
-**POST /artist-pages/{id}/featured-tracks/reorder**
-```json
-{
-  "ids": [3, 1, 2]
-}
-```
 
 ---
 
@@ -555,14 +301,14 @@ Deletes the featured track. Returns 204 No Content.
 
 Public, no auth.
 
-**Behavior**
+Behavior:
 
-* `404` if handle unknown
-* `404` if `is_published = false`
-* Keine internen IDs
-* **KONTAKT-DATEN SIND PRIVATE**: `booking_email`, `management_email`, `press_email`, `whatsapp_number` werden NICHT ausgeliefert
+* 404 if handle unknown
+* 404 if `is_published = false`
+* No internal IDs
+* Contact data stays private
 
-**Response**
+Response (V1 baseline):
 
 ```json
 {
@@ -574,71 +320,406 @@ Public, no auth.
       "avatar_url": "https://cdn...",
       "hero_image_url": null
     },
-    "focus": {
-      "type": "links",
-      "limit": 3
-    },
+    "focus": { "type": "links", "limit": 3 },
     "links": [],
-    "shows": [
-      {
-        "title": "Club XYZ - Berlin",
-        "venue": "Club XYZ",
-        "city": "Berlin",
-        "date": "2026-02-15T20:00:00Z",
-        "time": "20:00",
-        "price": 15.00,
-        "is_free": false,
-        "support_acts": ["Band A", "Band B"],
-        "url": "https://tickets.com/show123",
-        "flyer_url": "https://cdn.../flyers/abc123.jpg"
-      }
-    ],
+    "shows": [],
     "releases": [],
-    "featured_tracks": [
-      {
-        "title": "Lost in the City",
-        "artist_name": null,
-        "platform": "spotify",
-        "platform_url": "https://open.spotify.com/track/ABC123",
-        "embed_id": "ABC123"
-      }
+    "featured_tracks": []
+  }
+}
+```
+
+> Note: `focus` is V1 product logic and may change in V2 public page responses.
+
+---
+
+# ===============================
+
+# V2 – Stage System (Active Additions)
+
+# ===============================
+
+Status: Active for new development
+Product rules: docs/PRODUCT_V2.md
+Data model: docs/DATA_MODEL.md (V2 section)
+
+This section extends API v1. All existing v1 endpoints remain valid unless explicitly replaced.
+
+## Implementation Status
+
+### ✅ Implemented (Stage MVP)
+- `GET /t/{slug}` - Public tracking redirect
+- `GET /api/v1/analytics/overview` - Performance analytics (7d, 30d)
+
+### 🔄 Planned (Stage Pro)
+- Spotlight CRUD endpoints
+- Campaign CRUD endpoints  
+- Tracking Link CRUD endpoints
+- CSV Export
+
+---
+
+## Spotlights (Stage)
+
+### GET /spotlights/active
+
+Auth required.
+
+Response:
+
+```json
+{
+  "data": {
+    "id": 12,
+    "title": "New Album: VOIDBRINGER",
+    "type": "release",
+    "status": "active",
+    "starts_at": "2026-02-01T00:00:00Z",
+    "ends_at": null,
+    "primary_url": "https://open.spotify.com/album/...",
+    "description": "Our heaviest record so far.",
+    "created_at": "2026-02-01T10:00:00Z",
+    "updated_at": "2026-02-10T18:30:00Z"
+  }
+}
+```
+
+If no active spotlight exists:
+
+```json
+{ "data": null }
+```
+
+---
+
+### POST /spotlights
+
+Auth required.
+
+Request:
+
+```json
+{
+  "title": "Tour: Spring 2026",
+  "type": "tour",
+  "starts_at": "2026-03-01T00:00:00Z",
+  "ends_at": null,
+  "primary_url": "https://tickets.example.com",
+  "description": "New dates announced."
+}
+```
+
+Response:
+
+```json
+{
+  "data": { "id": 13, "status": "scheduled" }
+}
+```
+
+---
+
+### PATCH /spotlights/{id}
+
+Auth required.
+
+Request:
+
+```json
+{
+  "title": "Tour: Spring 2026 (updated)",
+  "primary_url": "https://tickets.example.com/new"
+}
+```
+
+Response:
+
+```json
+{ "data": { "ok": true } }
+```
+
+---
+
+### POST /spotlights/{id}/activate
+
+Auth required.
+
+Rules:
+
+* Only one active spotlight per artist page.
+* If another spotlight is active, it becomes ended.
+
+Response:
+
+```json
+{ "data": { "active_spotlight_id": 13 } }
+```
+
+---
+
+### POST /spotlights/{id}/end
+
+Auth required.
+
+Response:
+
+```json
+{ "data": { "ended_spotlight_id": 13 } }
+```
+
+---
+
+## Campaigns (Stage Pro)
+
+### GET /campaigns
+
+Auth required.
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "id": 21,
+      "name": "Instagram Story – Feb 2026",
+      "platform": "instagram",
+      "spotlight_id": 12,
+      "starts_at": "2026-02-10T00:00:00Z",
+      "ends_at": null
+    }
+  ]
+}
+```
+
+---
+
+### POST /campaigns
+
+Auth required.
+
+Request:
+
+```json
+{
+  "name": "Meta Ads – Album Launch",
+  "platform": "meta_ads",
+  "spotlight_id": 12,
+  "notes": "A/B test - different creatives",
+  "starts_at": "2026-02-15T00:00:00Z",
+  "ends_at": "2026-02-28T23:59:59Z"
+}
+```
+
+Response:
+
+```json
+{ "data": { "id": 22 } }
+```
+
+---
+
+### PATCH /campaigns/{id}
+
+Auth required.
+
+Request:
+
+```json
+{ "ends_at": "2026-03-03T23:59:59Z" }
+```
+
+Response:
+
+```json
+{ "data": { "ok": true } }
+```
+
+---
+
+### DELETE /campaigns/{id}
+
+Auth required.
+
+Response:
+
+```json
+{ "data": { "ok": true } }
+```
+
+---
+
+## Tracking Links (Stage + Pro)
+
+### GET /tracking-links
+
+Auth required.
+
+Response:
+
+```json
+{
+  "data": [
+    {
+      "id": 100,
+      "slug": "t_vK3a9QpN",
+      "module": "spotlight",
+      "label": "Spotify",
+      "target_url": "https://open.spotify.com/album/...",
+      "spotlight_id": 12,
+      "campaign_id": 21,
+      "is_active": true
+    }
+  ]
+}
+```
+
+---
+
+### POST /tracking-links
+
+Auth required.
+
+Request:
+
+```json
+{
+  "module": "spotlight",
+  "label": "Spotify",
+  "target_url": "https://open.spotify.com/album/...",
+  "spotlight_id": 12,
+  "campaign_id": 21,
+  "utm_source": "instagram",
+  "utm_medium": "story",
+  "utm_campaign": "album_launch"
+}
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": 100,
+    "slug": "t_vK3a9QpN",
+    "tracking_url": "https://<your-domain>/t/t_vK3a9QpN"
+  }
+}
+```
+
+---
+
+### PATCH /tracking-links/{id}
+
+Auth required.
+
+Request:
+
+```json
+{ "label": "Spotify (Link in Bio)", "is_active": true }
+```
+
+Response:
+
+```json
+{ "data": { "ok": true } }
+```
+
+---
+
+### DELETE /tracking-links/{id}
+
+Auth required.
+
+Response:
+
+```json
+{ "data": { "ok": true } }
+```
+
+---
+
+## Public Tracking Redirect (Stage + Pro)
+
+### GET /t/{slug}
+
+Public endpoint. Server-side tracking + 302 redirect to target_url.
+
+Behavior:
+
+* creates click event (server-side)
+* stores:
+
+  * occurred_at (UTC)
+  * referrer_host (host only)
+  * spotlight_id / campaign_id / module (denormalized)
+* must NOT store:
+
+  * IP addresses (may only be used transiently)
+  * full referrer URLs
+  * any user-identifying data
+
+Response:
+
+* `302 Found` redirect to target_url
+* `404 Not Found` if slug unknown or inactive
+
+---
+
+## Analytics (Stage + Pro)
+
+### GET /analytics/overview
+
+Auth required.
+
+Query params:
+
+* `range`: `7d` | `30d` (default `7d`)
+  * Note: MVP implements 7d and 30d only. 90d planned for future.
+* `spotlight_id`: optional (not yet implemented)
+* `campaign_id`: optional (not yet implemented)
+
+Response:
+
+```json
+{
+  "data": {
+    "range": "7d",
+    "total_clicks": 1240,
+    "by_module": [
+      { "module": "spotlight", "clicks": 740 },
+      { "module": "links", "clicks": 310 },
+      { "module": "shows", "clicks": 190 }
+    ],
+    "by_referrer": [
+      { "referrer_host": "instagram.com", "clicks": 820 },
+      { "referrer_host": "t.co", "clicks": 110 },
+      { "referrer_host": "direct", "clicks": 310 }
+    ],
+    "trend": [
+      { "date": "2026-02-12", "clicks": 120 },
+      { "date": "2026-02-13", "clicks": 180 }
     ]
   }
 }
 ```
 
-**WICHTIG**: Kontakt-Daten sind nicht in Response enthalten! Sie sind Studio-only und bleiben private.
+Notes:
+
+* `direct` is used when referrer is missing.
 
 ---
 
-## Status Codes
+## Export (Stage Pro)
 
-* `200 OK`
-* `201 Created`
-* `401 Unauthorized`
-* `403 Forbidden`
-* `404 Not Found`
-* `422 Validation Error`
+### GET /exports/campaigns/{id}.csv
 
----
+Auth required.
 
-## Regeln
+Returns a CSV file. Default content: daily rollup for the campaign (date, clicks, referrer_host, module).
 
-* Keine HTML Responses
-* Keine internen IDs in Public Responses
-* Keine nicht dokumentierten Felder
+MVP may return CSV synchronously.
 
 ```
 
 ---
-
-### ✅ Ergebnis
-- gültiges, sauberes Markdown  
-- konsistent strukturiert  
-- Copilot- & Team-tauglich  
-- **keine inhaltlichen Überraschungen**
-
-Wenn du willst, kann ich als Nächstes:
-- eine **kurze Copilot-Anweisung** schreiben: *„Implementiere API exakt nach diesem Contract“*, oder
-- die Datei gegen dein **Laravel Routing & Controller Setup spiegeln** (Check: fehlt noch was?).
-```

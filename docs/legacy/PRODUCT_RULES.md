@@ -1,4 +1,18 @@
-# Vibaro Product Rules (MVP)
+# Vibaro Product Rules (MVP – Legacy)
+
+⚠️ Status: Legacy (V1)
+
+Dieses Dokument beschreibt die ursprüngliche Produktdefinition 
+(Mini-Homepage mit Free + Artist Plan).
+
+Es ist nicht mehr die aktive Produktbasis.
+
+Die aktuelle Produktdefinition ist in:
+→ docs/PRODUCT_V2.md
+
+Dieses Dokument bleibt aus historischen Gründen bestehen.
+Neue Features dürfen sich nicht mehr auf dieses Dokument beziehen.
+
 
 Vibaro ist ein B2C-SaaS für Musiker zur Erstellung einer persönlichen, ruhigen Mini-Website
 unter `/p/[handle]`.
