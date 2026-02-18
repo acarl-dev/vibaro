@@ -22,10 +22,8 @@ export default function StudioSidebar({ page }: StudioSidebarProps) {
 
       <nav className="space-y-1 text-sm">
         <NavLink href="/studio">Übersicht</NavLink>
-        <NavLink href="/studio/performance">Performance</NavLink>
-        <NavLink href="/studio/spotlight">Spotlight</NavLink>
-        <NavLink href="/studio/campaigns">Kampagnen</NavLink>
-        <NavLink href="/studio/tracking-links">Tracking Links</NavLink>
+        <NavLink href="/studio/stage">Stage</NavLink>
+        <NavLink href="/studio/ergebnisse">Ergebnisse</NavLink>
         <div className="my-2 border-t border-zinc-800"></div>
         <NavLink href="/studio/appearance">Templates</NavLink>
         <NavLink href="/studio/profile">Profil</NavLink>

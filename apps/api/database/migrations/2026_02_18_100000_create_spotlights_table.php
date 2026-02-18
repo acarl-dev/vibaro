@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('type'); // e.g. 'release', 'tour', 'single', 'merch'
             $table->enum('status', ['scheduled', 'active', 'ended'])->default('scheduled');
-            $table->dateTime('starts_at');
+            $table->dateTime('starts_at')->nullable();
             $table->dateTime('ends_at')->nullable();
             $table->string('primary_url')->nullable();
             $table->text('description')->nullable();

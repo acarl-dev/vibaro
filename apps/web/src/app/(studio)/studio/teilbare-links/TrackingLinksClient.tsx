@@ -97,7 +97,7 @@ export default function TrackingLinksClient() {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm("Tracking Link löschen?")) return;
+    if (!confirm("Link löschen?")) return;
 
     try {
       await deleteTrackingLink(id);
@@ -117,9 +117,9 @@ export default function TrackingLinksClient() {
     return (
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">Tracking Links</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Teilbare Links</h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Erstelle trackbare Links für deine Spotlights, Releases, Shows und mehr.
+            Erstelle einen Link, den du posten kannst. Vibaro misst automatisch, wie oft er geklickt wird.
           </p>
         </div>
         <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -132,10 +132,21 @@ export default function TrackingLinksClient() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Tracking Links</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Teilbare Links</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Erstelle trackbare Links für deine Spotlights, Releases, Shows und mehr.
+          Erstelle einen Link, den du posten kannst. Vibaro misst automatisch, wie oft er geklickt wird.
         </p>
+      </div>
+
+      {/* Kontext-Hinweise */}
+      <div className="mb-6 rounded-lg border border-blue-900/30 bg-blue-900/10 p-4">
+        <h3 className="text-sm font-semibold text-blue-300 mb-2">So erstellst du einen teilbaren Link:</h3>
+        <ol className="space-y-1 text-sm text-blue-200/80">
+          <li>1. Klicke auf „+ Neuer Link" und gib dein Ziel an (z.B. Spotify, YouTube, Instagram)</li>
+          <li>2. Optional: Verknüpfe den Link mit einem Spotlight oder Push</li>
+          <li>3. Kopiere deinen Vibaro-Link und teile ihn überall (Story, Bio, WhatsApp)</li>
+          <li>4. Jeder Klick wird automatisch gemessen und erscheint unter „Ergebnisse"</li>
+        </ol>
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -145,14 +156,14 @@ export default function TrackingLinksClient() {
             onClick={() => setShowCreateForm(true)}
             className="mb-6 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
           >
-            + Neuer Tracking Link
+            + Neuer Link
           </button>
         )}
 
         {/* Create Form */}
         {showCreateForm && (
           <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-zinc-100">Neuer Tracking Link</h2>
+            <h2 className="mb-4 text-lg font-semibold text-zinc-100">Neuer teilbarer Link</h2>
             <form onSubmit={handleCreate}>
               <div className="space-y-4">
                 <div>
@@ -308,9 +319,9 @@ export default function TrackingLinksClient() {
 
         {/* Tracking Links List */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold text-zinc-100">Deine Tracking Links</h2>
+          <h2 className="mb-4 text-lg font-semibold text-zinc-100">Deine teilbaren Links</h2>
           {trackingLinks.length === 0 ? (
-            <p className="text-sm text-zinc-500">Noch keine Tracking Links vorhanden.</p>
+            <p className="text-sm text-zinc-500">Noch keine Links erstellt.</p>
           ) : (
             <div className="space-y-3">
               {trackingLinks.map((link) => (

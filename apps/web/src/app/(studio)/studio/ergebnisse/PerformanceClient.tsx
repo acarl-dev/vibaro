@@ -45,9 +45,9 @@ export default function PerformanceClient() {
     return (
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">Performance</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Deine Tracking-Daten – gefiltert und messbar.
+          <h1 className="text-3xl font-bold text-zinc-100">Wie läuft's?</h1>
+          <p className="mt-2 text-sm text-zinc-400">
+            So reagieren deine Fans.
           </p>
         </div>
         <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -61,13 +61,13 @@ export default function PerformanceClient() {
     return (
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">Performance</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Deine Tracking-Daten – gefiltert und messbar.
+          <h1 className="text-3xl font-bold text-zinc-100">Wie läuft's?</h1>
+          <p className="mt-2 text-sm text-zinc-400">
+            So reagieren deine Fans.
           </p>
         </div>
         <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-          <p className="text-sm text-zinc-500">Keine Performance-Daten verfügbar.</p>
+          <p className="text-sm text-zinc-500">Noch keine Reaktionen.</p>
         </div>
       </div>
     );
@@ -78,11 +78,13 @@ export default function PerformanceClient() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Performance</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Deine Tracking-Daten – gefiltert und messbar.
+        <h1 className="text-3xl font-bold text-zinc-100">Wie läuft's?</h1>
+        <p className="mt-2 text-sm text-zinc-400">
+          So reagieren deine Fans.
         </p>
       </div>
+
+
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
         {/* Filters */}
@@ -103,7 +105,7 @@ export default function PerformanceClient() {
           {/* Spotlight Filter */}
           {spotlights.length > 0 && (
             <div>
-              <label className="mr-2 text-sm font-medium text-zinc-300">Spotlight:</label>
+              <label className="mr-2 text-sm font-medium text-zinc-300">Fokus:</label>
               <select
                 value={selectedSpotlightId || ""}
                 onChange={(e) =>
@@ -122,29 +124,6 @@ export default function PerformanceClient() {
                   .map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.title} ({s.status})
-                    </option>
-                  ))}
-              </select>
-            </div>
-          )}
-
-          {/* Campaign Filter */}
-          {campaigns.length > 0 && (
-            <div>
-              <label className="mr-2 text-sm font-medium text-zinc-300">Kampagne:</label>
-              <select
-                value={selectedCampaignId || ""}
-                onChange={(e) =>
-                  setSelectedCampaignId(e.target.value ? parseInt(e.target.value) : null)
-                }
-                className="rounded border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 focus:border-zinc-500 focus:outline-none"
-              >
-                <option value="">Alle Kampagnen</option>
-                {campaigns
-                  .filter((c) => !selectedSpotlightId || c.spotlight_id === selectedSpotlightId)
-                  .map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} {c.platform && `(${c.platform})`}
                     </option>
                   ))}
               </select>

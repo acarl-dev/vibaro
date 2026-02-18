@@ -122,7 +122,7 @@ export default function CampaignsClient() {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm("Kampagne löschen? Dies entfernt auch alle zugehörigen Tracking-Links.")) return;
+    if (!confirm("Push löschen? Dies entfernt auch alle zugehörigen Links.")) return;
 
     try {
       await deleteCampaign(id);
@@ -161,9 +161,9 @@ export default function CampaignsClient() {
     return (
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">Kampagnen</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Pushes</h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Organisiere deine Marketing-Kampagnen und verfolge ihre Performance.
+            Organisiere deine Promotion und verfolge, was funktioniert.
           </p>
         </div>
         <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -176,10 +176,21 @@ export default function CampaignsClient() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Kampagnen</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Pushes</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Organisiere deine Marketing-Kampagnen und verfolge ihre Performance.
+          Organisiere deine Promotion und verfolge, was funktioniert.
         </p>
+      </div>
+
+      {/* Kontext-Hinweise */}
+      <div className="mb-6 rounded-lg border border-blue-900/30 bg-blue-900/10 p-4">
+        <h3 className="text-sm font-semibold text-blue-300 mb-2">Was sind Pushes?</h3>
+        <ol className="space-y-1 text-sm text-blue-200/80">
+          <li>1. Ein Push ist eine zeitlich begrenzte Promotion (z.B. "Instagram Story-Serie – Feb 2026")</li>
+          <li>2. Du kannst Pushes mit einem Spotlight verknüpfen (z.B. Album-Release)</li>
+          <li>3. Ordne deine teilbaren Links einem Push zu, um Klicks pro Aktion zu messen</li>
+          <li>4. So siehst du unter „Ergebnisse", welche Aktionen am besten funktionieren</li>
+        </ol>
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -189,14 +200,14 @@ export default function CampaignsClient() {
             onClick={() => setShowCreateForm(true)}
             className="mb-6 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
           >
-            + Neue Kampagne
+            + Neuer Push
           </button>
         )}
 
         {/* Create Form */}
         {showCreateForm && (
           <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-zinc-100">Neue Kampagne</h2>
+            <h2 className="mb-4 text-lg font-semibold text-zinc-100">Neuer Push</h2>
             <form onSubmit={handleCreate}>
               <div className="space-y-4">
                 <div>
@@ -306,7 +317,7 @@ export default function CampaignsClient() {
         {/* Edit Form */}
         {editingCampaign && (
           <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-800/50 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-zinc-100">Kampagne bearbeiten</h2>
+            <h2 className="mb-4 text-lg font-semibold text-zinc-100">Push bearbeiten</h2>
             <form onSubmit={handleUpdate}>
               <div className="space-y-4">
                 <div>
@@ -415,7 +426,7 @@ export default function CampaignsClient() {
           {campaigns.length === 0 ? (
             <div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-8 text-center">
               <p className="text-sm text-zinc-500">
-                Noch keine Kampagnen. Erstelle eine, um deine Marketing-Performance zu tracken.
+                Noch keine Pushes. Erstelle deinen ersten, um Promotion zu tracken.
               </p>
             </div>
           ) : (
