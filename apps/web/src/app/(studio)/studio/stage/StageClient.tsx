@@ -107,12 +107,28 @@ export default function StageClient() {
     const platform = PLATFORMS.find((p) => p.id === platformId);
     if (!platform) return;
 
+    let linkLabel = platform.name;
+    if (platform.id === "custom") {
+      const customName = window.prompt("Wie soll dein Link heißen?", "Eigener Link");
+      if (customName === null) {
+        return;
+      }
+
+      const trimmedName = customName.trim();
+      if (!trimmedName) {
+        alert("Bitte gib einen Namen ein.");
+        return;
+      }
+
+      linkLabel = trimmedName;
+    }
+
     try {
       setGeneratingLink(platformId);
 
       // 1. Create campaign
       const campaign = await createCampaign({
-        name: `${platform.name} — ${activeSpotlight.title}`,
+        name: `${linkLabel} — ${activeSpotlight.title}`,
         platform: platform.utmSource,
         spotlight_id: activeSpotlight.id,
       });
@@ -120,7 +136,7 @@ export default function StageClient() {
       // 2. Create tracking link
       const link = await createTrackingLink({
         module: "share",
-        label: platform.name,
+        label: linkLabel,
         target_url: activeSpotlight.primary_url,
         spotlight_id: activeSpotlight.id,
         campaign_id: campaign.id,
