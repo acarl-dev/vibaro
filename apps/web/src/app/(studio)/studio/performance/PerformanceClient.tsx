@@ -1,28 +1,39 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAnalytics, getAllSpotlights, type AnalyticsData, type Spotlight } from "@/lib/api/stage";
+import { 
+  getAnalytics, 
+  getAllSpotlights, 
+  getAllCampaigns,
+  type AnalyticsData, 
+  type Spotlight,
+  type Campaign,
+} from "@/lib/api/stage";
 
 export default function PerformanceClient() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [spotlights, setSpotlights] = useState<Spotlight[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<"7d" | "30d">("7d");
   const [selectedSpotlightId, setSelectedSpotlightId] = useState<number | null>(null);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
 
   useEffect(() => {
     loadData();
-  }, [range, selectedSpotlightId]);
+  }, [range, selectedSpotlightId, selectedCampaignId]);
 
   async function loadData() {
     try {
       setLoading(true);
-      const [analyticsData, spotlightsData] = await Promise.all([
-        getAnalytics(range, selectedSpotlightId || undefined),
+      const [analyticsData, spotlightsData, campaignsData] = await Promise.all([
+        getAnalytics(range, selectedSpotlightId || undefined, selectedCampaignId || undefined),
         getAllSpotlights(),
+        getAllCampaigns(),
       ]);
       setAnalytics(analyticsData);
       setSpotlights(spotlightsData);
+      setCampaigns(campaignsData);
     } catch (error) {
       console.error("Failed to load performance data:", error);
     } finally {
@@ -101,15 +112,40 @@ export default function PerformanceClient() {
             </select>
           </div>
         )}
+
+        {/* Campaign Filter */}
+        {campaigns.length > 0 && (
+          <div>
+            <label className="mr-2 text-sm font-medium text-zinc-700">Kampagne:</label>
+            <select
+              value={selectedCampaignId || ""}
+              onChange={(e) =>
+                setSelectedCampaignId(e.target.value ? parseInt(e.target.value) : null)
+              }
+              className="rounded border border-zinc-300 px-3 py-1.5 text-sm focus:border-zinc-500 focus:outline-none"
+            >
+              <option value="">Alle</option>
+              {campaigns
+                .filter((c) => !selectedSpotlightId || c.spotlight_id === selectedSpotlightId)
+                .map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} {c.platform && `(${c.platform})`}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Total Clicks */}
       <div className="mb-8 rounded-lg border border-zinc-200 bg-white p-6">
         <div className="text-sm font-medium text-zinc-500">Gesamt-Klicks</div>
         <div className="mt-2 text-4xl font-bold">{analytics.total_clicks}</div>
-        {selectedSpotlightId && (
+        {(selectedSpotlightId || selectedCampaignId) && (
           <p className="mt-2 text-xs text-zinc-500">
-            Gefiltert nach Spotlight
+            {selectedSpotlightId && "Gefiltert nach Spotlight"}
+            {selectedSpotlightId && selectedCampaignId && " + "}
+            {selectedCampaignId && "Gefiltert nach Kampagne"}
           </p>
         )}
       </div>

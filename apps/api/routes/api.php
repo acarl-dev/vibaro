@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\ArtistPageController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\FeaturedTrackController;
 use App\Http\Controllers\Api\GalleryImageController;
 use App\Http\Controllers\Api\LinkController;
@@ -106,6 +107,12 @@ Route::prefix('v1')->group(function () {
         Route::patch('/spotlights/{id}', [SpotlightController::class, 'update']);
         Route::post('/spotlights/{id}/activate', [SpotlightController::class, 'activate']);
         Route::post('/spotlights/{id}/end', [SpotlightController::class, 'end']);
+
+        // Campaigns (Stage Pro)
+        Route::get('/campaigns', [CampaignController::class, 'index']);
+        Route::post('/campaigns', [CampaignController::class, 'store']);
+        Route::patch('/campaigns/{id}', [CampaignController::class, 'update']);
+        Route::delete('/campaigns/{id}', [CampaignController::class, 'destroy']);
 
         // Tracking Links (V2 Stage)
         Route::get('/tracking-links', [TrackingLinkController::class, 'index']);

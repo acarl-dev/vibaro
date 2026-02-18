@@ -5,14 +5,17 @@ import {
   getAllTrackingLinks,
   createTrackingLink,
   deleteTrackingLink,
+  getAllSpotlights,
+  getAllCampaigns,
   type TrackingLink,
   type Spotlight,
-  getAllSpotlights,
+  type Campaign,
 } from "@/lib/api/stage";
 
 export default function TrackingLinksClient() {
   const [trackingLinks, setTrackingLinks] = useState<TrackingLink[]>([]);
   const [spotlights, setSpotlights] = useState<Spotlight[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -23,6 +26,7 @@ export default function TrackingLinksClient() {
     label: "",
     target_url: "",
     spotlight_id: "",
+    campaign_id: "",
     utm_source: "",
     utm_medium: "",
     utm_campaign: "",
@@ -35,12 +39,14 @@ export default function TrackingLinksClient() {
   async function loadData() {
     try {
       setLoading(true);
-      const [links, spots] = await Promise.all([
+      const [links, spots, camps] = await Promise.all([
         getAllTrackingLinks(),
         getAllSpotlights(),
+        getAllCampaigns(),
       ]);
       setTrackingLinks(links);
       setSpotlights(spots);
+      setCampaigns(camps);
     } catch (error) {
       console.error("Failed to load tracking links:", error);
     } finally {
@@ -62,6 +68,10 @@ export default function TrackingLinksClient() {
         data.spotlight_id = parseInt(formData.spotlight_id);
       }
 
+      if (formData.campaign_id) {
+        data.campaign_id = parseInt(formData.campaign_id);
+      }
+
       if (formData.utm_source) data.utm_source = formData.utm_source;
       if (formData.utm_medium) data.utm_medium = formData.utm_medium;
       if (formData.utm_campaign) data.utm_campaign = formData.utm_campaign;
@@ -74,6 +84,7 @@ export default function TrackingLinksClient() {
         label: "",
         target_url: "",
         spotlight_id: "",
+        campaign_id: "",
         utm_source: "",
         utm_medium: "",
         utm_campaign: "",
@@ -170,6 +181,28 @@ export default function TrackingLinksClient() {
                     {spotlights.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.title} ({s.status})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {campaigns.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-zinc-700">
+                    Kampagne (optional)
+                  </label>
+                  <select
+                    value={formData.campaign_id}
+                    onChange={(e) =>
+                      setFormData({ ...formData, campaign_id: e.target.value })
+                    }
+                    className="mt-1 w-full rounded border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+                  >
+                    <option value="">-- Keine Kampagne --</option>
+                    {campaigns.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} {c.platform && `(${c.platform})`}
                       </option>
                     ))}
                   </select>
@@ -286,6 +319,11 @@ export default function TrackingLinksClient() {
                       {link.spotlight_title && (
                         <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
                           {link.spotlight_title}
+                        </span>
+                      )}
+                      {link.campaign_name && (
+                        <span className="rounded bg-purple-100 px-2 py-0.5 text-xs text-purple-700">
+                          {link.campaign_name}
                         </span>
                       )}
                     </div>

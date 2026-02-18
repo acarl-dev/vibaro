@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
-use App\Models\Spotlight;
-use App\Models\ClickEvent;
 
 class TrackingLink extends Model
 {
@@ -48,6 +46,11 @@ class TrackingLink extends Model
     public function spotlight(): BelongsTo
     {
         return $this->belongsTo(Spotlight::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class);
     }
 
     public function clickEvents(): HasMany

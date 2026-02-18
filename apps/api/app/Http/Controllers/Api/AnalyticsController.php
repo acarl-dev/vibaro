@@ -17,11 +17,13 @@ class AnalyticsController extends Controller
         $request->validate([
             'range' => 'in:7d,30d',
             'spotlight_id' => 'nullable|exists:spotlights,id',
+            'campaign_id' => 'nullable|exists:campaigns,id',
         ]);
 
         $range = $request->input('range', '7d');
         $days = $range === '7d' ? 7 : 30;
         $spotlightId = $request->input('spotlight_id');
+        $campaignId = $request->input('campaign_id');
 
         $artistPage = $request->user()->artistPage;
 
@@ -44,6 +46,13 @@ class AnalyticsController extends Controller
         // Apply spotlight filter if provided
         if ($spotlightId) {
             $baseQuery->where('spotlight_id', $spotlightId);
+        }
+
+        // Apply campaign filter if provided
+        if ($campaignId) {
+            $baseQuery->whereHas('trackingLink', function ($query) use ($campaignId) {
+                $query->where('campaign_id', $campaignId);
+            });
         }
 
         // Total clicks in range
@@ -97,6 +106,7 @@ class AnalyticsController extends Controller
             'data' => [
                 'range' => $range,
                 'spotlight_id' => $spotlightId,
+                'campaign_id' => $campaignId,
                 'total_clicks' => $totalClicks,
                 'by_module' => $byModule,
                 'by_referrer' => $byReferrer,

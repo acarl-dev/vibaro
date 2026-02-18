@@ -484,9 +484,13 @@ Response:
       "id": 21,
       "name": "Instagram Story – Feb 2026",
       "platform": "instagram",
+      "notes": "A/B test - different creatives",
       "spotlight_id": 12,
+      "spotlight_title": "New Album: VOIDBRINGER",
       "starts_at": "2026-02-10T00:00:00Z",
-      "ends_at": null
+      "ends_at": null,
+      "created_at": "2026-02-10T10:00:00Z",
+      "updated_at": "2026-02-10T10:00:00Z"
     }
   ]
 }
@@ -514,7 +518,7 @@ Request:
 Response:
 
 ```json
-{ "data": { "id": 22 } }
+{ "data": { "id": 22, "name": "Meta Ads – Album Launch" } }
 ```
 
 ---
@@ -566,9 +570,13 @@ Response:
       "module": "spotlight",
       "label": "Spotify",
       "target_url": "https://open.spotify.com/album/...",
+      "tracking_url": "https://vibaro.app/t/t_vK3a9QpN",
       "spotlight_id": 12,
+      "spotlight_title": "New Album: VOIDBRINGER",
       "campaign_id": 21,
-      "is_active": true
+      "campaign_name": "Instagram Story – Feb 2026",
+      "is_active": true,
+      "created_at": "2026-02-10T10:00:00Z"
     }
   ]
 }
@@ -676,8 +684,8 @@ Query params:
 
 * `range`: `7d` | `30d` (default `7d`)
   * Note: MVP implements 7d and 30d only. 90d planned for future.
-* `spotlight_id`: optional (not yet implemented)
-* `campaign_id`: optional (not yet implemented)
+* `spotlight_id`: optional, filters analytics by spotlight
+* `campaign_id`: optional, filters analytics by campaign
 
 Response:
 
@@ -685,6 +693,8 @@ Response:
 {
   "data": {
     "range": "7d",
+    "spotlight_id": 12,
+    "campaign_id": 21,
     "total_clicks": 1240,
     "by_module": [
       { "module": "spotlight", "clicks": 740 },
@@ -692,9 +702,9 @@ Response:
       { "module": "shows", "clicks": 190 }
     ],
     "by_referrer": [
-      { "referrer_host": "instagram.com", "clicks": 820 },
-      { "referrer_host": "t.co", "clicks": 110 },
-      { "referrer_host": "direct", "clicks": 310 }
+      { "referrer": "instagram.com", "clicks": 820 },
+      { "referrer": "t.co", "clicks": 110 },
+      { "referrer": "direct", "clicks": 310 }
     ],
     "trend": [
       { "date": "2026-02-12", "clicks": 120 },

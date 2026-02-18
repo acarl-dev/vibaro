@@ -25,7 +25,7 @@ class TrackingLinkController extends Controller
         }
 
         $trackingLinks = TrackingLink::where('artist_page_id', $artistPage->id)
-            ->with(['spotlight:id,title'])
+            ->with(['spotlight:id,title', 'campaign:id,name'])
             ->orderByDesc('created_at')
             ->get()
             ->map(function ($link) {
@@ -39,6 +39,7 @@ class TrackingLinkController extends Controller
                     'spotlight_id' => $link->spotlight_id,
                     'spotlight_title' => $link->spotlight?->title,
                     'campaign_id' => $link->campaign_id,
+                    'campaign_name' => $link->campaign?->name,
                     'is_active' => $link->is_active,
                     'created_at' => $link->created_at->toISOString(),
                 ];

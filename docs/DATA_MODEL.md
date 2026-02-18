@@ -219,14 +219,18 @@ Leitprinzipien:
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
-| spotlight_id | bigint |
+| spotlight_id | bigint | nullable |
 | name | string |
-| platform | string |
-| notes | text |
-| starts_at | datetime |
-| ends_at | datetime |
+| platform | string | nullable |
+| notes | text | nullable |
+| starts_at | datetime | nullable |
+| ends_at | datetime | nullable |
 | created_at | timestamp |
 | updated_at | timestamp |
+
+**Regeln**
+- campaign_id ist optional für tracking_links.
+- spotlight_id ist optional – Kampagnen können global oder Spotlight-spezifisch sein.
 
 ---
 
