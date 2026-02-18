@@ -7,5 +7,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Public tracking redirect
-Route::get('/t/{slug}', [TrackingController::class, 'redirect'])->name('tracking.redirect');
+// Public tracking redirect with rate limiting
+// Rate limit: 60 requests per minute per IP+slug combination
+Route::get('/t/{slug}', [TrackingController::class, 'redirect'])
+    ->middleware('throttle:tracking')
+    ->name('tracking.redirect');

@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\ClickEvent;
 use App\Models\TrackingLink;
+use App\Services\BotDetectionService;
+use App\Services\ReferrerNormalizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class TrackingController extends Controller
 {
+    public function __construct(
+        private BotDetectionService $botDetection,
+        private ReferrerNormalizationService $referrerNormalizer
+    ) {}
+
     /**
      * Handle tracking redirect.
      */
@@ -39,23 +46,24 @@ class TrackingController extends Controller
     }
 
     /**
-     * Record click event with privacy-aware data.
+     * Record click event with privacy-aware data and abuse protection.
      */
     private function recordClick(Request $request, TrackingLink $trackingLink): void
     {
+        $userAgent = $request->userAgent();
         $referrer = $request->header('referer');
-        $referrerHost = null;
 
-        if ($referrer) {
-            $parsed = parse_url($referrer);
-            $referrerHost = $parsed['host'] ?? null;
-        }
+        // Detect if this is a bot/preview crawler
+        $isPreview = $this->botDetection->isPreviewBot($userAgent);
+
+        // Normalize referrer (handles Instagram mobile/link-wrapper, etc.)
+        $referrerHost = $this->referrerNormalizer->normalize($referrer);
 
         // Optional: derive country code from IP (never store IP itself)
         $countryCode = $this->deriveCountryCode($request->ip());
 
         // Optional: hash user agent for abuse detection (privacy-aware)
-        $userAgentHash = $this->hashUserAgent($request->userAgent());
+        $userAgentHash = $this->hashUserAgent($userAgent);
 
         ClickEvent::create([
             'tracking_link_id' => $trackingLink->id,
@@ -66,7 +74,8 @@ class TrackingController extends Controller
             'referrer_host' => $referrerHost,
             'country_code' => $countryCode,
             'user_agent_hash' => $userAgentHash,
-            'occurred_at' => now(),
+            'is_preview' => $isPreview,
+            'occurred_at' => now()->utc(), // Always store in UTC
         ]);
     }
 

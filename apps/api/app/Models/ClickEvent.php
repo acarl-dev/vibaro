@@ -25,6 +25,7 @@ class ClickEvent extends Model
         'referrer_host',
         'country_code',
         'user_agent_hash',
+        'is_preview',
         'occurred_at',
     ];
 
@@ -33,6 +34,7 @@ class ClickEvent extends Model
      */
     protected $casts = [
         'occurred_at' => 'datetime',
+        'is_preview' => 'boolean',
     ];
 
     public function trackingLink(): BelongsTo
@@ -48,5 +50,13 @@ class ClickEvent extends Model
     public function spotlight(): BelongsTo
     {
         return $this->belongsTo(Spotlight::class);
+    }
+
+    /**
+     * Scope to exclude preview/bot clicks from analytics.
+     */
+    public function scopeRealClicks($query)
+    {
+        return $query->where('is_preview', false);
     }
 }

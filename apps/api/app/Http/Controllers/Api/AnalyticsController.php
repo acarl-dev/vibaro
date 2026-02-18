@@ -36,8 +36,9 @@ class AnalyticsController extends Controller
 
         $startDate = now()->subDays($days)->startOfDay();
 
-        // Build base query
-        $baseQuery = ClickEvent::where('artist_page_id', $artistPage->id)
+        // Build base query (exclude preview/bot clicks via realClicks scope)
+        $baseQuery = ClickEvent::realClicks()
+            ->where('artist_page_id', $artistPage->id)
             ->where('occurred_at', '>=', $startDate);
 
         // Apply spotlight filter if provided
