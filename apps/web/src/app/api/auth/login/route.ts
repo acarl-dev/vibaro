@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set({
       name: "vibaro_token",
       value: token,
-      httpOnly: true,
+      httpOnly: false, // Must be false so client-side code can read it for Authorization header
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",

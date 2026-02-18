@@ -80,11 +80,20 @@ export type GalleryImageItem = {
   image_url: string;
 };
 
+export type SpotlightItem = {
+  id: number;
+  title: string;
+  type: string;
+  description: string | null;
+  url: string;
+};
+
 export type PublicArtistPageData = {
   handle: string;
   display_name: string;
   bio: string | null;
   is_published?: boolean;
+  spotlight?: SpotlightItem | null;
   images: {
     avatar_url: string | null;
     hero_image_url: string | null;

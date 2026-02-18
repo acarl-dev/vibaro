@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\PublicArtistPageController;
 use App\Http\Controllers\Api\ReleaseController;
 use App\Http\Controllers\Api\ShowController;
+use App\Http\Controllers\Api\SpotlightController;
+use App\Http\Controllers\Api\TrackingLinkController;
 use App\Http\Controllers\Api\VideoController;
 use Illuminate\Support\Facades\Route;
 
@@ -96,6 +98,19 @@ Route::prefix('v1')->group(function () {
 
         // Analytics (V2 Stage)
         Route::get('/analytics/overview', [AnalyticsController::class, 'overview']);
+
+        // Spotlights (V2 Stage)
+        Route::get('/spotlights/active', [SpotlightController::class, 'active']);
+        Route::get('/spotlights', [SpotlightController::class, 'index']);
+        Route::post('/spotlights', [SpotlightController::class, 'store']);
+        Route::patch('/spotlights/{id}', [SpotlightController::class, 'update']);
+        Route::post('/spotlights/{id}/activate', [SpotlightController::class, 'activate']);
+        Route::post('/spotlights/{id}/end', [SpotlightController::class, 'end']);
+
+        // Tracking Links (V2 Stage)
+        Route::get('/tracking-links', [TrackingLinkController::class, 'index']);
+        Route::post('/tracking-links', [TrackingLinkController::class, 'store']);
+        Route::delete('/tracking-links/{id}', [TrackingLinkController::class, 'destroy']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);

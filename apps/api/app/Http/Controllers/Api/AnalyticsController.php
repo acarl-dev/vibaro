@@ -16,10 +16,12 @@ class AnalyticsController extends Controller
     {
         $request->validate([
             'range' => 'in:7d,30d',
+            'spotlight_id' => 'nullable|exists:spotlights,id',
         ]);
 
         $range = $request->input('range', '7d');
         $days = $range === '7d' ? 7 : 30;
+        $spotlightId = $request->input('spotlight_id');
 
         $artistPage = $request->user()->artistPage;
 
@@ -34,14 +36,20 @@ class AnalyticsController extends Controller
 
         $startDate = now()->subDays($days)->startOfDay();
 
+        // Build base query
+        $baseQuery = ClickEvent::where('artist_page_id', $artistPage->id)
+            ->where('occurred_at', '>=', $startDate);
+
+        // Apply spotlight filter if provided
+        if ($spotlightId) {
+            $baseQuery->where('spotlight_id', $spotlightId);
+        }
+
         // Total clicks in range
-        $totalClicks = ClickEvent::where('artist_page_id', $artistPage->id)
-            ->where('occurred_at', '>=', $startDate)
-            ->count();
+        $totalClicks = (clone $baseQuery)->count();
 
         // Clicks by module
-        $byModule = ClickEvent::where('artist_page_id', $artistPage->id)
-            ->where('occurred_at', '>=', $startDate)
+        $byModule = (clone $baseQuery)
             ->select('module', DB::raw('count(*) as clicks'))
             ->groupBy('module')
             ->orderByDesc('clicks')
@@ -54,8 +62,7 @@ class AnalyticsController extends Controller
             });
 
         // Clicks by referrer (top 10)
-        $byReferrer = ClickEvent::where('artist_page_id', $artistPage->id)
-            ->where('occurred_at', '>=', $startDate)
+        $byReferrer = (clone $baseQuery)
             ->whereNotNull('referrer_host')
             ->select('referrer_host', DB::raw('count(*) as clicks'))
             ->groupBy('referrer_host')
@@ -70,8 +77,7 @@ class AnalyticsController extends Controller
             });
 
         // Trend (clicks per day)
-        $trend = ClickEvent::where('artist_page_id', $artistPage->id)
-            ->where('occurred_at', '>=', $startDate)
+        $trend = (clone $baseQuery)
             ->select(
                 DB::raw('DATE(occurred_at) as date'),
                 DB::raw('count(*) as clicks')
@@ -89,6 +95,7 @@ class AnalyticsController extends Controller
         return response()->json([
             'data' => [
                 'range' => $range,
+                'spotlight_id' => $spotlightId,
                 'total_clicks' => $totalClicks,
                 'by_module' => $byModule,
                 'by_referrer' => $byReferrer,

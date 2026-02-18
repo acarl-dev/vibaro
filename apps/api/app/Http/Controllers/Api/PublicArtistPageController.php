@@ -37,6 +37,31 @@ class PublicArtistPageController extends Controller
             return $this->error('NOT_FOUND', 'Artist page not found or unpublished.', 404);
         }
 
+        // Load active spotlight with its primary tracking link
+        $activeSpotlight = $page->spotlights()
+            ->where('status', 'active')
+            ->first();
+
+        // If there's an active spotlight, try to find or create a tracking link
+        $spotlightData = null;
+        if ($activeSpotlight) {
+            // Look for existing tracking link for this spotlight
+            $trackingLink = $activeSpotlight->trackingLinks()
+                ->where('module', 'spotlight')
+                ->where('is_active', true)
+                ->first();
+
+            // If no tracking link exists, we'll just use the primary_url
+            // The band should create tracking links manually in the studio
+            $spotlightData = [
+                'id' => $activeSpotlight->id,
+                'title' => $activeSpotlight->title,
+                'type' => $activeSpotlight->type,
+                'description' => $activeSpotlight->description,
+                'url' => $trackingLink ? $trackingLink->tracking_url : $activeSpotlight->primary_url,
+            ];
+        }
+
         $appUrl = rtrim(config('app.url'), '/');
 
         // Transform links - only include links with URLs
@@ -59,6 +84,7 @@ class PublicArtistPageController extends Controller
             'display_name' => $page->display_name,
             'bio' => $page->bio,
             'is_published' => $page->is_published,
+            'spotlight' => $spotlightData,
             'images' => [
                 'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
                 'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,

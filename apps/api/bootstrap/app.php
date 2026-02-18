@@ -13,8 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+        
+        // API should return 401, not redirect to login
+        $middleware->redirectGuestsTo(fn () => abort(401, 'Unauthenticated'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

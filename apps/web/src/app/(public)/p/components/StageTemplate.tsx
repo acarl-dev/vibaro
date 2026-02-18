@@ -78,6 +78,13 @@ export default function StageTemplate({
             padding: "0 clamp(16px, 4vw, 32px)",
           }}
         >
+          {/* Spotlight Banner - Top Priority */}
+          {page.spotlight && (
+            <section style={{ paddingTop: "32px", paddingBottom: "32px" }}>
+              <StageSpotlightBanner spotlight={page.spotlight} />
+            </section>
+          )}
+
           {/* Shows - Highest Priority, directly after hero */}
           {hasShows && (
             <section id="shows" style={{ paddingTop: "40px", paddingBottom: "48px" }}>
@@ -586,6 +593,63 @@ function StageReleaseList({ items }: { items: ReleaseItem[] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Stage Spotlight Banner - Featured content highlight
+// -----------------------------------------------------------------------------
+
+function StageSpotlightBanner({ spotlight }: { spotlight: { title: string; type: string; description: string | null; url: string } }) {
+  return (
+    <a
+      href={spotlight.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block rounded-lg border-2 border-white/20 bg-gradient-to-br from-white/5 to-transparent p-6 transition-all hover:border-white/40 hover:bg-white/10"
+      style={{
+        textDecoration: "none",
+      }}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="rounded bg-white/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-white">
+              Spotlight
+            </span>
+            <span className="text-xs uppercase tracking-wider text-white/60">
+              {spotlight.type === "release" && "🎵 Release"}
+              {spotlight.type === "tour" && "🎤 Tour"}
+              {spotlight.type === "announcement" && "📢 News"}
+              {spotlight.type === "other" && "✨"}
+            </span>
+          </div>
+          <h2 className="text-2xl font-bold text-white">{spotlight.title}</h2>
+          {spotlight.description && (
+            <p className="mt-2 text-sm leading-relaxed text-white/80">
+              {spotlight.description}
+            </p>
+          )}
+        </div>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors group-hover:bg-white/20">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 10h10m0 0l-4-4m4 4l-4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+    </a>
   );
 }
 
