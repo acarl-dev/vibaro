@@ -65,7 +65,7 @@ class TrackingLinkController extends Controller
         }
 
         $validated = $request->validate([
-            'module' => 'required|string|in:spotlight,link,show,release,campaign',
+            'module' => 'required|string|in:spotlight,link,show,release,campaign,share',
             'label' => 'required|string|max:255',
             'target_url' => 'required|url|max:1000',
             'spotlight_id' => 'nullable|exists:spotlights,id',

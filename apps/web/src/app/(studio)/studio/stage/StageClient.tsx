@@ -6,9 +6,11 @@ import {
   getAllSpotlights,
   createSpotlight,
   activateSpotlight,
+  endSpotlight,
   getAllTrackingLinks,
   createCampaign,
   createTrackingLink,
+  deleteTrackingLink,
   type Spotlight,
   type TrackingLink,
 } from "@/lib/api/stage";
@@ -29,7 +31,9 @@ export default function StageClient() {
   const [trackingLinks, setTrackingLinks] = useState<TrackingLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFocusForm, setShowFocusForm] = useState(false);
+  const [showFocusSelector, setShowFocusSelector] = useState(false);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
+  const [deletingLink, setDeletingLink] = useState<number | null>(null);
 
   // Focus form state
   const [focusForm, setFocusForm] = useState({
@@ -147,6 +151,48 @@ export default function StageClient() {
     }
   }
 
+  async function handleEndFocus() {
+    if (!activeSpotlight) return;
+    
+    if (!confirm("Fokus beenden? Dies kann nicht rückgängig gemacht werden.")) {
+      return;
+    }
+
+    try {
+      await endSpotlight(activeSpotlight.id);
+      await loadData();
+      setShowFocusSelector(false);
+    } catch (error: any) {
+      alert(error.message || "Konnte nicht beendet werden");
+    }
+  }
+
+  async function handleActivateFocus(id: number) {
+    try {
+      await activateSpotlight(id);
+      await loadData();
+      setShowFocusSelector(false);
+    } catch (error: any) {
+      alert(error.message || "Konnte nicht aktiviert werden");
+    }
+  }
+
+  async function handleDeleteLink(id: number) {
+    if (!confirm("Link wirklich löschen?")) {
+      return;
+    }
+
+    try {
+      setDeletingLink(id);
+      await deleteTrackingLink(id);
+      await loadData();
+    } catch (error: any) {
+      alert(error.message || "Konnte nicht gelöscht werden");
+    } finally {
+      setDeletingLink(null);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -189,16 +235,68 @@ export default function StageClient() {
                 </a>
               </div>
               <button
-                onClick={() => {
-                  alert("Fokus wechseln: Wähle einen anderen Fokus aus deiner Liste oder erstelle einen neuen.");
-                }}
+                onClick={() => setShowFocusSelector(true)}
                 className="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-sm font-medium transition-colors"
               >
                 Ändern
               </button>
             </div>
           </div>
-        ) : (
+        ) : null}
+
+        {/* Focus Selector Modal */}
+        {showFocusSelector && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowFocusSelector(false)}>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-zinc-100">Fokus ändern</h3>
+                <button onClick={() => setShowFocusSelector(false)} className="text-zinc-500 hover:text-zinc-300">
+                  ✕
+                </button>
+              </div>
+              
+              {activeSpotlight && (
+                <div className="mb-4 pb-4 border-b border-zinc-800">
+                  <p className="text-sm text-zinc-400 mb-2">Aktueller Fokus:</p>
+                  <p className="text-sm font-medium text-zinc-100">{activeSpotlight.title}</p>
+                  <button
+                    onClick={handleEndFocus}
+                    className="mt-3 w-full px-4 py-2 rounded-full bg-red-900/20 hover:bg-red-900/30 text-red-400 text-sm font-medium transition-colors"
+                  >
+                    Fokus beenden
+                  </button>
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm text-zinc-400 mb-3">Oder wähle einen anderen:</p>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {allSpotlights
+                    .filter((s) => s.id !== activeSpotlight?.id && s.status !== "ended")
+                    .map((spotlight) => (
+                      <button
+                        key={spotlight.id}
+                        onClick={() => handleActivateFocus(spotlight.id)}
+                        className="w-full text-left px-4 py-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                      >
+                        <p className="text-sm font-medium text-zinc-100">{spotlight.title}</p>
+                        <p className="text-xs text-zinc-500 mt-1">
+                          {spotlight.type === "release" ? "Album" :
+                           spotlight.type === "tour" ? "Tour" :
+                           spotlight.type === "announcement" ? "News" : "Sonstiges"} · {spotlight.status}
+                        </p>
+                      </button>
+                    ))}
+                  {allSpotlights.filter((s) => s.id !== activeSpotlight?.id && s.status !== "ended").length === 0 && (
+                    <p className="text-sm text-zinc-500 text-center py-4">Keine weiteren Fokus-Optionen</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!activeSpotlight && (
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 text-center">
             <h3 className="text-lg font-semibold text-zinc-300 mb-3">Noch nichts im Rampenlicht.</h3>
             <p className="text-zinc-400 mb-6">
@@ -278,7 +376,7 @@ export default function StageClient() {
       {/* Section 2: Teile deinen Fokus */}
       {activeSpotlight && (
         <section>
-          <h2 className="text-2xl font-bold text-zinc-100 mb-6">Verbreiten.</h2>
+          <h2 className="text-2xl font-bold text-zinc-100 mb-6">Verbreiten</h2>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {PLATFORMS.map((platform) => (
@@ -324,6 +422,14 @@ export default function StageClient() {
                     className="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium transition-colors"
                   >
                     Kopieren
+                  </button>
+                  <button
+                    onClick={() => handleDeleteLink(link.id)}
+                    disabled={deletingLink === link.id}
+                    className="px-3 py-2 rounded-full bg-zinc-800 hover:bg-red-900/30 text-zinc-400 hover:text-red-400 text-xs transition-colors disabled:opacity-50"
+                    title="Link löschen"
+                  >
+                    ✕
                   </button>
                 </div>
               </div>
