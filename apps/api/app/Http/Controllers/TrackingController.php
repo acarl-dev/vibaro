@@ -21,9 +21,12 @@ class TrackingController extends Controller
      */
     public function redirect(Request $request, string $slug)
     {
-        // Find active tracking link
-        $trackingLink = TrackingLink::where('slug', $slug)
-            ->where('is_active', true)
+        // Support both legacy slug and new short_code (8 chars)
+        $trackingLink = TrackingLink::active()
+            ->where(function ($query) use ($slug) {
+                $query->where('short_code', $slug)
+                      ->orWhere('slug', $slug);
+            })
             ->first();
 
         if (!$trackingLink) {
@@ -70,7 +73,9 @@ class TrackingController extends Controller
             'artist_page_id' => $trackingLink->artist_page_id,
             'spotlight_id' => $trackingLink->spotlight_id,
             'campaign_id' => $trackingLink->campaign_id,
-            'module' => $trackingLink->module,
+            'module' => $trackingLink->module ?? 'legacy', // Legacy field
+            'platform' => $trackingLink->platform, // V2 field
+            'placement' => $trackingLink->placement, // V2 field
             'referrer_host' => $referrerHost,
             'country_code' => $countryCode,
             'user_agent_hash' => $userAgentHash,

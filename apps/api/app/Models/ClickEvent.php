@@ -16,12 +16,14 @@ class ClickEvent extends Model
     /**
      * @var list<string>
      */
-    protected $fillable = [
+   protected $fillable = [
         'tracking_link_id',
         'artist_page_id',
         'spotlight_id',
         'campaign_id',
         'module',
+        'platform',
+        'placement',
         'referrer_host',
         'country_code',
         'user_agent_hash',

@@ -58,7 +58,38 @@ class AnalyticsController extends Controller
         // Total clicks in range
         $totalClicks = (clone $baseQuery)->count();
 
-        // Clicks by module
+        // Clicks by platform (V2)
+        $byPlatform = (clone $baseQuery)
+            ->select('platform', DB::raw('count(*) as clicks'))
+            ->whereNotNull('platform')
+            ->groupBy('platform')
+            ->orderByDesc('clicks')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'platform' => $item->platform,
+                    'clicks' => $item->clicks,
+                ];
+            });
+
+        // Clicks by platform+placement (V2)
+        $byPlacement = (clone $baseQuery)
+            ->select('platform', 'placement', DB::raw('count(*) as clicks'))
+            ->whereNotNull('platform')
+            ->whereNotNull('placement')
+            ->groupBy('platform', 'placement')
+            ->orderByDesc('clicks')
+            ->limit(15)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'platform' => $item->platform,
+                    'placement' => $item->placement,
+                    'clicks' => $item->clicks,
+                ];
+            });
+
+        // Clicks by module (legacy support)
         $byModule = (clone $baseQuery)
             ->select('module', DB::raw('count(*) as clicks'))
             ->groupBy('module')
@@ -108,7 +139,9 @@ class AnalyticsController extends Controller
                 'spotlight_id' => $spotlightId,
                 'campaign_id' => $campaignId,
                 'total_clicks' => $totalClicks,
-                'by_module' => $byModule,
+                'by_platform' => $byPlatform, // V2
+                'by_placement' => $byPlacement, // V2
+                'by_module' => $byModule, // Legacy
                 'by_referrer' => $byReferrer,
                 'trend' => $trend,
             ],

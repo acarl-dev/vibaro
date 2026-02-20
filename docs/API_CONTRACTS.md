@@ -897,8 +897,23 @@ Response:
   "data": {
     "range": "7d",
     "spotlight_id": 12,
-    "campaign_id": 21,
+    "campaign_id": null,
     "total_clicks": 1240,
+    "by_platform": [
+      { "platform": "instagram", "clicks": 620 },
+      { "platform": "tiktok", "clicks": 380 },
+      { "platform": "youtube", "clicks": 140 },
+      { "platform": "x", "clicks": 100 }
+    ],
+    "by_placement": [
+      { "platform": "instagram", "placement": "story", "clicks": 420 },
+      { "platform": "instagram", "placement": "bio", "clicks": 200 },
+      { "platform": "tiktok", "placement": "bio", "clicks": 280 },
+      { "platform": "tiktok", "placement": "video", "clicks": 100 },
+      { "platform": "youtube", "placement": "description", "clicks": 90 },
+      { "platform": "youtube", "placement": "bio", "clicks": 50 },
+      { "platform": "x", "placement": "bio", "clicks": 100 }
+    ],
     "by_module": [
       { "module": "spotlight", "clicks": 740 },
       { "module": "links", "clicks": 310 },
@@ -919,7 +934,12 @@ Response:
 
 Notes:
 
+* **V2 Platform Tracking:** `by_platform` and `by_placement` provide granular breakdown of clicks by platform (Instagram, TikTok, etc.) and placement (Story, Bio, etc.).
+* `by_platform`: Groups clicks by platform only. Only includes platforms with clicks.
+* `by_placement`: Groups clicks by (platform, placement) pairs. Limited to top 15 results ordered by clicks DESC.
+* `by_module`: Legacy field for backwards compatibility. Groups clicks by content module (spotlight, links, shows).
 * `direct` is used when referrer is missing.
+* All breakdown arrays only include entries with click_count > 0.
 
 ---
 
