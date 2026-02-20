@@ -720,6 +720,64 @@ Notes:
 
 ---
 
+## Studio Dashboard
+
+### GET /studio/home
+
+Auth required.
+
+Returns lightweight dashboard data for Studio Home page (3-second-check optimized).
+
+Response:
+
+```json
+{
+  "data": {
+    "spotlight": {
+      "id": 12,
+      "title": "New Album Release",
+      "slug": "new-album-release",
+      "type": "release",
+      "show_on_page": true,
+      "starts_at": "2026-02-15T00:00:00Z",
+      "ends_at": null
+    },
+    "top_links": [
+      {
+        "id": 42,
+        "label": "Instagram · Story",
+        "short_code": "a1b2c3d4",
+        "url": "https://vibaro.com/t/a1b2c3d4",
+        "clicks": 87,
+        "platform": "instagram",
+        "placement": "story"
+      }
+    ],
+    "page": {
+      "url": "https://vibaro.com/p/myhandle",
+      "is_published": true
+    },
+    "stats": {
+      "total_clicks_7d": 342,
+      "trend": 12
+    },
+    "tip": {
+      "type": "spotlight",
+      "message": "Erstelle ein Spotlight, um deine Performance zu tracken.",
+      "action": "/studio/project"
+    }
+  }
+}
+```
+
+Rules:
+- `spotlight`: null if no active spotlight exists (not archived, status = active)
+- `top_links`: max 3, ordered by `click_count` DESC, only active (not archived)
+- `stats.trend`: percentage change vs previous 7-day period (integer)
+- `tip`: null if no contextual tip available
+
+---
+
 ## Export (Stage Pro)
 
 ### GET /exports/campaigns/{id}.csv
@@ -729,7 +787,5 @@ Auth required.
 Returns a CSV file. Default content: daily rollup for the campaign (date, clicks, referrer_host, module).
 
 MVP may return CSV synchronously.
-
-```
 
 ---

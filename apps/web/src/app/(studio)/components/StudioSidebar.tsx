@@ -20,21 +20,36 @@ export default function StudioSidebar({ page }: StudioSidebarProps) {
         <p className="text-xs text-zinc-500">/@{page.handle}</p>
       </div>
 
-      <nav className="space-y-1 text-sm">
-        <NavLink href="/studio">Übersicht</NavLink>
-        <NavLink href="/studio/stage">Stage</NavLink>
-        <NavLink href="/studio/ergebnisse">Ergebnisse</NavLink>
-        <div className="my-2 border-t border-zinc-800"></div>
-        <NavLink href="/studio/appearance">Templates</NavLink>
-        <NavLink href="/studio/profile">Profil</NavLink>
-        <NavLink href="/studio/links">Links</NavLink>
-        <NavLink href="/studio/music">Music</NavLink>
-        <NavLink href="/studio/shows">Shows</NavLink>
-        <NavLink href="/studio/releases">Releases</NavLink>
-        <NavLink href="/studio/videos">Videos</NavLink>
-        <NavLink href="/studio/gallery">Gallery</NavLink>
-        <NavLink href="/studio/contact">Kontakt</NavLink>
-        <div className="pt-2">
+      <nav className="space-y-6 text-sm">
+        {/* Studio Section */}
+        <div>
+          <p className="mb-2 px-3 text-xs uppercase tracking-[0.12em] text-zinc-600">Studio</p>
+          <div className="space-y-1">
+            <NavLink href="/studio">Home</NavLink>
+            <NavLink href="/studio/project">Projekt</NavLink>
+            <NavLink href="/studio/share">Teilen</NavLink>
+            <NavLink href="/studio/results">Ergebnisse</NavLink>
+          </div>
+        </div>
+
+        {/* Page Content Section */}
+        <div>
+          <p className="mb-2 px-3 text-xs uppercase tracking-[0.12em] text-zinc-600">Meine Seite</p>
+          <div className="space-y-1">
+            <NavLink href="/studio/appearance">Themes</NavLink>
+            <NavLink href="/studio/profile">Profil</NavLink>
+            <NavLink href="/studio/links">Links</NavLink>
+            <NavLink href="/studio/music">Music</NavLink>
+            <NavLink href="/studio/shows">Shows</NavLink>
+            <NavLink href="/studio/releases">Releases</NavLink>
+            <NavLink href="/studio/videos">Videos</NavLink>
+            <NavLink href="/studio/gallery">Gallery</NavLink>
+            <NavLink href="/studio/contact">Kontakt</NavLink>
+          </div>
+        </div>
+
+        {/* Settings */}
+        <div className="pt-2 border-t border-zinc-800">
           <NavLink href="/studio/settings">Einstellungen</NavLink>
         </div>
       </nav>
