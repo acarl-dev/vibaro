@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PublicArtistPageController;
 use App\Http\Controllers\Api\ReleaseController;
 use App\Http\Controllers\Api\ShowController;
 use App\Http\Controllers\Api\SpotlightController;
+use App\Http\Controllers\Api\StudioController;
 use App\Http\Controllers\Api\TrackingLinkController;
 use App\Http\Controllers\Api\VideoController;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +100,9 @@ Route::prefix('v1')->group(function () {
 
         // Analytics (V2 Stage)
         Route::get('/analytics/overview', [AnalyticsController::class, 'overview']);
+
+        // Studio (V2 Home Dashboard)
+        Route::get('/studio/home', [StudioController::class, 'home']);
 
         // Spotlights (V2 Stage)
         Route::get('/spotlights/active', [SpotlightController::class, 'active']);

@@ -135,4 +135,54 @@ class TrackingLink extends Model
         $code = $this->short_code ?? $this->slug;
         return config('app.url') . '/t/' . $code;
     }
+
+    /**
+     * Generate label from platform and placement.
+     */
+    public static function generateLabel(?string $platform, ?string $placement): string
+    {
+        $parts = array_filter([
+            $platform ? ucfirst($platform) : null,
+            $placement ? ucfirst($placement) : null,
+        ]);
+
+        return implode(' · ', $parts) ?: 'Link';
+    }
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($link) {
+            // Generate short_code if not provided
+            if (empty($link->short_code)) {
+                $link->short_code = static::generateShortCode();
+            }
+
+            // Auto-generate label if not provided
+            if (empty($link->label) && ($link->platform || $link->placement)) {
+                $link->label = static::generateLabel($link->platform, $link->placement);
+            }
+
+            // Generate UTM parameters
+            if ($link->platform) {
+                $link->utm_source = $link->platform;
+            }
+
+            if ($link->placement) {
+                $link->utm_medium = $link->placement;
+            }
+
+            // Set utm_campaign from spotlight.slug
+            if ($link->spotlight_id) {
+                $spotlight = Spotlight::find($link->spotlight_id);
+                if ($spotlight && $spotlight->slug) {
+                    $link->utm_campaign = $spotlight->slug;
+                }
+            }
+        });
+    }
 }
