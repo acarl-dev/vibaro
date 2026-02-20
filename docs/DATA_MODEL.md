@@ -58,6 +58,7 @@ Zentrale Entität für Musiker-Seiten.
 | contact_message | string | nullable, max 500 |
 | is_published | boolean | default false |
 | published_at | timestamp | nullable |
+| visible_sections | jsonb | default '["profile","links","music","shows","releases","videos","gallery","contact"]' |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 

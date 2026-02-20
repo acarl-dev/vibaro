@@ -222,6 +222,38 @@ Response:
 
 ---
 
+### PATCH /artist-pages/{id}/sections
+
+Auth required.
+
+Updates the visible sections configuration for the artist page.
+
+Request:
+
+```json
+{
+  "visible_sections": ["profile", "links", "music", "shows", "contact"]
+}
+```
+
+**Field rules:**
+- `visible_sections`: Array of section identifiers
+- Valid sections: `profile`, `links`, `music`, `shows`, `releases`, `videos`, `gallery`, `contact`
+- Empty array is allowed (hides all sections)
+
+Response:
+
+```json
+{
+  "data": {
+    "id": 1,
+    "visible_sections": ["profile", "links", "music", "shows", "contact"]
+  }
+}
+```
+
+---
+
 ## Handle Check
 
 ### POST /handles/check
@@ -628,6 +660,37 @@ Restores an archived spotlight (sets `archived_at` to NULL).
 
 ---
 
+### PATCH /spotlights/{id}/show-on-page
+
+Auth required.
+
+Toggles the `show_on_page` flag for a spotlight (controls Hero Banner visibility on public page).
+
+Request:
+
+```json
+{
+  "show_on_page": true
+}
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": 12,
+    "show_on_page": true
+  }
+}
+```
+
+**Rules:**
+- Only active, non-archived spotlights can have `show_on_page = true`
+- Hero Banner is visible when `show_on_page = true` AND `status = active` AND `archived_at IS NULL`
+
+---
+
 ## Campaigns (Stage Pro)
 
 ### GET /campaigns
@@ -751,6 +814,52 @@ Response:
 
 ---
 
+### GET /tracking-links/check
+
+Auth required.
+
+Checks if a tracking link with the given combination already exists.
+
+Query params:
+- `spotlight_id`: Required
+- `platform`: Required
+- `placement`: Required
+
+Response (exists):
+
+```json
+{
+  "data": {
+    "exists": true,
+    "link": {
+      "id": 100,
+      "platform": "instagram",
+      "placement": "story",
+      "label": "Instagram · Story",
+      "short_code": "a1b2c3d4",
+      "url": "https://vibaro.app/t/a1b2c3d4",
+      "click_count": 87
+    }
+  }
+}
+```
+
+Response (does not exist):
+
+```json
+{
+  "data": {
+    "exists": false
+  }
+}
+```
+
+**Rules:**
+- Only checks non-archived links
+- Used by frontend to prevent duplicate creation attempts
+
+---
+
 ### POST /tracking-links
 
 Auth required.
@@ -823,7 +932,7 @@ Response (duplicate):
 
 ---
 
-### DELETE /tracking-links/{id}
+### PATCH /tracking-links/{id}/archive
 
 Auth required.
 
@@ -832,13 +941,34 @@ Archives the tracking link (soft delete via `archived_at`).
 Response:
 
 ```json
-{ "data": { "ok": true } }
+{
+  "data": {
+    "id": 100,
+    "archived_at": "2026-02-20T12:30:00Z"
+  }
+}
 ```
 
 **Rules:**
 - Does not delete click history
 - Archived links can be restored via backend (not exposed in MVP)
 - Archivierung removes the link from active queries and releases the unique constraint
+
+---
+
+### DELETE /tracking-links/{id}
+
+Auth required.
+
+**Deprecated:** Use `PATCH /tracking-links/{id}/archive` instead.
+
+Archives the tracking link (soft delete via `archived_at`).
+
+Response:
+
+```json
+{ "data": { "ok": true } }
+```
 
 ---
 
@@ -943,6 +1073,63 @@ Notes:
 
 ---
 
+### GET /analytics/breakdown
+
+Auth required.
+
+Provides nested breakdown of clicks by platform and placement (for detailed visualization).
+
+Query params:
+
+* `spotlight_id`: Required
+* `period`: `7d` | `30d` (default `7d`)
+
+Response:
+
+```json
+{
+  "data": {
+    "total_clicks": 87,
+    "trend": 12,
+    "period": "7d",
+    "by_platform": [
+      {
+        "platform": "instagram",
+        "clicks": 52,
+        "placements": [
+          { "placement": "story", "clicks": 38 },
+          { "placement": "bio", "clicks": 12 },
+          { "placement": "reel", "clicks": 2 }
+        ]
+      },
+      {
+        "platform": "tiktok",
+        "clicks": 23,
+        "placements": [
+          { "placement": "bio", "clicks": 18 },
+          { "placement": "video", "clicks": 5 }
+        ]
+      },
+      {
+        "platform": "youtube",
+        "clicks": 12,
+        "placements": [
+          { "placement": "description", "clicks": 12 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Notes:**
+- Nested structure: platform → placements array
+- Only includes platforms/placements with clicks > 0
+- `trend` is percentage change vs previous period (integer)
+- Used for "Plattform × Platzierung" breakdowns in Studio
+
+---
+
 ## Studio Dashboard
 
 ### GET /studio/home
@@ -961,6 +1148,7 @@ Response:
       "title": "New Album Release",
       "slug": "new-album-release",
       "type": "release",
+      "status": "active",
       "show_on_page": true,
       "starts_at": "2026-02-15T00:00:00Z",
       "ends_at": null
@@ -977,8 +1165,11 @@ Response:
       }
     ],
     "page": {
+      "handle": "myhandle",
       "url": "https://vibaro.com/p/myhandle",
-      "is_published": true
+      "is_published": true,
+      "display_name": "My Artist Name",
+      "updated_at": "2026-02-18T10:00:00Z"
     },
     "stats": {
       "total_clicks_7d": 342,
@@ -987,7 +1178,9 @@ Response:
     "tip": {
       "type": "spotlight",
       "message": "Erstelle ein Spotlight, um deine Performance zu tracken.",
-      "action": "/studio/project"
+      "action_label": "Spotlight erstellen",
+      "action_type": "navigate",
+      "action_payload": { "path": "/studio/project" }
     }
   }
 }
