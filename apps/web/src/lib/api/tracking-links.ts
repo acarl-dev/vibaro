@@ -5,17 +5,23 @@
 
 export type TrackingLinkData = {
   id: number;
+  short_code: string;
+  slug?: string;
+  module?: string;
   spotlight_id: number;
+  spotlight_title?: string;
+  campaign_id?: number;
+  campaign_name?: string;
   platform: string;
   placement: string;
   label: string;
-  short_code: string;
-  url: string;
+  tracking_url: string;
   target_url: string;
   click_count: number;
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;
+  is_active?: boolean;
   created_at: string;
 };
 

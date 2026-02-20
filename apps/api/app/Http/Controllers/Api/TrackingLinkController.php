@@ -25,21 +25,29 @@ class TrackingLinkController extends Controller
         }
 
         $trackingLinks = TrackingLink::where('artist_page_id', $artistPage->id)
+            ->active()
             ->with(['spotlight:id,title', 'campaign:id,name'])
             ->orderByDesc('created_at')
             ->get()
             ->map(function ($link) {
                 return [
                     'id' => $link->id,
+                    'short_code' => $link->short_code,
                     'slug' => $link->slug,
                     'module' => $link->module,
                     'label' => $link->label,
                     'target_url' => $link->target_url,
                     'tracking_url' => $link->tracking_url,
+                    'platform' => $link->platform,
+                    'placement' => $link->placement,
+                    'click_count' => $link->click_count,
                     'spotlight_id' => $link->spotlight_id,
                     'spotlight_title' => $link->spotlight?->title,
                     'campaign_id' => $link->campaign_id,
                     'campaign_name' => $link->campaign?->name,
+                    'utm_source' => $link->utm_source,
+                    'utm_medium' => $link->utm_medium,
+                    'utm_campaign' => $link->utm_campaign,
                     'is_active' => $link->is_active,
                     'created_at' => $link->created_at->toISOString(),
                 ];
@@ -125,6 +133,11 @@ class TrackingLinkController extends Controller
                 'platform' => $trackingLink->platform,
                 'placement' => $trackingLink->placement,
                 'label' => $trackingLink->label,
+                'click_count' => $trackingLink->click_count,
+                'utm_source' => $trackingLink->utm_source,
+                'utm_medium' => $trackingLink->utm_medium,
+                'utm_campaign' => $trackingLink->utm_campaign,
+                'created_at' => $trackingLink->created_at->toISOString(),
             ],
         ], 201);
     }

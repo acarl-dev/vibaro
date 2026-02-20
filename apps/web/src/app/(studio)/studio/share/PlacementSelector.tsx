@@ -27,8 +27,11 @@ export default function PlacementSelector({ platform, onSelect, selectedPlacemen
                   : "border-zinc-800 bg-zinc-950 hover:border-zinc-700 hover:bg-zinc-900"
               }`}
             >
-              <span className={`text-sm font-medium ${isSelected ? "text-blue-400" : "text-zinc-300"}`}>
+              <span className={`block text-sm font-medium mb-1 ${isSelected ? "text-blue-400" : "text-zinc-300"}`}>
                 {placement.label}
+              </span>
+              <span className="block text-xs text-zinc-500">
+                {placement.description}
               </span>
             </button>
           );

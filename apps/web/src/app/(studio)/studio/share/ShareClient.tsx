@@ -102,7 +102,7 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
 
       if (result.success && result.data) {
         // Auto-copy the new link
-        await navigator.clipboard.writeText(result.data.url);
+        await navigator.clipboard.writeText(result.data.tracking_url);
 
         const hint = getCopyHint(selectedPlatform.id, selectedPlacement.id);
         setCopyHint(hint);
@@ -193,10 +193,10 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 rounded-md border border-zinc-800 bg-zinc-900/50 px-4 py-3">
                   <span className="flex-1 font-mono text-sm text-zinc-300 truncate">
-                    {existingLink.url}
+                    {existingLink.tracking_url}
                   </span>
                   <button
-                    onClick={() => handleCopy(existingLink.url)}
+                    onClick={() => handleCopy(existingLink.tracking_url)}
                     className="shrink-0 rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 transition-colors"
                   >
                     Kopieren
@@ -244,33 +244,62 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
           </div>
         )}
 
-        {/* All Links Overview */}
+        {/* All Links Overview - Grouped by Platform */}
         {allLinks.length > 0 && (
           <div className="pt-8 border-t border-zinc-800">
             <h2 className="text-sm font-medium text-zinc-400 mb-4">Alle Links ({allLinks.length})</h2>
-            <div className="grid gap-3">
-              {allLinks.map((link) => (
-                <div
-                  key={link.id}
-                  className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/50 px-4 py-3 hover:bg-zinc-900 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-zinc-100">{link.label}</p>
-                    <p className="text-xs text-zinc-500 font-mono mt-0.5">{link.short_code}</p>
+            <div className="space-y-6">
+              {Object.entries(
+                allLinks.reduce((acc, link) => {
+                  if (!acc[link.platform]) {
+                    acc[link.platform] = [];
+                  }
+                  acc[link.platform].push(link);
+                  return acc;
+                }, {} as Record<string, TrackingLinkData[]>)
+              ).map(([platform, links]) => {
+                const platformInfo = getPlatformById(platform);
+                const totalClicks = links.reduce((sum, link) => sum + link.click_count, 0);
+                
+                return (
+                  <div key={platform}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xl">{platformInfo?.icon || '🔗'}</span>
+                      <h3 className="text-sm font-medium text-zinc-300">
+                        {platformInfo?.label || platform}
+                      </h3>
+                      <span className="text-xs text-zinc-500">
+                        {links.length} {links.length === 1 ? 'Link' : 'Links'} · {totalClicks} Klicks
+                      </span>
+                    </div>
+                    <div className="grid gap-2">
+                      {links.map((link) => (
+                        <div
+                          key={link.id}
+                          className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/50 px-4 py-3 hover:bg-zinc-900 transition-colors"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-zinc-100">{link.label}</p>
+                            <p className="text-xs text-zinc-500 font-mono mt-0.5">{link.short_code}</p>
+                          </div>
+                          <div className="flex items-center gap-3 ml-4">
+                            <span className="text-sm text-zinc-400">{link.click_count} Klicks</span>
+                            <button
+                              onClick={() => handleCopy(link.tracking_url)}
+                              className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+                              title="Link kopieren"
+                            >
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 ml-4">
-                    <span className="text-sm text-zinc-400">{link.click_count} Klicks</span>
-                    <button
-                      onClick={() => handleCopy(link.url)}
-                      className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

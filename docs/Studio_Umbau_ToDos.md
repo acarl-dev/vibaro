@@ -2430,18 +2430,22 @@ Frontend (7+):
 
 ### Phase 3: Teilen-Tab (Plattform → Platzierung)
 
-- [ ] `studio/share/page.tsx` erstellen
-- [ ] `studio/share/ShareClient.tsx` erstellen
-- [ ] `ShareClient.tsx` – Leerer Zustand: "Kein aktives Projekt" mit CTA zu /studio/project
-- [ ] `ShareClient.tsx` – Spotlight laden + aktive Links laden
-- [ ] `ShareClient.tsx` – Plattform-Auswahl → Platzierungs-Auswahl → Auto-Create → Auto-Copy
-- [ ] `ShareClient.tsx` – Duplikat-Schutz: existierende Links zeigen "Kopieren" statt "Erstellen"
-- [ ] `ShareClient.tsx` – Context-Hint nach Link-Erstellung (getCopyHint)
-- [ ] `ShareClient.tsx` – 409-Fehler abfangen und User-freundlich anzeigen
-- [ ] `components/studio/share/PlatformGrid.tsx` erstellen – 3×3 Grid mit Plattformen
-- [ ] `components/studio/share/PlacementSelector.tsx` erstellen – Platzierungen für gewählte Plattform
-- [ ] `components/studio/share/PlacementSelector.tsx` – Duplikat-Erkennung: bestehende Links visuell markieren
-- [ ] `components/studio/share/ActiveLinksList.tsx` erstellen – Gruppiert nach Plattform, Kopieren + Archivieren
+- [x] `studio/share/page.tsx` erstellen
+- [x] `studio/share/ShareClient.tsx` erstellen
+- [x] `ShareClient.tsx` – Leerer Zustand: "Kein aktives Projekt" mit CTA zu /studio/project
+- [x] `ShareClient.tsx` – Spotlight laden + aktive Links laden
+- [x] `ShareClient.tsx` – Plattform-Auswahl → Platzierungs-Auswahl → Auto-Create → Auto-Copy
+- [x] `ShareClient.tsx` – Duplikat-Schutz: existierende Links zeigen "Kopieren" statt "Erstellen"
+- [x] `ShareClient.tsx` – Context-Hint nach Link-Erstellung (getCopyHint)
+- [x] `ShareClient.tsx` – 409-Fehler abfangen und User-freundlich anzeigen
+- [x] `components/studio/share/PlatformGrid.tsx` erstellen – 3×3 Grid mit Plattformen (PlatformSelector.tsx)
+- [x] `components/studio/share/PlacementSelector.tsx` erstellen – Platzierungen für gewählte Plattform
+- [x] `components/studio/share/PlacementSelector.tsx` – Duplikat-Erkennung: bestehende Links visuell markieren
+- [x] `components/studio/share/ActiveLinksList.tsx` erstellen – Gruppiert nach Plattform, Kopieren + Archivieren
+- [x] Backend: TrackingLinkController.index() – Vollständige Response mit platform, placement, click_count
+- [x] Frontend: TypeScript-Typen angepasst (tracking_url statt url)
+- [x] Frontend: Link-Liste nach Plattform gruppiert mit Icons und Gesamt-Klicks
+- [x] Frontend: PlacementSelector zeigt Beschreibungen an
 
 #### Manuelle Tests Phase 3
 - [ ] `/studio/share` ohne Projekt → "Kein aktives Projekt" mit CTA
