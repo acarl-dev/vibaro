@@ -116,6 +116,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/spotlights/{spotlight}/show-on-page', [SpotlightController::class, 'toggleShowOnPage']);
         Route::post('/spotlights/{id}/archive', [SpotlightController::class, 'archive']);
         Route::post('/spotlights/{id}/restore', [SpotlightController::class, 'restore']);
+        Route::delete('/spotlights/{id}', [SpotlightController::class, 'destroy']);
 
         // Campaigns (Stage Pro)
         Route::get('/campaigns', [CampaignController::class, 'index']);

@@ -30,6 +30,7 @@ export type CreateSpotlightRequest = {
   primary_url: string;
   description?: string | null;
   show_on_page?: boolean;
+  activate?: boolean;
 };
 
 export type UpdateSpotlightRequest = Partial<Omit<CreateSpotlightRequest, "show_on_page">>;
@@ -333,6 +334,36 @@ export async function toggleSpotlightVisibility(
     };
   } catch (error) {
     console.error("Error toggling visibility:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * Permanently delete an archived spotlight
+ */
+export async function deleteSpotlight(
+  id: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}`, {
+      method: "DELETE",
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim L\u00f6schen des Projekts",
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting spotlight:", error);
     return {
       success: false,
       error: "Netzwerkfehler",

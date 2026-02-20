@@ -15,7 +15,7 @@
 - [Phase 4: QR-Code Feature (projektweite Ã„nderung)](#phase-4-qr-code-feature-projektweite-Ã¤nderung)
 - [Phase 5: Feinschliff & Konsistenz](#phase-5-feinschliff--konsistenz)
 - [Phase 6: Dokumentation](#phase-6-dokumentation)
-- [Datei-Ãœbersicht](#datei-Ã¼bersicht-Ã¤nderungen--neuerstellungen--lÃ¶schungen)
+- [Datei-Übersicht](#datei-Übersicht-Ã¤nderungen--neuerstellungen--lÃ¶schungen)
 - [Checkliste zum Abhaken](#checkliste-zum-abhaken)
 
 ---
@@ -79,7 +79,7 @@
   Logo (Vibaro, klein, Accent-Color)
   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   DASHBOARD         (Icon: LayoutGrid / Grid2x2)
-  Ãœbersicht
+  Übersicht
   
   MEINE SEITE       (Icon: FileEdit / FilePen)
   Seite bearbeiten
@@ -320,7 +320,7 @@
 
 ---
 
-## Datei-Ãœbersicht: Ã„nderungen / Neuerstellungen / LÃ¶schungen
+## Datei-Übersicht: Ã„nderungen / Neuerstellungen / LÃ¶schungen
 
 ### GeÃ¤nderte Dateien
 | Datei | Ã„nderung |

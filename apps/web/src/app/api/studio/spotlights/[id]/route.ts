@@ -44,3 +44,41 @@ export async function PATCH(
     );
   }
 }
+
+/**
+ * DELETE /api/studio/spotlights/[id]
+ * Permanently delete an archived spotlight
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const token = await getTokenFromCookies();
+    if (!token) {
+      return NextResponse.json(
+        { error: { code: "unauthorized", message: "Not authenticated" } },
+        { status: 401 }
+      );
+    }
+
+    const res = await backendFetch(`/api/v1/spotlights/${id}`, {
+      method: "DELETE",
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return NextResponse.json(json, { status: res.status });
+    }
+
+    return NextResponse.json(json);
+  } catch (error) {
+    console.error("Error deleting spotlight:", error);
+    return NextResponse.json(
+      { error: { code: "internal_error", message: "Internal server error" } },
+      { status: 500 }
+    );
+  }
+}

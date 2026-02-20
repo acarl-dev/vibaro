@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SpotlightData, fetchArchivedSpotlights, restoreSpotlight } from "@/lib/api/spotlights";
+import { SpotlightData, fetchArchivedSpotlights, restoreSpotlight, deleteSpotlight } from "@/lib/api/spotlights";
 import CreateSpotlightForm from "./CreateSpotlightForm";
 import SpotlightList from "./SpotlightList";
 import { useToast } from "@/context/ToastContext";
@@ -27,6 +27,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
   const [archivedSpotlights, setArchivedSpotlights] = useState<SpotlightData[]>([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
   const [restoringId, setRestoringId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const { showToast } = useToast();
 
   const activeSpotlight = spotlights.find(
@@ -74,6 +75,19 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
       showToast("Projekt wiederhergestellt", "success");
     } else {
       showToast(result.error || "Fehler beim Wiederherstellen", "error");
+    }
+  };
+
+  const handleDelete = async (id: number, title: string) => {
+    if (!confirm(`"${title}" endgültig löschen? Dies kann nicht rückgängig gemacht werden.`)) return;
+    setDeletingId(id);
+    const result = await deleteSpotlight(id);
+    setDeletingId(null);
+    if (result.success) {
+      setArchivedSpotlights((prev) => prev.filter((s) => s.id !== id));
+      showToast("Projekt gelöscht", "success");
+    } else {
+      showToast(result.error || "Fehler beim Löschen", "error");
     }
   };
 
@@ -197,13 +211,22 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
                       </span>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleRestore(s.id)}
-                    disabled={restoringId === s.id}
-                    className="studio-btn studio-btn-secondary text-xs disabled:opacity-50"
-                  >
-                    {restoringId === s.id ? "…" : "Wiederherstellen"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleRestore(s.id)}
+                      disabled={restoringId === s.id || deletingId === s.id}
+                      className="studio-btn studio-btn-secondary text-xs disabled:opacity-50"
+                    >
+                      {restoringId === s.id ? "…" : "Wiederherstellen"}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(s.id, s.title)}
+                      disabled={deletingId === s.id || restoringId === s.id}
+                      className="studio-btn studio-btn-danger text-xs disabled:opacity-50"
+                    >
+                      {deletingId === s.id ? "…" : "Löschen"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -44,6 +44,13 @@ export default function SpotlightCard({
   const statusInfo = STATUS_LABELS[spotlight.status] || STATUS_LABELS.scheduled;
 
   const handleActivate = async () => {
+    const confirmed = confirm(
+      spotlight.status === "ended"
+        ? "Dieses Projekt wieder aktivieren? Ein eventuell aktives Projekt wird dabei beendet."
+        : "Dieses Projekt aktivieren? Ein eventuell aktives Projekt wird dabei beendet."
+    );
+    if (!confirmed) return;
+
     setLoading(true);
     const result = await activateSpotlight(spotlight.id);
     setLoading(false);
@@ -159,7 +166,7 @@ export default function SpotlightCard({
             Bearbeiten
           </button>
 
-          {spotlight.status === "scheduled" && (
+          {(spotlight.status === "scheduled" || spotlight.status === "ended") && (
             <button
               onClick={handleActivate}
               disabled={loading}

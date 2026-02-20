@@ -6,6 +6,7 @@ export type SpotlightData = {
   title: string;
   slug: string;
   type: string;
+  status: string;
   show_on_page: boolean;
   starts_at: string | null;
   ends_at: string | null;

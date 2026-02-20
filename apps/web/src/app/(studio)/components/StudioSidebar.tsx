@@ -18,7 +18,7 @@ type StudioSidebarProps = {
 };
 
 const NAV_ITEMS = [
-  { label: "DASHBOARD",   sublabel: "Ãœbersicht",        href: "/studio",         icon: LayoutGrid, exact: true  },
+  { label: "DASHBOARD",   sublabel: "Übersicht",        href: "/studio",         icon: LayoutGrid, exact: true  },
   { label: "MEINE SEITE", sublabel: "Seite bearbeiten", href: "/studio/page",    icon: FilePen,    exact: false },
   { label: "PROJEKT",     sublabel: "Aktives Projekt",  href: "/studio/project", icon: Zap,        exact: false },
   { label: "TEILEN",      sublabel: "Links & Sharing",  href: "/studio/share",   icon: Megaphone,  exact: false },
@@ -26,7 +26,7 @@ const NAV_ITEMS = [
 ] as const;
 
 const PAGE_SUB_NAV = [
-  { label: "Ãœbersicht", href: "/studio/page" },
+  { label: "Übersicht", href: "/studio/page" },
   { label: "Themes",    href: "/studio/appearance" },
   { label: "Profil",    href: "/studio/profile" },
   { label: "Links",     href: "/studio/links" },

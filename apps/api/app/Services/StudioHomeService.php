@@ -77,7 +77,8 @@ class StudioHomeService
             'slug' => $spotlight->slug,
             'type' => $spotlight->type,
             'status' => $spotlight->status,
-            'activated_at' => $spotlight->starts_at?->toIso8601String(),
+            'starts_at' => $spotlight->starts_at?->toIso8601String(),
+            'ends_at' => $spotlight->ends_at?->toIso8601String(),
             'days_active' => $daysActive,
             'show_on_page' => $spotlight->show_on_page,
         ];

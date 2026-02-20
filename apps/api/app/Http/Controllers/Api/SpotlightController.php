@@ -118,13 +118,17 @@ class SpotlightController extends Controller
             'primary_url' => 'required|url|max:1000',
             'description' => 'nullable|string|max:1000',
             'show_on_page' => 'nullable|boolean',
+            'activate' => 'nullable|boolean',
         ]);
+
+        // If activate=true, set to active (boot hook will end any other active spotlight)
+        $status = ($validated['activate'] ?? false) ? 'active' : 'scheduled';
 
         $spotlight = Spotlight::create([
             'artist_page_id' => $artistPage->id,
             'title' => $validated['title'],
             'type' => $validated['type'],
-            'status' => 'scheduled',
+            'status' => $status,
             'starts_at' => $validated['starts_at'] ?? null,
             'ends_at' => $validated['ends_at'] ?? null,
             'primary_url' => $validated['primary_url'],
@@ -254,6 +258,29 @@ class SpotlightController extends Controller
         }
 
         $spotlight->archive();
+
+        return response()->json(['data' => ['ok' => true]]);
+    }
+
+    /**
+     * Permanently delete an archived spotlight.
+     */
+    public function destroy(Request $request, int $id)
+    {
+        $spotlight = Spotlight::withoutGlobalScopes()->findOrFail($id);
+
+        Gate::authorize('delete', $spotlight);
+
+        if (!$spotlight->isArchived()) {
+            return response()->json([
+                'error' => [
+                    'code' => 'not_archived',
+                    'message' => 'Only archived spotlights can be permanently deleted.',
+                ],
+            ], 400);
+        }
+
+        $spotlight->delete();
 
         return response()->json(['data' => ['ok' => true]]);
     }

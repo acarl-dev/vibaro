@@ -33,6 +33,7 @@ export default function CreateSpotlightForm({
     primary_url: "",
     description: "",
     show_on_page: true,
+    activate: false,
   });
 
   const handleSubmit = async (e: FormEvent) => {
@@ -146,6 +147,23 @@ export default function CreateSpotlightForm({
           />
           <label htmlFor="show_on_page" className="text-sm">
             Als Hero-Banner auf öffentlicher Seite anzeigen
+          </label>
+        </div>
+
+        {/* Activate immediately */}
+        <div className="flex items-start gap-2 rounded-lg px-3 py-2" style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.2)" }}>
+          <input
+            type="checkbox"
+            id="activate"
+            checked={formData.activate}
+            onChange={(e) =>
+              setFormData({ ...formData, activate: e.target.checked })
+            }
+            className="w-4 h-4 mt-0.5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label htmlFor="activate" className="text-sm">
+            <span className="font-medium" style={{ color: "var(--studio-success)" }}>Sofort aktivieren</span>
+            <span className="block text-xs mt-0.5" style={{ color: "var(--studio-text-secondary)" }}>Dieses Projekt wird direkt aktiv. Ein bestehendes aktives Projekt wird dabei beendet.</span>
           </label>
         </div>
       </div>
