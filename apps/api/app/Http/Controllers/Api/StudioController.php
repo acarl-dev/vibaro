@@ -22,9 +22,9 @@ class StudioController extends Controller
      */
     public function home(Request $request)
     {
-        $artistPage = $request->user()->artistPage;
+        $user = $request->user();
 
-        if (!$artistPage) {
+        if (!$user->artistPage) {
             return response()->json([
                 'error' => [
                     'code' => 'no_artist_page',
@@ -33,7 +33,7 @@ class StudioController extends Controller
             ], 404);
         }
 
-        $data = $this->homeService->getHomeData($artistPage);
+        $data = $this->homeService->getHomeData($user);
 
         return response()->json([
             'data' => $data,

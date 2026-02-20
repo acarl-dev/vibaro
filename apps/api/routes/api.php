@@ -42,6 +42,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/artist-pages/me', [ArtistPageController::class, 'me']);
         Route::post('/artist-pages', [ArtistPageController::class, 'store']);
         Route::patch('/artist-pages/{id}', [ArtistPageController::class, 'update']);
+        Route::patch('/artist-pages/{artistPage}/sections', [ArtistPageController::class, 'updateSections']);
         Route::post('/artist-pages/{id}/publish', [ArtistPageController::class, 'publish']);
         Route::post('/artist-pages/{id}/unpublish', [ArtistPageController::class, 'unpublish']);
         Route::post('/artist-pages/upload-avatar', [ArtistPageController::class, 'uploadAvatar']);
@@ -100,6 +101,7 @@ Route::prefix('v1')->group(function () {
 
         // Analytics (V2 Stage)
         Route::get('/analytics/overview', [AnalyticsController::class, 'overview']);
+        Route::get('/analytics/breakdown', [AnalyticsController::class, 'breakdown']);
 
         // Studio (V2 Home Dashboard)
         Route::get('/studio/home', [StudioController::class, 'home']);
@@ -111,6 +113,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/spotlights/{id}', [SpotlightController::class, 'update']);
         Route::post('/spotlights/{id}/activate', [SpotlightController::class, 'activate']);
         Route::post('/spotlights/{id}/end', [SpotlightController::class, 'end']);
+        Route::patch('/spotlights/{spotlight}/show-on-page', [SpotlightController::class, 'toggleShowOnPage']);
         Route::post('/spotlights/{id}/archive', [SpotlightController::class, 'archive']);
         Route::post('/spotlights/{id}/restore', [SpotlightController::class, 'restore']);
 
@@ -122,7 +125,9 @@ Route::prefix('v1')->group(function () {
 
         // Tracking Links (V2 Stage)
         Route::get('/tracking-links', [TrackingLinkController::class, 'index']);
+        Route::get('/tracking-links/check', [TrackingLinkController::class, 'check']);
         Route::post('/tracking-links', [TrackingLinkController::class, 'store']);
+        Route::patch('/tracking-links/{trackingLink}/archive', [TrackingLinkController::class, 'archive']);
         Route::delete('/tracking-links/{id}', [TrackingLinkController::class, 'destroy']);
 
         Route::post('/auth/logout', [AuthController::class, 'logout']);

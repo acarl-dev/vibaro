@@ -346,4 +346,29 @@ class ArtistPageController extends Controller
 
         return $this->success($results);
     }
+
+    /**
+     * PATCH /artist-pages/{id}/sections
+     * Update visible sections on the public page
+     */
+    public function updateSections(Request $request, ArtistPage $artistPage): JsonResponse
+    {
+        $this->authorize('update', $artistPage);
+
+        try {
+            $validated = $request->validate([
+                'visible_sections' => ['required', 'array'],
+                'visible_sections.*' => ['string', 'in:profile,links,music,shows,releases,videos,gallery,contact'],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        }
+
+        $artistPage->update($validated);
+
+        return $this->success([
+            'id' => $artistPage->id,
+            'visible_sections' => $artistPage->visible_sections,
+        ]);
+    }
 }

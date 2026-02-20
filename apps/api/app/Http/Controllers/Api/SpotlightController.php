@@ -197,10 +197,35 @@ class SpotlightController extends Controller
         $spotlight->update([
             'status' => 'ended',
             'ends_at' => now(),
+            'show_on_page' => false,
         ]);
+
+        // Archive all active tracking links for this spotlight
+        \App\Models\TrackingLink::where('spotlight_id', $spotlight->id)
+            ->active()
+            ->update(['archived_at' => now()]);
 
         return response()->json([
             'data' => ['ended_spotlight_id' => $spotlight->id],
+        ]);
+    }
+
+    /**
+     * Toggle show_on_page for a spotlight.
+     */
+    public function toggleShowOnPage(Spotlight $spotlight)
+    {
+        Gate::authorize('update', $spotlight);
+
+        $spotlight->update([
+            'show_on_page' => !$spotlight->show_on_page,
+        ]);
+
+        return response()->json([
+            'data' => [
+                'id' => $spotlight->id,
+                'show_on_page' => $spotlight->show_on_page,
+            ],
         ]);
     }
 

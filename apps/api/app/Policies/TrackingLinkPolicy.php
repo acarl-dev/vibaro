@@ -16,6 +16,12 @@ class TrackingLinkPolicy
         return $artistPage && $trackingLink->artist_page_id === $artistPage->id;
     }
 
+    public function update(User $user, TrackingLink $trackingLink): bool
+    {
+        $artistPage = $user->artistPage;
+        return $artistPage && $trackingLink->artist_page_id === $artistPage->id;
+    }
+
     public function delete(User $user, TrackingLink $trackingLink): bool
     {
         $artistPage = $user->artistPage;

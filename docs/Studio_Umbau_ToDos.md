@@ -2310,53 +2310,53 @@ Frontend (7+):
 ### Phase 1: Backend – Datenmodell + API
 
 #### Migrations
-- [ ] Migration erstellen: `add_platform_placement_to_tracking_links` (platform, placement, click_count, archived_at)
-- [ ] Partial Unique Index auf `tracking_links` (spotlight_id, platform, placement) WHERE archived_at IS NULL
-- [ ] Migration erstellen: `backfill_platform_placement_on_tracking_links` (utm_source → platform, placement = "legacy")
-- [ ] Migration erstellen: `make_platform_placement_required` (NOT NULL)
-- [ ] Migration erstellen: `add_show_on_page_to_spotlights`
-- [ ] Migration erstellen: `add_visible_sections_to_artist_pages`
-- [ ] Migration erstellen: `add_platform_to_campaigns` (falls Feld fehlt)
-- [ ] Alle Migrations ausführen und verifizieren
+- [x] Migration erstellen: `add_platform_placement_to_tracking_links` (platform, placement, click_count, archived_at)
+- [x] Partial Unique Index auf `tracking_links` (spotlight_id, platform, placement) WHERE archived_at IS NULL
+- [x] Migration erstellen: `backfill_platform_placement_on_tracking_links` (utm_source → platform, placement = "legacy")
+- [x] Migration erstellen: `make_platform_placement_required` (NOT NULL)
+- [x] Migration erstellen: `add_show_on_page_to_spotlights`
+- [x] Migration erstellen: `add_visible_sections_to_artist_pages`
+- [x] Migration erstellen: `add_platform_to_campaigns` (falls Feld fehlt)
+- [x] Alle Migrations ausführen und verifizieren
 
 #### Models
-- [ ] `TrackingLink.php` – `$fillable` erweitern (platform, placement, click_count, archived_at)
-- [ ] `TrackingLink.php` – `$casts` erweitern (archived_at → datetime, click_count → integer)
-- [ ] `TrackingLink.php` – Scope `scopeActive()` hinzufügen (whereNull archived_at)
-- [ ] `TrackingLink.php` – `booted()`: Label auto-generieren (Platform · Placement)
-- [ ] `TrackingLink.php` – `booted()`: UTMs auto-generieren (utm_source = platform, utm_medium = placement)
-- [ ] `TrackingLink.php` – `booted()`: utm_campaign aus Spotlight-Titel generieren
-- [ ] `Spotlight.php` – `$fillable` + `$casts` erweitern (show_on_page → boolean)
-- [ ] `ArtistPage.php` – `$fillable` + `$casts` erweitern (visible_sections → array)
+- [x] `TrackingLink.php` – `$fillable` erweitern (platform, placement, click_count, archived_at)
+- [x] `TrackingLink.php` – `$casts` erweitern (archived_at → datetime, click_count → integer)
+- [x] `TrackingLink.php` – Scope `scopeActive()` hinzufügen (whereNull archived_at)
+- [x] `TrackingLink.php` – `booted()`: Label auto-generieren (Platform · Placement)
+- [x] `TrackingLink.php` – `booted()`: UTMs auto-generieren (utm_source = platform, utm_medium = placement)
+- [x] `TrackingLink.php` – `booted()`: utm_campaign aus Spotlight-Titel generieren
+- [x] `Spotlight.php` – `$fillable` + `$casts` erweitern (show_on_page → boolean)
+- [x] `ArtistPage.php` – `$fillable` + `$casts` erweitern (visible_sections → array)
 
 #### Controllers
-- [ ] `TrackingLinkController@store` – Neuer Flow: nur platform + placement + target_url + spotlight_id akzeptieren
-- [ ] `TrackingLinkController@store` – Ownership-Check (Spotlight gehört User)
-- [ ] `TrackingLinkController@store` – Duplikat-Check vor Erstellung (409 bei Duplikat)
-- [ ] `TrackingLinkController@store` – Campaign auto-erstellen via `firstOrCreate`
-- [ ] `TrackingLinkController@store` – Short-Code generieren + tracking_url setzen
-- [ ] `TrackingLinkController@check` – Neue Methode: Duplikat-Prüfung Endpoint
-- [ ] `TrackingLinkController@archive` – Neue Methode: Soft-Archive statt Hard-Delete
-- [ ] `SpotlightController@toggleShowOnPage` – Neue Methode
-- [ ] `SpotlightController@end` – Beim Beenden: zugehörige Links archivieren + show_on_page zurücksetzen
-- [ ] `ArtistPageController@updateSections` – Neue Methode: visible_sections aktualisieren
+- [x] `TrackingLinkController@store` – Neuer Flow: nur platform + placement + target_url + spotlight_id akzeptieren
+- [x] `TrackingLinkController@store` – Ownership-Check (Spotlight gehört User)
+- [x] `TrackingLinkController@store` – Duplikat-Check vor Erstellung (409 bei Duplikat)
+- [x] `TrackingLinkController@store` – Campaign auto-erstellen via `firstOrCreate`
+- [x] `TrackingLinkController@store` – Short-Code generieren + tracking_url setzen
+- [x] `TrackingLinkController@check` – Neue Methode: Duplikat-Prüfung Endpoint
+- [x] `TrackingLinkController@archive` – Neue Methode: Soft-Archive statt Hard-Delete
+- [x] `SpotlightController@toggleShowOnPage` – Neue Methode
+- [x] `SpotlightController@end` – Beim Beenden: zugehörige Links archivieren + show_on_page zurücksetzen
+- [x] `ArtistPageController@updateSections` – Neue Methode: visible_sections aktualisieren
 
 #### Services
-- [ ] `StudioHomeService.php` erstellen – `getHomeData()` mit Spotlight, Stats, Top-Links, Page, Tip
-- [ ] `StudioHomeService.php` – `getStats()`: Klicks letzte 7 Tage + Trend (vs. vorherige 7 Tage)
-- [ ] `StudioHomeService.php` – `generateTip()`: Regelbasierte Tipps (kein Page → unpublished → kein Projekt → keine Links → stale → best platform)
-- [ ] `StudioHomeController.php` erstellen – `__invoke()` mit StudioHomeService
-- [ ] `AnalyticsService.php` – `getBreakdown()` hinzufügen: Gruppierung nach Platform + Placement
-- [ ] `AnalyticsController.php` erstellen/erweitern – `breakdown()` Methode
-- [ ] `TrackingService.php` – Bei Klick-Registrierung `click_count` auf TrackingLink inkrementieren
+- [x] `StudioHomeService.php` erstellen – `getHomeData()` mit Spotlight, Stats, Top-Links, Page, Tip
+- [x] `StudioHomeService.php` – `getStats()`: Klicks letzte 7 Tage + Trend (vs. vorherige 7 Tage)
+- [x] `StudioHomeService.php` – `generateTip()`: Regelbasierte Tipps (kein Page → unpublished → kein Projekt → keine Links → stale → best platform)
+- [x] `StudioHomeController.php` erstellen – `__invoke()` mit StudioHomeService
+- [x] `AnalyticsService.php` – `getBreakdown()` hinzufügen: Gruppierung nach Platform + Placement
+- [x] `AnalyticsController.php` erstellen/erweitern – `breakdown()` Methode
+- [x] `TrackingService.php` – Bei Klick-Registrierung `click_count` auf TrackingLink inkrementieren
 
 #### Routes
-- [ ] `routes/api.php` – `GET /studio/home` registrieren
-- [ ] `routes/api.php` – `GET /tracking-links/check` registrieren
-- [ ] `routes/api.php` – `PATCH /tracking-links/{id}/archive` registrieren
-- [ ] `routes/api.php` – `PATCH /spotlights/{id}/show-on-page` registrieren
-- [ ] `routes/api.php` – `PATCH /artist-pages/{id}/sections` registrieren
-- [ ] `routes/api.php` – `GET /analytics/breakdown` registrieren
+- [x] `routes/api.php` – `GET /studio/home` registrieren
+- [x] `routes/api.php` – `GET /tracking-links/check` registrieren
+- [x] `routes/api.php` – `PATCH /tracking-links/{id}/archive` registrieren
+- [x] `routes/api.php` – `PATCH /spotlights/{id}/show-on-page` registrieren
+- [x] `routes/api.php` – `PATCH /artist-pages/{id}/sections` registrieren
+- [x] `routes/api.php` – `GET /analytics/breakdown` registrieren
 
 #### Smoke-Tests Phase 1
 - [ ] `GET /studio/home` gibt gültige Daten zurück

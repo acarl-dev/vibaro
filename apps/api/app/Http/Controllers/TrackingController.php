@@ -82,6 +82,9 @@ class TrackingController extends Controller
             'is_preview' => $isPreview,
             'occurred_at' => now()->utc(), // Always store in UTC
         ]);
+
+        // Increment denormalized click counter on tracking link
+        $trackingLink->increment('click_count');
     }
 
     /**

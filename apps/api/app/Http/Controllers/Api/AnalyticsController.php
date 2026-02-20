@@ -147,4 +147,30 @@ class AnalyticsController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Get breakdown of clicks by platform and placement for a spotlight.
+     */
+    public function breakdown(Request $request, \App\Services\AnalyticsService $service)
+    {
+        $validated = $request->validate([
+            'spotlight_id' => 'required|integer',
+            'period' => 'sometimes|string|in:7d,30d,90d',
+        ]);
+
+        // Ownership check
+        $spotlight = \App\Models\Spotlight::where('id', $validated['spotlight_id'])
+            ->whereHas('artistPage', function ($query) use ($request) {
+                $query->where('user_id', $request->user()->id);
+            })
+            ->firstOrFail();
+
+        $data = $service->getBreakdown(
+            $request->user(),
+            $spotlight->id,
+            $validated['period'] ?? '7d'
+        );
+
+        return response()->json(['data' => $data]);
+    }
 }
