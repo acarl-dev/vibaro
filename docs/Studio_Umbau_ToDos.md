@@ -2470,21 +2470,21 @@ Frontend (7+):
 ### Phase 5: Mein Projekt + Ergebnisse-Tab
 
 #### Mein Projekt
-- [ ] `studio/project/page.tsx` erstellen
-- [ ] `studio/project/ProjectClient.tsx` erstellen
-- [ ] `ProjectClient.tsx` – Aktives Projekt: Status-Karte (Titel, Typ, Tage aktiv, Klicks)
-- [ ] `ProjectClient.tsx` – Kein Projekt: Formular (Titel, Typ, Ziel-Link)
-- [ ] `ProjectClient.tsx` – Projekt beenden: Bestätigung + API-Call
-- [ ] `ProjectClient.tsx` – Frühere Projekte: Liste mit Reaktivieren-Option
+- [x] `studio/project/page.tsx` erstellen
+- [x] `studio/project/ProjectClient.tsx` erstellen
+- [x] `ProjectClient.tsx` – Aktives Projekt: Status-Karte (Titel, Typ, Tage aktiv, Klicks)
+- [x] `ProjectClient.tsx` – Kein Projekt: Formular (Titel, Typ, Ziel-Link)
+- [x] `ProjectClient.tsx` – Projekt beenden: Bestätigung + API-Call
+- [x] `ProjectClient.tsx` – Frühere Projekte: Liste mit Reaktivieren-Option
 
 #### Ergebnisse
-- [ ] `studio/results/page.tsx` erstellen
-- [ ] `studio/results/ResultsClient.tsx` erstellen
-- [ ] `ResultsClient.tsx` – Leerer Zustand: "Sobald du Links teilst, siehst du hier wie es läuft."
-- [ ] `ResultsClient.tsx` – Zeitraum-Auswahl (7d, 30d, 90d)
-- [ ] `ResultsClient.tsx` – Gesamt-Klicks + Trend-Anzeige
-- [ ] `ResultsClient.tsx` – PlatformBreakdown Komponente einbinden
-- [ ] `components/studio/results/PlatformBreakdown.tsx` erstellen – Balken pro Plattform + eingerückte Balken pro Platzierung
+- [x] `studio/results/page.tsx` erstellen
+- [x] `studio/results/ResultsClient.tsx` erstellen
+- [x] `ResultsClient.tsx` – Leerer Zustand: "Sobald du Links teilst, siehst du hier wie es läuft."
+- [x] `ResultsClient.tsx` – Zeitraum-Auswahl (7d, 30d, 90d)
+- [x] `ResultsClient.tsx` – Gesamt-Klicks + Trend-Anzeige
+- [x] `ResultsClient.tsx` – PlatformBreakdown Komponente einbinden
+- [x] `components/studio/results/PlatformBreakdown.tsx` erstellen – Balken pro Plattform + eingerückte Balken pro Platzierung
 
 #### Manuelle Tests Phase 5
 - [ ] `/studio/project` ohne Projekt → Formular angezeigt

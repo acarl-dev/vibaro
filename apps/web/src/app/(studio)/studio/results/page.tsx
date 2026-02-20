@@ -19,13 +19,13 @@ export default async function ResultsPage({
 }: {
   searchParams: { range?: string; spotlight?: string };
 }) {
-  const range = (searchParams.range === "30d" ? "30d" : "7d") as "7d" | "30d";
+  const range = (searchParams.range === "30d" ? "30d" : searchParams.range === "90d" ? "90d" : "7d") as "7d" | "30d" | "90d";
   const spotlightId = searchParams.spotlight
     ? parseInt(searchParams.spotlight)
     : undefined;
 
   const [analytics, spotlights] = await Promise.all([
-    fetchAnalytics({ range, spotlight_id: spotlightId }),
+    fetchAnalytics({ range: range as "7d" | "30d", spotlight_id: spotlightId }),
     getSpotlights(),
   ]);
 

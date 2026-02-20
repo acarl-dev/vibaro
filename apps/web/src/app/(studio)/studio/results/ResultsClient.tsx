@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnalyticsData } from "@/lib/api/analytics";
 import { SpotlightData } from "@/lib/api/spotlights";
 import { PLATFORMS } from "@/lib/platforms";
+import { getAnalyticsBreakdown, AnalyticsBreakdown } from "@/lib/api/stage";
+import PlatformBreakdown from "@/components/studio/results/PlatformBreakdown";
 
 type ResultsClientProps = {
   analytics: AnalyticsData | null;
   spotlights: SpotlightData[];
-  initialRange: "7d" | "30d";
+  initialRange: "7d" | "30d" | "90d";
   initialSpotlightId?: number;
 };
 
@@ -21,12 +23,30 @@ export default function ResultsClient({
 }: ResultsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [range, setRange] = useState<"7d" | "30d">(initialRange);
+  const [range, setRange] = useState<"7d" | "30d" | "90d">(initialRange);
   const [spotlightFilter, setSpotlightFilter] = useState<number | undefined>(
     initialSpotlightId
   );
+  const [breakdownData, setBreakdownData] = useState<AnalyticsBreakdown | null>(null);
+  const [loadingBreakdown, setLoadingBreakdown] = useState(false);
 
-  const handleRangeChange = (newRange: "7d" | "30d") => {
+  // Load breakdown data when spotlight is selected
+  useEffect(() => {
+    if (spotlightFilter) {
+      setLoadingBreakdown(true);
+      getAnalyticsBreakdown(spotlightFilter, range)
+        .then(setBreakdownData)
+        .catch((error) => {
+          console.error("Failed to load breakdown:", error);
+          setBreakdownData(null);
+        })
+        .finally(() => setLoadingBreakdown(false));
+    } else {
+      setBreakdownData(null);
+    }
+  }, [spotlightFilter, range]);
+
+  const handleRangeChange = (newRange: "7d" | "30d" | "90d") => {
     setRange(newRange);
     const params = new URLSearchParams(searchParams.toString());
     params.set("range", newRange);
@@ -54,6 +74,29 @@ export default function ResultsClient({
     const platform = PLATFORMS.find((p) => p.id === platformId);
     return platform ? `${platform.icon} ${platform.label}` : platformId;
   };
+
+  // Empty state when no spotlights exist
+  if (spotlights.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-6 max-w-6xl">
+        <h1 className="text-2xl font-bold mb-6">Ergebnisse</h1>
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-12 text-center">
+          <p className="text-gray-600 dark:text-gray-400 mb-2">
+            📊 Sobald du Links teilst, siehst du hier wie es läuft.
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+            Starte ein Projekt und erstelle deinen ersten Link.
+          </p>
+          <a
+            href="/studio/project"
+            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Projekt starten →
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (!analytics) {
     return (
@@ -102,6 +145,16 @@ export default function ResultsClient({
           >
             30 Tage
           </button>
+          <button
+            onClick={() => handleRangeChange("90d")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              range === "90d"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            90 Tage
+          </button>
         </div>
 
         {/* Spotlight Filter */}
@@ -127,17 +180,46 @@ export default function ResultsClient({
 
       {/* Total Clicks Card */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
-        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-          Gesamt Clicks
-        </div>
-        <div className="text-4xl font-bold">{analytics.total_clicks.toLocaleString()}</div>
-        <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-          {range === "7d" ? "Letzte 7 Tage" : "Letzte 30 Tage"}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+              Gesamt Clicks
+            </div>
+            <div className="text-4xl font-bold">
+              {breakdownData 
+                ? breakdownData.total_clicks.toLocaleString() 
+                : analytics.total_clicks.toLocaleString()}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+              {range === "7d" ? "Letzte 7 Tage" : range === "30d" ? "Letzte 30 Tage" : "Letzte 90 Tage"}
+            </div>
+          </div>
+          {breakdownData && breakdownData.trend !== 0 && (
+            <div className={`text-sm font-medium ${
+              breakdownData.trend > 0 
+                ? "text-green-600 dark:text-green-400" 
+                : "text-red-600 dark:text-red-400"
+            }`}>
+              {breakdownData.trend > 0 ? "+" : ""}{breakdownData.trend} vs. vorheriger Zeitraum
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Platform Breakdown */}
-      {analytics.by_platform.length > 0 && (
+      {/* Platform Breakdown - New Hierarchical View */}
+      {breakdownData && breakdownData.by_platform.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Nach Plattform & Platzierung</h2>
+          {loadingBreakdown ? (
+            <div className="text-center py-8 text-gray-500">Lädt...</div>
+          ) : (
+            <PlatformBreakdown data={breakdownData} />
+          )}
+        </div>
+      )}
+
+      {/* Fallback: Old Platform Breakdown (when no spotlight selected) */}
+      {!breakdownData && analytics.by_platform.length > 0 && (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Nach Plattform</h2>
           <div className="space-y-3">
@@ -169,10 +251,13 @@ export default function ResultsClient({
         </div>
       )}
 
-      {/* Placement Breakdown */}
-      {analytics.by_placement.length > 0 && (
+      {/* Placement Breakdown - Only show when no spotlight selected (fallback) */}
+      {!breakdownData && analytics.by_placement.length > 0 && (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Nach Platzierung</h2>
+          <div className="text-xs text-gray-500 mb-3">
+            💡 Wähle ein Projekt oben aus, um die hierarchische Ansicht zu sehen
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
