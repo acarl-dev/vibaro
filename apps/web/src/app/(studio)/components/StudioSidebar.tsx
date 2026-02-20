@@ -36,6 +36,7 @@ export default function StudioSidebar({ page }: StudioSidebarProps) {
         <div>
           <p className="mb-2 px-3 text-xs uppercase tracking-[0.12em] text-zinc-600">Meine Seite</p>
           <div className="space-y-1">
+            <NavLink href="/studio/page">Übersicht</NavLink>
             <NavLink href="/studio/appearance">Themes</NavLink>
             <NavLink href="/studio/profile">Profil</NavLink>
             <NavLink href="/studio/links">Links</NavLink>

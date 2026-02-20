@@ -293,6 +293,7 @@ it does not belong in Vibaro V2.
 - No drag & drop in MVP.
 - No CMS-like flexibility.
 - Content editing remains simple and predictable.
+- **Implementation**: `/studio/page` is an overview/dashboard page showing page status, content counts, and quick navigation to all content editing pages (Profile, Links, Music, Shows, Releases, Videos, Gallery, Themes, Contact). Each section has its own dedicated CRUD page accessible via sidebar.
 
 ### 12.8 Platform Configuration
 
