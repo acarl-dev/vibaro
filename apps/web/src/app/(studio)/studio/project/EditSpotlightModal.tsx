@@ -66,14 +66,14 @@ export default function EditSpotlightModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Projekt bearbeiten</h2>
+            <h2 className="studio-h2 text-base">Projekt bearbeiten</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              className="studio-subtitle hover:text-[var(--studio-text-primary)] transition-colors text-lg"
             >
               ✕
             </button>
@@ -89,7 +89,7 @@ export default function EditSpotlightModal({
                 type="text"
                 value={formData.title || ""}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="studio-input w-full px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -104,7 +104,7 @@ export default function EditSpotlightModal({
                 onChange={(e) =>
                   setFormData({ ...formData, type: e.target.value as SpotlightType })
                 }
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="studio-input w-full px-3 py-2 text-sm"
                 required
               >
                 {SPOTLIGHT_TYPES.map((type) => (
@@ -126,7 +126,7 @@ export default function EditSpotlightModal({
                 onChange={(e) =>
                   setFormData({ ...formData, primary_url: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="studio-input w-full px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -140,13 +140,13 @@ export default function EditSpotlightModal({
                   setFormData({ ...formData, description: e.target.value })
                 }
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
             </div>
 
             {/* Note about slug */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm text-blue-800 dark:text-blue-200">
-              <strong>Hinweis:</strong> Der Slug ({spotlight.slug}) bleibt unverändert, damit
+            <div className="rounded-lg p-3 text-sm" style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-accent-muted)", color: "var(--studio-text-secondary)" }}>
+              <strong style={{ color: "var(--studio-text-primary)" }}>Hinweis:</strong> Der Slug ({spotlight.slug}) bleibt unverändert, damit
               bestehende Tracking-Links funktionieren.
             </div>
 
@@ -155,7 +155,7 @@ export default function EditSpotlightModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="studio-btn studio-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Speichere..." : "Speichern"}
               </button>
@@ -163,7 +163,7 @@ export default function EditSpotlightModal({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                className="studio-btn studio-btn-secondary disabled:opacity-50"
               >
                 Abbrechen
               </button>

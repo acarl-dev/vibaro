@@ -423,15 +423,15 @@
 - [ ] QR-Code scanbar getestet (Kontrast weiÃŸ/schwarz)
 
 ### Phase 5: Feinschliff
-- [ ] Transitions auf allen interaktiven Elementen (150ms ease)
-- [ ] Hover-States konsistent (Cards, Buttons, Nav-Items)
-- [ ] Focus-States sichtbar und konsistent (Accent-Outline)
-- [ ] Responsive Testing: Desktop (â‰¥1024px) bestanden
-- [ ] Responsive Testing: Tablet (768â€“1023px) bestanden
+- [x] Transitions auf allen interaktiven Elementen (150ms ease) — `globals.css`: `.studio-btn`, `.studio-card`, `.studio-input`, Sidebar-Links, BottomNav
+- [x] Hover-States konsistent (Cards, Buttons, Nav-Items) — `.studio-card-interactive:hover`, `.studio-btn-*:hover`, Sidebar hover: Surface-Elevated
+- [x] Focus-States sichtbar und konsistent (Accent-Outline) — `[data-theme="studio"] *:focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 2px; }` in `globals.css`
+- [ ] Responsive Testing: Desktop (≥1024px) bestanden
+- [ ] Responsive Testing: Tablet (768–1023px) bestanden
 - [ ] Responsive Testing: Mobile (<768px) bestanden
-- [ ] Dark-Mode-only im Studio sichergestellt (kein Light-Mode-Bleed)
-- [ ] Alte/unbenutzte Imports und Styles entfernt
-- [ ] Kein HEX-Farbwert direkt in Komponenten (alles Ã¼ber CSS-Variablen)
+- [x] Dark-Mode-only im Studio sichergestellt (kein Light-Mode-Bleed) — alle `dark:`-Varianten und `bg-white`/`bg-gray-*` aus Studio-Komponenten entfernt (`SpotlightCard`, `CreateSpotlightForm`, `EditSpotlightModal`, `MusicClient`)
+- [x] Alte/unbenutzte Imports und Styles entfernt — `StudioHeader.tsx`, `StudioTabs.tsx`, `SpotlightClient.tsx` gelöscht
+- [x] Kein HEX-Farbwert direkt in Komponenten (alles über CSS-Variablen) — `bg-[#0A0A0A]` in `MusicClient.tsx` entfernt; `#ffffff`/`#000000` in `StudioQRCode.tsx` sind intentionale Ausnahme (maximale Scan-Kompatibilität)
 
 ### Phase 6: Dokumentation
 - [ ] `docs/THEMES.md` aktualisiert (Studio-Theme Variablen)

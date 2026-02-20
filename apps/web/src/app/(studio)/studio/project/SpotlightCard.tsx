@@ -26,9 +26,9 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  active: { label: "Aktiv", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
-  scheduled: { label: "Geplant", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
-  ended: { label: "Beendet", color: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200" },
+  active:    { label: "Aktiv",    color: "studio-badge-live" },
+  scheduled: { label: "Geplant",  color: "studio-badge-draft" },
+  ended:     { label: "Beendet",  color: "studio-badge-ended" },
 };
 
 export default function SpotlightCard({
@@ -112,37 +112,36 @@ export default function SpotlightCard({
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <div className="studio-card">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-lg">{spotlight.title}</h3>
-              <span
-                className={`px-2 py-0.5 text-xs font-medium rounded ${statusInfo.color}`}
-              >
+              <h3 className="studio-h2 text-base">{spotlight.title}</h3>
+              <span className={statusInfo.color}>
                 {statusInfo.label}
               </span>
-              <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+              <span className="studio-badge-ended">
                 {TYPE_LABELS[spotlight.type] || spotlight.type}
               </span>
             </div>
             {spotlight.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <p className="studio-subtitle text-sm mb-2">
                 {spotlight.description}
               </p>
             )}
-            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
+            <div className="flex items-center gap-4 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
               <span>Slug: {spotlight.slug}</span>
               <a
                 href={spotlight.primary_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                className="hover:underline transition-colors"
+                style={{ color: "var(--studio-accent)" }}
               >
                 Link →
               </a>
               {spotlight.show_on_page && (
-                <span className="text-green-600 dark:text-green-400">
+                <span style={{ color: "var(--studio-success)" }}>
                   ✓ Hero-Banner aktiv
                 </span>
               )}
@@ -151,11 +150,11 @@ export default function SpotlightCard({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-2 flex-wrap pt-3" style={{ borderTop: "1px solid var(--studio-border)" }}>
           <button
             onClick={() => setShowEditModal(true)}
             disabled={loading}
-            className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+            className="studio-btn studio-btn-secondary disabled:opacity-50"
           >
             Bearbeiten
           </button>
@@ -164,7 +163,8 @@ export default function SpotlightCard({
             <button
               onClick={handleActivate}
               disabled={loading}
-              className="px-3 py-1.5 text-sm bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors disabled:opacity-50"
+              className="studio-btn disabled:opacity-50"
+              style={{ background: "rgba(34,197,94,0.12)", color: "var(--studio-success)", border: "1px solid rgba(34,197,94,0.25)" }}
             >
               Aktivieren
             </button>
@@ -174,7 +174,8 @@ export default function SpotlightCard({
             <button
               onClick={handleEnd}
               disabled={loading}
-              className="px-3 py-1.5 text-sm bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors disabled:opacity-50"
+              className="studio-btn disabled:opacity-50"
+              style={{ background: "rgba(245,158,11,0.12)", color: "var(--studio-warning)", border: "1px solid rgba(245,158,11,0.25)" }}
             >
               Beenden
             </button>
@@ -183,7 +184,7 @@ export default function SpotlightCard({
           <button
             onClick={handleToggleVisibility}
             disabled={loading}
-            className="px-3 py-1.5 text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
+            className="studio-btn studio-btn-secondary disabled:opacity-50"
           >
             {spotlight.show_on_page ? "Banner ausblenden" : "Banner einblenden"}
           </button>
@@ -191,7 +192,7 @@ export default function SpotlightCard({
           <button
             onClick={handleArchive}
             disabled={loading}
-            className="px-3 py-1.5 text-sm bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors disabled:opacity-50"
+            className="studio-btn studio-btn-danger disabled:opacity-50"
           >
             Archivieren
           </button>

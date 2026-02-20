@@ -58,9 +58,9 @@ export default function CreateSpotlightForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6"
+      className="studio-card"
     >
-      <h2 className="text-lg font-semibold mb-4">Neues Projekt erstellen</h2>
+      <h2 className="studio-h2 text-base mb-4">Neues Projekt erstellen</h2>
 
       <div className="space-y-4">
         {/* Title */}
@@ -73,7 +73,7 @@ export default function CreateSpotlightForm({
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             placeholder="z.B. Neue Single 'Summer Vibes'"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="studio-input w-full px-3 py-2 text-sm"
             required
           />
         </div>
@@ -88,7 +88,7 @@ export default function CreateSpotlightForm({
             onChange={(e) =>
               setFormData({ ...formData, type: e.target.value as SpotlightType })
             }
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="studio-input w-full px-3 py-2 text-sm"
             required
           >
             {SPOTLIGHT_TYPES.map((type) => (
@@ -111,10 +111,10 @@ export default function CreateSpotlightForm({
               setFormData({ ...formData, primary_url: e.target.value })
             }
             placeholder="https://spotify.com/..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="studio-input w-full px-3 py-2 text-sm"
             required
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="studio-subtitle text-xs mt-1">
             Haupt-Link für dieses Projekt (Spotify, YouTube, etc.)
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function CreateSpotlightForm({
             }
             placeholder="Kurze Beschreibung (optional)"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="studio-input w-full px-3 py-2 text-sm"
           />
         </div>
 
@@ -155,7 +155,7 @@ export default function CreateSpotlightForm({
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="studio-btn studio-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Erstelle..." : "Erstellen"}
         </button>
@@ -163,7 +163,7 @@ export default function CreateSpotlightForm({
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+          className="studio-btn studio-btn-secondary disabled:opacity-50"
         >
           Abbrechen
         </button>

@@ -191,14 +191,16 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-zinc-100">
-      <div className="mx-auto max-w-4xl px-6 py-12">
+    <div>
+      <div className="max-w-4xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight">Music</h1>
-          <p className="mt-2 text-sm text-zinc-400">
-            Wähle bis zu 5-7 Tracks aus, die auf deiner Seite abgespielt werden können.
-          </p>
+        <div className="studio-page-header mb-8">
+          <div>
+            <h1 className="studio-h1 text-2xl">Music</h1>
+            <p className="studio-subtitle mt-1">
+              Wähle bis zu 5-7 Tracks aus, die auf deiner Seite abgespielt werden können.
+            </p>
+          </div>
         </div>
 
         {/* Error */}
@@ -211,25 +213,25 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
         {/* Create Buttons */}
         {!isCreating && !editingId && (
           <div className="mb-6">
-            <p className="mb-3 text-sm text-zinc-400">
+            <p className="studio-subtitle mb-3 text-sm">
               Wähle die Plattform, für die du einen Player hinzufügen möchtest.
             </p>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => startCreatingFor("spotify")}
-                className="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                className="studio-btn studio-btn-secondary rounded-full text-xs"
               >
                 Spotify
               </button>
               <button
                 onClick={() => startCreatingFor("youtubemusic")}
-                className="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                className="studio-btn studio-btn-secondary rounded-full text-xs"
               >
                 YouTube Music
               </button>
               <button
                 onClick={() => startCreatingFor("soundcloud")}
-                className="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                className="studio-btn studio-btn-secondary rounded-full text-xs"
               >
                 SoundCloud
               </button>
@@ -239,11 +241,11 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
 
         {/* Create Form */}
         {isCreating && (
-          <div className="mb-6 rounded-lg border border-zinc-800 bg-zinc-900/30 p-6">
-            <h3 className="mb-4 text-lg font-medium">Neuer Track</h3>
+          <div className="studio-card mb-6">
+            <h3 className="studio-h2 mb-4 text-base">Neuer Track</h3>
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm text-zinc-400">Plattform *</label>
+                <label className="studio-subtitle mb-2 block text-sm">Plattform *</label>
                 <select
                   value={formData.platform}
                   onChange={(e) =>
@@ -261,7 +263,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                           : formData.title,
                     })
                   }
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
+                  className="studio-input w-full px-3 py-2 text-sm"
                 >
                   <option value="spotify">Spotify</option>
                   <option value="youtubemusic">YouTube Music</option>
@@ -270,15 +272,15 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm text-zinc-400">URL *</label>
+                <label className="studio-subtitle mb-2 block text-sm">URL *</label>
                 <input
                   type="url"
                   value={formData.platform_url}
                   onChange={(e) => setFormData({ ...formData, platform_url: e.target.value })}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
+                  className="studio-input w-full px-3 py-2 text-sm"
                   placeholder="https://open.spotify.com/track/..."
                 />
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="studio-subtitle mt-2 text-xs">
                   Wir erzeugen den Player automatisch aus der URL.
                 </p>
               </div>
@@ -286,13 +288,13 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleCreate}
-                  className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200"
+                  className="studio-btn studio-btn-primary"
                 >
                   Erstellen
                 </button>
                 <button
                   onClick={cancelCreating}
-                  className="rounded-lg border border-zinc-800 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                  className="studio-btn studio-btn-secondary"
                 >
                   Abbrechen
                 </button>
@@ -303,21 +305,21 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
 
         {/* Tracks List */}
         {tracks.length === 0 && !isCreating ? (
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-6 py-12 text-center">
-            <p className="text-sm text-zinc-400">Noch keine Tracks hinzugefügt.</p>
+          <div className="studio-card px-6 py-12 text-center">
+            <p className="studio-subtitle text-sm">Noch keine Tracks hinzugefügt.</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-6"
+                className="studio-card p-4"
               >
                 {editingId === track.id ? (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Track bearbeiten</h3>
+                    <h3 className="studio-h2 text-base">Track bearbeiten</h3>
                     <div>
-                      <label className="mb-2 block text-sm text-zinc-400">Plattform *</label>
+                      <label className="studio-subtitle mb-2 block text-sm">Plattform *</label>
                       <select
                         value={formData.platform}
                         onChange={(e) =>
@@ -335,7 +337,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                                 : formData.title,
                           })
                         }
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
+                        className="studio-input w-full px-3 py-2 text-sm"
                       >
                         <option value="spotify">Spotify</option>
                         <option value="youtubemusic">YouTube Music</option>
@@ -344,16 +346,16 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm text-zinc-400">URL *</label>
+                      <label className="studio-subtitle mb-2 block text-sm">URL *</label>
                       <input
                         type="url"
                         value={formData.platform_url}
                         onChange={(e) =>
                           setFormData({ ...formData, platform_url: e.target.value })
                         }
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm focus:border-zinc-700 focus:outline-none"
+                        className="studio-input w-full px-3 py-2 text-sm"
                       />
-                      <p className="mt-2 text-xs text-zinc-500">
+                      <p className="studio-subtitle mt-2 text-xs">
                         Wir erzeugen den Player automatisch aus der URL.
                       </p>
                     </div>
@@ -361,13 +363,13 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                     <div className="flex gap-3 pt-2">
                       <button
                         onClick={() => handleUpdate(track.id)}
-                        className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200"
+                        className="studio-btn studio-btn-primary"
                       >
                         Speichern
                       </button>
                       <button
                         onClick={cancelEditing}
-                        className="rounded-lg border border-zinc-800 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                        className="studio-btn studio-btn-secondary"
                       >
                         Abbrechen
                       </button>
@@ -376,7 +378,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                 ) : (
                   <div>
                     <div className="mb-4 space-y-3">
-                      <div className="h-[152px] overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30">
+                      <div className="h-[152px] overflow-hidden rounded-lg" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface-elevated)" }}>
                         {track.platform === "spotify" && (
                           <iframe
                             src={`https://open.spotify.com/embed/track/${getEmbedId(
@@ -432,13 +434,13 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                     <div className="flex gap-3">
                       <button
                         onClick={() => startEditing(track)}
-                        className="rounded-lg border border-zinc-800 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                        className="studio-btn studio-btn-secondary"
                       >
                         Bearbeiten
                       </button>
                       <button
                         onClick={() => handleDelete(track.id)}
-                        className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-500/50 hover:bg-red-500/20"
+                        className="studio-btn studio-btn-danger"
                       >
                         Löschen
                       </button>
