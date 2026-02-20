@@ -11,11 +11,16 @@ type PageStatusCardProps = {
 export default function PageStatusCard({ page }: PageStatusCardProps) {
   const [copied, setCopied] = useState(false);
 
+  // Build full URL from handle (URL is owned by the frontend, not the API)
+  // Use NEXT_PUBLIC_APP_URL (inlined at build time) to avoid SSR/client mismatch
+  const origin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const pageUrl = page?.handle ? `/p/${page.handle}` : null;
+  const fullPageUrl = page?.handle ? `${origin}/p/${page.handle}` : null;
+
   const handleCopy = async () => {
-    if (!page?.url) return;
-    
+    if (!fullPageUrl) return;
     try {
-      await navigator.clipboard.writeText(page.url);
+      await navigator.clipboard.writeText(fullPageUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -61,10 +66,10 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
         </div>
       </div>
 
-      {page.is_published && (
+      {pageUrl && (
         <div className="mt-4 flex items-center gap-2 rounded px-3 py-2" style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)" }}>
           <span className="flex-1 truncate text-xs font-mono" style={{ color: "var(--studio-text-primary)", fontFamily: "var(--font-geist-mono, ui-monospace, monospace)" }}>
-            {page.url}
+            {fullPageUrl || pageUrl}
           </span>
           <button
             onClick={handleCopy}
@@ -83,7 +88,7 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
             )}
           </button>
           <a
-            href={page.url}
+            href={pageUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded p-1.5 transition-colors"

@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
 import StudioEmptyState from "../../components/StudioEmptyState";
+import StudioQRCode from "../../components/StudioQRCode";
 import { Megaphone } from "../../components/StudioIcons";
 
 type ShareClientProps = {
@@ -23,9 +24,10 @@ type ShareClientProps = {
     slug: string;
     primary_url?: string;
   } | null;
+  pageUrl: string | null;
 };
 
-export default function ShareClient({ activeSpotlight }: ShareClientProps) {
+export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
@@ -127,6 +129,15 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
     return (
       <div className="mx-auto max-w-4xl">
         <StudioPageHeader title="TEILEN" subtitle="Erstelle Tracking-Links für deine Kanäle." />
+        {pageUrl && (
+          <div className="rounded-lg p-6 mb-8" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
+            <h2 className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--studio-text-secondary)" }}>QR-Code</h2>
+            <StudioQRCode
+              url={pageUrl}
+              handle={pageUrl.split("/p/")[1] ?? undefined}
+            />
+          </div>
+        )}
         <StudioEmptyState
           icon={Megaphone}
           title="Kein aktives Projekt"
@@ -152,6 +163,17 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
       />
 
       <div className="space-y-8">
+        {/* QR-Code Card */}
+        {pageUrl && (
+          <div className="rounded-lg p-6" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
+            <h2 className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--studio-text-secondary)" }}>QR-Code</h2>
+            <StudioQRCode
+              url={pageUrl}
+              handle={pageUrl.split("/p/")[1] ?? undefined}
+            />
+          </div>
+        )}
+
         {/* Platform Selector */}
         <PlatformSelector 
           onSelect={handlePlatformSelect} 

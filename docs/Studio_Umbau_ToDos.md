@@ -409,7 +409,7 @@
 - [x] **Teilen:** PageHeader eingebaut
 - [x] **Teilen:** URL-Box prominent + Copy-Button mit Feedback
 - [x] **Teilen:** Link-Rows visuell vereinheitlicht (Social-Share-Buttons deferred zu Phase 4)
-- [ ] **Teilen:** QR-Code-Card mit Beschreibung — Phase 4
+- [x] **Teilen:** QR-Code-Card mit Beschreibung — Phase 4
 - [x] **Ergebnisse:** PageHeader eingebaut
 - [x] **Ergebnisse:** Kennzahlen-Row mit StatCards
 - [x] **Ergebnisse:** Zeitverlauf-Darstellung (CSS-Balken)
@@ -417,9 +417,9 @@
 - [x] **Ergebnisse:** Empty State
 
 ### Phase 4: QR-Code
-- [ ] `qrcode.react` evaluiert und ggf. installiert (BegrÃ¼ndung im PR)
-- [ ] `StudioQRCode.tsx` erstellt (Rendering + Styling)
-- [ ] Download-Funktion (PNG, clientseitig) implementiert
+- [x] `qrcode.react` evaluiert und installiert (v4.2.0; Kern-Feature, keine sinnvolle Eigenimplementierung, ~5kb, kein Server nötig)
+- [x] `StudioQRCode.tsx` erstellt (Rendering + Styling)
+- [x] Download-Funktion (PNG, clientseitig) implementiert
 - [ ] QR-Code scanbar getestet (Kontrast weiÃŸ/schwarz)
 
 ### Phase 5: Feinschliff

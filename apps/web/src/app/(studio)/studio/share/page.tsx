@@ -1,4 +1,5 @@
 import { backendFetch } from "@/lib/api/backend";
+import { fetchStudioHome } from "@/lib/api/studio";
 import ShareClient from "./ShareClient";
 
 type Spotlight = {
@@ -9,20 +10,30 @@ type Spotlight = {
   primary_url?: string | null;
 };
 
-async function fetchActiveSpotlight(): Promise<{ id: number; title: string; slug: string; primary_url?: string } | null> {
+/** Returns the best available non-archived spotlight: active > scheduled > most recent. */
+async function fetchBestSpotlight(): Promise<{ id: number; title: string; slug: string; primary_url?: string } | null> {
   try {
-    const res = await backendFetch("/api/v1/spotlights/active", { cache: "no-store" });
+    const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
     if (!res.ok) return null;
     const json = await res.json();
-    const data = json?.data as Spotlight | null;
-    
-    if (!data) return null;
+    const list = (json?.data ?? []) as Spotlight[];
+
+    if (list.length === 0) return null;
+
+    // Prefer active, then scheduled, then any
+    const priority = ['active', 'scheduled'];
+    let best: Spotlight | null = null;
+    for (const status of priority) {
+      best = list.find((s) => s.status === status) ?? null;
+      if (best) break;
+    }
+    if (!best) best = list[0];
 
     return {
-      id: data.id,
-      title: data.title,
-      slug: data.slug,
-      primary_url: data.primary_url || undefined,
+      id: best.id,
+      title: best.title,
+      slug: best.slug,
+      primary_url: best.primary_url || undefined,
     };
   } catch {
     return null;
@@ -30,7 +41,16 @@ async function fetchActiveSpotlight(): Promise<{ id: number; title: string; slug
 }
 
 export default async function SharePage() {
-  const activeSpotlight = await fetchActiveSpotlight();
+  const [activeSpotlight, homeData] = await Promise.all([
+    fetchBestSpotlight(),
+    fetchStudioHome(),
+  ]);
 
-  return <ShareClient activeSpotlight={activeSpotlight} />;
+  // Build page URL from handle — frontend owns the domain, not the API
+  const handle = homeData?.page?.handle;
+  const pageUrl = handle
+    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/p/${handle}`
+    : null;
+
+  return <ShareClient activeSpotlight={activeSpotlight} pageUrl={pageUrl} />;
 }

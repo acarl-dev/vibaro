@@ -22,8 +22,10 @@ export type TopLinkData = {
 };
 
 export type PageStatusData = {
-  url: string;
+  handle: string | null;
+  url: string | null;
   is_published: boolean;
+  display_name?: string | null;
 };
 
 export type StatsData = {
