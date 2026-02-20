@@ -193,23 +193,30 @@ Leitprinzipien:
 
 ## spotlights
 
-| Feld | Typ |
-|----|----|
-| id | bigint |
-| artist_page_id | bigint |
-| title | string |
-| type | string |
-| status | string (`active` \| `scheduled` \| `ended`) |
-| starts_at | datetime |
-| ends_at | datetime |
-| primary_url | string |
-| description | text |
-| created_at | timestamp |
-| updated_at | timestamp |
+| Feld | Typ | Hinweise |
+|----|----|----|
+| id | bigint | PK |
+| artist_page_id | bigint | FK → artist_pages.id |
+| title | string | Öffentlich sichtbar, kann geändert werden |
+| slug | string | **Stabil**, einmalig generiert, unique, url-safe |
+| type | string | z.B. `release`, `tour`, `single`, `merch` |
+| status | string | `active` \| `scheduled` \| `ended` |
+| starts_at | datetime | nullable |
+| ends_at | datetime | nullable |
+| primary_url | string | nullable |
+| description | text | nullable |
+| show_on_page | boolean | default true, steuert Hero-Banner |
+| archived_at | timestamp | nullable, soft delete |
+| created_at | timestamp | |
+| updated_at | timestamp | |
 
 **Regeln**
 - Maximal ein `active` Spotlight pro artist_page.
 - `ends_at` darf nicht kleiner als `starts_at` sein.
+- **slug ist die stabile Campaign-Identität** – Titeländerung beeinflusst Analytics nicht.
+- slug wird bei Erstellung generiert (lowercase, url-safe, unique).
+- `show_on_page = true` + `status = active` + `archived_at IS NULL` → Hero-Banner sichtbar auf öffentlicher Seite.
+- Archivierung (`archived_at`) entfernt Spotlight aus Studio-Ansichten, löscht aber keine TrackingLinks oder ClickEvents.
 
 ---
 
@@ -236,28 +243,40 @@ Leitprinzipien:
 
 ## tracking_links
 
-| Feld | Typ |
-|----|----|
-| id | bigint |
-| artist_page_id | bigint |
-| spotlight_id | bigint |
-| campaign_id | bigint |
-| module | string |
-| label | string |
-| target_url | string |
-| slug | string (unique) |
-| utm_source | string |
-| utm_medium | string |
-| utm_campaign | string |
-| utm_content | string |
-| utm_term | string |
-| is_active | boolean |
-| created_at | timestamp |
-| updated_at | timestamp |
+| Feld | Typ | Hinweise |
+|----|----|----|
+| id | bigint | PK |
+| artist_page_id | bigint | FK → artist_pages.id |
+| spotlight_id | bigint | FK → spotlights.id |
+| campaign_id | bigint | nullable, (Stage Pro, future) |
+| platform | string | z.B. `instagram`, `tiktok`, `email`, `spotify` |
+| placement | string | z.B. `story`, `bio`, `post`, `reel`, `newsletter` |
+| label | string | nullable, öffentlich sichtbar (z.B. "Hör jetzt rein") |
+| target_url | string | Ziel-URL |
+| short_code | string | unique, Public identifier (8 chars) |
+| utm_source | string | serverseitig generiert |
+| utm_medium | string | serverseitig generiert |
+| utm_campaign | string | **spotlight.slug** (stabil) |
+| utm_content | string | nullable |
+| utm_term | string | nullable |
+| click_count | integer | default 0, nur atomar inkrementiert |
+| archived_at | timestamp | nullable, soft delete |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+**Indizes**
+- unique(short_code)
+- index(artist_page_id)
+- index(spotlight_id)
+- **Partial Unique Index**: (spotlight_id, platform, placement) WHERE archived_at IS NULL
 
 **Regeln**
-- Öffentliche Tracking-Route verwendet nur `slug`.
+- Öffentliche Tracking-Route verwendet nur `short_code`.
 - target_url wird serverseitig validiert (http/https only).
+- **Keine Duplikate**: Pro Spotlight kann es nur einen aktiven Link pro (platform, placement) geben.
+- Archivierung löscht keine Click-Historie.
+- **utm_campaign basiert immer auf spotlight.slug**, nicht auf spotlight.title.
+- click_count ist ein Cache für Performance (Top-Listen), echte Analytics basieren auf click_events.
 
 ---
 

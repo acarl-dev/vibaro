@@ -238,3 +238,65 @@ If a feature does not strengthen:
 - stage ownership
 
 it does not belong in Vibaro V2.
+
+---
+
+## 12. Technical Implementation Rules (Studio V2)
+
+### 12.1 Spotlight Identity
+
+- **Spotlight.slug** is the stable campaign identity for analytics.
+- Title changes do not affect analytics or UTM parameters.
+- slug is generated once at creation (lowercase, url-safe, unique).
+- utm_campaign is always based on spotlight.slug.
+
+### 12.2 Tracking Links
+
+- TrackingLinks are unique per (Spotlight, Platform, Placement).
+- Partial unique index enforces: `(spotlight_id, platform, placement) WHERE archived_at IS NULL`.
+- Duplicate prevention: check existence before creating new link.
+- click_count is a performance cache (for Top-N lists only).
+- Real analytics are always based on click_events.
+
+### 12.3 Archivierung
+
+- Spotlight archivierung deletes no TrackingLinks or ClickEvents.
+- Archivierung via `archived_at` timestamp (soft delete pattern).
+- Archived entities remain queryable for historic analytics.
+- Studio UI filters out archived entities by default.
+
+### 12.4 Hero Integration
+
+- Active Spotlight with `show_on_page = true` + `archived_at IS NULL` → visible on public page.
+- `show_on_page` toggle allows Hero-Banner control without archiving.
+- Archivierung automatically removes Hero-Banner.
+
+### 12.5 Studio Navigation
+
+- `/studio` → Home (default, lightweight, no heavy analytics)
+- `/studio/page` → Meine Seite (content editing)
+- `/studio/project` → Projekt (Spotlight management)
+- `/studio/share` → Teilen (Tracking Link creation)
+- `/studio/results` → Ergebnisse (Analytics dashboard)
+
+### 12.6 Home Endpoint Performance
+
+- Home endpoint must remain lightweight and fast.
+- No expensive analytics aggregations on Home.
+- Top-N links use click_count (cached counter).
+- Heavy analytics only in `/studio/results`.
+
+### 12.7 Page Builder (MVP Scope)
+
+- Fixed content areas: About, Music, Socials (required).
+- Optional areas: Tour, Shop.
+- No drag & drop in MVP.
+- No CMS-like flexibility.
+- Content editing remains simple and predictable.
+
+### 12.8 Platform Configuration
+
+- Platform definitions (Instagram, TikTok, Spotify, …) in frontend config (`platforms.ts`).
+- Each platform defines available placements (Story, Bio, Post, Reel, …).
+- Backend validates platform/placement as strings (no hardcoded enums in MVP).
+- Future: move to DB if platform config becomes user-customizable.
