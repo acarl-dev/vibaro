@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
-import StudioHeader from "./components/StudioHeader";
-import StudioTabs from "./components/StudioTabs";
+import StudioSidebar from "./components/StudioSidebar";
+import StudioBottomNav from "./components/StudioBottomNav";
 import { ToastProvider } from "@/context/ToastContext";
 
 export type ArtistPageData = {
@@ -35,7 +35,6 @@ async function fetchArtistPage(): Promise<ArtistPageData | null> {
     const json = await res.json();
     const data = json?.data;
     if (!data) return null;
-
     return {
       id: data.id,
       handle: data.handle,
@@ -53,34 +52,29 @@ async function fetchArtistPage(): Promise<ArtistPageData | null> {
 }
 
 export default async function StudioLayout({ children }: { children: ReactNode }) {
-  // Auth Guard
   const token = await getTokenFromCookies();
+  if (!token) redirect("/login?next=/studio");
 
-  if (!token) {
-    redirect("/login?next=/studio");
-  }
-
-  // Check onboarding status
   const me = await fetchMe();
-  if (me?.artist_page?.is_onboarded === false) {
-    redirect("/studio/onboarding");
-  }
+  if (me?.artist_page?.is_onboarded === false) redirect("/studio/onboarding");
 
-  // Fetch artist page
   const page = await fetchArtistPage();
-  if (!page) {
-    redirect("/studio/onboarding");
-  }
+  if (!page) redirect("/studio/onboarding");
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-zinc-950 text-zinc-50">
-        <StudioHeader page={page} />
-        <StudioTabs />
-        
-        <main className="mx-auto max-w-7xl p-6 pb-24 md:pb-6">
-          {children}
-        </main>
+      <div
+        data-theme="studio"
+        className="flex min-h-screen"
+        style={{ background: "var(--studio-bg)", color: "var(--studio-text-primary)" }}
+      >
+        <StudioSidebar page={page} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <main className="flex-1 p-6 pb-24 md:pb-6">
+            {children}
+          </main>
+        </div>
+        <StudioBottomNav />
       </div>
     </ToastProvider>
   );

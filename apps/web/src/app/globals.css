@@ -58,3 +58,135 @@ a:focus-visible,
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+/* =============================================================================
+   STUDIO THEME (Internal – not user-facing, not switchable)
+   Applied via [data-theme="studio"] on the studio layout wrapper.
+   Completely separate from the public page theme system in styles/themes.css.
+   ============================================================================= */
+
+[data-theme="studio"] {
+  --studio-bg:               #0A0A0F;
+  --studio-surface:          #14141C;
+  --studio-surface-elevated: #1C1C28;
+  --studio-border:           #2A2A3A;
+  --studio-text-primary:     #EAEAF0;
+  --studio-text-secondary:   #8888A0;
+  --studio-accent:           #E63946;
+  --studio-accent-hover:     #FF4D5A;
+  --studio-accent-muted:     rgba(230, 57, 70, 0.15);
+  --studio-success:          #22C55E;
+  --studio-warning:          #F59E0B;
+}
+
+/* =============================================================================
+   STUDIO UTILITY CLASSES
+   Reusable across all studio pages and components.
+   ============================================================================= */
+
+@layer utilities {
+  /* Card */
+  .studio-card {
+    background-color: var(--studio-surface);
+    border: 1px solid var(--studio-border);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: none;
+    transition: border-color 150ms ease;
+  }
+
+  .studio-card-interactive:hover {
+    border-color: var(--studio-accent-muted);
+  }
+
+  /* Page header row */
+  .studio-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--studio-border);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+
+  /* Typography */
+  .studio-h1 {
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--studio-text-primary);
+  }
+
+  .studio-h2 {
+    font-weight: 600;
+    text-transform: none;
+    color: var(--studio-text-primary);
+  }
+
+  .studio-subtitle {
+    color: var(--studio-text-secondary);
+    font-size: 14px;
+  }
+
+  /* Input */
+  .studio-input {
+    background-color: var(--studio-surface-elevated);
+    border: 1px solid var(--studio-border);
+    color: var(--studio-text-primary);
+    border-radius: 6px;
+    transition: border-color 150ms ease;
+  }
+
+  .studio-input::placeholder {
+    color: var(--studio-text-secondary);
+  }
+
+  .studio-input:focus,
+  .studio-input:focus-visible {
+    outline: none;
+    border-color: var(--studio-accent);
+  }
+
+  /* Status badges */
+  .studio-badge-live {
+    color: var(--studio-success);
+    background-color: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .studio-badge-draft {
+    color: var(--studio-warning);
+    background-color: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .studio-badge-ended {
+    color: var(--studio-text-secondary);
+    background-color: rgba(136, 136, 160, 0.1);
+    border: 1px solid rgba(136, 136, 160, 0.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Focus state for studio interactive elements */
+  [data-theme="studio"] *:focus-visible {
+    outline: 2px solid var(--studio-accent);
+    outline-offset: 2px;
+  }
+}
