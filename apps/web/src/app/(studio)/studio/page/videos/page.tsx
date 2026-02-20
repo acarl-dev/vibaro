@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import VideosClient from "./VideosClient";
+import VideosClient from "../../videos/VideosClient";
 
 type Video = {
   id: number;
@@ -24,8 +24,8 @@ async function fetchVideos(): Promise<Video[]> {
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageVideosPage() {
+  const videos = await fetchVideos();
 
-export default function VideosPageRedirect() {
-  redirect("/studio/page/videos");
+  return <VideosClient initialVideos={videos} />;
 }

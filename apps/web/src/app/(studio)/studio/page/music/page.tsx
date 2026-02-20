@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import MusicClient from "./MusicClient";
+import MusicClient from "../../music/MusicClient";
 
 type FeaturedTrack = {
   id: number;
@@ -40,8 +40,13 @@ async function fetchFeaturedTracks(artistPageId: number): Promise<FeaturedTrack[
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageMusicPage() {
+  const artistPageId = await fetchArtistPageId();
+  if (!artistPageId) {
+    redirect("/studio/onboarding");
+  }
 
-export default function MusicPageRedirect() {
-  redirect("/studio/page/music");
+  const tracks = await fetchFeaturedTracks(artistPageId);
+
+  return <MusicClient initialTracks={tracks} />;
 }

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import LinksClient from "./LinksClient";
+import ProfileClient from "../../profile/ProfileClient";
 
 type ArtistPage = {
   id: number;
@@ -10,14 +10,6 @@ type ArtistPage = {
   is_published: boolean;
   avatar_url: string | null;
   hero_image_url: string | null;
-};
-
-type Link = {
-  id: number;
-  type?: string;
-  title: string | null;
-  url: string | null;
-  position: number;
 };
 
 async function fetchArtistPage(): Promise<ArtistPage | null> {
@@ -42,21 +34,12 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
   }
 }
 
-async function fetchLinks(): Promise<Link[]> {
-  try {
-    const res = await backendFetch("/api/v1/artist-pages/me/links", {
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json?.data ?? [];
-  } catch {
-    return [];
+export default async function PageProfilePage() {
+  const page = await fetchArtistPage();
+
+  if (!page) {
+    redirect("/studio/onboarding");
   }
-}
 
-import { redirect } from "next/navigation";
-
-export default function LinksPageRedirect() {
-  redirect("/studio/page/links");
+  return <ProfileClient initialPage={page} />;
 }

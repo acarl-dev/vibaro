@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import GalleryClient from "./GalleryClient";
+import GalleryClient from "../../gallery/GalleryClient";
 
 type GalleryImage = {
   id: number;
@@ -21,8 +21,8 @@ async function fetchGalleryImages(): Promise<GalleryImage[]> {
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageGalleryPage() {
+  const images = await fetchGalleryImages();
 
-export default function GalleryPageRedirect() {
-  redirect("/studio/page/gallery");
+  return <GalleryClient initialImages={images} />;
 }

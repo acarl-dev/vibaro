@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import LinksClient from "./LinksClient";
+import LinksClient from "../../links/LinksClient";
 
 type ArtistPage = {
   id: number;
@@ -55,8 +55,13 @@ async function fetchLinks(): Promise<Link[]> {
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageLinksPage() {
+  const page = await fetchArtistPage();
+  if (!page) {
+    redirect("/studio/onboarding");
+  }
 
-export default function LinksPageRedirect() {
-  redirect("/studio/page/links");
+  const links = await fetchLinks();
+
+  return <LinksClient initialLinks={links} />;
 }

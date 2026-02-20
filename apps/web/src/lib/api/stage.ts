@@ -41,6 +41,10 @@ export interface TrackingLink {
   spotlight_title?: string;
   campaign_id: number | null;
   campaign_name?: string;
+  platform?: string;
+  placement?: string;
+  click_count?: number;
+  archived_at?: string | null;
   is_active: boolean;
   created_at: string;
 }
@@ -53,6 +57,61 @@ export interface AnalyticsData {
   by_module: Array<{ module: string; clicks: number }>;
   by_referrer: Array<{ referrer: string; clicks: number }>;
   trend: Array<{ date: string; clicks: number }>;
+}
+
+export interface StudioHomeData {
+  spotlight: {
+    id: number;
+    title: string;
+    type: string;
+    status: string;
+    activated_at: string;
+    days_active: number;
+    show_on_page: boolean;
+  } | null;
+  stats: {
+    total_clicks_7d: number;
+    trend: number;
+  };
+  top_links: {
+    id: number;
+    platform: string;
+    placement: string;
+    tracking_url: string;
+    click_count: number;
+  }[];
+  page: {
+    handle: string;
+    is_published: boolean;
+    display_name: string;
+    updated_at: string;
+  } | null;
+  tip: {
+    type: string;
+    message: string;
+    action_label: string;
+    action_type: string;
+    action_payload: Record<string, any>;
+  } | null;
+}
+
+export interface AnalyticsBreakdown {
+  total_clicks: number;
+  trend: number;
+  period: string;
+  by_platform: {
+    platform: string;
+    clicks: number;
+    placements: {
+      placement: string;
+      clicks: number;
+    }[];
+  }[];
+}
+
+export interface DuplicateCheckResult {
+  exists: boolean;
+  link?: TrackingLink | null;
 }
 
 /**
@@ -287,22 +346,11 @@ export async function getAllTrackingLinks(): Promise<TrackingLink[]> {
 }
 
 export async function createTrackingLink(data: {
-  module: string;
-  label: string;
+  spotlight_id: number;
+  platform: string;
+  placement: string;
   target_url: string;
-  spotlight_id?: number;
-  campaign_id?: number;
-  utm_source?: string;
-  utm_medium?: string;
-  utm_campaign?: string;
-  utm_content?: string;
-  utm_term?: string;
-}): Promise<{
-  id: number;
-  slug: string;
-  tracking_url: string;
-  target_url: string;
-}> {
+}): Promise<TrackingLink> {
   const res = await apiFetch('/api/v1/tracking-links', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -357,4 +405,108 @@ export async function getAnalytics(
   
   const json = await res.json();
   return json.data;
+}
+
+// ============================================
+// Studio Home API (Phase 2)
+// ============================================
+
+export async function getStudioHome(): Promise<StudioHomeData> {
+  const res = await apiFetch('/api/v1/studio/home');
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Failed to fetch studio home:', res.status, errorText);
+    throw new Error(`Failed to fetch studio home: ${res.status}`);
+  }
+  
+  const json = await res.json();
+  return json.data;
+}
+
+export async function checkTrackingLink(
+  spotlightId: number,
+  platform: string,
+  placement: string
+): Promise<DuplicateCheckResult> {
+  const params = new URLSearchParams({
+    spotlight_id: spotlightId.toString(),
+    platform,
+    placement,
+  });
+  
+  const res = await apiFetch(`/api/v1/tracking-links/check?${params.toString()}`);
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Failed to check tracking link:', res.status, errorText);
+    throw new Error(`Failed to check tracking link: ${res.status}`);
+  }
+  
+  const json = await res.json();
+  return json.data;
+}
+
+export async function archiveTrackingLink(id: number): Promise<TrackingLink> {
+  const res = await apiFetch(`/api/v1/tracking-links/${id}/archive`, {
+    method: 'PATCH',
+  });
+  
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error?.message || 'Failed to archive tracking link');
+  }
+  
+  const json = await res.json();
+  return json.data;
+}
+
+export async function getAnalyticsBreakdown(
+  spotlightId: number,
+  period: string = '7d'
+): Promise<AnalyticsBreakdown> {
+  const params = new URLSearchParams({
+    spotlight_id: spotlightId.toString(),
+    period,
+  });
+  
+  const res = await apiFetch(`/api/v1/analytics/breakdown?${params.toString()}`);
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Failed to fetch analytics breakdown:', res.status, errorText);
+    throw new Error(`Failed to fetch analytics breakdown: ${res.status}`);
+  }
+  
+  const json = await res.json();
+  return json.data;
+}
+
+export async function toggleShowOnPage(spotlightId: number): Promise<Spotlight> {
+  const res = await apiFetch(`/api/v1/spotlights/${spotlightId}/show-on-page`, {
+    method: 'PATCH',
+  });
+  
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error?.message || 'Failed to toggle show on page');
+  }
+  
+  const json = await res.json();
+  return json.data;
+}
+
+export async function updateVisibleSections(
+  pageId: number,
+  sections: string[]
+): Promise<void> {
+  const res = await apiFetch(`/api/v1/artist-pages/${pageId}/sections`, {
+    method: 'PATCH',
+    body: JSON.stringify({ visible_sections: sections }),
+  });
+  
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error?.message || 'Failed to update visible sections');
+  }
 }

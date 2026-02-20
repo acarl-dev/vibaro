@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
 import StudioHeader from "./components/StudioHeader";
-import StudioSidebar from "./components/StudioSidebar";
+import StudioTabs from "./components/StudioTabs";
 
 export type ArtistPageData = {
   id: number;
@@ -74,14 +74,11 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       <StudioHeader page={page} />
+      <StudioTabs />
       
-      <div className="mx-auto flex max-w-7xl">
-        <StudioSidebar page={page} />
-        
-        <main className="flex-1 p-6">
-          {children}
-        </main>
-      </div>
+      <main className="mx-auto max-w-7xl p-6 pb-24 md:pb-6">
+        {children}
+      </main>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import ShowsClient from "./ShowsClient";
+import ShowsClient from "../../shows/ShowsClient";
 
 type Show = {
   id: number;
@@ -40,9 +40,14 @@ async function fetchShows(artistPageId: number): Promise<Show[]> {
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageShowsPage() {
+  const artistPageId = await fetchArtistPageId();
 
-export default function ShowsPageRedirect() {
-  redirect("/studio/page/shows");
+  if (!artistPageId) {
+    redirect("/login");
+  }
+
+  const shows = await fetchShows(artistPageId);
+
+  return <ShowsClient initialShows={shows} />;
 }
-

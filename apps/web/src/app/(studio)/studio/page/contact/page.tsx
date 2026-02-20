@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import ContactClient from "./ContactClient";
+import ContactClient from "../../contact/ContactClient";
 
 type ArtistPage = {
   id: number;
@@ -32,8 +32,23 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageContactPage() {
+  const page = await fetchArtistPage();
 
-export default function ContactPageRedirect() {
-  redirect("/studio/page/contact");
+  if (!page) {
+    redirect("/studio/onboarding");
+  }
+
+  return (
+    <ContactClient
+      initialData={{
+        booking_email: page.booking_email,
+        management_email: page.management_email,
+        press_email: page.press_email,
+        whatsapp_number: page.whatsapp_number,
+        contact_message: page.contact_message,
+      }}
+      artistPageId={page.id}
+    />
+  );
 }

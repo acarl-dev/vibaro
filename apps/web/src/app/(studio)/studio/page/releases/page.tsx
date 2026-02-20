@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import ReleasesClient from "./ReleasesClient";
+import ReleasesClient from "../../releases/ReleasesClient";
 
 type Release = {
   id: number;
@@ -44,8 +44,13 @@ async function fetchReleases(artistPageId: number): Promise<Release[]> {
   }
 }
 
-import { redirect } from "next/navigation";
+export default async function PageReleasesPage() {
+  const artistPageId = await fetchArtistPageId();
+  if (!artistPageId) {
+    redirect("/studio/onboarding");
+  }
 
-export default function ReleasesPageRedirect() {
-  redirect("/studio/page/releases");
+  const releases = await fetchReleases(artistPageId);
+
+  return <ReleasesClient initialReleases={releases} />;
 }

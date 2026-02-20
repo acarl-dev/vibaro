@@ -2370,54 +2370,54 @@ Frontend (7+):
 ### Phase 2: Frontend – Navigations-Umbau + Home-Tab
 
 #### Plattform-Konfiguration
-- [ ] `src/lib/platforms.ts` erstellen – PLATFORMS-Array mit Plattformen, Platzierungen, copyHints
-- [ ] `src/lib/platforms.ts` – Helper-Funktionen: getPlatform, getPlacement, getCopyHint, formatLinkLabel
+- [x] `src/lib/platforms.ts` erstellen – PLATFORMS-Array mit Plattformen, Platzierungen, copyHints
+- [x] `src/lib/platforms.ts` – Helper-Funktionen: getPlatform, getPlacement, getCopyHint, formatLinkLabel
 
 #### API-Client
-- [ ] `src/lib/api/stage.ts` – Neue Typen: StudioHomeData, AnalyticsBreakdown, DuplicateCheckResult
-- [ ] `src/lib/api/stage.ts` – Neue Funktion: `getStudioHome()`
-- [ ] `src/lib/api/stage.ts` – Neue Funktion: `checkTrackingLink()`
-- [ ] `src/lib/api/stage.ts` – Neue Funktion: `archiveTrackingLink()`
-- [ ] `src/lib/api/stage.ts` – Neue Funktion: `getAnalyticsBreakdown()`
-- [ ] `src/lib/api/stage.ts` – Neue Funktion: `toggleShowOnPage()`
-- [ ] `src/lib/api/stage.ts` – Neue Funktion: `updateVisibleSections()`
-- [ ] `src/lib/api/stage.ts` – `createTrackingLink()` Signatur ändern (nur platform, placement, target_url, spotlight_id)
-- [ ] `src/lib/api/stage.ts` – `createCampaign()` entfernen
-- [ ] `src/lib/api/stage.ts` – `deleteTrackingLink()` durch `archiveTrackingLink()` ersetzen
+- [x] `src/lib/api/stage.ts` – Neue Typen: StudioHomeData, AnalyticsBreakdown, DuplicateCheckResult
+- [x] `src/lib/api/stage.ts` – Neue Funktion: `getStudioHome()`
+- [x] `src/lib/api/stage.ts` – Neue Funktion: `checkTrackingLink()`
+- [x] `src/lib/api/stage.ts` – Neue Funktion: `archiveTrackingLink()`
+- [x] `src/lib/api/stage.ts` – Neue Funktion: `getAnalyticsBreakdown()`
+- [x] `src/lib/api/stage.ts` – Neue Funktion: `toggleShowOnPage()`
+- [x] `src/lib/api/stage.ts` – Neue Funktion: `updateVisibleSections()`
+- [x] `src/lib/api/stage.ts` – `createTrackingLink()` Signatur ändern (nur platform, placement, target_url, spotlight_id)
+- [x] `src/lib/api/stage.ts` – `createCampaign()` entfernen
+- [x] `src/lib/api/stage.ts` – `deleteTrackingLink()` durch `archiveTrackingLink()` ersetzen
 
 #### Studio Layout
-- [ ] `studio/layout.tsx` – Sidebar mit 13 Punkten ersetzen durch Tab-Leiste mit 5 Tabs (Home, Meine Seite, Mein Projekt, Teilen, Ergebnisse)
-- [ ] `studio/layout.tsx` – Settings als Zahnrad-Icon / User-Menü, nicht als Tab
-- [ ] `studio/layout.tsx` – Mobile: Bottom-Nav oder horizontal scrollbare Tabs
+- [x] `studio/layout.tsx` – Sidebar mit 13 Punkten ersetzen durch Tab-Leiste mit 5 Tabs (Home, Meine Seite, Mein Projekt, Teilen, Ergebnisse)
+- [x] `studio/layout.tsx` – Settings als Zahnrad-Icon / User-Menü, nicht als Tab
+- [x] `studio/layout.tsx` – Mobile: Bottom-Nav oder horizontal scrollbare Tabs
 
 #### Content-Editoren verschieben (Routing)
-- [ ] `/studio/profile` → `/studio/page/profile` (page.tsx erstellen, Komponente importieren)
-- [ ] `/studio/links` → `/studio/page/links`
-- [ ] `/studio/music` → `/studio/page/music`
-- [ ] `/studio/shows` → `/studio/page/shows`
-- [ ] `/studio/releases` → `/studio/page/releases`
-- [ ] `/studio/videos` → `/studio/page/videos`
-- [ ] `/studio/gallery` → `/studio/page/gallery`
-- [ ] `/studio/appearance` → `/studio/page/appearance`
-- [ ] `/studio/contact` → `/studio/page/contact`
-- [ ] Alte Routes: Redirects zu neuen Routes einrichten oder löschen
-- [ ] Alle Backlinks/Breadcrumbs in Editor-Komponenten aktualisieren (Zurück → /studio/page)
+- [x] `/studio/profile` → `/studio/page/profile` (page.tsx erstellen, Komponente importieren)
+- [x] `/studio/links` → `/studio/page/links`
+- [x] `/studio/music` → `/studio/page/music`
+- [x] `/studio/shows` → `/studio/page/shows`
+- [x] `/studio/releases` → `/studio/page/releases`
+- [x] `/studio/videos` → `/studio/page/videos`
+- [x] `/studio/gallery` → `/studio/page/gallery`
+- [x] `/studio/appearance` → `/studio/page/appearance`
+- [x] `/studio/contact` → `/studio/page/contact`
+- [x] Alte Routes: Redirects zu neuen Routes einrichten oder löschen
+- [x] Alle Backlinks/Breadcrumbs in Editor-Komponenten aktualisieren (Zurück → /studio/page)
 
 #### PageOverviewClient anpassen
-- [ ] `hrefs` in sections-Array auf `/studio/page/X` aktualisieren
-- [ ] Deutsche Begriffe: Music→Musik, Shows→Konzerte, Gallery→Galerie, Themes→Design
-- [ ] Stage-Route Redirect: `/studio/stage/page.tsx` → redirect('/studio/project')
+- [x] `hrefs` in sections-Array auf `/studio/page/X` aktualisieren
+- [x] Deutsche Begriffe: Music→Musik, Shows→Konzerte, Gallery→Galerie, Themes→Design
+- [x] Stage-Route Redirect: `/studio/stage/page.tsx` → redirect('/studio/project')
 
 #### Home-Tab erstellen
-- [ ] `studio/page.tsx` überschreiben → rendert StudioHomeClient
-- [ ] `StudioHomeClient.tsx` erstellen – Lädt StudioHomeData, zeigt Karten
-- [ ] `StudioHomeClient.tsx` – Erstbesuch-Erkennung (kein Page + kein Spotlight → WelcomeView)
-- [ ] `StudioHomeClient.tsx` – Normaler Besuch: Begrüßung + ProjectStatusCard + TopLinksCard + PageStatusCard + TipCard
-- [ ] `components/studio/home/WelcomeView.tsx` erstellen
-- [ ] `components/studio/home/ProjectStatusCard.tsx` erstellen
-- [ ] `components/studio/home/TopLinksCard.tsx` erstellen
-- [ ] `components/studio/home/PageStatusCard.tsx` erstellen
-- [ ] `components/studio/home/TipCard.tsx` erstellen
+- [x] `studio/page.tsx` überschreiben → rendert StudioHomeClient
+- [x] `StudioHomeClient.tsx` erstellen – Lädt StudioHomeData, zeigt Karten
+- [x] `StudioHomeClient.tsx` – Erstbesuch-Erkennung (kein Page + kein Spotlight → WelcomeView)
+- [x] `StudioHomeClient.tsx` – Normaler Besuch: Begrüßung + ProjectStatusCard + TopLinksCard + PageStatusCard + TipCard
+- [x] `components/studio/home/WelcomeView.tsx` erstellen
+- [x] `components/studio/home/ProjectStatusCard.tsx` erstellen
+- [x] `components/studio/home/TopLinksCard.tsx` erstellen
+- [x] `components/studio/home/PageStatusCard.tsx` erstellen
+- [x] `components/studio/home/TipCard.tsx` erstellen
 
 #### Manuelle Tests Phase 2
 - [ ] `/studio` öffnen → Home-Tab mit Karten angezeigt

@@ -13,18 +13,8 @@ async function fetchArtistPage() {
   }
 }
 
-export default async function AppearancePage() {
-  const page = await fetchArtistPage();
+import { redirect } from "next/navigation";
 
-  if (!page) {
-    redirect("/studio/onboarding");
-  }
-
-  return (
-    <AppearanceClient
-      artistPageId={page.id}
-      initialThemeKey={page.theme_key || "modern"}
-      initialThemeVariant={page.theme_variant || "auto"}
-    />
-  );
+export default function AppearancePageRedirect() {
+  redirect("/studio/page/appearance");
 }
