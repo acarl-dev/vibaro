@@ -3,7 +3,7 @@
  * Used in "use client" components
  */
 
-export type SpotlightType = "single" | "album" | "tour" | "event";
+export type SpotlightType = "single" | "album" | "tour" | "event" | "video" | "merch" | "livestream" | "collab";
 export type SpotlightStatus = "scheduled" | "active" | "ended";
 
 export type SpotlightData = {

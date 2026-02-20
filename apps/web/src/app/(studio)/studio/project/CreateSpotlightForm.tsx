@@ -19,6 +19,10 @@ const SPOTLIGHT_TYPES: { value: SpotlightType; label: string }[] = [
   { value: "album", label: "Album" },
   { value: "tour", label: "Tour" },
   { value: "event", label: "Event" },
+  { value: "video", label: "Video" },
+  { value: "merch", label: "Merch" },
+  { value: "livestream", label: "Livestream" },
+  { value: "collab", label: "Kollaboration" },
 ];
 
 export default function CreateSpotlightForm({

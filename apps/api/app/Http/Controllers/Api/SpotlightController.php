@@ -112,7 +112,7 @@ class SpotlightController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|string|in:single,album,tour,event',
+            'type' => 'required|string|in:single,album,tour,event,video,merch,livestream,collab',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after:starts_at',
             'primary_url' => 'required|url|max:1000',
@@ -165,7 +165,7 @@ class SpotlightController extends Controller
 
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
-            'type' => 'sometimes|string|in:single,album,tour,event',
+            'type' => 'sometimes|string|in:single,album,tour,event,video,merch,livestream,collab',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after:starts_at',
             'primary_url' => 'sometimes|url|max:1000',

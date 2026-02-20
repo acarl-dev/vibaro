@@ -18,6 +18,10 @@ const TYPE_LABELS: Record<string, string> = {
   album: "Album",
   tour: "Tour",
   event: "Event",
+  video: "Video",
+  merch: "Merch",
+  livestream: "Livestream",
+  collab: "Kollaboration",
 };
 
 export default function ProjectClient({ spotlights: initialSpotlights }: ProjectClientProps) {
@@ -46,6 +50,18 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
   const handleSpotlightUpdated = (updatedSpotlight: SpotlightData) => {
     setSpotlights(
       spotlights.map((s) => (s.id === updatedSpotlight.id ? updatedSpotlight : s))
+    );
+  };
+
+  const handleSpotlightActivated = (id: number) => {
+    setSpotlights((prev) =>
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, status: "active" as const }
+          : s.status === "active"
+          ? { ...s, status: "ended" as const }
+          : s
+      )
     );
   };
 
@@ -152,6 +168,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
             spotlights={[activeSpotlight]}
             onUpdate={handleSpotlightUpdated}
             onRemove={handleSpotlightRemoved}
+            onActivate={handleSpotlightActivated}
           />
         </div>
       )}
@@ -164,6 +181,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
             spotlights={scheduledSpotlights}
             onUpdate={handleSpotlightUpdated}
             onRemove={handleSpotlightRemoved}
+            onActivate={handleSpotlightActivated}
           />
         </div>
       )}
@@ -178,6 +196,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
             spotlights={endedSpotlights}
             onUpdate={handleSpotlightUpdated}
             onRemove={handleSpotlightRemoved}
+            onActivate={handleSpotlightActivated}
           />
         </div>
       )}

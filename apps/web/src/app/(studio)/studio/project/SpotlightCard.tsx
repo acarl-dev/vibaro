@@ -8,7 +8,6 @@ import {
   archiveSpotlight,
   toggleSpotlightVisibility,
 } from "@/lib/api/spotlights";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
 import EditSpotlightModal from "./EditSpotlightModal";
 
@@ -16,6 +15,7 @@ type SpotlightCardProps = {
   spotlight: SpotlightData;
   onUpdate: (spotlight: SpotlightData) => void;
   onRemove: (id: number) => void;
+  onActivate: (id: number) => void;
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -23,6 +23,10 @@ const TYPE_LABELS: Record<string, string> = {
   album: "Album",
   tour: "Tour",
   event: "Event",
+  video: "Video",
+  merch: "Merch",
+  livestream: "Livestream",
+  collab: "Kollaboration",
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -35,8 +39,8 @@ export default function SpotlightCard({
   spotlight,
   onUpdate,
   onRemove,
+  onActivate,
 }: SpotlightCardProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const { showToast } = useToast();
@@ -57,7 +61,7 @@ export default function SpotlightCard({
 
     if (result.success) {
       showToast("Projekt aktiviert", "success");
-      router.refresh();
+      onActivate(spotlight.id);
     } else {
       showToast(result.error || "Fehler beim Aktivieren", "error");
     }
@@ -72,7 +76,7 @@ export default function SpotlightCard({
 
     if (result.success) {
       showToast("Projekt beendet", "success");
-      router.refresh();
+      onUpdate({ ...spotlight, status: "ended", show_on_page: false });
     } else {
       showToast(result.error || "Fehler beim Beenden", "error");
     }
