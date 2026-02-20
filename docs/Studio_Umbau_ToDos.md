@@ -2495,10 +2495,15 @@ Frontend (7+):
 
 ### Phase 6: Projekt ↔ Seite Verknüpfung
 
-- [ ] `components/public-page/ProjectHeroBanner.tsx` erstellen
-- [ ] Hero-Banner zeigt: Titel, Typ-Label, CTA-Button mit richtigem Text (Jetzt hören / Tickets sichern / Mehr erfahren)
-- [ ] Backend: `PublicPageController.php` – Aktives Spotlight mit show_on_page=true in Response aufnehmen
-- [ ] Öffentliche Seite (`p/[handle]/page.tsx`) – Hero-Banner rendern wenn active_spotlight vorhanden
+- [x] `components/public-page/ProjectHeroBanner.tsx` erstellen
+- [x] Hero-Banner zeigt: Titel, Typ-Label, CTA-Button mit richtigem Text (Jetzt hören / Tickets sichern / Mehr erfahren)
+- [x] Backend: `PublicPageController.php` – Aktives Spotlight mit show_on_page=true in Response aufnehmen (Feld: `active_spotlight`)
+- [x] Öffentliche Seite (`p/[handle]/page.tsx`) – Hero-Banner rendern wenn active_spotlight vorhanden
+- [x] ModernTemplate: Hero-Banner nach Hero-Bild eingebunden
+- [x] StageTemplate: Hero-Banner nach Haupt-Navigation eingebunden (ersetzt StageSpotlightBanner)
+- [x] EditorialTemplate: Hero-Banner nach Opening-Sektion eingebunden
+- [x] MinimalTemplate: Hero-Banner nach Bio-Sektion eingebunden
+- [x] `shared.tsx`: SpotlightItem Typ und PublicArtistPageData auf `active_spotlight` umgestellt
 
 #### Manuelle Tests Phase 6
 - [ ] Projekt mit show_on_page=false → Kein Hero-Banner auf öffentlicher Seite

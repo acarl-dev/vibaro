@@ -14,6 +14,7 @@ import {
 } from "./shared";
 import MusicPlayer from "./MusicPlayer";
 import { PreviewBanner } from "./PreviewBanner";
+import ProjectHeroBanner from "@/components/public-page/ProjectHeroBanner";
 
 /**
  * ModernTemplate - Block-based artist page with hierarchical structure
@@ -75,6 +76,17 @@ export default function ModernTemplate({
             padding: '0 clamp(20px, 5vw, 40px)',
           }}
         >
+          {/* Active Project Hero Banner */}
+          {page.active_spotlight && (
+            <div className="pt-12 pb-6">
+              <ProjectHeroBanner
+                title={page.active_spotlight.title}
+                type={page.active_spotlight.type}
+                primaryUrl={page.active_spotlight.primary_url}
+              />
+            </div>
+          )}
+
           {/* Links directly under hero - part of identity block */}
           {hasLinks && (
             <section className="pt-12 pb-16">

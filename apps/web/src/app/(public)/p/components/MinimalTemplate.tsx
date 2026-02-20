@@ -10,6 +10,7 @@ import {
   getUpcomingShows,
 } from "./shared";
 import { PreviewBanner } from "./PreviewBanner";
+import ProjectHeroBanner from "@/components/public-page/ProjectHeroBanner";
 
 /**
  * MinimalTemplate - Ultra-reduced, typography-first, no decoration
@@ -144,6 +145,17 @@ export default function MinimalTemplate({
         >
           {/* About - Section 6.1 */}
           {hasBio && <MinimalAbout bio={page.bio!} />}
+
+          {/* Active Project Hero Banner */}
+          {page.active_spotlight && (
+            <div style={{ marginBottom: TOKENS.space[6] }}>
+              <ProjectHeroBanner
+                title={page.active_spotlight.title}
+                type={page.active_spotlight.type}
+                primaryUrl={page.active_spotlight.primary_url}
+              />
+            </div>
+          )}
 
           {/* Releases - Section 6.2 */}
           {hasReleases && <MinimalReleases items={page.releases} />}

@@ -37,28 +37,19 @@ class PublicArtistPageController extends Controller
             return $this->error('NOT_FOUND', 'Artist page not found or unpublished.', 404);
         }
 
-        // Load active spotlight with its primary tracking link
+        // Load active spotlight that should be shown on page (Hero Banner)
         $activeSpotlight = $page->spotlights()
             ->where('status', 'active')
+            ->where('show_on_page', true)
             ->first();
 
-        // If there's an active spotlight, try to find or create a tracking link
+        // Prepare spotlight data for Hero Banner
         $spotlightData = null;
         if ($activeSpotlight) {
-            // Look for existing tracking link for this spotlight
-            $trackingLink = $activeSpotlight->trackingLinks()
-                ->where('module', 'spotlight')
-                ->where('is_active', true)
-                ->first();
-
-            // If no tracking link exists, we'll just use the primary_url
-            // The band should create tracking links manually in the studio
             $spotlightData = [
-                'id' => $activeSpotlight->id,
                 'title' => $activeSpotlight->title,
                 'type' => $activeSpotlight->type,
-                'description' => $activeSpotlight->description,
-                'url' => $trackingLink ? $trackingLink->tracking_url : $activeSpotlight->primary_url,
+                'primary_url' => $activeSpotlight->primary_url,
             ];
         }
 
@@ -85,7 +76,7 @@ class PublicArtistPageController extends Controller
             'bio' => $page->bio,
             'is_published' => $page->is_published,
             'visible_sections' => $page->visible_sections ?? ['profile', 'links', 'music', 'shows', 'releases', 'videos', 'gallery', 'contact'],
-            'spotlight' => $spotlightData,
+            'active_spotlight' => $spotlightData,
             'images' => [
                 'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
                 'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,

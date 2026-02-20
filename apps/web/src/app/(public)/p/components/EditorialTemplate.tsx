@@ -10,6 +10,7 @@ import {
 } from "./shared";
 import { PreviewBanner } from "./PreviewBanner";
 import LazyVideoEmbed from "./LazyVideoEmbed";
+import ProjectHeroBanner from "@/components/public-page/ProjectHeroBanner";
 
 /**
  * EditorialTemplate - Text-led, quiet, curated (Artist Plan only)
@@ -110,6 +111,24 @@ export default function EditorialTemplate({
       >
         {/* Editorial Opening (Section 4) - Text links, Bild rechts */}
         <EditorialOpening page={page} />
+
+        {/* Active Project Hero Banner */}
+        {page.active_spotlight && (
+          <div
+            style={{
+              maxWidth: TOKENS.maxWidth,
+              marginInline: "auto",
+              paddingInline: TOKENS.paddingInline,
+              paddingBottom: TOKENS.space.sm,
+            }}
+          >
+            <ProjectHeroBanner
+              title={page.active_spotlight.title}
+              type={page.active_spotlight.type}
+              primaryUrl={page.active_spotlight.primary_url}
+            />
+          </div>
+        )}
 
         {/* Intro-Text / Bio (Section 7.1) */}
         {page.bio && <EditorialIntro bio={page.bio} />}

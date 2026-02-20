@@ -81,11 +81,9 @@ export type GalleryImageItem = {
 };
 
 export type SpotlightItem = {
-  id: number;
   title: string;
   type: string;
-  description: string | null;
-  url: string;
+  primary_url: string;
 };
 
 export type PublicArtistPageData = {
@@ -93,7 +91,7 @@ export type PublicArtistPageData = {
   display_name: string;
   bio: string | null;
   is_published?: boolean;
-  spotlight?: SpotlightItem | null;
+  active_spotlight?: SpotlightItem | null;
   visible_sections?: string[];
   images: {
     avatar_url: string | null;
