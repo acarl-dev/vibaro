@@ -383,13 +383,13 @@
 - [x] Alte `StudioNavbar.tsx` entfernt / ersetzt (StudioHeader + StudioTabs durch StudioSidebar + StudioBottomNav ersetzt; Aufräumen in Phase 5)
 
 ### Phase 2: Einheitliche Komponenten
-- [ ] `StudioPageHeader.tsx` erstellt (Title, Subtitle, Action-Slot)
-- [ ] `StudioCard.tsx` erstellt (Surface, Border, optional Accent-Border)
-- [ ] `StudioEmptyState.tsx` erstellt (Icon, Title, Description, Action)
-- [ ] `StudioStatCard.tsx` erstellt (Value, Label, Trend)
-- [ ] `StudioStatusBadge.tsx` erstellt (Live/Entwurf/Beendet)
-- [ ] Button-Varianten fÃ¼r Studio definiert (Primary/Secondary/Danger/Ghost)
-- [ ] Input-Styles fÃ¼r Studio definiert (Dark-Inputs)
+- [x] `StudioPageHeader.tsx` erstellt (Title, Subtitle, Action-Slot)
+- [x] `StudioCard.tsx` erstellt (Surface, Border, optional Accent-Border)
+- [x] `StudioEmptyState.tsx` erstellt (Icon, Title, Description, Action)
+- [x] `StudioStatCard.tsx` erstellt (Value, Label, Trend)
+- [x] `StudioStatusBadge.tsx` erstellt (Live/Entwurf/Beendet)
+- [x] Button-Varianten für Studio definiert (Primary/Secondary/Danger/Ghost) → `StudioButton.tsx` + `.studio-btn-*` CSS-Klassen in `globals.css`
+- [x] Input-Styles für Studio definiert (Dark-Inputs) → `.studio-input` bereits in `globals.css` vorhanden
 
 ### Phase 3: Tab-Seiten
 - [ ] **Dashboard:** PageHeader eingebaut
