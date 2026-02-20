@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
 import PageOverviewClient from "./PageOverviewClient";
+import type { Spotlight } from "@/lib/api/stage";
 
 type ArtistPage = {
   id: number;
@@ -10,6 +11,7 @@ type ArtistPage = {
   is_published: boolean;
   avatar_url: string | null;
   hero_image_url: string | null;
+  visible_sections?: string[];
 };
 
 type ContentCounts = {
@@ -37,7 +39,26 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
       is_published: Boolean(data.is_published),
       avatar_url: data.avatar_url ?? null,
       hero_image_url: data.hero_image_url ?? null,
+      visible_sections: data.visible_sections ?? ["profile", "links", "music", "shows", "releases", "videos", "gallery", "contact"],
     };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchActiveSpotlight(): Promise<Spotlight | null> {
+  try {
+    const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const spotlights = json?.data ?? [];
+    
+    // Find active spotlight
+    const activeSpotlight = Array.isArray(spotlights)
+      ? spotlights.find((s: any) => s.status === "active")
+      : null;
+
+    return activeSpotlight || null;
   } catch {
     return null;
   }
@@ -91,7 +112,10 @@ export default async function PageEditorPage() {
     redirect("/studio/onboarding");
   }
 
-  const counts = await fetchContentCounts(page.id);
+  const [counts, activeSpotlight] = await Promise.all([
+    fetchContentCounts(page.id),
+    fetchActiveSpotlight(),
+  ]);
 
-  return <PageOverviewClient page={page} counts={counts} />;
+  return <PageOverviewClient page={page} counts={counts} activeSpotlight={activeSpotlight} />;
 }

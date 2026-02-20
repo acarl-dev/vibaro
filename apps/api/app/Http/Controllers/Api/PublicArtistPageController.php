@@ -84,6 +84,7 @@ class PublicArtistPageController extends Controller
             'display_name' => $page->display_name,
             'bio' => $page->bio,
             'is_published' => $page->is_published,
+            'visible_sections' => $page->visible_sections ?? ['profile', 'links', 'music', 'shows', 'releases', 'videos', 'gallery', 'contact'],
             'spotlight' => $spotlightData,
             'images' => [
                 'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,

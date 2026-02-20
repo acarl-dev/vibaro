@@ -94,6 +94,7 @@ export type PublicArtistPageData = {
   bio: string | null;
   is_published?: boolean;
   spotlight?: SpotlightItem | null;
+  visible_sections?: string[];
   images: {
     avatar_url: string | null;
     hero_image_url: string | null;
@@ -1033,11 +1034,19 @@ export function setupFocus(page: PublicArtistPageData) {
  * Checks which optional sections are available
  */
 export function getAvailableSections(page: PublicArtistPageData) {
+  const visibleSections = page.visible_sections ?? ["profile", "links", "music", "shows", "releases", "videos", "gallery", "contact"];
+  
+  const isSectionVisible = (key: string) => visibleSections.includes(key);
+  
   return {
-    hasVideos: (page.videos?.length ?? 0) > 0,
-    hasGallery: (page.gallery_images?.length ?? 0) > 0,
-    hasContact: !!(page.booking_email || page.management_email || page.press_email || page.whatsapp_number),
-    hasMusicPlayer: (page.featured_tracks?.length ?? 0) > 0,
+    hasVideos: (page.videos?.length ?? 0) > 0 && isSectionVisible("videos"),
+    hasGallery: (page.gallery_images?.length ?? 0) > 0 && isSectionVisible("gallery"),
+    hasContact: !!(page.booking_email || page.management_email || page.press_email || page.whatsapp_number) && isSectionVisible("contact"),
+    hasMusicPlayer: (page.featured_tracks?.length ?? 0) > 0 && isSectionVisible("music"),
+    hasLinks: (page.links?.length ?? 0) > 0 && isSectionVisible("links"),
+    hasShows: (page.shows?.length ?? 0) > 0 && isSectionVisible("shows"),
+    hasReleases: (page.releases?.length ?? 0) > 0 && isSectionVisible("releases"),
+    isSectionVisible,
   };
 }
 
@@ -1088,6 +1097,13 @@ export function OptionalSectionRenderer({
   section: { type: "links" | "shows" | "releases" };
   page: PublicArtistPageData;
 }) {
+  const { isSectionVisible } = getAvailableSections(page);
+  
+  // Check if section is visible based on visible_sections
+  if (!isSectionVisible(section.type)) {
+    return null;
+  }
+  
   return (
     <Section key={section.type} title={getSectionTitle(section.type === "releases" ? "Discography" : section.type)}>
       {section.type === "links" && <LinkList items={page.links} />}

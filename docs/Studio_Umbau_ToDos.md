@@ -2458,14 +2458,14 @@ Frontend (7+):
 
 ### Phase 4: Meine Seite verfeinern
 
-- [ ] `PageOverviewClient.tsx` – Bereichs-Toggles hinzufügen (sichtbar/verborgen pro Bereich)
-- [ ] `PageOverviewClient.tsx` – API-Call `updateVisibleSections()` bei Toggle-Änderung
-- [ ] `PageOverviewClient.tsx` – Props erweitern um `visible_sections` und `activeSpotlight`
-- [ ] `PageOverviewClient.tsx` – Projekt-Hinweis-Banner: "Du promotest gerade X. Auf Seite anzeigen?"
-- [ ] `PageOverviewClient.tsx` – `handleShowOnPage()` Funktion (ruft toggleShowOnPage API auf)
-- [ ] `page/page.tsx` – Props mit visible_sections und activeSpotlight laden und übergeben
-- [ ] Öffentliche Seite (`p/[handle]/page.tsx`) – Nur Bereiche rendern die in visible_sections enthalten sind
-- [ ] Backend: `PublicPageController.php` – `visible_sections` im Response mitliefern
+- [x] `PageOverviewClient.tsx` – Bereichs-Toggles hinzufügen (sichtbar/verborgen pro Bereich)
+- [x] `PageOverviewClient.tsx` – API-Call `updateVisibleSections()` bei Toggle-Änderung
+- [x] `PageOverviewClient.tsx` – Props erweitern um `visible_sections` und `activeSpotlight`
+- [x] `PageOverviewClient.tsx` – Projekt-Hinweis-Banner: "Du promotest gerade X. Auf Seite anzeigen?"
+- [x] `PageOverviewClient.tsx` – `handleShowOnPage()` Funktion (ruft toggleShowOnPage API auf)
+- [x] `page/page.tsx` – Props mit visible_sections und activeSpotlight laden und übergeben
+- [x] Öffentliche Seite (`p/[handle]/page.tsx`) – Nur Bereiche rendern die in visible_sections enthalten sind
+- [x] Backend: `PublicPageController.php` – `visible_sections` im Response mitliefern
 
 ### Phase 5: Mein Projekt + Ergebnisse-Tab
 

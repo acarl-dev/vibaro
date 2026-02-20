@@ -201,6 +201,7 @@ class ArtistPageController extends Controller
             'bio' => $page->bio,
             'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
             'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,
+            'visible_sections' => $page->visible_sections ?? ['profile', 'links', 'music', 'shows', 'releases', 'videos', 'gallery', 'contact'],
             'theme_key' => $page->theme_key,
             'theme_variant' => $page->theme_variant,
             'accent_color' => $page->accent_color,
