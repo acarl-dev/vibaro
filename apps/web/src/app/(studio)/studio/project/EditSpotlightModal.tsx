@@ -8,7 +8,7 @@ import {
   updateSpotlight,
   fetchSpotlights,
 } from "@/lib/api/spotlights";
-import Toast, { useToast } from "@/components/Toast";
+import { useToast } from "@/context/ToastContext";
 
 type EditSpotlightModalProps = {
   spotlight: SpotlightData;
@@ -29,7 +29,7 @@ export default function EditSpotlightModal({
   onClose,
 }: EditSpotlightModalProps) {
   const [loading, setLoading] = useState(false);
-  const { toastState, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<UpdateSpotlightRequest>({
     title: spotlight.title,
     type: spotlight.type,
@@ -170,14 +170,6 @@ export default function EditSpotlightModal({
             </div>
           </form>
         </div>
-
-        {toastState.show && (
-          <Toast
-            message={toastState.message}
-            type={toastState.type}
-            onClose={hideToast}
-          />
-        )}
       </div>
     </div>
   );

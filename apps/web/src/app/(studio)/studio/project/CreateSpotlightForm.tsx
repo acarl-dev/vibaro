@@ -7,7 +7,7 @@ import {
   CreateSpotlightRequest,
   createSpotlight,
 } from "@/lib/api/spotlights";
-import Toast, { useToast } from "@/components/Toast";
+import { useToast } from "@/context/ToastContext";
 
 type CreateSpotlightFormProps = {
   onSuccess: (spotlight: SpotlightData) => void;
@@ -26,7 +26,7 @@ export default function CreateSpotlightForm({
   onCancel,
 }: CreateSpotlightFormProps) {
   const [loading, setLoading] = useState(false);
-  const { toastState, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<CreateSpotlightRequest>({
     title: "",
     type: "single",
@@ -169,13 +169,6 @@ export default function CreateSpotlightForm({
         </button>
       </div>
 
-      {toastState.show && (
-        <Toast
-          message={toastState.message}
-          type={toastState.type}
-          onClose={hideToast}
-        />
-      )}
     </form>
   );
 }

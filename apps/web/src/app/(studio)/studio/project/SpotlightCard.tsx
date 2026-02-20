@@ -9,7 +9,7 @@ import {
   toggleSpotlightVisibility,
 } from "@/lib/api/spotlights";
 import { useRouter } from "next/navigation";
-import Toast, { useToast } from "@/components/Toast";
+import { useToast } from "@/context/ToastContext";
 import EditSpotlightModal from "./EditSpotlightModal";
 
 type SpotlightCardProps = {
@@ -39,7 +39,7 @@ export default function SpotlightCard({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const { toastState, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
 
   const statusInfo = STATUS_LABELS[spotlight.status] || STATUS_LABELS.scheduled;
 
@@ -206,13 +206,6 @@ export default function SpotlightCard({
         />
       )}
 
-      {toastState.show && (
-        <Toast
-          message={toastState.message}
-          type={toastState.type}
-          onClose={hideToast}
-        />
-      )}
     </>
   );
 }
