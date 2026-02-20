@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { togglePublishAction } from "./actions";
 import { updateVisibleSections, toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
+import { useToast } from "@/context/ToastContext";
 
 type ArtistPage = {
   id: number;
@@ -34,6 +35,7 @@ type Props = {
 
 export default function PageOverviewClient({ page, counts, activeSpotlight }: Props) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [isPublishing, setIsPublishing] = useState(false);
   const [visibleSections, setVisibleSections] = useState<string[]>(
     page.visible_sections ?? ["profile", "links", "music", "shows", "releases", "videos", "gallery", "contact"]
@@ -51,11 +53,11 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
       if (result.success) {
         router.refresh();
       } else {
-        alert(result.error || "Fehler beim Veröffentlichen");
+        showToast(result.error || "Fehler beim Veröffentlichen", "error");
       }
     } catch (error) {
       console.error("Publish error:", error);
-      alert("Fehler beim Veröffentlichen");
+      showToast("Fehler beim Veröffentlichen", "error");
     } finally {
       setIsPublishing(false);
     }
@@ -73,7 +75,7 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
       router.refresh();
     } catch (error) {
       console.error("Toggle section error:", error);
-      alert("Fehler beim Aktualisieren der Sichtbarkeit");
+      showToast("Fehler beim Aktualisieren der Sichtbarkeit", "error");
     } finally {
       setUpdatingSection(null);
     }
@@ -88,7 +90,7 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
       router.refresh();
     } catch (error) {
       console.error("Show on page error:", error);
-      alert("Fehler beim Aktualisieren");
+      showToast("Fehler beim Aktualisieren", "error");
     } finally {
       setShowingOnPage(false);
     }

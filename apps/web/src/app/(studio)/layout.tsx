@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
 import StudioHeader from "./components/StudioHeader";
 import StudioTabs from "./components/StudioTabs";
+import { ToastProvider } from "@/context/ToastContext";
 
 export type ArtistPageData = {
   id: number;
@@ -72,13 +73,15 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50">
-      <StudioHeader page={page} />
-      <StudioTabs />
-      
-      <main className="mx-auto max-w-7xl p-6 pb-24 md:pb-6">
-        {children}
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-screen bg-zinc-950 text-zinc-50">
+        <StudioHeader page={page} />
+        <StudioTabs />
+        
+        <main className="mx-auto max-w-7xl p-6 pb-24 md:pb-6">
+          {children}
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

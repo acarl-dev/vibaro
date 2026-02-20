@@ -78,18 +78,18 @@ export default function ResultsClient({
   // Empty state when no spotlights exist
   if (spotlights.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-6xl">
-        <h1 className="text-2xl font-bold mb-6">Ergebnisse</h1>
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-12 text-center">
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100 mb-6">Ergebnisse</h1>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-12 text-center">
+          <p className="text-zinc-300 font-medium mb-2">
             📊 Sobald du Links teilst, siehst du hier wie es läuft.
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+          <p className="text-sm text-zinc-500 mb-6">
             Starte ein Projekt und erstelle deinen ersten Link.
           </p>
           <a
             href="/studio/project"
-            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-5 py-2 text-sm font-medium text-white hover:bg-blue-600 transition-colors"
           >
             Projekt starten →
           </a>
@@ -100,10 +100,10 @@ export default function ResultsClient({
 
   if (!analytics) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-6xl">
-        <h1 className="text-2xl font-bold mb-6">Ergebnisse</h1>
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-8 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100 mb-6">Ergebnisse</h1>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-8 text-center">
+          <p className="text-zinc-500 text-sm">
             Keine Daten verfügbar
           </p>
         </div>

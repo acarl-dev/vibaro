@@ -1,59 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 type ToastProps = {
   message: string;
+  subtext?: string;
   type?: "success" | "error" | "info";
   onClose: () => void;
 };
 
-export default function Toast({ message, type = "info", onClose }: ToastProps) {
+export default function Toast({ message, subtext, type = "info", onClose }: ToastProps) {
   useEffect(() => {
-    const timer = setTimeout(onClose, 3000);
+    const timer = setTimeout(onClose, 4000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bgColor =
+  const accent =
     type === "success"
-      ? "bg-green-600"
+      ? "border-l-4 border-green-500"
       : type === "error"
-      ? "bg-red-600"
-      : "bg-blue-600";
+      ? "border-l-4 border-red-500"
+      : "border-l-4 border-blue-500";
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-5">
-      <div
-        className={`${bgColor} text-white px-4 py-3 rounded-lg shadow-lg min-w-[200px] max-w-md`}
-      >
-        <p className="text-sm font-medium">{message}</p>
-      </div>
+    <div className={`bg-zinc-800 text-zinc-50 px-4 py-3 rounded-lg shadow-xl min-w-[220px] max-w-sm ${accent} animate-in slide-in-from-bottom-3`}>
+      <p className="text-sm font-medium leading-snug">{message}</p>
+      {subtext && (
+        <p className="text-xs text-zinc-400 mt-0.5">{subtext}</p>
+      )}
     </div>
   );
-}
-
-export function useToast() {
-  const [toastState, setToastState] = useState<{
-    show: boolean;
-    message: string;
-    type: "success" | "error" | "info";
-  }>({
-    show: false,
-    message: "",
-    type: "info",
-  });
-
-  const showToast = (
-    message: string,
-    type: "success" | "error" | "info" = "info"
-  ) => {
-    setToastState({ show: true, message, type });
-  };
-
-  const hideToast = () => {
-    setToastState({ ...toastState, show: false });
-  };
-
-  return { toastState, showToast, hideToast };
 }
 

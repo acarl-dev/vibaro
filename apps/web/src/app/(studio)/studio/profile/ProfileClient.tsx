@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/context/ToastContext";
 
 type ArtistPage = {
   id: number;
@@ -19,6 +20,7 @@ type ProfileClientProps = {
 
 export default function ProfileClient({ initialPage }: ProfileClientProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const maxBioLength = 400;
   const [displayName, setDisplayName] = useState(initialPage.display_name);
   const [bio, setBio] = useState(initialPage.bio ?? "");
@@ -103,7 +105,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
 
   const handleHeroUpload = async (file: File) => {
     if (file.size > 2 * 1024 * 1024) {
-      alert("Datei zu groß. Maximal 2 MB erlaubt.");
+      showToast("Datei zu groß. Maximal 2 MB erlaubt.", "error");
       return;
     }
 
@@ -121,10 +123,10 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
         router.refresh();
       } else {
         const error = await res.json().catch(() => ({ error: "Unknown error" }));
-        alert(`Upload fehlgeschlagen: ${JSON.stringify(error)}`);
+        showToast("Upload fehlgeschlagen", "error", error?.message || JSON.stringify(error));
       }
     } catch (err) {
-      alert("Netzwerkfehler. Bitte versuche es erneut.");
+      showToast("Netzwerkfehler. Bitte versuche es erneut.", "error");
     } finally {
       setHeroUploading(false);
     }
@@ -142,10 +144,10 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
       if (res.ok) {
         router.refresh();
       } else {
-        alert("Löschen fehlgeschlagen");
+        showToast("Löschen fehlgeschlagen", "error");
       }
     } catch (err) {
-      alert("Netzwerkfehler");
+      showToast("Netzwerkfehler", "error");
     } finally {
       setHeroUploading(false);
     }

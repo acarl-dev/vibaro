@@ -24,7 +24,20 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
   };
 
   if (!page) {
-    return null;
+    return (
+      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
+        <h2 className="text-sm font-medium text-zinc-400">Meine Seite</h2>
+        <p className="mt-1 text-sm text-zinc-500">Noch keine Seite eingerichtet</p>
+        <div className="mt-4">
+          <Link
+            href="/studio/page"
+            className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            Seite einrichten →
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

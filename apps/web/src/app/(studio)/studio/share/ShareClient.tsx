@@ -11,6 +11,7 @@ import {
   createTrackingLink,
   type TrackingLinkData,
 } from "@/lib/api/tracking-links";
+import { useToast } from "@/context/ToastContext";
 
 type ShareClientProps = {
   activeSpotlight: {
@@ -23,12 +24,11 @@ type ShareClientProps = {
 
 export default function ShareClient({ activeSpotlight }: ShareClientProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
   const [selectedPlacement, setSelectedPlacement] = useState<Placement | null>(null);
   const [existingLink, setExistingLink] = useState<TrackingLinkData | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
   const [copyHint, setCopyHint] = useState<string>("");
   const [allLinks, setAllLinks] = useState<TrackingLinkData[]>([]);
 
@@ -80,9 +80,7 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
   const handleCopy = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
-      setToastMessage("Link kopiert!");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      showToast("Link kopiert!", "success");
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -106,23 +104,17 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
 
         const hint = getCopyHint(selectedPlatform.id, selectedPlacement.id);
         setCopyHint(hint);
-        setToastMessage("Link erstellt & kopiert!");
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 4000);
+        showToast("Link erstellt & kopiert!", "success", hint || undefined);
 
         // Reload links
         await loadLinks();
         setExistingLink(result.data);
       } else {
-        setToastMessage(result.error || "Fehler beim Erstellen");
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
+        showToast(result.error || "Fehler beim Erstellen", "error");
       }
     } catch (error) {
       console.error("Error creating link:", error);
-      setToastMessage("Netzwerkfehler. Bitte erneut versuchen.");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      showToast("Netzwerkfehler. Bitte erneut versuchen.", "error");
     } finally {
       setIsCreating(false);
     }
@@ -305,17 +297,6 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
         )}
       </div>
 
-      {/* Toast */}
-      {showToast && (
-        <div className="fixed bottom-8 right-8 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 shadow-xl">
-            <p className="text-sm font-medium text-zinc-100">{toastMessage}</p>
-            {copyHint && toastMessage.includes("erstellt") && (
-              <p className="mt-1 text-xs text-zinc-400 max-w-xs">{copyHint}</p>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

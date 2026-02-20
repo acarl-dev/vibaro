@@ -2513,36 +2513,37 @@ Frontend (7+):
 ### Phase 7: Polish
 
 #### Toast-System
-- [ ] `components/ui/Toast.tsx` erstellen – Auto-dismiss nach 4s, unten-rechts positioniert
-- [ ] `context/ToastContext.tsx` erstellen – `showToast(message, subtext?)` Funktion
-- [ ] `studio/layout.tsx` – ToastProvider einbinden
+- [x] `components/Toast.tsx` überarbeitet – Auto-dismiss nach 4s, subtext-Support, zinc-Design, unten-rechts positioniert via Provider
+- [x] `context/ToastContext.tsx` erstellen – `showToast(message, type?, subtext?)` Funktion + Provider + Stack-Rendering
+- [x] `studio/layout.tsx` – ToastProvider einbinden (wraps gesamtes Layout inkl. Tabs)
 
 #### alert() ersetzen
-- [ ] `ShareClient.tsx` – Alle alert() durch showToast() ersetzen
-- [ ] `ProjectClient.tsx` – Alle alert() durch showToast() ersetzen
-- [ ] `PageOverviewClient.tsx` – Alle alert() durch showToast() ersetzen
-- [ ] Alle weiteren Stellen im Studio mit alert() identifizieren und ersetzen
+- [x] `ShareClient.tsx` – Lokale Toast-State migriert zu `useToast()` (inkl. Copy-Hint als subtext)
+- [x] `ProjectClient.tsx` – Keine alert()-Aufrufe vorhanden (sauber)
+- [x] `PageOverviewClient.tsx` – Alle 4 alert() durch showToast() ersetzt
+- [x] `ProfileClient.tsx` – Alle alert() durch showToast() ersetzt (Upload, Löschen, Netzwerkfehler)
+- [x] `stage/`-Dateien – nicht migriert (werden in Phase 8 gelöscht)
 
 #### Leer-Zustände
-- [ ] Home – kein Projekt: Einladender CTA
-- [ ] Home – kein Page: Einladender CTA
-- [ ] Teilen – kein Projekt: Einladender CTA
-- [ ] Teilen – keine Links: Ermutigende Nachricht
-- [ ] Ergebnisse – keine Daten: Erklärender Hinweis + CTA
-- [ ] Projekt – kein Projekt: Formular (bereits in Phase 5)
+- [x] Home – kein Projekt: Einladender CTA (`ProjectStatusCard` → "Spotlight erstellen →")
+- [x] Home – kein Page: Einladender CTA (`PageStatusCard` – war `null`, jetzt CTA zu `/studio/page`)
+- [x] Teilen – kein Projekt: Einladender CTA (vorhanden in `ShareClient`)
+- [x] Teilen – keine Links: Ermutigende Nachricht (Link-Erstellungs-Flow ist der CTA; `TopLinksCard` zeigt "Jetzt erstellen →")
+- [x] Ergebnisse – keine Daten: Erklärender Hinweis + CTA (zinc-Design, "Projekt starten →")
+- [x] Projekt – kein Projekt: Formular (Phase 5)
 
 #### Mobile-Optimierung
-- [ ] PlatformGrid: `grid-cols-2` auf Mobile, `sm:grid-cols-3` ab sm
-- [ ] Tab-Navigation: Horizontal scrollbar oder Bottom-Nav (fixed bottom-0)
-- [ ] Home-Karten: Volle Breite, reduziertes Padding auf Mobile
-- [ ] PlacementSelector: Stack-Layout statt Side-by-Side auf Mobile
+- [x] PlatformGrid: `grid-cols-2 sm:grid-cols-3 md:grid-cols-5` – bereits vorhanden in `PlatformSelector`
+- [x] Tab-Navigation: Bottom-Nav fixed bottom-0 – bereits vorhanden in `StudioTabs` (md:hidden Block)
+- [x] Home-Karten: Volle Breite auf Mobile – `grid gap-6 md:grid-cols-2` in `HomeClient`
+- [x] PlacementSelector: `grid-cols-2 sm:grid-cols-3` – bereits vorhanden
 
 #### Sprache bereinigen
-- [ ] "Music" → "Musik" (PageOverviewClient + Navigation)
-- [ ] "Shows" → "Konzerte" (PageOverviewClient + Navigation)
-- [ ] "Gallery" → "Galerie" (PageOverviewClient + Navigation)
-- [ ] "Themes" → "Design" (PageOverviewClient + Navigation)
-- [ ] "Featured Tracks" → "Ausgewählte Tracks" (wo relevant)
+- [x] "Music" → "Musik" (PageOverviewClient + Navigation)
+- [x] "Shows" → "Konzerte" (PageOverviewClient + Navigation)
+- [x] "Gallery" → "Galerie" (PageOverviewClient + Navigation)
+- [x] "Themes" → "Design" (PageOverviewClient + Navigation)
+- [ ] "Featured Tracks" → "Ausgewählte Tracks" (noch prüfen)
 - [ ] Alle weiteren englischen UI-Texte im Studio identifizieren und übersetzen
 
 ### Phase 8: Aufräumen
