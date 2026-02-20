@@ -5,7 +5,7 @@ import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
  * GET /api/studio/spotlights
  * Fetch all spotlights for authenticated user
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const token = await getTokenFromCookies();
     if (!token) {
@@ -15,7 +15,11 @@ export async function GET() {
       );
     }
 
-    const res = await backendFetch("/api/v1/spotlights", {
+    const { searchParams } = new URL(request.url);
+    const archived = searchParams.get("archived");
+    const query = archived === "1" ? "?archived=1" : "";
+
+    const res = await backendFetch(`/api/v1/spotlights${query}`, {
       cache: "no-store",
     });
 

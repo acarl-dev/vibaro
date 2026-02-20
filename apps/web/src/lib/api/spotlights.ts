@@ -17,6 +17,7 @@ export type SpotlightData = {
   primary_url: string;
   description: string | null;
   show_on_page: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -51,6 +52,28 @@ export async function fetchSpotlights(): Promise<SpotlightData[]> {
     return json?.data ?? [];
   } catch (error) {
     console.error("Error fetching spotlights:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetch archived spotlights for current user
+ */
+export async function fetchArchivedSpotlights(): Promise<SpotlightData[]> {
+  try {
+    const res = await fetch("/api/studio/spotlights?archived=1", {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch archived spotlights:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    return json?.data ?? [];
+  } catch (error) {
+    console.error("Error fetching archived spotlights:", error);
     return [];
   }
 }
@@ -252,7 +275,7 @@ export async function archiveSpotlight(
  */
 export async function restoreSpotlight(
   id: number
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; data?: SpotlightData; error?: string }> {
   try {
     const res = await fetch(`/api/studio/spotlights/${id}/restore`, {
       method: "POST",
@@ -269,6 +292,7 @@ export async function restoreSpotlight(
 
     return {
       success: true,
+      data: json?.data,
     };
   } catch (error) {
     console.error("Error restoring spotlight:", error);

@@ -64,8 +64,13 @@ class SpotlightController extends Controller
             ], 404);
         }
 
+        $showArchived = $request->boolean('archived');
+
         $spotlights = Spotlight::where('artist_page_id', $artistPage->id)
-            ->active()
+            ->when($showArchived,
+                fn($q) => $q->whereNotNull('archived_at'),
+                fn($q) => $q->whereNull('archived_at')
+            )
             ->orderByDesc('created_at')
             ->get()
             ->map(function ($spotlight) {
@@ -80,6 +85,7 @@ class SpotlightController extends Controller
                     'primary_url' => $spotlight->primary_url,
                     'description' => $spotlight->description,
                     'show_on_page' => $spotlight->show_on_page,
+                    'archived_at' => $spotlight->archived_at?->toISOString(),
                     'created_at' => $spotlight->created_at->toISOString(),
                     'updated_at' => $spotlight->updated_at->toISOString(),
                 ];
@@ -272,6 +278,20 @@ class SpotlightController extends Controller
 
         $spotlight->restore();
 
-        return response()->json(['data' => ['ok' => true]]);
+        return response()->json(['data' => [
+            'id'          => $spotlight->id,
+            'title'       => $spotlight->title,
+            'slug'        => $spotlight->slug,
+            'type'        => $spotlight->type,
+            'status'      => $spotlight->status,
+            'starts_at'   => $spotlight->starts_at?->toISOString(),
+            'ends_at'     => $spotlight->ends_at?->toISOString(),
+            'primary_url' => $spotlight->primary_url,
+            'description' => $spotlight->description,
+            'show_on_page' => $spotlight->show_on_page,
+            'archived_at' => null,
+            'created_at'  => $spotlight->created_at->toISOString(),
+            'updated_at'  => $spotlight->updated_at->toISOString(),
+        ]]);
     }
 }

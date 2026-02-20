@@ -7,9 +7,10 @@ import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
  */
 export async function POST(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = await getTokenFromCookies();
     if (!token) {
       return NextResponse.json(
@@ -18,7 +19,7 @@ export async function POST(
       );
     }
 
-    const res = await backendFetch(`/api/v1/spotlights/${params.id}/end`, {
+    const res = await backendFetch(`/api/v1/spotlights/${id}/end`, {
       method: "POST",
     });
 

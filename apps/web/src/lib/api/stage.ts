@@ -18,19 +18,6 @@ export interface Spotlight {
   updated_at: string;
 }
 
-export interface Campaign {
-  id: number;
-  name: string;
-  platform: string | null;
-  notes: string | null;
-  spotlight_id: number | null;
-  spotlight_title?: string;
-  starts_at: string | null;
-  ends_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface TrackingLink {
   id: number;
   slug: string;
@@ -258,78 +245,6 @@ export async function endSpotlight(id: number): Promise<void> {
 }
 
 // ============================================
-// Campaigns API
-// ============================================
-
-export async function getAllCampaigns(): Promise<Campaign[]> {
-  const res = await apiFetch('/api/v1/campaigns');
-  
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error('Failed to fetch campaigns:', res.status, errorText);
-    throw new Error(`Failed to fetch campaigns: ${res.status}`);
-  }
-  
-  const json = await res.json();
-  return json.data;
-}
-
-export async function createCampaign(data: {
-  name: string;
-  platform?: string;
-  notes?: string;
-  spotlight_id?: number;
-  starts_at?: string;
-  ends_at?: string;
-}): Promise<{ id: number; name: string }> {
-  const res = await apiFetch('/api/v1/campaigns', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error?.message || 'Failed to create campaign');
-  }
-  
-  const json = await res.json();
-  return json.data;
-}
-
-export async function updateCampaign(
-  id: number,
-  data: Partial<{
-    name: string;
-    platform: string | null;
-    notes: string | null;
-    spotlight_id: number | null;
-    starts_at: string | null;
-    ends_at: string | null;
-  }>
-): Promise<void> {
-  const res = await apiFetch(`/api/v1/campaigns/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error?.message || 'Failed to update campaign');
-  }
-}
-
-export async function deleteCampaign(id: number): Promise<void> {
-  const res = await apiFetch(`/api/v1/campaigns/${id}`, {
-    method: 'DELETE',
-  });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error?.message || 'Failed to delete campaign');
-  }
-}
-
-// ============================================
 // Tracking Links API
 // ============================================
 
@@ -364,17 +279,6 @@ export async function createTrackingLink(data: {
   
   const json = await res.json();
   return json.data;
-}
-
-export async function deleteTrackingLink(id: number): Promise<void> {
-  const res = await apiFetch(`/api/v1/tracking-links/${id}`, {
-    method: 'DELETE',
-  });
-  
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error?.message || 'Failed to delete tracking link');
-  }
 }
 
 // ============================================

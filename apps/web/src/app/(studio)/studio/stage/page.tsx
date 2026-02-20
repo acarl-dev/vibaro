@@ -1,5 +1,5 @@
-import StageClient from "./StageClient";
+import { redirect } from "next/navigation";
 
 export default function StagePage() {
-  return <StageClient />;
+  redirect("/studio/project");
 }

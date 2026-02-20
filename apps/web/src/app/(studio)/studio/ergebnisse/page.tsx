@@ -1,5 +1,5 @@
-import PerformanceClient from "./PerformanceClient";
+import { redirect } from "next/navigation";
 
-export default function PerformancePage() {
-  return <PerformanceClient />;
+export default function ErgebnissePageRedirect() {
+  redirect("/studio/results");
 }

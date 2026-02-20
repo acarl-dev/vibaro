@@ -7,9 +7,10 @@ import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = await getTokenFromCookies();
     if (!token) {
       return NextResponse.json(
@@ -18,7 +19,7 @@ export async function DELETE(
       );
     }
 
-    const res = await backendFetch(`/api/v1/tracking-links/${params.id}`, {
+    const res = await backendFetch(`/api/v1/tracking-links/${id}`, {
       method: "DELETE",
     });
 

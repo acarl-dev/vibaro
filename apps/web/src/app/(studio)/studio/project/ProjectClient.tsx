@@ -1,17 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { SpotlightData } from "@/lib/api/spotlights";
+import { SpotlightData, fetchArchivedSpotlights, restoreSpotlight } from "@/lib/api/spotlights";
 import CreateSpotlightForm from "./CreateSpotlightForm";
 import SpotlightList from "./SpotlightList";
+import { useToast } from "@/context/ToastContext";
 
 type ProjectClientProps = {
   spotlights: SpotlightData[];
 };
 
+const TYPE_LABELS: Record<string, string> = {
+  single: "Single",
+  album: "Album",
+  tour: "Tour",
+  event: "Event",
+};
+
 export default function ProjectClient({ spotlights: initialSpotlights }: ProjectClientProps) {
   const [spotlights, setSpotlights] = useState<SpotlightData[]>(initialSpotlights);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
+  const [archivedSpotlights, setArchivedSpotlights] = useState<SpotlightData[]>([]);
+  const [archiveLoading, setArchiveLoading] = useState(false);
+  const [restoringId, setRestoringId] = useState<number | null>(null);
+  const { showToast } = useToast();
 
   const activeSpotlight = spotlights.find(
     (s) => s.status === "active"
@@ -36,6 +49,31 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
     setSpotlights(spotlights.filter((s) => s.id !== id));
   };
 
+  const handleToggleArchive = async () => {
+    if (!showArchive && archivedSpotlights.length === 0) {
+      setArchiveLoading(true);
+      const data = await fetchArchivedSpotlights();
+      setArchivedSpotlights(data);
+      setArchiveLoading(false);
+    }
+    setShowArchive((prev) => !prev);
+  };
+
+  const handleRestore = async (id: number) => {
+    setRestoringId(id);
+    const result = await restoreSpotlight(id);
+    setRestoringId(null);
+    if (result.success) {
+      setArchivedSpotlights((prev) => prev.filter((s) => s.id !== id));
+      if (result.data) {
+        setSpotlights((prev) => [result.data!, ...prev]);
+      }
+      showToast("Projekt wiederhergestellt", "success");
+    } else {
+      showToast(result.error || "Fehler beim Wiederherstellen", "error");
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       {/* Header */}
@@ -46,12 +84,20 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
             Verwalte deine Spotlights (Singles, Alben, Touren, Events)
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          {showCreateForm ? "Abbrechen" : "+ Neues Projekt"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleToggleArchive}
+            className="px-3 py-2 text-sm text-zinc-400 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors"
+          >
+            {showArchive ? "Archiv ausblenden" : "Archiv"}
+          </button>
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            {showCreateForm ? "Abbrechen" : "+ Neues Projekt"}
+          </button>
+        </div>
       </div>
 
       {/* Create Form */}
@@ -117,6 +163,48 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
             onUpdate={handleSpotlightUpdated}
             onRemove={handleSpotlightRemoved}
           />
+        </div>
+      )}
+
+      {/* Archived Spotlights */}
+      {showArchive && (
+        <div className="mt-8 pt-6 border-t border-zinc-800">
+          <h2 className="text-lg font-semibold mb-3 text-zinc-500 flex items-center gap-2">
+            Archiv
+          </h2>
+          {archiveLoading && (
+            <p className="text-sm text-zinc-500">Lade Archiv…</p>
+          )}
+          {!archiveLoading && archivedSpotlights.length === 0 && (
+            <p className="text-sm text-zinc-500">Keine archivierten Projekte.</p>
+          )}
+          {!archiveLoading && archivedSpotlights.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {archivedSpotlights.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center justify-between px-4 py-3 rounded-lg bg-zinc-900 border border-zinc-800"
+                >
+                  <div>
+                    <span className="text-sm font-medium text-zinc-300">{s.title}</span>
+                    <span className="ml-2 text-xs text-zinc-500">{TYPE_LABELS[s.type] ?? s.type}</span>
+                    {s.archived_at && (
+                      <span className="ml-2 text-xs text-zinc-600">
+                        archiviert {new Date(s.archived_at).toLocaleDateString("de-DE")}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleRestore(s.id)}
+                    disabled={restoringId === s.id}
+                    className="px-3 py-1 text-xs text-zinc-300 border border-zinc-700 rounded hover:bg-zinc-700 transition-colors disabled:opacity-50"
+                  >
+                    {restoringId === s.id ? "…" : "Wiederherstellen"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

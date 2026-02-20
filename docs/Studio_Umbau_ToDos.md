@@ -2549,30 +2549,47 @@ Frontend (7+):
 ### Phase 8: Aufräumen
 
 #### Alte Stage-Dateien löschen
-- [ ] `studio/stage/StageClient.tsx` löschen
-- [ ] `studio/stage/FocusSection.tsx` löschen
-- [ ] `studio/stage/SpreadSection.tsx` löschen
-- [ ] `studio/stage/ActiveSpreadList.tsx` löschen
-- [ ] `studio/stage/MiniPerformanceSummary.tsx` löschen
-- [ ] `studio/stage/page.tsx` behalten (Redirect → /studio/project)
+- [x] `studio/stage/StageClient.tsx` löschen
+- [x] `studio/stage/FocusSection.tsx` löschen
+- [x] `studio/stage/SpreadSection.tsx` löschen
+- [x] `studio/stage/ActiveSpreadList.tsx` löschen
+- [x] `studio/stage/MiniPerformanceSummary.tsx` löschen
+- [x] `studio/stage/SpotlightClient.tsx` löschen (orphan – dupliziert in `spotlight/`)
+- [x] `studio/stage/page.tsx` → Redirect zu `/studio/project`
+
+#### Zusätzliche Bereinigung
+- [x] `studio/ergebnisse/PerformanceClient.tsx` löschen + `ergebnisse/page.tsx` → Redirect zu `/studio/results`
+- [x] `studio/pushes/CampaignsClient.tsx` löschen (kein `page.tsx`, nie erreichbar)
+- [x] `studio/teilbare-links/TrackingLinksClient.tsx` löschen (kein `page.tsx`, nie erreichbar)
+- [x] `studio/OverviewClient.tsx.backup` löschen (Backup-Datei)
 
 #### Alte Top-Level Editor-Routes
-- [ ] Alle 9 alten Routes prüfen: Redirects vorhanden oder gelöscht
-- [ ] Keine toten Links im Studio (alle Navigation funktioniert)
+- [x] Alle 9 alten Routes prüfen: Redirects vorhanden oder gelöscht
+- [x] `/studio/profile` → Redirect `/studio/page/profile` ✓
+- [x] `/studio/links` → Redirect `/studio/page/links` ✓
+- [x] `/studio/music` → Redirect `/studio/page/music` ✓
+- [x] `/studio/shows` → Redirect `/studio/page/shows` ✓
+- [x] `/studio/releases` → Redirect `/studio/page/releases` ✓
+- [x] `/studio/videos` → Redirect `/studio/page/videos` ✓
+- [x] `/studio/gallery` → Redirect `/studio/page/gallery` ✓
+- [x] `/studio/appearance` → Redirect `/studio/page/appearance` ✓
+- [x] `/studio/contact` → Redirect `/studio/page/contact` ✓
+- [x] `/studio/stage` → Redirect `/studio/project` ✓
+- [x] `/studio/ergebnisse` → Redirect `/studio/results` ✓
 
 #### Nicht mehr benötigte API-Funktionen
-- [ ] `createCampaign()` aus stage.ts entfernt
-- [ ] `deleteTrackingLink()` aus stage.ts entfernt (ersetzt durch archiveTrackingLink)
-- [ ] Alte PLATFORMS-Konstante aus SpreadSection.tsx entfernt (ersetzt durch platforms.ts)
+- [x] `createCampaign()` aus stage.ts entfernt (inkl. `Campaign`-Interface, `getAllCampaigns`, `updateCampaign`, `deleteCampaign`)
+- [x] `deleteTrackingLink()` aus stage.ts entfernt (ersetzt durch `archiveTrackingLink`)
+- [x] Alte PLATFORMS-Konstante aus SpreadSection.tsx entfernt (Datei gelöscht)
 
 #### Finale Prüfung
-- [ ] `npm run build` erfolgreich (keine Compiler-Fehler)
-- [ ] Keine Imports von gelöschten Dateien
-- [ ] Öffentliche Seite funktioniert weiterhin
+- [x] `npx tsc --noEmit` ausgeführt – keine neuen Fehler durch Phase-8-Änderungen (nur pre-existing Fehler)
+- [x] Keine Imports von gelöschten Dateien
+- [ ] Öffentliche Seite funktioniert weiterhin (manuell testen)
 - [ ] Bestehende Tracking-Links funktionieren (Klick-Tracking)
 - [ ] Backfilled Links (placement="legacy") werden korrekt angezeigt
 
 #### Docs final aktualisieren
-- [ ] `docs/DATA_MODEL.md` spiegelt finalen Zustand wider
-- [ ] `docs/API_CONTRACTS.md` spiegelt finalen Zustand wider
-- [ ] `docs/PRODUCT_RULES.md` spiegelt finalen Zustand wider
+- [x] `docs/DATA_MODEL.md` spiegelt finalen Zustand wider (in Phase 0 getan)
+- [x] `docs/API_CONTRACTS.md` spiegelt finalen Zustand wider (in Phase 0 getan)
+- [x] `docs/PRODUCT_RULES.md` spiegelt finalen Zustand wider (in Phase 0 getan)

@@ -7,9 +7,10 @@ import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = await getTokenFromCookies();
     if (!token) {
       return NextResponse.json(
@@ -20,7 +21,7 @@ export async function PATCH(
 
     const body = await request.json();
 
-    const res = await backendFetch(`/api/v1/spotlights/${params.id}`, {
+    const res = await backendFetch(`/api/v1/spotlights/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
