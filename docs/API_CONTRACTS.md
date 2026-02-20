@@ -365,19 +365,23 @@ This section extends API v1. All existing v1 endpoints remain valid unless expli
 
 Auth required.
 
-Response:
+Returns the currently active spotlight for the authenticated user's artist page.
+
+**Response:**
 
 ```json
 {
   "data": {
     "id": 12,
     "title": "New Album: VOIDBRINGER",
-    "type": "release",
+    "slug": "new-album-voidbringer",
+    "type": "album",
     "status": "active",
     "starts_at": "2026-02-01T00:00:00Z",
     "ends_at": null,
     "primary_url": "https://open.spotify.com/album/...",
     "description": "Our heaviest record so far.",
+    "show_on_page": true,
     "created_at": "2026-02-01T10:00:00Z",
     "updated_at": "2026-02-10T18:30:00Z"
   }
@@ -390,32 +394,115 @@ If no active spotlight exists:
 { "data": null }
 ```
 
+**Notes:**
+- Only returns spotlights where `archived_at IS NULL`
+- `slug` is the stable campaign identifier (never changes)
+
+---
+
+### GET /spotlights
+
+Auth required.
+
+Returns all non-archived spotlights for the authenticated user's artist page.
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "id": 12,
+      "title": "New Album: VOIDBRINGER",
+      "slug": "new-album-voidbringer",
+      "type": "album",
+      "status": "active",
+      "starts_at": "2026-02-01T00:00:00Z",
+      "ends_at": null,
+      "primary_url": "https://open.spotify.com/album/...",
+      "description": "Our heaviest record so far.",
+      "show_on_page": true,
+      "created_at": "2026-02-01T10:00:00Z",
+      "updated_at": "2026-02-10T18:30:00Z"
+    },
+    {
+      "id": 11,
+      "title": "Tour: Spring 2026",
+      "slug": "tour-spring-2026",
+      "type": "tour",
+      "status": "scheduled",
+      "starts_at": "2026-03-01T00:00:00Z",
+      "ends_at": null,
+      "primary_url": "https://tickets.example.com",
+      "description": "New dates announced.",
+      "show_on_page": false,
+      "created_at": "2026-01-15T10:00:00Z",
+      "updated_at": "2026-01-15T10:00:00Z"
+    }
+  ]
+}
+```
+
+**Filters:**
+- Only returns spotlights where `archived_at IS NULL`
+- Ordered by `created_at DESC`
+
 ---
 
 ### POST /spotlights
 
 Auth required.
 
-Request:
+Creates a new spotlight.
+
+**Request:**
 
 ```json
 {
-  "title": "Tour: Spring 2026",
-  "type": "tour",
+  "title": "New Single: Summer Vibes",
+  "type": "single",
   "starts_at": "2026-03-01T00:00:00Z",
   "ends_at": null,
-  "primary_url": "https://tickets.example.com",
-  "description": "New dates announced."
+  "primary_url": "https://spotify.com/...",
+  "description": "Feel-good summer anthem.",
+  "show_on_page": true
 }
 ```
 
-Response:
+**Field validation:**
+- `title`: required, string, max 255 chars
+- `type`: required, one of: `single`, `album`, `tour`, `event`
+- `starts_at`: optional, date
+- `ends_at`: optional, date (must be after `starts_at`)
+- `primary_url`: required, URL, max 1000 chars
+- `description`: optional, string, max 1000 chars
+- `show_on_page`: optional, boolean (default: true)
+
+**Response (201 Created):**
 
 ```json
 {
-  "data": { "id": 13, "status": "scheduled" }
+  "data": {
+    "id": 13,
+    "title": "New Single: Summer Vibes",
+    "slug": "new-single-summer-vibes",
+    "type": "single",
+    "status": "scheduled",
+    "starts_at": "2026-03-01T00:00:00Z",
+    "ends_at": null,
+    "primary_url": "https://spotify.com/...",
+    "description": "Feel-good summer anthem.",
+    "show_on_page": true,
+    "created_at": "2026-02-20T12:00:00Z",
+    "updated_at": "2026-02-20T12:00:00Z"
+  }
 }
 ```
+
+**Backend behavior:**
+- `slug` is auto-generated from `title` (lowercase, URL-safe, unique)
+- `status` starts as `scheduled`
+- `archived_at` is NULL
 
 ---
 
@@ -423,20 +510,32 @@ Response:
 
 Auth required.
 
-Request:
+Updates an existing spotlight.
+
+**Request:**
 
 ```json
 {
-  "title": "Tour: Spring 2026 (updated)",
-  "primary_url": "https://tickets.example.com/new"
+  "title": "New Single: Summer Vibes (Radio Edit)",
+  "primary_url": "https://spotify.com/new-url",
+  "description": "Updated description",
+  "show_on_page": false
 }
 ```
 
-Response:
+**Field validation:**
+- All fields optional
+- Same constraints as POST
+
+**Response:**
 
 ```json
 { "data": { "ok": true } }
 ```
+
+**Notes:**
+- `slug` never changes (stable identifier for analytics)
+- `status` is not changed via PATCH (use activate/end endpoints)
 
 ---
 
@@ -444,12 +543,14 @@ Response:
 
 Auth required.
 
-Rules:
+Activates a spotlight (sets `status` to `active`).
 
-* Only one active spotlight per artist page.
-* If another spotlight is active, it becomes ended.
+**Rules:**
+- Only one active spotlight per artist page
+- If another spotlight is already active, it is automatically set to `ended`
+- Model boot hook enforces one-active-per-page rule
 
-Response:
+**Response:**
 
 ```json
 { "data": { "active_spotlight_id": 13 } }
@@ -461,10 +562,68 @@ Response:
 
 Auth required.
 
-Response:
+Ends a spotlight (sets `status` to `ended`, sets `ends_at` to current timestamp).
+
+**Response:**
 
 ```json
 { "data": { "ended_spotlight_id": 13 } }
+```
+
+---
+
+### POST /spotlights/{id}/archive
+
+Auth required.
+
+Archives a spotlight (soft delete via `archived_at`).
+
+**Behavior:**
+- Sets `archived_at` to current timestamp
+- Archived spotlights are excluded from GET /spotlights and GET /spotlights/active
+- Does NOT delete associated tracking links or click events
+- Releases the unique constraint for (artist_page_id + slug)
+
+**Response:**
+
+```json
+{ "data": { "ok": true } }
+```
+
+**Error (400 Bad Request):**
+
+```json
+{
+  "error": {
+    "code": "already_archived",
+    "message": "This spotlight is already archived."
+  }
+}
+```
+
+---
+
+### POST /spotlights/{id}/restore
+
+Auth required.
+
+Restores an archived spotlight (sets `archived_at` to NULL).
+
+**Response:**
+
+```json
+{ "data": { "ok": true } }
+```
+
+**Error (400 Bad Request):**
+
+```json
+{
+  "error": {
+    "code": "not_archived",
+    "message": "This spotlight is not archived."
+  }
+}
 ```
 
 ---

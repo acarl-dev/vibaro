@@ -39,4 +39,16 @@ class SpotlightPolicy
         $artistPage = $user->artistPage;
         return $artistPage && $spotlight->artist_page_id === $artistPage->id;
     }
+
+    public function archive(User $user, Spotlight $spotlight): bool
+    {
+        $artistPage = $user->artistPage;
+        return $artistPage && $spotlight->artist_page_id === $artistPage->id;
+    }
+
+    public function restore(User $user, Spotlight $spotlight): bool
+    {
+        $artistPage = $user->artistPage;
+        return $artistPage && $spotlight->artist_page_id === $artistPage->id;
+    }
 }

@@ -1,7 +1,20 @@
-import { redirect } from "next/navigation";
+import { backendFetch } from "@/lib/api/backend";
+import ProjectClient from "./ProjectClient";
+import { SpotlightData } from "@/lib/api/spotlights";
 
-export default function ProjectPage() {
-  // Temporary redirect to existing stage page
-  // TODO: Build dedicated Spotlight management page (Phase 3)
-  redirect("/studio/stage");
+async function fetchSpotlights(): Promise<SpotlightData[]> {
+  try {
+    const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function ProjectPage() {
+  const spotlights = await fetchSpotlights();
+
+  return <ProjectClient spotlights={spotlights} />;
 }

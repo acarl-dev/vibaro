@@ -111,6 +111,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('/spotlights/{id}', [SpotlightController::class, 'update']);
         Route::post('/spotlights/{id}/activate', [SpotlightController::class, 'activate']);
         Route::post('/spotlights/{id}/end', [SpotlightController::class, 'end']);
+        Route::post('/spotlights/{id}/archive', [SpotlightController::class, 'archive']);
+        Route::post('/spotlights/{id}/restore', [SpotlightController::class, 'restore']);
 
         // Campaigns (Stage Pro)
         Route::get('/campaigns', [CampaignController::class, 'index']);

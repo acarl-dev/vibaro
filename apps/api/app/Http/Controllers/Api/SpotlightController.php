@@ -26,6 +26,7 @@ class SpotlightController extends Controller
         }
 
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
+            ->active()
             ->where('status', 'active')
             ->first();
 
@@ -33,12 +34,14 @@ class SpotlightController extends Controller
             'data' => $spotlight ? [
                 'id' => $spotlight->id,
                 'title' => $spotlight->title,
+                'slug' => $spotlight->slug,
                 'type' => $spotlight->type,
                 'status' => $spotlight->status,
                 'starts_at' => $spotlight->starts_at?->toISOString(),
                 'ends_at' => $spotlight->ends_at?->toISOString(),
                 'primary_url' => $spotlight->primary_url,
                 'description' => $spotlight->description,
+                'show_on_page' => $spotlight->show_on_page,
                 'created_at' => $spotlight->created_at->toISOString(),
                 'updated_at' => $spotlight->updated_at->toISOString(),
             ] : null,
@@ -62,18 +65,21 @@ class SpotlightController extends Controller
         }
 
         $spotlights = Spotlight::where('artist_page_id', $artistPage->id)
+            ->active()
             ->orderByDesc('created_at')
             ->get()
             ->map(function ($spotlight) {
                 return [
                     'id' => $spotlight->id,
                     'title' => $spotlight->title,
+                    'slug' => $spotlight->slug,
                     'type' => $spotlight->type,
                     'status' => $spotlight->status,
                     'starts_at' => $spotlight->starts_at?->toISOString(),
                     'ends_at' => $spotlight->ends_at?->toISOString(),
                     'primary_url' => $spotlight->primary_url,
                     'description' => $spotlight->description,
+                    'show_on_page' => $spotlight->show_on_page,
                     'created_at' => $spotlight->created_at->toISOString(),
                     'updated_at' => $spotlight->updated_at->toISOString(),
                 ];
@@ -100,11 +106,12 @@ class SpotlightController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|string|in:release,tour,announcement,other',
+            'type' => 'required|string|in:single,album,tour,event',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after:starts_at',
             'primary_url' => 'required|url|max:1000',
             'description' => 'nullable|string|max:1000',
+            'show_on_page' => 'nullable|boolean',
         ]);
 
         $spotlight = Spotlight::create([
@@ -116,12 +123,23 @@ class SpotlightController extends Controller
             'ends_at' => $validated['ends_at'] ?? null,
             'primary_url' => $validated['primary_url'],
             'description' => $validated['description'] ?? null,
+            'show_on_page' => $validated['show_on_page'] ?? true,
         ]);
 
         return response()->json([
             'data' => [
                 'id' => $spotlight->id,
+                'title' => $spotlight->title,
+                'slug' => $spotlight->slug,
+                'type' => $spotlight->type,
                 'status' => $spotlight->status,
+                'starts_at' => $spotlight->starts_at?->toISOString(),
+                'ends_at' => $spotlight->ends_at?->toISOString(),
+                'primary_url' => $spotlight->primary_url,
+                'description' => $spotlight->description,
+                'show_on_page' => $spotlight->show_on_page,
+                'created_at' => $spotlight->created_at->toISOString(),
+                'updated_at' => $spotlight->updated_at->toISOString(),
             ],
         ], 201);
     }
@@ -137,11 +155,12 @@ class SpotlightController extends Controller
 
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
-            'type' => 'sometimes|string|in:release,tour,announcement,other',
+            'type' => 'sometimes|string|in:single,album,tour,event',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after:starts_at',
             'primary_url' => 'sometimes|url|max:1000',
             'description' => 'nullable|string|max:1000',
+            'show_on_page' => 'sometimes|boolean',
         ]);
 
         $spotlight->update($validated);
@@ -183,5 +202,51 @@ class SpotlightController extends Controller
         return response()->json([
             'data' => ['ended_spotlight_id' => $spotlight->id],
         ]);
+    }
+
+    /**
+     * Archive a spotlight (soft delete).
+     */
+    public function archive(Request $request, int $id)
+    {
+        $spotlight = Spotlight::findOrFail($id);
+
+        Gate::authorize('archive', $spotlight);
+
+        if ($spotlight->isArchived()) {
+            return response()->json([
+                'error' => [
+                    'code' => 'already_archived',
+                    'message' => 'This spotlight is already archived.',
+                ],
+            ], 400);
+        }
+
+        $spotlight->archive();
+
+        return response()->json(['data' => ['ok' => true]]);
+    }
+
+    /**
+     * Restore an archived spotlight.
+     */
+    public function restore(Request $request, int $id)
+    {
+        $spotlight = Spotlight::withoutGlobalScopes()->findOrFail($id);
+
+        Gate::authorize('restore', $spotlight);
+
+        if (!$spotlight->isArchived()) {
+            return response()->json([
+                'error' => [
+                    'code' => 'not_archived',
+                    'message' => 'This spotlight is not archived.',
+                ],
+            ], 400);
+        }
+
+        $spotlight->restore();
+
+        return response()->json(['data' => ['ok' => true]]);
     }
 }

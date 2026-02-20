@@ -1,0 +1,317 @@
+/**
+ * Client-side API for Spotlights
+ * Used in "use client" components
+ */
+
+export type SpotlightType = "single" | "album" | "tour" | "event";
+export type SpotlightStatus = "scheduled" | "active" | "ended";
+
+export type SpotlightData = {
+  id: number;
+  title: string;
+  slug: string;
+  type: SpotlightType;
+  status: SpotlightStatus;
+  starts_at: string | null;
+  ends_at: string | null;
+  primary_url: string;
+  description: string | null;
+  show_on_page: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateSpotlightRequest = {
+  title: string;
+  type: SpotlightType;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  primary_url: string;
+  description?: string | null;
+  show_on_page?: boolean;
+};
+
+export type UpdateSpotlightRequest = Partial<Omit<CreateSpotlightRequest, "show_on_page">>;
+
+/**
+ * Fetch all spotlights for current user
+ */
+export async function fetchSpotlights(): Promise<SpotlightData[]> {
+  try {
+    const res = await fetch("/api/studio/spotlights", {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch spotlights:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    return json?.data ?? [];
+  } catch (error) {
+    console.error("Error fetching spotlights:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetch active spotlight
+ */
+export async function fetchActiveSpotlight(): Promise<SpotlightData | null> {
+  try {
+    const res = await fetch("/api/studio/spotlights/active", {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch active spotlight:", res.status);
+      return null;
+    }
+
+    const json = await res.json();
+    return json?.data ?? null;
+  } catch (error) {
+    console.error("Error fetching active spotlight:", error);
+    return null;
+  }
+}
+
+/**
+ * Create a new spotlight
+ */
+export async function createSpotlight(
+  data: CreateSpotlightRequest
+): Promise<{ success: boolean; data?: SpotlightData; error?: string }> {
+  try {
+    const res = await fetch("/api/studio/spotlights", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Erstellen des Spotlights",
+      };
+    }
+
+    return {
+      success: true,
+      data: json?.data,
+    };
+  } catch (error) {
+    console.error("Error creating spotlight:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * Update an existing spotlight
+ */
+export async function updateSpotlight(
+  id: number,
+  data: UpdateSpotlightRequest
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Aktualisieren des Spotlights",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error updating spotlight:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * Activate a spotlight (sets status to 'active', deactivates others)
+ */
+export async function activateSpotlight(
+  id: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}/activate`, {
+      method: "POST",
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Aktivieren des Spotlights",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error activating spotlight:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * End a spotlight (sets status to 'ended')
+ */
+export async function endSpotlight(
+  id: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}/end`, {
+      method: "POST",
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Beenden des Spotlights",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error ending spotlight:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * Archive a spotlight (soft delete)
+ */
+export async function archiveSpotlight(
+  id: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}/archive`, {
+      method: "POST",
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Archivieren des Spotlights",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error archiving spotlight:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * Restore an archived spotlight
+ */
+export async function restoreSpotlight(
+  id: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}/restore`, {
+      method: "POST",
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Wiederherstellen des Spotlights",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error restoring spotlight:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
+
+/**
+ * Toggle show_on_page visibility
+ */
+export async function toggleSpotlightVisibility(
+  id: number,
+  show_on_page: boolean
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/studio/spotlights/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ show_on_page }),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: json?.error?.message || "Fehler beim Ändern der Sichtbarkeit",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error toggling visibility:", error);
+    return {
+      success: false,
+      error: "Netzwerkfehler",
+    };
+  }
+}
