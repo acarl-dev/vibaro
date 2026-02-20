@@ -559,6 +559,8 @@ Response:
 
 Auth required.
 
+Returns all tracking links for the authenticated user.
+
 Response:
 
 ```json
@@ -566,21 +568,27 @@ Response:
   "data": [
     {
       "id": 100,
-      "slug": "t_vK3a9QpN",
-      "module": "spotlight",
-      "label": "Spotify",
-      "target_url": "https://open.spotify.com/album/...",
-      "tracking_url": "https://vibaro.app/t/t_vK3a9QpN",
       "spotlight_id": 12,
-      "spotlight_title": "New Album: VOIDBRINGER",
-      "campaign_id": 21,
-      "campaign_name": "Instagram Story – Feb 2026",
-      "is_active": true,
+      "platform": "instagram",
+      "placement": "story",
+      "label": "Instagram · Story",
+      "short_code": "a1b2c3d4",
+      "target_url": "https://open.spotify.com/album/...",
+      "url": "https://vibaro.app/t/a1b2c3d4",
+      "click_count": 87,
+      "utm_source": "instagram",
+      "utm_medium": "story",
+      "utm_campaign": "new-album-release",
       "created_at": "2026-02-10T10:00:00Z"
     }
   ]
 }
 ```
+
+**Rules:**
+- Archived links are not returned
+- `label` is auto-generated if not provided: `{Platform} · {Placement}`
+- `utm_campaign` is always `spotlight.slug` (stable identifier)
 
 ---
 
@@ -588,50 +596,71 @@ Response:
 
 Auth required.
 
+Creates a new tracking link. Checks for duplicates (spotlight_id + platform + placement).
+
 Request:
 
 ```json
 {
-  "module": "spotlight",
-  "label": "Spotify",
-  "target_url": "https://open.spotify.com/album/...",
   "spotlight_id": 12,
-  "campaign_id": 21,
-  "utm_source": "instagram",
-  "utm_medium": "story",
-  "utm_campaign": "album_launch"
+  "platform": "instagram",
+  "placement": "story",
+  "target_url": "https://open.spotify.com/album/...",
+  "label": "Instagram Story"
 }
 ```
 
-Response:
+**Field rules:**
+- `spotlight_id`: Required
+- `platform`: Required (validated against Platform enum)
+- `placement`: Required
+- `target_url`: Required, must be valid http/https URL
+- `label`: Optional, auto-generated if not provided
+
+Response (success):
 
 ```json
 {
   "data": {
     "id": 100,
-    "slug": "t_vK3a9QpN",
-    "tracking_url": "https://<your-domain>/t/t_vK3a9QpN"
+    "short_code": "a1b2c3d4",
+    "url": "https://vibaro.app/t/a1b2c3d4",
+    "label": "Instagram · Story",
+    "platform": "instagram",
+    "placement": "story",
+    "utm_source": "instagram",
+    "utm_medium": "story",
+    "utm_campaign": "new-album-release",
+    "click_count": 0,
+    "created_at": "2026-02-10T10:00:00Z"
   }
 }
 ```
 
----
-
-### PATCH /tracking-links/{id}
-
-Auth required.
-
-Request:
+Response (duplicate):
 
 ```json
-{ "label": "Spotify (Link in Bio)", "is_active": true }
+{
+  "error": {
+    "code": "duplicate_link",
+    "message": "Ein Link für diese Kombination existiert bereits.",
+    "details": {
+      "spotlight_id": 12,
+      "platform": "instagram",
+      "placement": "story"
+    }
+  }
+}
 ```
 
-Response:
-
-```json
-{ "data": { "ok": true } }
-```
+**Backend rules:**
+- Partial unique index enforces uniqueness: `(spotlight_id, platform, placement) WHERE archived_at IS NULL`
+- `short_code` is auto-generated (8 characters, unique)
+- UTM parameters are auto-generated:
+  - `utm_source` = `platform`
+  - `utm_medium` = `placement`
+  - `utm_campaign` = `spotlight.slug`
+- `click_count` starts at 0
 
 ---
 
@@ -639,38 +668,53 @@ Response:
 
 Auth required.
 
+Archives the tracking link (soft delete via `archived_at`).
+
 Response:
 
 ```json
 { "data": { "ok": true } }
 ```
 
+**Rules:**
+- Does not delete click history
+- Archived links can be restored via backend (not exposed in MVP)
+- Archivierung removes the link from active queries and releases the unique constraint
+
 ---
 
 ## Public Tracking Redirect (Stage + Pro)
 
-### GET /t/{slug}
+### GET /t/{short_code}
 
 Public endpoint. Server-side tracking + 302 redirect to target_url.
 
-Behavior:
+**Path parameter:**
+- `short_code`: 8-character unique identifier for tracking link
 
-* creates click event (server-side)
-* stores:
+**Behavior:**
 
-  * occurred_at (UTC)
-  * referrer_host (host only)
-  * spotlight_id / campaign_id / module (denormalized)
-* must NOT store:
+* Creates ClickEvent (server-side)
+* Denormalized data stored:
+  * `occurred_at` (UTC)
+  * `referrer_host` (host only, from HTTP Referer header)
+  * `spotlight_id` (from TrackingLink)
+  * `platform` (from TrackingLink)
+  * `placement` (from TrackingLink)
+* Must NOT store:
+  * IP addresses (may only be used transiently for bot detection)
+  * Full referrer URLs (only extract host)
+  * Any user-identifying data (cookies, fingerprints, etc.)
+* Increments `tracking_links.click_count` atomically
 
-  * IP addresses (may only be used transiently)
-  * full referrer URLs
-  * any user-identifying data
+**Response:**
+* `302 Found` - Redirect to `tracking_link.target_url`
+* `404 Not Found` - If short_code unknown or tracking link archived
 
-Response:
-
-* `302 Found` redirect to target_url
-* `404 Not Found` if slug unknown or inactive
+**Privacy rules:**
+- No cookies set
+- No fingerprinting
+- Server-side only (no client tracking scripts)
 
 ---
 
