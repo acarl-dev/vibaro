@@ -5,6 +5,9 @@ import { SpotlightData, fetchArchivedSpotlights, restoreSpotlight } from "@/lib/
 import CreateSpotlightForm from "./CreateSpotlightForm";
 import SpotlightList from "./SpotlightList";
 import { useToast } from "@/context/ToastContext";
+import StudioPageHeader from "../../components/StudioPageHeader";
+import StudioEmptyState from "../../components/StudioEmptyState";
+import { Zap } from "../../components/StudioIcons";
 
 type ProjectClientProps = {
   spotlights: SpotlightData[];
@@ -75,30 +78,27 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-4xl">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Projekt</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Verwalte deine Spotlights (Singles, Alben, Touren, Events)
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleToggleArchive}
-            className="px-3 py-2 text-sm text-zinc-400 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors"
-          >
-            {showArchive ? "Archiv ausblenden" : "Archiv"}
-          </button>
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            {showCreateForm ? "Abbrechen" : "+ Neues Projekt"}
-          </button>
-        </div>
-      </div>
+    <div className="max-w-4xl">
+      <StudioPageHeader
+        title="PROJEKT"
+        subtitle="Verwalte deine Spotlights (Singles, Alben, Touren, Events)"
+        action={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleToggleArchive}
+              className="studio-btn studio-btn-secondary text-xs"
+            >
+              {showArchive ? "Archiv ausblenden" : "Archiv"}
+            </button>
+            <button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="studio-btn studio-btn-primary text-xs"
+            >
+              {showCreateForm ? "Abbrechen" : "+ Neues Projekt"}
+            </button>
+          </div>
+        }
+      />
 
       {/* Create Form */}
       {showCreateForm && (
@@ -112,24 +112,26 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
 
       {/* Empty State */}
       {spotlights.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Noch keine Projekte erstellt
-          </p>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Erstes Projekt erstellen
-          </button>
-        </div>
+        <StudioEmptyState
+          icon={Zap}
+          title="Noch keine Projekte"
+          description="Erstelle dein erstes Spotlight – Single, Album, Tour oder Event."
+          action={
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="studio-btn studio-btn-primary"
+            >
+              Erstes Projekt erstellen
+            </button>
+          }
+        />
       )}
 
       {/* Active Spotlight */}
       {activeSpotlight && (
         <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+          <h2 className="text-xs font-semibold uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: "var(--studio-text-secondary)" }}>
+            <span className="w-2 h-2 rounded-full" style={{ background: "var(--studio-success)" }}></span>
             Aktives Projekt
           </h2>
           <SpotlightList
@@ -143,7 +145,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
       {/* Scheduled Spotlights */}
       {scheduledSpotlights.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3">Geplant</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--studio-text-secondary)" }}>Geplant</h2>
           <SpotlightList
             spotlights={scheduledSpotlights}
             onUpdate={handleSpotlightUpdated}
@@ -155,7 +157,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
       {/* Ended Spotlights */}
       {endedSpotlights.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-3 text-gray-600 dark:text-gray-400">
+          <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--studio-text-secondary)" }}>
             Beendet
           </h2>
           <SpotlightList
@@ -168,28 +170,29 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
 
       {/* Archived Spotlights */}
       {showArchive && (
-        <div className="mt-8 pt-6 border-t border-zinc-800">
-          <h2 className="text-lg font-semibold mb-3 text-zinc-500 flex items-center gap-2">
+        <div className="mt-8 pt-6" style={{ borderTop: "1px solid var(--studio-border)" }}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--studio-text-secondary)" }}>
             Archiv
           </h2>
           {archiveLoading && (
-            <p className="text-sm text-zinc-500">Lade Archiv…</p>
+            <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Lade Archiv…</p>
           )}
           {!archiveLoading && archivedSpotlights.length === 0 && (
-            <p className="text-sm text-zinc-500">Keine archivierten Projekte.</p>
+            <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Keine archivierten Projekte.</p>
           )}
           {!archiveLoading && archivedSpotlights.length > 0 && (
             <div className="flex flex-col gap-2">
               {archivedSpotlights.map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between px-4 py-3 rounded-lg bg-zinc-900 border border-zinc-800"
+                  className="flex items-center justify-between px-4 py-3 rounded-lg"
+                  style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}
                 >
                   <div>
-                    <span className="text-sm font-medium text-zinc-300">{s.title}</span>
-                    <span className="ml-2 text-xs text-zinc-500">{TYPE_LABELS[s.type] ?? s.type}</span>
+                    <span className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>{s.title}</span>
+                    <span className="ml-2 text-xs" style={{ color: "var(--studio-text-secondary)" }}>{TYPE_LABELS[s.type] ?? s.type}</span>
                     {s.archived_at && (
-                      <span className="ml-2 text-xs text-zinc-600">
+                      <span className="ml-2 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
                         archiviert {new Date(s.archived_at).toLocaleDateString("de-DE")}
                       </span>
                     )}
@@ -197,7 +200,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
                   <button
                     onClick={() => handleRestore(s.id)}
                     disabled={restoringId === s.id}
-                    className="px-3 py-1 text-xs text-zinc-300 border border-zinc-700 rounded hover:bg-zinc-700 transition-colors disabled:opacity-50"
+                    className="studio-btn studio-btn-secondary text-xs disabled:opacity-50"
                   >
                     {restoringId === s.id ? "…" : "Wiederherstellen"}
                   </button>

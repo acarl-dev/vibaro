@@ -43,16 +43,17 @@ export default function TipCard({ tip }: TipCardProps) {
   };
 
   return (
-    <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
+    <div className="rounded-lg p-4" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
       <div className="flex items-start gap-3">
-        <div className="shrink-0 rounded-md bg-blue-500/10 p-2 text-blue-400">
+        <div className="shrink-0 rounded p-2" style={{ background: "var(--studio-accent-muted)", color: "var(--studio-accent)" }}>
           {getIcon()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-zinc-300">{tip.message}</p>
+          <p className="text-sm" style={{ color: "var(--studio-text-primary)" }}>{tip.message}</p>
           <Link
             href={tip.action}
-            className="mt-2 inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+            className="mt-2 inline-flex items-center text-sm font-medium transition-colors"
+            style={{ color: "var(--studio-accent)" }}
           >
             Jetzt erledigen →
           </Link>

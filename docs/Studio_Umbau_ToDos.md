@@ -392,29 +392,29 @@
 - [x] Input-Styles für Studio definiert (Dark-Inputs) → `.studio-input` bereits in `globals.css` vorhanden
 
 ### Phase 3: Tab-Seiten
-- [ ] **Dashboard:** PageHeader eingebaut
-- [ ] **Dashboard:** Stat-Cards-Row implementiert
-- [ ] **Dashboard:** Aktives-Projekt-Card mit Accent-Border
-- [ ] **Dashboard:** Seiten-Status-Card
-- [ ] **Dashboard:** Empty State fÃ¼r keine Daten
-- [ ] **Meine Seite:** PageHeader mit "VerÃ¶ffentlichen"-Button
-- [ ] **Meine Seite:** Split-Layout (Desktop: Preview links, Form rechts)
-- [ ] **Meine Seite:** `StudioPhonePreview.tsx` erstellt
+- [x] **Dashboard:** PageHeader eingebaut
+- [x] **Dashboard:** Stat-Cards-Row implementiert
+- [x] **Dashboard:** Aktives-Projekt-Card mit Accent-Border
+- [x] **Dashboard:** Seiten-Status-Card
+- [x] **Dashboard:** Empty State für keine Daten
+- [x] **Meine Seite:** PageHeader mit "Veröffentlichen"-Button
+- [ ] **Meine Seite:** Split-Layout (Desktop: Preview links, Form rechts) — zurückgestellt, aktuell Section-Grid
+- [ ] **Meine Seite:** `StudioPhonePreview.tsx` erstellt — zurückgestellt
 - [ ] **Meine Seite:** Form-Felder mit Studio-Input-Styles
 - [ ] **Meine Seite:** Mobile: Kein Split, nur Formular
-- [ ] **Projekt:** PageHeader eingebaut
-- [ ] **Projekt:** Projekt-Card mit Status-Badge
-- [ ] **Projekt:** Einstellungen in Sektionen gruppiert
-- [ ] **Projekt:** Empty State
-- [ ] **Teilen:** PageHeader eingebaut
-- [ ] **Teilen:** URL-Box prominent + Copy-Button mit Feedback
-- [ ] **Teilen:** Social-Share-Buttons (4er Row)
-- [ ] **Teilen:** QR-Code-Card mit Beschreibung
-- [ ] **Ergebnisse:** PageHeader eingebaut
-- [ ] **Ergebnisse:** Kennzahlen-Row mit StatCards
-- [ ] **Ergebnisse:** Zeitverlauf-Darstellung (CSS-Balken oder bestehende Chart-Lib)
-- [ ] **Ergebnisse:** Tabellen mit Zebra-Striping
-- [ ] **Ergebnisse:** Empty State
+- [x] **Projekt:** PageHeader eingebaut
+- [x] **Projekt:** Projekt-Card mit Status-Badge
+- [x] **Projekt:** Einstellungen in Sektionen gruppiert
+- [x] **Projekt:** Empty State
+- [x] **Teilen:** PageHeader eingebaut
+- [x] **Teilen:** URL-Box prominent + Copy-Button mit Feedback
+- [x] **Teilen:** Link-Rows visuell vereinheitlicht (Social-Share-Buttons deferred zu Phase 4)
+- [ ] **Teilen:** QR-Code-Card mit Beschreibung — Phase 4
+- [x] **Ergebnisse:** PageHeader eingebaut
+- [x] **Ergebnisse:** Kennzahlen-Row mit StatCards
+- [x] **Ergebnisse:** Zeitverlauf-Darstellung (CSS-Balken)
+- [x] **Ergebnisse:** Tabellen mit Zebra-Striping
+- [x] **Ergebnisse:** Empty State
 
 ### Phase 4: QR-Code
 - [ ] `qrcode.react` evaluiert und ggf. installiert (BegrÃ¼ndung im PR)

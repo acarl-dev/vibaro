@@ -25,13 +25,14 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
 
   if (!page) {
     return (
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
-        <h2 className="text-sm font-medium text-zinc-400">Meine Seite</h2>
-        <p className="mt-1 text-sm text-zinc-500">Noch keine Seite eingerichtet</p>
+      <div className="rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
+        <h2 className="text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>Meine Seite</h2>
+        <p className="mt-1 text-sm" style={{ color: "var(--studio-text-secondary)" }}>Noch keine Seite eingerichtet</p>
         <div className="mt-4">
           <Link
             href="/studio/page"
-            className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+            className="text-sm font-medium transition-colors"
+            style={{ color: "var(--studio-accent)" }}
           >
             Seite einrichten →
           </Link>
@@ -41,31 +42,34 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
+    <div className="rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h2 className="text-sm font-medium text-zinc-400">Meine Seite</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--studio-text-secondary)" }}>Meine Seite</h2>
           <div className="mt-2 flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              page.is_published 
-                ? "bg-green-500/10 text-green-400 border border-green-500/20" 
-                : "bg-zinc-800 text-zinc-400"
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${page.is_published ? "bg-green-400" : "bg-zinc-500"}`}></span>
-              {page.is_published ? "Veröffentlicht" : "Unveröffentlicht"}
+            <span
+              className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-xs font-semibold uppercase"
+              style={page.is_published
+                ? { background: "rgba(34,197,94,0.12)", color: "var(--studio-success)" }
+                : { background: "rgba(245,158,11,0.12)", color: "var(--studio-warning)" }
+              }
+            >
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: page.is_published ? "var(--studio-success)" : "var(--studio-warning)" }}></span>
+              {page.is_published ? "Veröffentlicht" : "Nicht veröffentlicht"}
             </span>
           </div>
         </div>
       </div>
 
       {page.is_published && (
-        <div className="mt-4 flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900/50 px-3 py-2">
-          <span className="flex-1 text-sm text-zinc-300 truncate font-mono text-xs">
+        <div className="mt-4 flex items-center gap-2 rounded px-3 py-2" style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)" }}>
+          <span className="flex-1 truncate text-xs font-mono" style={{ color: "var(--studio-text-primary)", fontFamily: "var(--font-geist-mono, ui-monospace, monospace)" }}>
             {page.url}
           </span>
           <button
             onClick={handleCopy}
-            className="shrink-0 rounded-md p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+            className="shrink-0 rounded p-1.5 transition-colors"
+            style={{ color: "var(--studio-text-secondary)" }}
             title="URL kopieren"
           >
             {copied ? (
@@ -82,7 +86,8 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
             href={page.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 rounded-md p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+            className="shrink-0 rounded p-1.5 transition-colors"
+            style={{ color: "var(--studio-text-secondary)" }}
             title="Seite öffnen"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,7 +100,8 @@ export default function PageStatusCard({ page }: PageStatusCardProps) {
       <div className="mt-4">
         <Link
           href="/studio/page"
-          className="text-sm font-medium text-zinc-100 hover:text-white transition-colors"
+          className="text-sm font-medium transition-colors"
+          style={{ color: "var(--studio-accent)" }}
         >
           {page.is_published ? "Seite bearbeiten" : "Seite einrichten"} →
         </Link>

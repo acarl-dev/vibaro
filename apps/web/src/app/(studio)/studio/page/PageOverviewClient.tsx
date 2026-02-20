@@ -6,6 +6,7 @@ import { useState } from "react";
 import { togglePublishAction } from "./actions";
 import { updateVisibleSections, toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
 import { useToast } from "@/context/ToastContext";
+import StudioPageHeader from "../../components/StudioPageHeader";
 
 type ArtistPage = {
   id: number;
@@ -172,14 +173,24 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
   ];
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-medium text-zinc-50">Meine Seite</h1>
-        <p className="text-zinc-400">
-          Verwalte den Content deiner öffentlichen Künstler-Seite
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl">
+      <StudioPageHeader
+        title="MEINE SEITE"
+        subtitle="Verwalte den Content deiner öffentlichen Künstler-Seite"
+        action={
+          <button
+            onClick={handlePublish}
+            disabled={isPublishing}
+            className="studio-btn studio-btn-primary disabled:opacity-50"
+          >
+            {isPublishing
+              ? "…"
+              : page.is_published
+                ? "Verstecken"
+                : "Veröffentlichen"}
+          </button>
+        }
+      />
 
       {/* Projekt-Hinweis-Banner */}
       {activeSpotlight && activeSpotlight.status === "active" && !activeSpotlight.show_on_page && (
@@ -209,24 +220,25 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
       )}
 
       {/* Status Card */}
-      <div className="mb-8 rounded-lg border border-zinc-800 bg-zinc-900/30 p-6">
+      <div className="mb-8 rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="mb-2 flex items-center gap-3">
-              <h2 className="text-xl font-medium text-zinc-50">
+              <h2 className="text-xl font-bold uppercase tracking-wide" style={{ color: "var(--studio-text-primary)" }}>
                 {page.display_name}
               </h2>
               <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  page.is_published
-                    ? "bg-green-500/10 text-green-400"
-                    : "bg-yellow-500/10 text-yellow-400"
-                }`}
+                className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-xs font-semibold uppercase"
+                style={page.is_published
+                  ? { background: "rgba(34,197,94,0.12)", color: "var(--studio-success)" }
+                  : { background: "rgba(245,158,11,0.12)", color: "var(--studio-warning)" }
+                }
               >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: page.is_published ? "var(--studio-success)" : "var(--studio-warning)" }} />
                 {page.is_published ? "Veröffentlicht" : "Nicht veröffentlicht"}
               </span>
             </div>
-            <p className="mb-4 text-sm text-zinc-400">/@{page.handle}</p>
+            <p className="mb-4 text-sm" style={{ color: "var(--studio-text-secondary)", fontFamily: "var(--font-geist-mono, ui-monospace, monospace)" }}>/@{page.handle}</p>
 
             <div className="flex gap-3">
               {page.is_published && (
@@ -234,46 +246,21 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
                   href={publicUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300"
+                  className="inline-flex items-center gap-2 text-sm transition-colors"
+                  style={{ color: "var(--studio-accent)" }}
                 >
                   <span>Seite ansehen</span>
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>
               )}
             </div>
           </div>
-
-          <button
-            onClick={handlePublish}
-            disabled={isPublishing}
-            className={`rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${
-              page.is_published
-                ? "bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20"
-                : "bg-green-500/10 text-green-400 hover:bg-green-500/20"
-            } disabled:opacity-50`}
-          >
-            {isPublishing
-              ? "..."
-              : page.is_published
-                ? "Verstecken"
-                : "Veröffentlichen"}
-          </button>
         </div>
 
         {!page.is_published && (
-          <div className="mt-4 rounded border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-300">
+          <div className="mt-4 rounded px-4 py-3 text-sm" style={{ border: "1px solid var(--studio-warning)", background: "rgba(245,158,11,0.08)", color: "var(--studio-warning)" }}>
             <strong>Hinweis:</strong> Deine Seite ist noch nicht öffentlich
             sichtbar. Vervollständige Profil, Links und Music, dann kannst du
             veröffentlichen.
@@ -283,7 +270,7 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
 
       {/* Content Sections Grid */}
       <div className="space-y-3">
-        <h3 className="mb-4 text-sm uppercase tracking-wider text-zinc-500">
+        <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--studio-text-secondary)" }}>
           Bereiche
         </h3>
 
@@ -294,7 +281,8 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
           return (
             <div
               key={section.key}
-              className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/20 p-5"
+              className="flex items-center justify-between rounded-lg p-5 transition-colors"
+              style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}
             >
               <Link
                 href={section.href}
@@ -302,36 +290,33 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
               >
                 <div className="text-2xl">{section.icon}</div>
                 <div>
-                  <h4 className="mb-1 font-medium text-zinc-100 group-hover:text-zinc-50">
+                    <h4 className="mb-1 font-medium" style={{ color: "var(--studio-text-primary)" }}>
                     {section.title}
                   </h4>
-                  <p className="text-sm text-zinc-500">{section.description}</p>
+                  <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>{section.description}</p>
                 </div>
               </Link>
 
               <div className="flex items-center gap-4">
-                <div className="min-w-[2rem] text-right text-sm font-medium text-zinc-400">
+                <div className="min-w-[2rem] text-right text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>
                   {typeof section.count === "number" ? (
-                    <span
-                      className={
-                        section.count > 0 ? "text-zinc-300" : "text-zinc-600"
-                      }
-                    >
+                    <span style={{ color: section.count > 0 ? "var(--studio-text-primary)" : "var(--studio-border)" }}>
                       {section.count}
                     </span>
                   ) : (
-                    <span className="text-zinc-600">{section.count}</span>
+                    <span style={{ color: "var(--studio-text-secondary)" }}>{section.count}</span>
                   )}
                 </div>
 
                 <button
                   onClick={() => handleToggleSection(section.key, !isVisible)}
                   disabled={isUpdating}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+                  className="rounded px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-50"
+                  style={
                     isVisible
-                      ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                      : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
-                  }`}
+                      ? { background: "rgba(34,197,94,0.12)", color: "var(--studio-success)" }
+                      : { background: "var(--studio-surface-elevated)", color: "var(--studio-text-secondary)", border: "1px solid var(--studio-border)" }
+                  }
                 >
                   {isUpdating ? "..." : isVisible ? "Sichtbar" : "Versteckt"}
                 </button>
@@ -342,15 +327,15 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
       </div>
 
       {/* Info Box */}
-      <div className="mt-8 rounded-lg border border-zinc-800 bg-zinc-900/10 p-5">
-        <h4 className="mb-2 font-medium text-zinc-300">
-          💡 Tipp: Content-Strategie
+      <div className="mt-8 rounded-lg p-5" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
+        <h4 className="mb-2 font-semibold" style={{ color: "var(--studio-text-primary)" }}>
+          Tipp: Content-Strategie
         </h4>
-        <p className="text-sm leading-relaxed text-zinc-500">
-          Für eine starke Seite empfehlen wir: <strong>Profil + Bio</strong> (wichtig),{" "}
-          <strong>3-5 Links</strong> (Instagram, Spotify, etc.),{" "}
-          <strong>3-5 Featured Tracks</strong>, und optional <strong>kommende Shows</strong>{" "}
-          sowie <strong>neueste Releases</strong>. Weniger ist oft mehr.
+        <p className="text-sm leading-relaxed" style={{ color: "var(--studio-text-secondary)" }}>
+          Für eine starke Seite empfehlen wir: <strong style={{ color: "var(--studio-text-primary)" }}>Profil + Bio</strong> (wichtig),{" "}
+          <strong style={{ color: "var(--studio-text-primary)" }}>3–5 Links</strong> (Instagram, Spotify, etc.),{" "}
+          <strong style={{ color: "var(--studio-text-primary)" }}>3–5 Featured Tracks</strong>, und optional <strong style={{ color: "var(--studio-text-primary)" }}>kommende Shows</strong>{" "}
+          sowie <strong style={{ color: "var(--studio-text-primary)" }}>neueste Releases</strong>. Weniger ist oft mehr.
         </p>
       </div>
     </div>

@@ -23,15 +23,15 @@ export default function TopLinksCard({ links, stats }: TopLinksCardProps) {
   };
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
+    <div className="rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-sm font-medium text-zinc-400">Performance (7 Tage)</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--studio-text-secondary)" }}>Performance (7 Tage)</h2>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-zinc-100">{stats.total_clicks_7d}</span>
-            <span className="text-sm text-zinc-500">Klicks</span>
+            <span className="text-2xl font-bold" style={{ color: "var(--studio-text-primary)" }}>{stats.total_clicks_7d}</span>
+            <span className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Klicks</span>
             {stats.trend !== 0 && (
-              <span className={`text-xs font-medium ${stats.trend > 0 ? "text-green-400" : "text-red-400"}`}>
+              <span className="text-xs font-medium" style={{ color: stats.trend > 0 ? "var(--studio-success)" : "var(--studio-accent)" }}>
                 {stats.trend > 0 ? "+" : ""}{stats.trend}%
               </span>
             )}
@@ -41,10 +41,11 @@ export default function TopLinksCard({ links, stats }: TopLinksCardProps) {
 
       {links.length === 0 ? (
         <div className="py-6 text-center">
-          <p className="text-sm text-zinc-500">Noch keine Tracking-Links erstellt</p>
+          <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Noch keine Tracking-Links erstellt</p>
           <Link
             href="/studio/share"
-            className="mt-3 inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+            className="mt-3 inline-flex items-center text-sm font-medium transition-colors"
+            style={{ color: "var(--studio-accent)" }}
           >
             Jetzt erstellen →
           </Link>
@@ -55,21 +56,22 @@ export default function TopLinksCard({ links, stats }: TopLinksCardProps) {
             {links.map((link) => (
               <div
                 key={link.id}
-                className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/50 p-3 hover:bg-zinc-900 transition-colors"
-              >
+                className="flex items-center justify-between rounded p-3 transition-colors"
+                style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface-elevated)" }}>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-100 truncate">{link.label}</p>
-                  <p className="text-xs text-zinc-500">
-                    {link.platform && link.placement 
-                      ? `${link.platform} · ${link.placement}` 
+                  <p className="text-sm font-medium truncate" style={{ color: "var(--studio-text-primary)" }}>{link.label}</p>
+                  <p className="text-xs" style={{ color: "var(--studio-text-secondary)", fontFamily: "var(--font-geist-mono, ui-monospace, monospace)" }}>
+                    {link.platform && link.placement
+                      ? `${link.platform} · ${link.placement}`
                       : link.short_code}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 ml-4">
-                  <span className="text-sm font-medium text-zinc-400">{link.clicks}</span>
+                  <span className="text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>{link.clicks}</span>
                   <button
                     onClick={() => handleCopy(link)}
-                    className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+                    className="rounded p-1.5 transition-colors"
+                    style={{ color: "var(--studio-text-secondary)" }}
                     title="Link kopieren"
                   >
                     {copiedId === link.id ? (
@@ -87,10 +89,11 @@ export default function TopLinksCard({ links, stats }: TopLinksCardProps) {
             ))}
           </div>
           
-          <div className="mt-4 pt-4 border-t border-zinc-800">
+          <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--studio-border)" }}>
             <Link
               href="/studio/results"
-              className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+              className="text-sm font-medium transition-colors"
+              style={{ color: "var(--studio-accent)" }}
             >
               Alle Ergebnisse ansehen →
             </Link>
