@@ -82,7 +82,7 @@ export default function ResultsClient({
   // Empty state when no spotlights exist
   if (spotlights.length === 0) {
     return (
-      <div className="mx-auto max-w-4xl">
+      <div>
         <StudioPageHeader title="ERGEBNISSE" subtitle="Stats & Daten" />
         <StudioEmptyState
           icon={TrendingUp}
@@ -100,7 +100,7 @@ export default function ResultsClient({
 
   if (!analytics) {
     return (
-      <div className="mx-auto max-w-4xl">
+      <div>
         <StudioPageHeader title="ERGEBNISSE" subtitle="Stats & Daten" />
         <StudioEmptyState
           icon={TrendingUp}
@@ -112,7 +112,7 @@ export default function ResultsClient({
   }
 
   return (
-    <div className="container mx-auto max-w-6xl">
+    <div>
       <StudioPageHeader title="ERGEBNISSE" subtitle="Click-Analytics für deine Tracking-Links" />
 
       {/* Stats Row */}

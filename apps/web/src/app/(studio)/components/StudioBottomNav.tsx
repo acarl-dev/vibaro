@@ -7,7 +7,7 @@ import { LayoutGrid, FilePen, Zap, Megaphone, TrendingUp } from "./StudioIcons";
 const NAV_ITEMS = [
   { label: "Dashboard",  href: "/studio",         icon: LayoutGrid, exact: true  },
   { label: "Seite",      href: "/studio/page",    icon: FilePen,    exact: false },
-  { label: "Projekt",    href: "/studio/project", icon: Zap,        exact: false },
+  { label: "Module",     href: "/studio/project", icon: Zap,        exact: false },
   { label: "Teilen",     href: "/studio/share",   icon: Megaphone,  exact: false },
   { label: "Ergebnisse", href: "/studio/results", icon: TrendingUp, exact: false },
 ] as const;

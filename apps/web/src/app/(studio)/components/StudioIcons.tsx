@@ -36,3 +36,28 @@ export function Settings({ size = 18, className = "" }: IconProps) {
 export function ExternalLink({ size = 18, className = "" }: IconProps) {
   return <svg {...def(size, className)}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>;
 }
+
+// Module icons
+export function Mic({ size = 18, className = "" }: IconProps) {
+  return <svg {...def(size, className)}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>;
+}
+
+export function Disc({ size = 18, className = "" }: IconProps) {
+  return <svg {...def(size, className)}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>;
+}
+
+export function ShoppingBag({ size = 18, className = "" }: IconProps) {
+  return <svg {...def(size, className)}><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>;
+}
+
+export function BarChart2({ size = 18, className = "" }: IconProps) {
+  return <svg {...def(size, className)}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
+}
+
+export function Headphones({ size = 18, className = "" }: IconProps) {
+  return <svg {...def(size, className)}><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>;
+}
+
+export function ChevronRight({ size = 18, className = "" }: IconProps) {
+  return <svg {...def(size, className)}><polyline points="9 18 15 12 9 6"/></svg>;
+}

@@ -35,6 +35,10 @@ body {
   font-family: var(--font-sans);
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Utility: Hide scrollbar for mobile navigation */
 .scrollbar-hide {
   -ms-overflow-style: none;

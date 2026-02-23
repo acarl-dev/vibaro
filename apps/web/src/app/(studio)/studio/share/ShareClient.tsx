@@ -127,7 +127,7 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
 
   if (!activeSpotlight) {
     return (
-      <div className="mx-auto max-w-4xl">
+      <div>
         <StudioPageHeader title="TEILEN" subtitle="Erstelle Tracking-Links für deine Kanäle." />
         {pageUrl && (
           <div className="rounded-lg p-6 mb-8" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
@@ -156,7 +156,7 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div>
       <StudioPageHeader
         title="TEILEN"
         subtitle={`Erstelle Tracking-Links für ${activeSpotlight.title}`}

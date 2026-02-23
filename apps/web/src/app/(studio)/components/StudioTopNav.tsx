@@ -15,7 +15,7 @@ const PAGE_SECTION_PREFIX = "/studio/page";
 const NAV_ITEMS = [
   { label: "Dashboard",   href: "/studio",         exact: true  },
   { label: "Meine Seite", href: "/studio/page",    exact: false, isPageSection: true },
-  { label: "Projekt",     href: "/studio/project", exact: false },
+  { label: "Module",      href: "/studio/project", exact: false },
   { label: "Teilen",      href: "/studio/share",   exact: false },
   { label: "Ergebnisse",  href: "/studio/results", exact: false },
 ] as const;

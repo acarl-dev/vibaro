@@ -20,7 +20,7 @@ type StudioSidebarProps = {
 const NAV_ITEMS = [
   { label: "DASHBOARD",   sublabel: "Übersicht",        href: "/studio",         icon: LayoutGrid, exact: true  },
   { label: "MEINE SEITE", sublabel: "Seite bearbeiten", href: "/studio/page",    icon: FilePen,    exact: false },
-  { label: "PROJEKT",     sublabel: "Aktives Projekt",  href: "/studio/project", icon: Zap,        exact: false },
+  { label: "MODULE",      sublabel: "Aktive Module",    href: "/studio/project", icon: Zap,        exact: false },
   { label: "TEILEN",      sublabel: "Links & Sharing",  href: "/studio/share",   icon: Megaphone,  exact: false },
   { label: "ERGEBNISSE",  sublabel: "Stats & Daten",    href: "/studio/results", icon: TrendingUp, exact: false },
 ] as const;

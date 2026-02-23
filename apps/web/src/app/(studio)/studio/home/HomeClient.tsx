@@ -14,7 +14,7 @@ type HomeClientProps = {
 
 export default function HomeClient({ data }: HomeClientProps) {
   return (
-    <div className="mx-auto max-w-5xl">
+    <div>
       <StudioPageHeader
         title="DASHBOARD"
         subtitle="Dein Performance-Zentrum – schnell und übersichtlich."
