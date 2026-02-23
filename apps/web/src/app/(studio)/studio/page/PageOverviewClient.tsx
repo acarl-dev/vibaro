@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { togglePublishAction, updateVisibleSectionsAction } from "./actions";
 import { toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
 import { useToast } from "@/context/ToastContext";
@@ -30,7 +30,6 @@ type ContentCounts = {
 
 type Props = {
   page: ArtistPage;
-  counts: ContentCounts;
   activeSpotlight?: Spotlight | null;
 };
 
@@ -45,7 +44,7 @@ const SECTIONS = [
   { key: "contact",  label: "Kontakt",   href: "/studio/page/contact"   },
 ];
 
-export default function PageOverviewClient({ page, counts, activeSpotlight }: Props) {
+export default function PageOverviewClient({ page, activeSpotlight }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -55,6 +54,15 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
   const [updatingSection, setUpdatingSection] = useState<string | null>(null);
   const [showingOnPage, setShowingOnPage] = useState(false);
   const [previewReloadKey, setPreviewReloadKey] = useState(0);
+  const [counts, setCounts] = useState<ContentCounts | null>(null);
+
+  // Lazy-load content counts after mount so the page renders immediately
+  useEffect(() => {
+    fetch("/api/studio/page-counts", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => { if (json?.data) setCounts(json.data); })
+      .catch(() => {});
+  }, []);
 
   // Relative path so the iframe works in any environment (local, staging, prod)
   const previewPath = `/p/${page.handle}`;
@@ -109,6 +117,7 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
   };
 
   const contentCount = (key: string): number | null => {
+    if (!counts) return null;
     const map: Record<string, number> = {
       links:    counts.links,
       music:    counts.featured_tracks,
@@ -276,6 +285,14 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
                         style={{ color: "var(--studio-text-secondary)" }}
                       >
                         {count > 0 ? count : "—"}
+                      </span>
+                    )}
+                    {count === null && (
+                      <span
+                        className="text-[10px] font-mono"
+                        style={{ color: "var(--studio-border)" }}
+                      >
+                        ·
                       </span>
                     )}
                   </Link>

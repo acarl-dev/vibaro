@@ -23,7 +23,19 @@ export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey =
   const [device, setDevice] = useState<Device>("desktop");
   const [scale, setScale] = useState(1);
   const [localKey, setLocalKey] = useState(0); // forces iframe reload via button
+  const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Defer iframe rendering until after first client paint
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Whenever the iframe key changes, show the loading overlay again
+  useEffect(() => {
+    if (isMounted) setIsLoading(true);
+  }, [reloadKey, localKey, isMounted]);
 
   const activeDevice = DEVICES.find((d) => d.key === device)!;
 
@@ -156,18 +168,52 @@ export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey =
               : {}),
           }}
         >
-          <iframe
-            key={`${reloadKey}-${localKey}`}
-            src={previewPath}
-            style={{
-              width: "100%",
-              height: `${PREVIEW_HEIGHT}px`,
-              border: "none",
-              display: "block",
-            }}
-            title="Seiten-Vorschau"
-          />
+          {isMounted && (
+            <iframe
+              key={`${reloadKey}-${localKey}`}
+              src={previewPath}
+              style={{
+                width: "100%",
+                height: `${PREVIEW_HEIGHT}px`,
+                border: "none",
+                display: "block",
+                opacity: isLoading ? 0 : 1,
+                transition: "opacity 0.3s ease",
+              }}
+              title="Seiten-Vorschau"
+              onLoad={() => setIsLoading(false)}
+            />
+          )}
         </div>
+
+        {/* Loading overlay */}
+        {isLoading && (
+          <div
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3"
+            style={{ background: "#0a0a0f" }}
+          >
+            {/* Spinner */}
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--studio-accent)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="animate-spin"
+            >
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            <span
+              className="text-xs font-medium tracking-wider uppercase"
+              style={{ color: "var(--studio-text-secondary)" }}
+            >
+              Vorschau wird geladen
+            </span>
+          </div>
+        )}
 
         {/* Visual height clip hint */}
         <div
