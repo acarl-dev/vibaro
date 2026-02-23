@@ -15,12 +15,14 @@ type Props = {
   previewPath: string;
   /** Full URL for the external "Öffnen" link */
   externalUrl: string;
+  /** Increment to force an iframe reload from outside */
+  reloadKey?: number;
 };
 
-export default function LivePreviewPanel({ previewPath, externalUrl }: Props) {
+export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey = 0 }: Props) {
   const [device, setDevice] = useState<Device>("desktop");
   const [scale, setScale] = useState(1);
-  const [key, setKey] = useState(0); // forces iframe reload
+  const [localKey, setLocalKey] = useState(0); // forces iframe reload via button
   const containerRef = useRef<HTMLDivElement>(null);
 
   const activeDevice = DEVICES.find((d) => d.key === device)!;
@@ -121,7 +123,7 @@ export default function LivePreviewPanel({ previewPath, externalUrl }: Props) {
             Öffnen
           </a>
           <button
-            onClick={() => setKey((k) => k + 1)}
+            onClick={() => setLocalKey((k) => k + 1)}
             className="p-1 rounded transition-colors"
             style={{ color: "var(--studio-text-secondary)" }}
             title="Neu laden"
@@ -155,7 +157,7 @@ export default function LivePreviewPanel({ previewPath, externalUrl }: Props) {
           }}
         >
           <iframe
-            key={key}
+            key={`${reloadKey}-${localKey}`}
             src={previewPath}
             style={{
               width: "100%",

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { togglePublishAction } from "./actions";
-import { updateVisibleSections, toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
+import { togglePublishAction, updateVisibleSectionsAction } from "./actions";
+import { toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
 import { useToast } from "@/context/ToastContext";
 import LivePreviewPanel from "./LivePreviewPanel";
 
@@ -54,6 +54,7 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
   );
   const [updatingSection, setUpdatingSection] = useState<string | null>(null);
   const [showingOnPage, setShowingOnPage] = useState(false);
+  const [previewReloadKey, setPreviewReloadKey] = useState(0);
 
   // Relative path so the iframe works in any environment (local, staging, prod)
   const previewPath = `/p/${page.handle}`;
@@ -82,8 +83,10 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
       const newSections = shouldShow
         ? [...visibleSections, sectionKey]
         : visibleSections.filter((s) => s !== sectionKey);
-      await updateVisibleSections(page.id, newSections);
+      const result = await updateVisibleSectionsAction(page.id, newSections);
+      if (!result.success) throw new Error(result.error);
       setVisibleSections(newSections);
+      setPreviewReloadKey((k) => k + 1);
       router.refresh();
     } catch {
       showToast("Fehler beim Aktualisieren der Sichtbarkeit", "error");
@@ -285,7 +288,7 @@ export default function PageOverviewClient({ page, counts, activeSpotlight }: Pr
 
       {/* ── Right panel: live preview ── */}
       <div className="flex-1 min-w-0" style={{ background: "var(--studio-bg)" }}>
-        <LivePreviewPanel previewPath={previewPath} externalUrl={externalUrl} />
+        <LivePreviewPanel previewPath={previewPath} externalUrl={externalUrl} reloadKey={previewReloadKey} />
       </div>
     </div>
   );

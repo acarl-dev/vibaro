@@ -51,15 +51,18 @@ export default function ModernTemplate({
       return showDate >= now;
     });
   }, [page.shows]);
-  
-  // Check what content is available
-  const hasLinks = (page.links?.length ?? 0) > 0;
-  const hasShows = (upcomingShows?.length ?? 0) > 0;
-  const hasReleases = (page.releases?.length ?? 0) > 0;
-  const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0;
-  const hasVideos = (page.videos?.length ?? 0) > 0;
-  const hasGallery = (page.gallery_images?.length ?? 0) > 0;
-  const hasContact = !!(page.contacts?.length);
+
+  // Section visibility — respects visible_sections toggled in the studio
+  const visibleSections = page.visible_sections ?? ["profile", "links", "music", "shows", "releases", "videos", "gallery", "contact"];
+  const isSectionVisible = (key: string) => visibleSections.includes(key);
+
+  const hasLinks = (page.links?.length ?? 0) > 0 && isSectionVisible("links");
+  const hasShows = upcomingShows.length > 0 && isSectionVisible("shows");
+  const hasReleases = (page.releases?.length ?? 0) > 0 && isSectionVisible("releases");
+  const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0 && isSectionVisible("music");
+  const hasVideos = (page.videos?.length ?? 0) > 0 && isSectionVisible("videos");
+  const hasGallery = (page.gallery_images?.length ?? 0) > 0 && isSectionVisible("gallery");
+  const hasContact = !!(page.contacts?.length) && isSectionVisible("contact");
 
   return (
     <>
