@@ -61,20 +61,17 @@ export default function StudioTopNav({ page }: StudioTopNavProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex items-center px-3 text-[11px] font-bold tracking-widest uppercase transition-colors"
+                className="flex items-center px-3 text-[11px] font-semibold tracking-widest uppercase transition-colors"
                 style={{
                   color: active
                     ? "var(--studio-text-primary)"
                     : "var(--studio-text-secondary)",
+                  borderBottom: active
+                    ? "2px solid var(--studio-accent)"
+                    : "2px solid transparent",
                 }}
               >
                 {item.label}
-                {active && (
-                  <span
-                    className="absolute bottom-0 left-3 right-3 h-[2px] rounded-t-full"
-                    style={{ background: "var(--studio-accent)" }}
-                  />
-                )}
               </Link>
             );
           })}

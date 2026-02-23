@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import StudioTabPage from "../../components/StudioTabPage";
 
 type GalleryImage = {
   id: number;
@@ -314,14 +315,10 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Gallery</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Verwalte deine Fotos und Press Shots (max. 16 Bilder).
-        </p>
-      </div>
-
+    <StudioTabPage
+      title="Galerie"
+      description="Verwalte deine Fotos und Press Shots (max. 16 Bilder)."
+    >
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -558,6 +555,6 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
           </div>
         </div>
       )}
-    </div>
+    </StudioTabPage>
   );
 }

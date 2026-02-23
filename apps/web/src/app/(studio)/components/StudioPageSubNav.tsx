@@ -49,7 +49,7 @@ export default function StudioPageSubNav() {
       className="sticky z-30 flex-shrink-0"
       style={{
         top: "var(--studio-nav-height, 56px)",
-        background: "var(--studio-bg)",
+        background: "var(--studio-surface)",
         borderBottom: "1px solid var(--studio-border)",
       }}
     >
@@ -64,7 +64,7 @@ export default function StudioPageSubNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex-shrink-0 flex items-center px-3 py-2.5 text-[11px] font-semibold tracking-wider uppercase transition-colors whitespace-nowrap"
+                className="flex-shrink-0 flex items-center px-3 py-2.5 text-[11px] font-semibold tracking-widest uppercase transition-colors whitespace-nowrap"
                 style={{
                   color: active
                     ? "var(--studio-text-primary)"

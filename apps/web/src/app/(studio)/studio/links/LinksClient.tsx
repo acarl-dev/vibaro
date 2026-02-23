@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import StudioTabPage from "../../components/StudioTabPage";
 import { getSocialIcon, getPlatformName, type SocialPlatform } from "@/lib/social-icons";
 
 type Link = {
@@ -126,14 +127,10 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
   const customLinks = links.filter((l) => !SOCIAL_PLATFORMS.includes(l.type as SocialPlatform));
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Links</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Füge URLs zu deinen Social Media Profilen und Musikplattformen hinzu.
-        </p>
-      </div>
-
+    <StudioTabPage
+      title="Links"
+      description="Füge URLs zu deinen Social Media Profilen und Musikplattformen hinzu."
+    >
       <div className="space-y-6">
         {/* Social Media Section */}
         <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -269,7 +266,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
           )}
         </div>
       </div>
-    </div>
+    </StudioTabPage>
   );
 }
 

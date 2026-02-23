@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import StudioTabPage from "../../components/StudioTabPage";
 
 type FeaturedTrack = {
   id: number;
@@ -191,19 +192,11 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
   };
 
   return (
-    <div>
-      <div className="max-w-4xl">
-        {/* Header */}
-        <div className="studio-page-header mb-8">
-          <div>
-            <h1 className="studio-h1 text-2xl">Music</h1>
-            <p className="studio-subtitle mt-1">
-              Wähle bis zu 5-7 Tracks aus, die auf deiner Seite abgespielt werden können.
-            </p>
-          </div>
-        </div>
-
-        {/* Error */}
+    <StudioTabPage
+      title="Musik"
+      description="Wähle bis zu 5-7 Tracks aus, die auf deiner Seite abgespielt werden können."
+    >
+      {/* Error */}
         {error && (
           <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {error}
@@ -451,7 +444,6 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </StudioTabPage>
   );
 }

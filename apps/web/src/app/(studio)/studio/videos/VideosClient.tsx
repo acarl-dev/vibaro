@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import StudioTabPage from "../../components/StudioTabPage";
 
 type Video = {
   id: number;
@@ -213,14 +214,10 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Videos</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Verwalte deine Musikvideos und anderen Video-Content (max. 8 Videos).
-        </p>
-      </div>
-
+    <StudioTabPage
+      title="Videos"
+      description="Verwalte deine Musikvideos und anderen Video-Content (max. 8 Videos)."
+    >
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -464,6 +461,6 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
           )}
         </div>
       </div>
-    </div>
+    </StudioTabPage>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+import StudioTabPage from "../../components/StudioTabPage";
 
 type Release = {
   id: number;
@@ -277,15 +278,12 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Releases</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Präsentiere deine Alben, EPs und Singles.
-        </p>
-        <div className="mt-3 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
-          💡 <span className="font-medium">Info:</span> Markierte Releases erscheinen als "New Release" ganz oben auf deiner Künstlerseite.
-        </div>
+    <StudioTabPage
+      title="Releases"
+      description="Präsentiere deine Alben, EPs und Singles."
+    >
+      <div className="mb-4 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
+        💡 <span className="font-medium">Info:</span> Markierte Releases erscheinen als „New Release“ ganz oben auf deiner Künstlerseite.
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -610,6 +608,6 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
           )}
         </div>
       </div>
-    </div>
+    </StudioTabPage>
   );
 }

@@ -26,7 +26,7 @@ export default function StudioBottomNav() {
           const Icon = item.icon;
           return (
             <Link key={item.href} href={item.href}
-              className="flex flex-col items-center justify-center flex-1 gap-1 transition-colors"
+              className="relative flex flex-col items-center justify-center flex-1 gap-1 transition-colors"
               style={{ color: active ? "var(--studio-accent)" : "var(--studio-text-secondary)" }}>
               <Icon size={19} />
               <span className="text-[9px] font-semibold tracking-wider uppercase">{item.label}</span>
