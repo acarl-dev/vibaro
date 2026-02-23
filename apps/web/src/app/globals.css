@@ -318,8 +318,7 @@ a:focus-visible,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(900px 420px at 50% 35%, rgba(0,0,0,0.10), rgba(0,0,0,0.65) 70%),
-    linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.24) 60%, rgba(0,0,0,0.70));
+    radial-gradient(900px 420px at 50% 35%, rgba(0,0,0,0.10), rgba(0,0,0,0.40) 70%);
   pointer-events: none;
 }
 
@@ -372,8 +371,8 @@ a:focus-visible,
 /* Name dock — centred poster headline below the logo */
 .stage-hero__nameDock {
   text-align: center;
-  padding-top: clamp(32px, 4vw, 56px);
-  padding-bottom: 40px;
+  padding-top: clamp(48px, 6vw, 80px);
+  padding-bottom: 0;
 }
 
 .stage-hero__title {
@@ -386,8 +385,10 @@ a:focus-visible,
 }
 
 .stage-hero__subtitle {
-  margin: 24px auto 0;
-  max-width: 60ch;
-  color: rgba(255,255,255,0.70);
-  font-size: clamp(12px, 1.1vw, 14px);
+  margin: clamp(32px, 4vw, 56px) auto 0;
+  max-width: 80ch;
+  color: rgba(255,255,255,0.40);
+  font-size: clamp(11px, 0.9vw, 13px);
+  line-height: 1.45;
+  letter-spacing: 0.01em;
 }

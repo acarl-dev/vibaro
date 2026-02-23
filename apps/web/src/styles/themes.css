@@ -15,9 +15,9 @@
 :root,
 [data-theme="dark-editorial"] {
   /* Backgrounds */
-  --bg-page: 9 9 11;              /* Main page background (zinc-950) */
-  --bg-surface: 24 24 27;         /* Card/surface background (zinc-900) */
-  --bg-surface-hover: 39 39 42;   /* Hover state for surfaces (zinc-800) */
+  --bg-page: 5 5 7;               /* Main page background (#050507, matches stage-hero) */
+  --bg-surface: 14 14 18;         /* Card/surface background */
+  --bg-surface-hover: 24 24 27;   /* Hover state for surfaces (zinc-900) */
   
   /* Text */
   --text-primary: 250 250 250;    /* Main text (zinc-50) */

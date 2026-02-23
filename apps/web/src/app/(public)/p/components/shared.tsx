@@ -387,7 +387,7 @@ export function LinkList({ items }: { items: LinkItem[] }) {
   };
 
   return (
-    <div className="flex flex-wrap gap-4 md:gap-6">
+    <div className="flex flex-wrap justify-center gap-4 md:gap-6">
       {items.map((link, index) => (
         <a
           key={index}

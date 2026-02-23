@@ -89,7 +89,7 @@ export default function ModernTemplate({
 
           {/* Links directly under hero - part of identity block */}
           {hasLinks && (
-            <section className="pt-12 pb-16">
+            <section className="pb-16" style={{ paddingTop: "clamp(32px, 4vw, 56px)" }}>
               <LinkList items={page.links} />
             </section>
           )}
