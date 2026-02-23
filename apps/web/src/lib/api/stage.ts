@@ -124,17 +124,10 @@ function getTokenFromCookie(): string | null {
 async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   const token = getTokenFromCookie();
   
-  // DEBUG: Log token status
-  console.log('[DEBUG] All cookies:', document.cookie);
-  console.log('[DEBUG] Token from cookie:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
-  
   const headers = new Headers(init?.headers || {});
   
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
-    console.log('[DEBUG] Authorization header set');
-  } else {
-    console.warn('[DEBUG] No token found, request will be unauthorized');
   }
   
   if (init?.body && typeof init.body === 'string' && !headers.has('Content-Type')) {
