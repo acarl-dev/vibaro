@@ -19,17 +19,18 @@ export default function StudioBottomNav() {
     return pathname.startsWith(href);
   };
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--studio-surface)] border-t border-[var(--studio-border)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50" style={{ background: "var(--studio-surface)", borderTop: "1px solid var(--studio-border)" }}>
       <div className="flex h-16">
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.href, item.exact);
           const Icon = item.icon;
           return (
             <Link key={item.href} href={item.href}
-              className="flex flex-col items-center justify-center flex-1 gap-0.5 transition-colors"
+              className="flex flex-col items-center justify-center flex-1 gap-1 transition-colors"
               style={{ color: active ? "var(--studio-accent)" : "var(--studio-text-secondary)" }}>
-              <Icon size={20} />
-              {active && <span className="w-1 h-1 rounded-full bg-[var(--studio-accent)]" />}
+              <Icon size={19} />
+              <span className="text-[9px] font-semibold tracking-wider uppercase">{item.label}</span>
+              {active && <span className="absolute bottom-0 w-8 h-0.5 rounded-t-full" style={{ background: "var(--studio-accent)" }} />}
             </Link>
           );
         })}

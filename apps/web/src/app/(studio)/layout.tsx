@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
-import StudioSidebar from "./components/StudioSidebar";
+import StudioTopNav from "./components/StudioTopNav";
+import StudioPageSubNav from "./components/StudioPageSubNav";
 import StudioBottomNav from "./components/StudioBottomNav";
 import { ToastProvider } from "@/context/ToastContext";
 
@@ -70,15 +71,19 @@ export default async function StudioLayout({ children }: { children: ReactNode }
     <ToastProvider>
       <div
         data-theme="studio"
-        className="flex min-h-screen"
+        className="flex flex-col min-h-screen"
         style={{ background: "var(--studio-bg)", color: "var(--studio-text-primary)" }}
       >
-        <StudioSidebar page={page} />
-        <div className="flex-1 flex flex-col min-w-0">
-          <main className="flex-1 p-6 pb-24 md:pb-6">
+        <StudioTopNav page={page} />
+        <StudioPageSubNav />
+        <main className="flex-1 pb-20 md:pb-0">
+          <div
+            className="mx-auto px-4 sm:px-6 py-8"
+            style={{ maxWidth: "1200px" }}
+          >
             {children}
-          </main>
-        </div>
+          </div>
+        </main>
         <StudioBottomNav />
       </div>
     </ToastProvider>

@@ -8,27 +8,24 @@ type StudioPageHeaderProps = {
 
 export default function StudioPageHeader({ title, subtitle, action }: StudioPageHeaderProps) {
   return (
-    <div
-      className="flex items-center justify-between mb-6 pb-4"
-      style={{ borderBottom: "1px solid var(--studio-border)" }}
-    >
+    <div className="flex items-start justify-between mb-8 gap-4">
       <div>
         <h1
-          className="text-xl font-bold uppercase tracking-[0.05em]"
+          className="text-lg font-bold uppercase tracking-[0.08em]"
           style={{ color: "var(--studio-text-primary)" }}
         >
           {title}
         </h1>
         {subtitle && (
           <p
-            className="text-sm mt-0.5"
+            className="text-sm mt-1 leading-relaxed"
             style={{ color: "var(--studio-text-secondary)" }}
           >
             {subtitle}
           </p>
         )}
       </div>
-      {action && <div className="flex-shrink-0">{action}</div>}
+      {action && <div className="flex-shrink-0 mt-0.5">{action}</div>}
     </div>
   );
 }
