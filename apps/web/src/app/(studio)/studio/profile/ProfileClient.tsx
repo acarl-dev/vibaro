@@ -255,7 +255,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
   return (
     <StudioTabPage
       title="Header"
-      description="Klicke auf Elemente, um sie direkt zu bearbeiten"
+      description="Header-Bild, Fokuspunkt, Künstlername und Bio"
       action={saveStatus !== "idle" ? (
         <div className="flex items-center gap-2 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
           {saveStatus === "saving" && (
@@ -317,13 +317,6 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                   </div>
                 </div>
               )}
-              <div
-                className="hidden md:block absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(to bottom, rgba(9,9,11,0) 0%, rgba(9,9,11,0) 45%, rgba(9,9,11,0.35) 55%, rgba(9,9,11,0.65) 70%, rgba(9,9,11,0.85) 82%, rgba(9,9,11,0.95) 92%, rgba(9,9,11,0.98) 100%)",
-                }}
-              />
 
               {/* Edit/Delete Buttons */}
               <div className="absolute top-4 right-4 z-[40] flex gap-2">
@@ -392,88 +385,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 </button>
               </div>
 
-              {/* Name & Bio in Hero - Editable (positioned like on public page) */}
-              <div
-                className="absolute"
-                style={{
-                  top: "50%",
-                  left: 0,
-                  right: 0,
-                  transform: "translate(20%, -5%)",
-                  paddingBottom: "2rem",
-                }}
-              >
-                <div
-                  className="mx-auto"
-                  style={{
-                    maxWidth: "980px",
-                    padding: "0 clamp(16px, 4vw, 48px)",
-                  }}
-                >
-                  {/* Display Name - Editable */}
-                  <div className="mb-1.5">
-                    {editingName ? (
-                      <input
-                        ref={nameInputRef}
-                        type="text"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        onBlur={() => setEditingName(false)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") setEditingName(false);
-                          if (e.key === "Escape") {
-                            setDisplayName(initialPage.display_name);
-                            setEditingName(false);
-                          }
-                        }}
-                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2"
-                        style={{ width: "auto", minWidth: "300px", maxWidth: "100%" }}
-                        placeholder="Dein Name"
-                      />
-                    ) : (
-                      <h1
-                        onClick={() => setEditingName(true)}
-                        className="text-2xl md:text-3xl font-semibold tracking-tight leading-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
-                      >
-                        {displayName || "Dein Name"}
-                      </h1>
-                    )}
-                  </div>
 
-                  {/* Bio - Editable */}
-                  <div className="w-full">
-                    {editingBio ? (
-                      <div className="space-y-2 w-full">
-                        <textarea
-                          ref={bioTextareaRef}
-                          value={bio}
-                          onChange={(e) => setBio(e.target.value)}
-                          onBlur={() => setEditingBio(false)}
-                          maxLength={maxBioLength}
-                          rows={1}
-                          className="w-full rounded-lg border-2 border-emerald-500 bg-black/40 backdrop-blur-sm px-4 py-3 text-xs leading-relaxed text-zinc-200 focus:outline-none resize-none overflow-hidden placeholder:text-zinc-400"
-                          style={{ maxWidth: "72ch" }}
-                          placeholder="Erzähl kurz über dich..."
-                        />
-                        <div className="flex items-center justify-between text-xs text-white/70 bg-black/40 backdrop-blur-sm rounded px-3 py-1">
-                          <span>
-                            Enter = Neue Zeile • ESC = Abbrechen • Noch {Math.max(0, maxBioLength - bio.length)} Zeichen
-                          </span>
-                          <span>{bio.length}/{maxBioLength}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <p
-                        onClick={() => setEditingBio(true)}
-                        className="mt-1.5 text-zinc-200 text-[11px] leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap w-full"
-                        style={{ maxWidth: "50.4ch" }}
-                      >
-                        {bio || <span className="text-white/60 italic">Klicke hier, um deine Bio hinzuzufügen...</span>}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           ) : (
             <div className="relative aspect-[21/9] bg-zinc-900">
@@ -578,72 +490,106 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
           </div>
         </div>
 
-        {/* Name & Bio Section - Only visible when NO hero image (for templates without image) */}
-        {!initialPage.hero_image_url && (
-          <div className="p-6 border-b border-zinc-800">
-            <div className="mx-auto" style={{ maxWidth: "720px" }}>
-              {/* Display Name - Editable */}
-              <div className="mb-4">
-                <label className="block text-xs text-zinc-500 mb-2">Künstlername</label>
-                {editingName ? (
-                  <input
-                    ref={nameInputRef}
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    onBlur={() => setEditingName(false)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") setEditingName(false);
-                      if (e.key === "Escape") {
-                        setDisplayName(initialPage.display_name);
-                        setEditingName(false);
-                      }
-                    }}
-                    className="w-full text-xl font-semibold tracking-tight bg-transparent border-b-2 border-emerald-500 text-white focus:outline-none py-2"
-                    placeholder="Dein Name"
-                  />
-                ) : (
-                  <h2
-                    onClick={() => setEditingName(true)}
-                    className="text-xl font-semibold tracking-tight text-white cursor-text hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-white/30 py-2"
-                  >
-                    {displayName || <span className="text-zinc-500">Klicke hier, um deinen Namen einzugeben...</span>}
-                  </h2>
-                )}
-              </div>
-
-              {/* Bio - Editable */}
-              <div>
-                <label className="block text-xs text-zinc-500 mb-2">Bio</label>
-                {editingBio ? (
-                  <div className="space-y-2">
-                    <textarea
-                      ref={bioTextareaRef}
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      onBlur={() => setEditingBio(false)}
-                      maxLength={maxBioLength}
-                      rows={3}
-                      className="w-full rounded-lg border-2 border-emerald-500 bg-zinc-800/50 px-4 py-3 text-sm leading-relaxed text-zinc-200 focus:outline-none resize-none overflow-hidden placeholder:text-zinc-400"
-                      placeholder="Erzähl kurz über dich..."
-                    />
-                    <div className="flex items-center justify-between text-xs text-zinc-500">
-                      <span>Enter = Neue Zeile • ESC = Abbrechen</span>
-                      <span>{bio.length}/{maxBioLength}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <p
-                    onClick={() => setEditingBio(true)}
-                    className="text-sm text-zinc-300 leading-relaxed cursor-text hover:text-white transition-colors whitespace-pre-wrap py-2 border-b-2 border-transparent hover:border-white/30 min-h-[60px]"
-                  >
-                    {bio || <span className="text-zinc-500 italic">Klicke hier, um deine Bio hinzuzufügen...</span>}
-                  </p>
-                )}
-              </div>
-            </div>
+        {/* Name & Bio Section – always visible below the hero */}
+        <div
+          className="px-6 py-5 flex flex-col gap-5"
+          style={{ borderBottom: "1px solid var(--studio-border)" }}
+        >
+          {/* Künstlername */}
+          <div>
+            <label
+              className="block text-[10px] font-semibold uppercase tracking-widest mb-2"
+              style={{ color: "var(--studio-text-secondary)" }}
+            >
+              Künstlername
+            </label>
+            {editingName ? (
+              <input
+                ref={nameInputRef}
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                onBlur={() => setEditingName(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setEditingName(false);
+                  if (e.key === "Escape") {
+                    setDisplayName(initialPage.display_name);
+                    setEditingName(false);
+                  }
+                }}
+                className="w-full text-xl font-bold tracking-tight bg-transparent focus:outline-none py-1"
+                style={{
+                  color: "var(--studio-text-primary)",
+                  borderBottom: "2px solid var(--studio-accent)",
+                }}
+                placeholder="Dein Künstlername"
+              />
+            ) : (
+              <button
+                onClick={() => setEditingName(true)}
+                className="group w-full text-left py-1 transition-colors"
+                style={{ borderBottom: "2px solid var(--studio-border)" }}
+              >
+                <span
+                  className="text-xl font-bold tracking-tight"
+                  style={{ color: displayName ? "var(--studio-text-primary)" : "var(--studio-text-secondary)" }}
+                >
+                  {displayName || "Klicke hier, um deinen Namen einzugeben…"}
+                </span>
+              </button>
+            )}
           </div>
-        )}
+
+          {/* Bio */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                className="block text-[10px] font-semibold uppercase tracking-widest"
+                style={{ color: "var(--studio-text-secondary)" }}
+              >
+                Bio
+              </label>
+              <span
+                className="text-[10px] font-mono"
+                style={{ color: "var(--studio-text-secondary)" }}
+              >
+                {bio.length}/{maxBioLength}
+              </span>
+            </div>
+            {editingBio ? (
+              <textarea
+                ref={bioTextareaRef}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                onBlur={() => setEditingBio(false)}
+                maxLength={maxBioLength}
+                rows={3}
+                className="w-full rounded-lg px-4 py-3 text-sm leading-relaxed focus:outline-none resize-none overflow-hidden"
+                style={{
+                  background: "var(--studio-surface-elevated)",
+                  border: "2px solid var(--studio-accent)",
+                  color: "var(--studio-text-primary)",
+                }}
+                placeholder="Erzähl kurz über dich…"
+              />
+            ) : (
+              <button
+                onClick={() => setEditingBio(true)}
+                className="w-full text-left rounded-lg px-4 py-3 text-sm leading-relaxed transition-colors"
+                style={{
+                  background: "var(--studio-surface-elevated)",
+                  border: "1px solid var(--studio-border)",
+                  color: bio ? "var(--studio-text-primary)" : "var(--studio-text-secondary)",
+                  minHeight: "72px",
+                }}
+              >
+                <span className={bio ? "whitespace-pre-wrap" : "italic"}>
+                  {bio || "Klicke hier, um deine Bio hinzuzufügen…"}
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Info Box */}
         <div className="p-8">
@@ -653,10 +599,9 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-sm text-zinc-300 font-medium mb-1">So sieht dein Profil aus</p>
+                <p className="text-sm text-zinc-300 font-medium mb-1">Fokuspunkt setzen</p>
                 <p className="text-xs text-zinc-500">
-                  Dies ist eine Live-Vorschau deines öffentlichen Profils. Klicke auf Name oder Bio, 
-                  um sie zu bearbeiten. Änderungen werden automatisch gespeichert.
+                  Klicke auf „Fokuspunkt“, um festzulegen, welcher Bereich des Bilds immer sichtbar bleibt – unabhängig von der Bildschirmgröße.
                 </p>
               </div>
             </div>
