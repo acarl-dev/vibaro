@@ -201,6 +201,8 @@ class ArtistPageController extends Controller
             'bio' => $page->bio,
             'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
             'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,
+            'hero_focal_x' => $page->hero_focal_x ?? 50,
+            'hero_focal_y' => $page->hero_focal_y ?? 35,
             'visible_sections' => $page->visible_sections ?? ['profile', 'links', 'music', 'shows', 'releases', 'videos', 'gallery', 'contact'],
             'theme_key' => $page->theme_key,
             'theme_variant' => $page->theme_variant,
@@ -271,6 +273,32 @@ class ArtistPageController extends Controller
         // Store new hero image
         $path = $request->file('hero_image')->store('hero-images', 'public');
         $page->header_path = $path;
+        $page->save();
+
+        return $this->success($this->transform($page));
+    }
+
+    public function updateHeroFocal(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        try {
+            $validated = $request->validate([
+                'hero_focal_x' => ['required', 'integer', 'min:0', 'max:100'],
+                'hero_focal_y' => ['required', 'integer', 'min:0', 'max:100'],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        }
+
+        $page->hero_focal_x = $validated['hero_focal_x'];
+        $page->hero_focal_y = $validated['hero_focal_y'];
         $page->save();
 
         return $this->success($this->transform($page));

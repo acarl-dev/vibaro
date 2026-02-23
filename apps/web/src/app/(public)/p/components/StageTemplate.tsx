@@ -165,6 +165,8 @@ function StageHero({
   hasShows: boolean;
 }) {
   const hasHeroImage = !!page.images.hero_image_url;
+  const focalX = page.images.hero_focal_x ?? 50;
+  const focalY = page.images.hero_focal_y ?? 35;
 
   const handleScrollToShows = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -174,114 +176,21 @@ function StageHero({
     }
   };
 
-  return (
-    <header
-      className="relative w-full overflow-hidden"
-      style={{
-        height: "100vh",
-        minHeight: "100vh",
-        backgroundColor: "#0b0b0b",
-      }}
-    >
-      {hasHeroImage ? (
-        <>
-          {/* Hero Image - Full bleed */}
-          <img
-            src={page.images.hero_image_url!}
-            alt={`${page.display_name}`}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "50% 30%" }}
-          />
-
-          {/* Dark gradient overlay - from bottom for readability */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.85) 15%, rgba(11,11,11,0.4) 40%, transparent 70%)",
-            }}
-          />
-
-          {/* Content overlay at bottom */}
-          <div
-            className="absolute bottom-0 left-0 right-0 z-10"
-            style={{ padding: "0 clamp(16px, 4vw, 32px) 48px" }}
-          >
-            <div className="mx-auto" style={{ maxWidth: "1000px" }}>
-              {/* Band name - Large, bold */}
-              <h1
-                className="font-bold tracking-tight"
-                style={{
-                  fontSize: "clamp(36px, 8vw, 64px)",
-                  lineHeight: 1.1,
-                  textTransform: "uppercase",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {page.display_name}
-              </h1>
-
-              {/* Optional short claim (bio truncated) */}
-              {page.bio && (
-                <p
-                  className="mt-4 line-clamp-2"
-                  style={{
-                    fontSize: "clamp(14px, 2vw, 18px)",
-                    color: "rgba(255,255,255,0.7)",
-                    maxWidth: "600px",
-                  }}
-                >
-                  {page.bio}
-                </p>
-              )}
-
-              {/* CTA - Shows ansehen */}
-              {hasShows && (
-                <a
-                  href="#shows"
-                  onClick={handleScrollToShows}
-                  className="inline-flex items-center gap-2 mt-6 px-6 py-3 font-semibold text-sm uppercase tracking-wider transition-all"
-                  style={{
-                    backgroundColor: "var(--stage-accent, #ffffff)",
-                    color: "#0b0b0b",
-                    borderRadius: "4px",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = "0.9";
-                    e.currentTarget.style.transform = "translateY(-1px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = "1";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
-                >
-                  Shows ansehen
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                </a>
-              )}
-            </div>
-          </div>
-        </>
-      ) : (
-        /* No hero image - centered name */
+  if (!hasHeroImage) {
+    return (
+      <header
+        style={{
+          backgroundColor: "#050507",
+        }}
+      >
         <div
-          className="h-full flex flex-col items-center justify-center text-center"
+          className="flex flex-col items-center justify-center text-center"
           style={{
-            height: "100vh",
-            minHeight: "100vh",
-            padding: "48px clamp(16px, 4vw, 32px)",
+            minHeight: "clamp(400px, 60vh, 700px)",
+            padding: "clamp(48px, 8vw, 96px) clamp(16px, 4vw, 32px)",
             background: "linear-gradient(to bottom, #111111, #0b0b0b)",
           }}
         >
-          {/* Avatar if available */}
           {page.images.avatar_url && (
             <div
               className="overflow-hidden rounded-full mb-8"
@@ -298,7 +207,6 @@ function StageHero({
               />
             </div>
           )}
-
           <h1
             className="font-bold tracking-tight"
             style={{
@@ -310,7 +218,6 @@ function StageHero({
           >
             {page.display_name}
           </h1>
-
           {page.bio && (
             <p
               className="mt-4 line-clamp-2"
@@ -323,38 +230,135 @@ function StageHero({
               {page.bio}
             </p>
           )}
-
           {hasShows && (
             <a
               href="#shows"
               onClick={handleScrollToShows}
               className="inline-flex items-center gap-2 mt-8 px-6 py-3 font-semibold text-sm uppercase tracking-wider border-2 transition-all"
-              style={{
-                borderColor: "rgba(255,255,255,0.3)",
-                color: "#ffffff",
-                borderRadius: "4px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
-              }}
+              style={{ borderColor: "rgba(255,255,255,0.3)", color: "#ffffff", borderRadius: "4px" }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}
             >
               Shows ansehen
-              <svg
-                className="w-4 h-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
             </a>
           )}
         </div>
-      )}
+      </header>
+    );
+  }
+
+  return (
+    <header
+      className="relative"
+      style={{ backgroundColor: "#050507", padding: "32px 0 48px" }}
+    >
+      {/* Bleed Light – atmospheric glow behind the frame, generated in CSS.
+          The header has NO overflow-hidden so the blur can spill past the edges.
+          The Frame below has its own overflow-hidden to contain the image. */}
+      <div className="stage-hero-bleed" aria-hidden="true" />
+
+      {/* Frame Container */}
+      <div
+        className="relative mx-auto"
+        style={{ maxWidth: "1440px", padding: "0 20px", zIndex: 2 }}
+      >
+        <div
+          className="relative overflow-hidden"
+          style={{
+            height: "clamp(560px, 70vh, 900px)",
+            borderRadius: "18px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: "0 30px 80px rgba(0,0,0,0.65)",
+          }}
+        >
+          {/* Hero Image with focal point */}
+          <img
+            src={page.images.hero_image_url!}
+            alt={page.display_name}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              objectPosition: `${focalX}% ${focalY}%`,
+              transform: "scale(1.03)",
+              transformOrigin: "center center",
+            }}
+          />
+
+          {/* Overlay: Vignette + Gradient */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(1200px 700px at 60% 20%, rgba(0,0,0,0.20), transparent 60%), " +
+                "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.50) 100%)",
+            }}
+          />
+
+          {/* Content – poster style at bottom */}
+          <div
+            className="absolute z-10 text-white"
+            style={{
+              left: "clamp(18px, 4vw, 56px)",
+              right: "clamp(18px, 4vw, 56px)",
+              bottom: "clamp(20px, 5vw, 56px)",
+            }}
+          >
+            <h1
+              className="font-extrabold tracking-tight"
+              style={{
+                fontSize: "clamp(44px, 6vw, 86px)",
+                lineHeight: 0.95,
+                textTransform: "uppercase",
+                marginBottom: "12px",
+              }}
+            >
+              {page.display_name}
+            </h1>
+
+            {page.bio && (
+              <p
+                style={{
+                  marginBottom: "22px",
+                  maxWidth: "52ch",
+                  fontSize: "clamp(14px, 1.5vw, 18px)",
+                  opacity: 0.85,
+                  lineHeight: 1.5,
+                }}
+              >
+                {page.bio}
+              </p>
+            )}
+
+            {hasShows && (
+              <a
+                href="#shows"
+                onClick={handleScrollToShows}
+                className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm uppercase tracking-wider transition-all"
+                style={{
+                  backgroundColor: "var(--stage-accent, #ffffff)",
+                  color: "#050507",
+                  borderRadius: "4px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = "0.9";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = "1";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                Shows ansehen
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

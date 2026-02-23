@@ -12,6 +12,8 @@ type ArtistPage = {
   is_published: boolean;
   avatar_url: string | null;
   hero_image_url: string | null;
+  hero_focal_x: number | null;
+  hero_focal_y: number | null;
 };
 
 type ProfileClientProps = {
@@ -28,6 +30,10 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
   const [editingName, setEditingName] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [heroUploading, setHeroUploading] = useState(false);
+  const [focalMode, setFocalMode] = useState(false);
+  const [focalX, setFocalX] = useState(initialPage.hero_focal_x ?? 50);
+  const [focalY, setFocalY] = useState(initialPage.hero_focal_y ?? 35);
+  const [focalSaving, setFocalSaving] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   const bioTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -172,6 +178,29 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
     }
   };
 
+  const saveFocalPoint = async (x: number, y: number) => {
+    setFocalX(x);
+    setFocalY(y);
+    setFocalSaving(true);
+    try {
+      const res = await fetch("/api/studio/update-hero-focal", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hero_focal_x: x, hero_focal_y: y }),
+      });
+      if (res.ok) {
+        showToast("Fokuspunkt gespeichert.", "success");
+      } else {
+        showToast("Fehler beim Speichern.", "error");
+      }
+    } catch {
+      showToast("Fehler beim Speichern.", "error");
+    } finally {
+      setFocalSaving(false);
+      setFocalMode(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
@@ -215,7 +244,35 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 src={initialPage.hero_image_url}
                 alt="Hero"
                 className="w-full h-full object-cover"
+                style={{ objectPosition: `${focalX}% ${focalY}%` }}
               />
+              {/* Focal Point Crosshair */}
+              <div
+                className="absolute pointer-events-none z-20 transition-all duration-150"
+                style={{ left: `${focalX}%`, top: `${focalY}%`, transform: "translate(-50%, -50%)" }}
+              >
+                <div className="w-5 h-5 rounded-full border-2 border-white shadow-lg flex items-center justify-center bg-black/40">
+                  <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                </div>
+              </div>
+              {/* Focal Mode Overlay – captures click position */}
+              {focalMode && (
+                <div
+                  className="absolute inset-0 bg-blue-500/10 border-2 border-blue-400/60 cursor-crosshair z-30"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                    saveFocalPoint(x, y);
+                  }}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-xs font-medium">
+                      Klicke auf den gewünschten Fokuspunkt
+                    </div>
+                  </div>
+                </div>
+              )}
               <div
                 className="hidden md:block absolute inset-0 pointer-events-none"
                 style={{
@@ -225,7 +282,29 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               />
 
               {/* Edit/Delete Buttons */}
-              <div className="absolute top-4 right-4 z-10 flex gap-2">
+              <div className="absolute top-4 right-4 z-[40] flex gap-2">
+                <button
+                  onClick={() => setFocalMode(!focalMode)}
+                  disabled={heroUploading || focalSaving}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg backdrop-blur-sm border text-xs text-white transition-colors disabled:opacity-50 ${
+                    focalMode
+                      ? "bg-blue-600/90 border-blue-400/40 hover:bg-blue-600"
+                      : "bg-black/60 border-white/10 hover:bg-black/80"
+                  }`}
+                >
+                  {focalSaving ? (
+                    <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v2M12 20v2M2 12h2M20 12h2" />
+                    </svg>
+                  )}
+                  {focalMode ? "Abbrechen" : "Fokuspunkt"}
+                </button>
                 <label className="cursor-pointer">
                   <input
                     type="file"

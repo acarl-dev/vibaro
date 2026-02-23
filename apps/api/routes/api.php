@@ -41,15 +41,16 @@ Route::prefix('v1')->group(function () {
         // Artist Page (private)
         Route::get('/artist-pages/me', [ArtistPageController::class, 'me']);
         Route::post('/artist-pages', [ArtistPageController::class, 'store']);
+        Route::post('/artist-pages/upload-avatar', [ArtistPageController::class, 'uploadAvatar']);
+        Route::post('/artist-pages/upload-hero', [ArtistPageController::class, 'uploadHero']);
+        Route::patch('/artist-pages/update-hero-focal', [ArtistPageController::class, 'updateHeroFocal']);
+        Route::delete('/artist-pages/delete-avatar', [ArtistPageController::class, 'deleteAvatar']);
+        Route::delete('/artist-pages/delete-hero', [ArtistPageController::class, 'deleteHero']);
+        Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
         Route::patch('/artist-pages/{id}', [ArtistPageController::class, 'update']);
         Route::patch('/artist-pages/{artistPage}/sections', [ArtistPageController::class, 'updateSections']);
         Route::post('/artist-pages/{id}/publish', [ArtistPageController::class, 'publish']);
         Route::post('/artist-pages/{id}/unpublish', [ArtistPageController::class, 'unpublish']);
-        Route::post('/artist-pages/upload-avatar', [ArtistPageController::class, 'uploadAvatar']);
-        Route::post('/artist-pages/upload-hero', [ArtistPageController::class, 'uploadHero']);
-        Route::delete('/artist-pages/delete-avatar', [ArtistPageController::class, 'deleteAvatar']);
-        Route::delete('/artist-pages/delete-hero', [ArtistPageController::class, 'deleteHero']);
-        Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
 
         // Links (private CRUD)
         Route::get('/artist-pages/me/links', [LinkController::class, 'myLinks']);

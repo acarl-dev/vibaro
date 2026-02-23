@@ -36,6 +36,8 @@ class ArtistPage extends Model
         'is_published',
         'published_at',
         'visible_sections',
+        'hero_focal_x',
+        'hero_focal_y',
     ];
 
     /**
@@ -45,6 +47,8 @@ class ArtistPage extends Model
         'is_published' => 'boolean',
         'published_at' => 'datetime',
         'visible_sections' => 'array',
+        'hero_focal_x' => 'integer',
+        'hero_focal_y' => 'integer',
     ];
 
     public function user(): BelongsTo

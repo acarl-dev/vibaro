@@ -28,6 +28,8 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
       is_published: Boolean(data.is_published),
       avatar_url: data.avatar_url ?? null,
       hero_image_url: data.hero_image_url ?? null,
+      hero_focal_x: data.hero_focal_x ?? 50,
+      hero_focal_y: data.hero_focal_y ?? 35,
     };
   } catch {
     return null;

@@ -96,6 +96,8 @@ export type PublicArtistPageData = {
   images: {
     avatar_url: string | null;
     hero_image_url: string | null;
+    hero_focal_x?: number | null;
+    hero_focal_y?: number | null;
   };
   focus?: {
     type: "links" | "shows" | "releases";
@@ -125,93 +127,12 @@ export type PublicArtistPageData = {
 export function Hero({ page }: { page: PublicArtistPageData }) {
   const hasHeroImage = !!page.images.hero_image_url;
   const hasAvatar = !!page.images.avatar_url;
+  const focalX = page.images.hero_focal_x ?? 50;
+  const focalY = page.images.hero_focal_y ?? 35;
 
-  return (
-    <section className="w-full bg-zinc-950">
-      {hasHeroImage ? (
-        <header>
-          {/* Hero image: mobile = full image (auto height), desktop = full-bleed cover */}
-          <div className="relative w-full overflow-hidden bg-zinc-950 md:h-screen">
-            <img
-              src={page.images.hero_image_url!}
-              alt={`${page.display_name} hero image`}
-              className="block w-full h-auto md:absolute md:inset-0 md:w-full md:h-full md:object-cover md:object-[50%_0%]"
-            />
-
-            {/* Mobile-only subtle fade into page background */}
-            <div
-              className="absolute inset-x-0 bottom-0 h-24 pointer-events-none md:hidden"
-              style={{
-                background:
-                  "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 60%, rgb(9, 9, 11) 100%)",
-              }}
-            />
-
-            {/* Desktop-only gradient overlay for readability */}
-            <div
-              className="hidden md:block absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "linear-gradient(to bottom, rgba(9,9,11,0) 0%, rgba(9,9,11,0) 45%, rgba(9,9,11,0.35) 55%, rgba(9,9,11,0.65) 70%, rgba(9,9,11,0.85) 82%, rgba(9,9,11,0.95) 92%, rgba(9,9,11,0.98) 100%)",
-              }}
-            />
-
-            {/* Desktop-only text overlay */}
-            <div
-              className="hidden md:block absolute"
-              style={{
-                top: "68%",
-                left: 0,
-                right: 0,
-                transform: "translateY(-5%)",
-                paddingBottom: "2rem",
-              }}
-            >
-              <div
-                className="mx-auto"
-                style={containerStyle()}
-              >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
-                  {page.display_name}
-                </h1>
-
-                {page.bio && (
-                  <p
-                    className="mt-3 text-zinc-200 text-base md:text-lg leading-relaxed"
-                    style={bioTextStyle()}
-                  >
-                    {page.bio}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile-only: name & bio below image */}
-          <div
-            className="md:hidden relative bg-zinc-950"
-            style={{
-              marginTop: "-1px",
-              padding: PADDING_HERO_MOBILE,
-            }}
-          >
-            <div className="mx-auto" style={containerStyle()}>
-              <h1 className="text-4xl font-semibold tracking-tight leading-tight text-white">
-                {page.display_name}
-              </h1>
-
-              {page.bio && (
-                <p
-                  className="mt-3 text-zinc-300 text-base leading-relaxed"
-                  style={bioTextStyle()}
-                >
-                  {page.bio}
-                </p>
-              )}
-            </div>
-          </div>
-        </header>
-      ) : (
+  if (!hasHeroImage) {
+    return (
+      <section className="w-full bg-zinc-950">
         <header
           className="relative w-full"
           style={{
@@ -221,7 +142,6 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
           }}
         >
           <div className="h-full flex flex-col items-center justify-center text-center mx-auto" style={containerStyle()}>
-            {/* Logo/Avatar */}
             {hasAvatar ? (
               <div className="relative h-40 w-40 md:h-48 md:w-48 lg:h-56 lg:w-56 overflow-hidden rounded-full ring-2 ring-zinc-800/50 shadow-2xl mb-8">
                 <img
@@ -237,24 +157,96 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
                 </span>
               </div>
             )}
-
-            {/* Name */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-white">
               {page.display_name}
             </h1>
-
-            {/* Bio */}
             {page.bio && (
-              <p
-                className="mt-4 text-zinc-300 text-base md:text-lg leading-relaxed mx-auto"
-                style={bioTextStyle()}
-              >
+              <p className="mt-4 text-zinc-300 text-base md:text-lg leading-relaxed mx-auto" style={bioTextStyle()}>
                 {page.bio}
               </p>
             )}
           </div>
         </header>
-      )}
+      </section>
+    );
+  }
+
+  return (
+    <section
+      className="relative w-full overflow-hidden"
+      style={{ backgroundColor: "#050507", padding: "28px 0 44px" }}
+    >
+      {/* Bleed Light – atmospheric glow behind the frame */}
+      <div className="stage-hero-bleed" aria-hidden="true" />
+
+      {/* Frame Container */}
+      <div
+        className="relative mx-auto"
+        style={{ maxWidth: "1440px", padding: "0 clamp(12px, 2.5vw, 24px)", zIndex: 2 }}
+      >
+        {/* Frame */}
+        <div
+          className="relative overflow-hidden"
+          style={{
+            height: "clamp(480px, 68vh, 860px)",
+            borderRadius: "16px",
+            border: "1px solid rgba(255,255,255,0.07)",
+            boxShadow: "0 24px 72px rgba(0,0,0,0.6)",
+          }}
+        >
+          {/* Hero Image with focal point */}
+          <img
+            src={page.images.hero_image_url!}
+            alt={`${page.display_name} hero image`}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              objectPosition: `${focalX}% ${focalY}%`,
+              transform: "scale(1.02)",
+              transformOrigin: "center center",
+            }}
+          />
+
+          {/* Overlay: Vignette + Gradient */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(1200px 700px at 60% 20%, rgba(0,0,0,0.18), transparent 60%), " +
+                "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.45) 100%)",
+            }}
+          />
+
+          {/* Content – bottom left, poster style */}
+          <div
+            className="absolute z-10 text-white"
+            style={{
+              left: "clamp(16px, 4vw, 52px)",
+              right: "clamp(16px, 4vw, 52px)",
+              bottom: "clamp(20px, 4.5vw, 52px)",
+            }}
+          >
+            <h1
+              className="font-semibold tracking-tight leading-tight"
+              style={{ fontSize: "clamp(32px, 5.5vw, 80px)" }}
+            >
+              {page.display_name}
+            </h1>
+            {page.bio && (
+              <p
+                className="mt-3"
+                style={{
+                  maxWidth: "52ch",
+                  fontSize: "clamp(13px, 1.4vw, 17px)",
+                  opacity: 0.82,
+                  lineHeight: 1.55,
+                }}
+              >
+                {page.bio}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
