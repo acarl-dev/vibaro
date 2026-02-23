@@ -67,7 +67,7 @@ class LinkController extends Controller
 
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'url' => 'nullable|url|max:2048',
+            'url' => 'nullable|string|max:2048',
             'type' => 'nullable|string|in:facebook,instagram,tiktok,x,youtube,spotify,applemusic,soundcloud,bandcamp,website,custom',
         ]);
 
@@ -105,7 +105,7 @@ class LinkController extends Controller
 
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'url' => 'nullable|url|max:2048',
+            'url' => 'nullable|string|max:2048',
             'type' => 'nullable|string|in:facebook,instagram,tiktok,x,youtube,spotify,applemusic,soundcloud,bandcamp,website,custom',
             'is_visible' => 'nullable|boolean',
         ]);

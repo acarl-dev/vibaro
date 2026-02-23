@@ -34,6 +34,11 @@ export async function backendFetch(
 
   const headers = new Headers(init?.headers || {});
 
+  // Always request JSON from Laravel
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
+
   // Add Authorization if token exists
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
