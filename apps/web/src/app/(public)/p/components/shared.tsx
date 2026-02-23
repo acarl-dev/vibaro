@@ -172,82 +172,49 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
   }
 
   return (
-    <section
-      className="relative w-full overflow-hidden"
-      style={{ backgroundColor: "#050507", padding: "28px 0 44px" }}
-    >
-      {/* Bleed Light – atmospheric glow behind the frame */}
-      <div className="stage-hero-bleed" aria-hidden="true" />
+    <header className="stage-hero">
+      <div className="stage-hero__container">
+        {/* Banner wrapper – provides the positioning context for the logo badge */}
+        <div className="stage-hero__bannerWrap">
+          <div className="stage-hero__banner">
+            <img
+              className="stage-hero__img"
+              src={page.images.hero_image_url!}
+              alt={`${page.display_name} hero image`}
+              style={{ objectPosition: `${focalX}% ${focalY}%` }}
+            />
+            <div className="stage-hero__overlay" aria-hidden="true" />
+          </div>
 
-      {/* Frame Container */}
-      <div
-        className="relative mx-auto"
-        style={{ maxWidth: "1440px", padding: "0 clamp(12px, 2.5vw, 24px)", zIndex: 2 }}
-      >
-        {/* Frame */}
-        <div
-          className="relative overflow-hidden"
-          style={{
-            height: "clamp(480px, 68vh, 860px)",
-            borderRadius: "16px",
-            border: "1px solid rgba(255,255,255,0.07)",
-            boxShadow: "0 24px 72px rgba(0,0,0,0.6)",
-          }}
-        >
-          {/* Hero Image with focal point */}
-          <img
-            src={page.images.hero_image_url!}
-            alt={`${page.display_name} hero image`}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              objectPosition: `${focalX}% ${focalY}%`,
-              transform: "scale(1.02)",
-              transformOrigin: "center center",
-            }}
-          />
+          {/* Logo Badge – centred on the bottom border of the banner */}
+          <div className="stage-hero__logoWrap">
+            <div className="stage-hero__logoBadge">
+              {hasAvatar ? (
+                <img
+                  className="stage-hero__logoImg"
+                  src={page.images.avatar_url!}
+                  alt={`${page.display_name} logo`}
+                />
+              ) : (
+                <span className="text-white font-light" style={{ fontSize: "clamp(24px, 3vw, 40px)" }}>
+                  {getInitials(page.display_name)}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
 
-          {/* Overlay: Vignette + Gradient */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(1200px 700px at 60% 20%, rgba(0,0,0,0.18), transparent 60%), " +
-                "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.45) 100%)",
-            }}
-          />
-
-          {/* Content – bottom left, poster style */}
-          <div
-            className="absolute z-10 text-white"
-            style={{
-              left: "clamp(16px, 4vw, 52px)",
-              right: "clamp(16px, 4vw, 52px)",
-              bottom: "clamp(20px, 4.5vw, 52px)",
-            }}
-          >
-            <h1
-              className="font-semibold tracking-tight leading-tight"
-              style={{ fontSize: "clamp(32px, 5.5vw, 80px)" }}
-            >
-              {page.display_name}
-            </h1>
+        {/* Name Dock */}
+        <div className="stage-hero__transition">
+          <div className="stage-hero__nameDock">
+            <h1 className="stage-hero__title">{page.display_name}</h1>
             {page.bio && (
-              <p
-                className="mt-3"
-                style={{
-                  maxWidth: "52ch",
-                  fontSize: "clamp(13px, 1.4vw, 17px)",
-                  opacity: 0.82,
-                  lineHeight: 1.55,
-                }}
-              >
-                {page.bio}
-              </p>
+              <p className="stage-hero__subtitle">{page.bio}</p>
             )}
           </div>
         </div>
       </div>
-    </section>
+    </header>
   );
 }
 

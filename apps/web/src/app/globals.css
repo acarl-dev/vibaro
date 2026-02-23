@@ -260,21 +260,134 @@ a:focus-visible,
 }
 
 /* =============================================================================
-   STAGE HERO: Stage Frame + Bleed Light
-   Used by StageTemplate for the hero section.
-   The bleed light creates a full-width atmosphere behind the centered frame
-   without loading a second image.
+   STAGE HERO: Premium Dark Stage
    ============================================================================= */
 
-.stage-hero-bleed {
+.stage-hero {
+  position: relative;
+  overflow: hidden;
+  background: #050507;
+}
+
+/* Minimal top-light depth — no colour nebula */
+.stage-hero::before {
+  content: "";
   position: absolute;
-  inset: -200px;
-  z-index: 1;
-  pointer-events: none;
+  inset: 0;
   background:
-    radial-gradient(900px 520px at 20% 30%, rgba(255, 40, 40, 0.13), transparent 60%),
-    radial-gradient(1000px 650px at 75% 35%, rgba(120, 80, 255, 0.11), transparent 65%),
-    radial-gradient(800px 520px at 50% 90%, rgba(255, 255, 255, 0.04), transparent 70%);
-  filter: blur(18px);
-  opacity: 0.9;
+    radial-gradient(1200px 600px at 50% -220px, rgba(255,255,255,0.045), transparent 65%),
+    radial-gradient(900px 500px at 15% 10%, rgba(255,255,255,0.02), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stage-hero__container {
+  position: relative;
+  z-index: 2;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px 20px 0;
+}
+
+/* Wraps the banner and gives positioning context for the logo badge overflow */
+.stage-hero__bannerWrap {
+  position: relative;
+}
+
+/* Banner frame — short panel, not a tall card */
+.stage-hero__banner {
+  position: relative;
+  height: clamp(270px, 33vh, 480px);
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 38px 110px rgba(0,0,0,0.82),
+    0 0 0 1px rgba(255,255,255,0.03) inset;
+}
+
+.stage-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.03);
+  filter: brightness(0.92) contrast(1.06);
+}
+
+.stage-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 420px at 50% 35%, rgba(0,0,0,0.10), rgba(0,0,0,0.65) 70%),
+    linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.24) 60%, rgba(0,0,0,0.70));
+  pointer-events: none;
+}
+
+/* Transition zone: name dock below the banner */
+.stage-hero__transition {
+  position: relative;
+  /* Clear the logo badge that protrudes 50% below the banner */
+  padding-top: clamp(44px, 5vw, 72px);
+}
+
+/* Logo badge sits centred on the bottom border of the banner */
+.stage-hero__logoWrap {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  z-index: 10;
+}
+
+.stage-hero__logoBadge {
+  width: clamp(72px, 8vw, 120px);
+  height: clamp(72px, 8vw, 120px);
+  border-radius: 999px;
+  background: rgba(10,10,12,0.85);
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.85),
+    0 0 0 1px rgba(255,255,255,0.06) inset;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.stage-hero__logoBadge::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  pointer-events: none;
+}
+
+.stage-hero__logoImg {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+}
+
+/* Name dock — centred poster headline below the logo */
+.stage-hero__nameDock {
+  text-align: center;
+  padding-top: clamp(32px, 4vw, 56px);
+  padding-bottom: 40px;
+}
+
+.stage-hero__title {
+  color: #fff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  font-size: clamp(40px, 5.2vw, 84px);
+}
+
+.stage-hero__subtitle {
+  margin: 24px auto 0;
+  max-width: 60ch;
+  color: rgba(255,255,255,0.70);
+  font-size: clamp(12px, 1.1vw, 14px);
 }
