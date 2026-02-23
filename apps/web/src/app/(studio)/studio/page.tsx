@@ -6,8 +6,9 @@ export default async function StudioHomePage() {
   const data = await fetchStudioHome();
 
   if (!data) {
-    // If no data, user might not have an artist page or auth issue
-    redirect("/studio/onboarding");
+    // Auth or server error – layout already verified the artist page exists,
+    // so a null here means a session/token problem, not missing onboarding.
+    redirect("/login?next=/studio");
   }
 
   return <HomeClient data={data} />;

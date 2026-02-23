@@ -17,37 +17,40 @@ export type ArtistPageData = {
   theme_variant?: string | null;
 };
 
-async function fetchMe(): Promise<{ artist_page?: { is_onboarded: boolean } | null } | null> {
+async function fetchMe(): Promise<{ data: { artist_page?: { is_onboarded: boolean } | null } | null; status: number }> {
   try {
     const res = await backendFetch("/api/v1/me", { cache: "no-store" });
-    if (!res.ok) return null;
+    if (!res.ok) return { data: null, status: res.status };
     const json = await res.json();
-    return json?.data ?? null;
+    return { data: json?.data ?? null, status: res.status };
   } catch {
-    return null;
+    return { data: null, status: 500 };
   }
 }
 
-async function fetchArtistPage(): Promise<ArtistPageData | null> {
+async function fetchArtistPage(): Promise<{ data: ArtistPageData | null; status: number }> {
   try {
     const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
-    if (!res.ok) return null;
+    if (!res.ok) return { data: null, status: res.status };
     const json = await res.json();
-    const data = json?.data;
-    if (!data) return null;
+    const raw = json?.data;
+    if (!raw) return { data: null, status: 200 };
     return {
-      id: data.id,
-      handle: data.handle,
-      display_name: data.display_name,
-      bio: data.bio ?? null,
-      is_published: Boolean(data.is_published),
-      avatar_url: data.avatar_url ?? null,
-      hero_image_url: data.hero_image_url ?? null,
-      theme_key: data.theme_key ?? "modern",
-      theme_variant: data.theme_variant ?? "auto",
+      data: {
+        id: raw.id,
+        handle: raw.handle,
+        display_name: raw.display_name,
+        bio: raw.bio ?? null,
+        is_published: Boolean(raw.is_published),
+        avatar_url: raw.avatar_url ?? null,
+        hero_image_url: raw.hero_image_url ?? null,
+        theme_key: raw.theme_key ?? "modern",
+        theme_variant: raw.theme_variant ?? "auto",
+      },
+      status: 200,
     };
   } catch {
-    return null;
+    return { data: null, status: 500 };
   }
 }
 
@@ -55,10 +58,12 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   const token = await getTokenFromCookies();
   if (!token) redirect("/login?next=/studio");
 
-  const me = await fetchMe();
+  const { data: me, status: meStatus } = await fetchMe();
+  if (meStatus === 401 || meStatus === 403) redirect("/login?next=/studio");
   if (me?.artist_page?.is_onboarded === false) redirect("/studio/onboarding");
 
-  const page = await fetchArtistPage();
+  const { data: page, status: pageStatus } = await fetchArtistPage();
+  if (pageStatus === 401 || pageStatus === 403) redirect("/login?next=/studio");
   if (!page) redirect("/studio/onboarding");
 
   return (
