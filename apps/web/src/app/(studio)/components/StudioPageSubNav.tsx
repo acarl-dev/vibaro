@@ -20,7 +20,7 @@ const PAGE_SECTION_PREFIXES = [
 
 const SUB_NAV_ITEMS = [
   { label: "Übersicht",  href: "/studio/page",             exact: true },
-  { label: "Profil",     href: "/studio/page/profile"                  },
+  { label: "Header",     href: "/studio/page/profile"                 },
   { label: "Links",      href: "/studio/page/links"                    },
   { label: "Musik",      href: "/studio/page/music"                    },
   { label: "Shows",      href: "/studio/page/shows"                    },
@@ -28,7 +28,6 @@ const SUB_NAV_ITEMS = [
   { label: "Videos",     href: "/studio/page/videos"                   },
   { label: "Galerie",    href: "/studio/page/gallery"                  },
   { label: "Kontakt",    href: "/studio/page/contact"                  },
-  { label: "Themes",     href: "/studio/page/appearance"               },
 ] as const;
 
 export default function StudioPageSubNav() {
