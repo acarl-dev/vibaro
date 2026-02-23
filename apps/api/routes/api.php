@@ -43,9 +43,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/artist-pages', [ArtistPageController::class, 'store']);
         Route::post('/artist-pages/upload-avatar', [ArtistPageController::class, 'uploadAvatar']);
         Route::post('/artist-pages/upload-hero', [ArtistPageController::class, 'uploadHero']);
+        Route::post('/artist-pages/upload-logo', [ArtistPageController::class, 'uploadLogo']);
         Route::patch('/artist-pages/update-hero-focal', [ArtistPageController::class, 'updateHeroFocal']);
         Route::delete('/artist-pages/delete-avatar', [ArtistPageController::class, 'deleteAvatar']);
         Route::delete('/artist-pages/delete-hero', [ArtistPageController::class, 'deleteHero']);
+        Route::delete('/artist-pages/delete-logo', [ArtistPageController::class, 'deleteLogo']);
         Route::post('/handles/check', [ArtistPageController::class, 'checkHandle']);
         Route::patch('/artist-pages/{id}', [ArtistPageController::class, 'update']);
         Route::patch('/artist-pages/{artistPage}/sections', [ArtistPageController::class, 'updateSections']);

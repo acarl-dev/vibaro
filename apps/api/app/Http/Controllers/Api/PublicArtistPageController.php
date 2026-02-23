@@ -80,6 +80,7 @@ class PublicArtistPageController extends Controller
             'images' => [
                 'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
                 'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,
+                'logo_url' => $page->logo_path ? $appUrl . Storage::url($page->logo_path) : null,
                 'hero_focal_x' => $page->hero_focal_x ?? 50,
                 'hero_focal_y' => $page->hero_focal_y ?? 35,
             ],

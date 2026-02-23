@@ -10,6 +10,7 @@ type ArtistPage = {
   is_published: boolean;
   avatar_url: string | null;
   hero_image_url: string | null;
+  logo_url: string | null;
 };
 
 async function fetchArtistPage(): Promise<ArtistPage | null> {
@@ -28,6 +29,7 @@ async function fetchArtistPage(): Promise<ArtistPage | null> {
       is_published: Boolean(data.is_published),
       avatar_url: data.avatar_url ?? null,
       hero_image_url: data.hero_image_url ?? null,
+      logo_url: data.logo_url ?? null,
       hero_focal_x: data.hero_focal_x ?? 50,
       hero_focal_y: data.hero_focal_y ?? 35,
     };

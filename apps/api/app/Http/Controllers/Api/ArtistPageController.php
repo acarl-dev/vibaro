@@ -201,6 +201,7 @@ class ArtistPageController extends Controller
             'bio' => $page->bio,
             'avatar_url' => $page->avatar_path ? $appUrl . Storage::url($page->avatar_path) : null,
             'hero_image_url' => $page->header_path ? $appUrl . Storage::url($page->header_path) : null,
+            'logo_url' => $page->logo_path ? $appUrl . Storage::url($page->logo_path) : null,
             'hero_focal_x' => $page->hero_focal_x ?? 50,
             'hero_focal_y' => $page->hero_focal_y ?? 35,
             'visible_sections' => $page->visible_sections ?? ['profile', 'links', 'music', 'shows', 'releases', 'videos', 'gallery', 'contact'],
@@ -274,6 +275,54 @@ class ArtistPageController extends Controller
         $path = $request->file('hero_image')->store('hero-images', 'public');
         $page->header_path = $path;
         $page->save();
+
+        return $this->success($this->transform($page));
+    }
+
+    public function uploadLogo(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        try {
+            $validated = $request->validate([
+                'logo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        }
+
+        if ($page->logo_path) {
+            Storage::disk('public')->delete($page->logo_path);
+        }
+
+        $path = $request->file('logo')->store('logos', 'public');
+        $page->logo_path = $path;
+        $page->save();
+
+        return $this->success($this->transform($page));
+    }
+
+    public function deleteLogo(Request $request): JsonResponse
+    {
+        $page = $request->user()->artistPage;
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        $this->authorize('update', $page);
+
+        if ($page->logo_path) {
+            Storage::disk('public')->delete($page->logo_path);
+            $page->logo_path = null;
+            $page->save();
+        }
 
         return $this->success($this->transform($page));
     }

@@ -24,6 +24,7 @@ class ArtistPage extends Model
         'bio',
         'avatar_path',
         'header_path',
+        'logo_path',
         'theme_key',
         'theme_variant',
         'accent_mode',

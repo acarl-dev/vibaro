@@ -12,6 +12,7 @@ type ArtistPage = {
   is_published: boolean;
   avatar_url: string | null;
   hero_image_url: string | null;
+  logo_url: string | null;
   hero_focal_x: number | null;
   hero_focal_y: number | null;
 };
@@ -30,6 +31,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
   const [editingName, setEditingName] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [heroUploading, setHeroUploading] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [focalMode, setFocalMode] = useState(false);
   const [focalX, setFocalX] = useState(initialPage.hero_focal_x ?? 50);
   const [focalY, setFocalY] = useState(initialPage.hero_focal_y ?? 35);
@@ -175,6 +177,54 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
       showToast("Netzwerkfehler", "error");
     } finally {
       setHeroUploading(false);
+    }
+  };
+
+  const handleLogoUpload = async (file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Datei zu groß. Maximal 2 MB erlaubt.", "error");
+      return;
+    }
+
+    setLogoUploading(true);
+    const formData = new FormData();
+    formData.append("logo", file);
+
+    try {
+      const res = await fetch("/api/studio/upload-logo", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        router.refresh();
+        showToast("Logo erfolgreich hochgeladen.", "success");
+      } else {
+        showToast("Upload fehlgeschlagen", "error");
+      }
+    } catch {
+      showToast("Netzwerkfehler. Bitte versuche es erneut.", "error");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const handleLogoDelete = async () => {
+    if (!confirm("Logo wirklich entfernen?")) return;
+
+    setLogoUploading(true);
+    try {
+      const res = await fetch("/api/studio/delete-logo", { method: "DELETE" });
+      if (res.ok) {
+        router.refresh();
+        showToast("Logo entfernt.", "success");
+      } else {
+        showToast("Löschen fehlgeschlagen", "error");
+      }
+    } catch {
+      showToast("Netzwerkfehler", "error");
+    } finally {
+      setLogoUploading(false);
     }
   };
 
@@ -465,6 +515,73 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               </label>
             </div>
           )}
+        </div>
+
+        {/* Logo Upload Section */}
+        <div className="p-6 border-b border-zinc-800">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-sm font-medium text-white">Logo</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Wird im Header-Badge angezeigt. Ersetzt Avatar als Logo-Quelle.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Preview */}
+            <div className="relative flex-shrink-0 w-16 h-16 rounded-full bg-black border border-zinc-700 overflow-hidden flex items-center justify-center">
+              {initialPage.logo_url ? (
+                <img src={initialPage.logo_url} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                <svg className="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              )}
+            </div>
+            {/* Actions */}
+            <div className="flex gap-2">
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={logoUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleLogoUpload(file);
+                  }}
+                />
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-xs text-white hover:bg-zinc-700 transition-colors cursor-pointer">
+                  {logoUploading ? (
+                    <>
+                      <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Lädt...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      {initialPage.logo_url ? "Austauschen" : "Logo hochladen"}
+                    </>
+                  )}
+                </div>
+              </label>
+              {initialPage.logo_url && (
+                <button
+                  onClick={handleLogoDelete}
+                  disabled={logoUploading}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 border border-red-500/30 text-xs text-red-400 hover:bg-red-600/30 transition-colors disabled:opacity-50"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Entfernen
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Name & Bio Section - Only visible when NO hero image (for templates without image) */}

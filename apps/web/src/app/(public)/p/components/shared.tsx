@@ -96,6 +96,7 @@ export type PublicArtistPageData = {
   images: {
     avatar_url: string | null;
     hero_image_url: string | null;
+    logo_url?: string | null;
     hero_focal_x?: number | null;
     hero_focal_y?: number | null;
   };
@@ -127,6 +128,7 @@ export type PublicArtistPageData = {
 export function Hero({ page }: { page: PublicArtistPageData }) {
   const hasHeroImage = !!page.images.hero_image_url;
   const hasAvatar = !!page.images.avatar_url;
+  const hasLogo = !!page.images.logo_url;
   const focalX = page.images.hero_focal_x ?? 50;
   const focalY = page.images.hero_focal_y ?? 35;
 
@@ -189,7 +191,13 @@ export function Hero({ page }: { page: PublicArtistPageData }) {
           {/* Logo Badge – centred on the bottom border of the banner */}
           <div className="stage-hero__logoWrap">
             <div className="stage-hero__logoBadge">
-              {hasAvatar ? (
+              {hasLogo ? (
+                <img
+                  className="stage-hero__logoImg"
+                  src={page.images.logo_url!}
+                  alt={`${page.display_name} logo`}
+                />
+              ) : hasAvatar ? (
                 <img
                   className="stage-hero__logoImg"
                   src={page.images.avatar_url!}
