@@ -121,9 +121,28 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
 
       if (res.ok) {
         router.refresh();
+        showToast("Header-Bild erfolgreich hochgeladen.", "success");
       } else {
-        const error = await res.json().catch(() => ({ error: "Unknown error" }));
-        showToast("Upload fehlgeschlagen", "error", error?.message || JSON.stringify(error));
+        const body = await res.json().catch(() => null);
+        const errorMsg = body?.error?.message as string | undefined;
+        const fields = body?.error?.fields as Record<string, string[]> | undefined;
+        const firstFieldError = fields ? Object.values(fields).flat()[0] : undefined;
+
+        // Surface a friendly German message for file-size rejections
+        if (
+          res.status === 422 &&
+          (firstFieldError?.toLowerCase().includes("kilobytes") ||
+            firstFieldError?.toLowerCase().includes("size") ||
+            firstFieldError?.toLowerCase().includes("too large"))
+        ) {
+          showToast("Datei zu groß. Maximal 2 MB erlaubt.", "error");
+        } else {
+          showToast(
+            "Upload fehlgeschlagen",
+            "error",
+            firstFieldError ?? errorMsg ?? "Unbekannter Fehler"
+          );
+        }
       }
     } catch (err) {
       showToast("Netzwerkfehler. Bitte versuche es erneut.", "error");

@@ -1,37 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTokenFromCookies } from "@/lib/api/backend";
+import { backendFetch } from "@/lib/api/backend";
 
 export async function POST(req: NextRequest) {
-  const token = await getTokenFromCookies();
-
-  if (!token) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
   try {
-    const formData = await req.formData();
-    
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/artist-pages/upload-hero`, {
+    // Read the raw body buffer to preserve the exact multipart encoding (including boundary)
+    const bodyBuffer = await req.arrayBuffer();
+
+    const res = await backendFetch("/api/v1/artist-pages/upload-hero", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Content-Type": req.headers.get("content-type") || "application/octet-stream",
       },
-      body: formData,
+      body: bodyBuffer,
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      console.error("Backend upload error:", res.status, data);
+      console.error("Backend upload-hero error:", res.status, data);
       return NextResponse.json(data, { status: res.status });
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Upload proxy error:", error);
+    console.error("Upload-hero proxy error:", error);
     return NextResponse.json(
       { error: "Internal server error", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
