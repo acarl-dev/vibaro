@@ -138,10 +138,8 @@ class PublicArtistPageController extends Controller
                     'image_url' => $appUrl . Storage::url($image->image_path),
                 ];
             })->toArray(),
-            'booking_email' => $page->booking_email,
-            'management_email' => $page->management_email,
-            'press_email' => $page->press_email,
-            'whatsapp_number' => $page->whatsapp_number,
+            // contacts: use the flexible array if set, otherwise fall back to the 4 legacy fields
+            'contacts' => $this->resolveContacts($page),
             'contact_message' => $page->contact_message,
             'theme' => [
                 'key' => $page->theme_key,
@@ -149,5 +147,31 @@ class PublicArtistPageController extends Controller
                 'accent_color' => $page->accent_mode === 'manual' ? $page->accent_color : null,
             ],
         ]);
+    }
+
+    /**
+     * Return the contacts array.
+     * Always builds from the 4 legacy individual fields (studio writes to these).
+     * The contacts JSONB column is reserved for the future studio UI.
+     */
+    private function resolveContacts(ArtistPage $page): array
+    {
+        $contacts = [];
+        if ($page->booking_email)    $contacts[] = ['label' => 'Booking',    'type' => 'email',    'value' => $page->booking_email];
+        if ($page->management_email) $contacts[] = ['label' => 'Management', 'type' => 'email',    'value' => $page->management_email];
+        if ($page->press_email)      $contacts[] = ['label' => 'Press',      'type' => 'email',    'value' => $page->press_email];
+        if ($page->whatsapp_number)  $contacts[] = ['label' => 'WhatsApp',   'type' => 'whatsapp', 'value' => $page->whatsapp_number];
+
+        // Merge any extra contacts from the JSONB column (future studio-managed entries)
+        if (!empty($page->contacts)) {
+            $legacyLabels = array_column($contacts, 'label');
+            foreach ($page->contacts as $c) {
+                if (!in_array($c['label'] ?? '', $legacyLabels, true)) {
+                    $contacts[] = $c;
+                }
+            }
+        }
+
+        return $contacts;
     }
 }

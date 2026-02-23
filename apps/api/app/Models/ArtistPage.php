@@ -34,6 +34,7 @@ class ArtistPage extends Model
         'press_email',
         'whatsapp_number',
         'contact_message',
+        'contacts',
         'is_published',
         'published_at',
         'visible_sections',
@@ -48,6 +49,7 @@ class ArtistPage extends Model
         'is_published' => 'boolean',
         'published_at' => 'datetime',
         'visible_sections' => 'array',
+        'contacts' => 'array',
         'hero_focal_x' => 'integer',
         'hero_focal_y' => 'integer',
     ];

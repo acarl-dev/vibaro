@@ -59,7 +59,7 @@ export default function ModernTemplate({
   const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0;
   const hasVideos = (page.videos?.length ?? 0) > 0;
   const hasGallery = (page.gallery_images?.length ?? 0) > 0;
-  const hasContact = !!(page.booking_email || page.management_email || page.press_email || page.whatsapp_number);
+  const hasContact = !!(page.contacts?.length);
 
   return (
     <>
@@ -223,15 +223,14 @@ export default function ModernTemplate({
 
           {/* Block 5 - Kontakt: clear endpoint */}
           {hasContact && (
-            <section className="pt-20 pb-12">
-              <SectionHeader title="Contact" variant="medium" />
-              <ContactInquiryButton
-                booking_email={page.booking_email}
-                management_email={page.management_email}
-                press_email={page.press_email}
-                whatsapp_number={page.whatsapp_number}
-                contact_message={page.contact_message}
-              />
+            <section className="flex justify-center" style={{ paddingTop: "80px", paddingBottom: "48px" }}>
+              <div style={{ maxWidth: "860px", width: "100%" }}>
+                <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", opacity: 0.5, color: "#fff", marginBottom: "32px", textAlign: "center" }}>Contact</p>
+                <ContactInquiryButton
+                  contacts={page.contacts}
+                  contact_message={page.contact_message}
+                />
+              </div>
             </section>
           )}
         </main>

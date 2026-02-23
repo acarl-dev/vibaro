@@ -51,11 +51,12 @@ Zentrale Entität für Musiker-Seiten.
 | theme_variant | string | z.B. `auto`, `stage-blue` |
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
-| booking_email | string | nullable, PRIVATE |
-| management_email | string | nullable, PRIVATE |
-| press_email | string | nullable, PRIVATE |
-| whatsapp_number | string | nullable, PRIVATE |
+| booking_email | string | nullable, PRIVATE (legacy) |
+| management_email | string | nullable, PRIVATE (legacy) |
+| press_email | string | nullable, PRIVATE (legacy) |
+| whatsapp_number | string | nullable, PRIVATE (legacy) |
 | contact_message | string | nullable, max 500 |
+| contacts | jsonb | nullable. Array of `{ label, type: "email"\|"whatsapp", value }`. Source of truth for public contact section. Falls back to legacy fields if null. |
 | is_published | boolean | default false |
 | published_at | timestamp | nullable |
 | visible_sections | jsonb | default '["profile","links","music","shows","releases","videos","gallery","contact"]' |
@@ -67,7 +68,8 @@ Zentrale Entität für Musiker-Seiten.
 - index(user_id)
 
 **Wichtig**
-- Kontaktfelder sind Studio-only und niemals Teil der Public API.
+- Legacy-Kontaktfelder (`booking_email` etc.) bleiben im Schema für die Studio-Settings erhalten.
+- Das `contacts`-Array ist die neue Source of Truth für die Public Page. Die API baut es aus `contacts` (falls gesetzt) oder fällt auf die Legacy-Felder zurück.
 - Handle darf nicht geändert werden, wenn veröffentlicht.
 - Public Queries erfolgen immer über handle, nie über ID.
 
