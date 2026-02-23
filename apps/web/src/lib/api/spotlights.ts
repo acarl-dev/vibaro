@@ -15,11 +15,22 @@ export type SpotlightData = {
   starts_at: string | null;
   ends_at: string | null;
   primary_url: string;
+  cover_image_url: string | null;
+  artist_name: string | null;
+  platform_name: string | null;
   description: string | null;
   show_on_page: boolean;
   archived_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type SpotlightMetadata = {
+  title: string | null;
+  artist_name: string | null;
+  cover_image_url: string | null;
+  platform_name: string | null;
+  suggested_type: SpotlightType | null;
 };
 
 export type CreateSpotlightRequest = {
@@ -28,12 +39,37 @@ export type CreateSpotlightRequest = {
   starts_at?: string | null;
   ends_at?: string | null;
   primary_url: string;
+  cover_image_url?: string | null;
+  artist_name?: string | null;
+  platform_name?: string | null;
   description?: string | null;
   show_on_page?: boolean;
   activate?: boolean;
 };
 
 export type UpdateSpotlightRequest = Partial<Omit<CreateSpotlightRequest, "show_on_page">>;
+
+/**
+ * Fetch oEmbed metadata from a public URL (Spotify, YouTube, SoundCloud, etc.)
+ */
+export async function fetchSpotlightMetadata(
+  url: string
+): Promise<SpotlightMetadata | null> {
+  try {
+    const res = await fetch(
+      `/api/studio/spotlights/fetch-metadata?url=${encodeURIComponent(url)}`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    return json?.data ?? null;
+  } catch (error) {
+    console.error("Error fetching spotlight metadata:", error);
+    return null;
+  }
+}
 
 /**
  * Fetch all spotlights for current user

@@ -4,11 +4,52 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Spotlight;
+use App\Services\MetadataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class SpotlightController extends Controller
 {
+    /**
+     * Shared formatter: convert a Spotlight model instance to API array.
+     */
+    private function spotlightToArray(Spotlight $spotlight): array
+    {
+        return [
+            'id'              => $spotlight->id,
+            'title'           => $spotlight->title,
+            'slug'            => $spotlight->slug,
+            'type'            => $spotlight->type,
+            'status'          => $spotlight->status,
+            'starts_at'       => $spotlight->starts_at?->toISOString(),
+            'ends_at'         => $spotlight->ends_at?->toISOString(),
+            'primary_url'     => $spotlight->primary_url,
+            'cover_image_url' => $spotlight->cover_image_url,
+            'artist_name'     => $spotlight->artist_name,
+            'platform_name'   => $spotlight->platform_name,
+            'description'     => $spotlight->description,
+            'show_on_page'    => $spotlight->show_on_page,
+            'archived_at'     => $spotlight->archived_at?->toISOString(),
+            'created_at'      => $spotlight->created_at->toISOString(),
+            'updated_at'      => $spotlight->updated_at->toISOString(),
+        ];
+    }
+
+    /**
+     * Fetch oEmbed metadata from a public URL (Spotify, YouTube, SoundCloud, etc.).
+     * Used by the frontend to auto-fill project details on URL paste.
+     */
+    public function fetchMetadata(Request $request, MetadataService $metadataService)
+    {
+        $validated = $request->validate([
+            'url' => 'required|url|max:1000',
+        ]);
+
+        $meta = $metadataService->fetchFromUrl($validated['url']);
+
+        return response()->json(['data' => $meta]);
+    }
+
     /**
      * Get active spotlight for authenticated user's artist page.
      */
@@ -31,20 +72,7 @@ class SpotlightController extends Controller
             ->first();
 
         return response()->json([
-            'data' => $spotlight ? [
-                'id' => $spotlight->id,
-                'title' => $spotlight->title,
-                'slug' => $spotlight->slug,
-                'type' => $spotlight->type,
-                'status' => $spotlight->status,
-                'starts_at' => $spotlight->starts_at?->toISOString(),
-                'ends_at' => $spotlight->ends_at?->toISOString(),
-                'primary_url' => $spotlight->primary_url,
-                'description' => $spotlight->description,
-                'show_on_page' => $spotlight->show_on_page,
-                'created_at' => $spotlight->created_at->toISOString(),
-                'updated_at' => $spotlight->updated_at->toISOString(),
-            ] : null,
+            'data' => $spotlight ? $this->spotlightToArray($spotlight) : null,
         ]);
     }
 
@@ -73,23 +101,7 @@ class SpotlightController extends Controller
             )
             ->orderByDesc('created_at')
             ->get()
-            ->map(function ($spotlight) {
-                return [
-                    'id' => $spotlight->id,
-                    'title' => $spotlight->title,
-                    'slug' => $spotlight->slug,
-                    'type' => $spotlight->type,
-                    'status' => $spotlight->status,
-                    'starts_at' => $spotlight->starts_at?->toISOString(),
-                    'ends_at' => $spotlight->ends_at?->toISOString(),
-                    'primary_url' => $spotlight->primary_url,
-                    'description' => $spotlight->description,
-                    'show_on_page' => $spotlight->show_on_page,
-                    'archived_at' => $spotlight->archived_at?->toISOString(),
-                    'created_at' => $spotlight->created_at->toISOString(),
-                    'updated_at' => $spotlight->updated_at->toISOString(),
-                ];
-            });
+            ->map(fn($s) => $this->spotlightToArray($s));
 
         return response()->json(['data' => $spotlights]);
     }
@@ -111,47 +123,38 @@ class SpotlightController extends Controller
         }
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'type' => 'required|string|in:single,album,tour,event,video,merch,livestream,collab',
-            'starts_at' => 'nullable|date',
-            'ends_at' => 'nullable|date|after:starts_at',
-            'primary_url' => 'required|url|max:1000',
-            'description' => 'nullable|string|max:1000',
-            'show_on_page' => 'nullable|boolean',
-            'activate' => 'nullable|boolean',
+            'title'           => 'required|string|max:255',
+            'type'            => 'required|string|in:single,album,tour,event,video,merch,livestream,collab',
+            'starts_at'       => 'nullable|date',
+            'ends_at'         => 'nullable|date|after:starts_at',
+            'primary_url'     => 'required|url|max:1000',
+            'cover_image_url' => 'nullable|url|max:1000',
+            'artist_name'     => 'nullable|string|max:255',
+            'platform_name'   => 'nullable|string|max:100',
+            'description'     => 'nullable|string|max:1000',
+            'show_on_page'    => 'nullable|boolean',
+            'activate'        => 'nullable|boolean',
         ]);
 
         // If activate=true, set to active (boot hook will end any other active spotlight)
         $status = ($validated['activate'] ?? false) ? 'active' : 'scheduled';
 
         $spotlight = Spotlight::create([
-            'artist_page_id' => $artistPage->id,
-            'title' => $validated['title'],
-            'type' => $validated['type'],
-            'status' => $status,
-            'starts_at' => $validated['starts_at'] ?? null,
-            'ends_at' => $validated['ends_at'] ?? null,
-            'primary_url' => $validated['primary_url'],
-            'description' => $validated['description'] ?? null,
-            'show_on_page' => $validated['show_on_page'] ?? true,
+            'artist_page_id'  => $artistPage->id,
+            'title'           => $validated['title'],
+            'type'            => $validated['type'],
+            'status'          => $status,
+            'starts_at'       => $validated['starts_at'] ?? null,
+            'ends_at'         => $validated['ends_at'] ?? null,
+            'primary_url'     => $validated['primary_url'],
+            'cover_image_url' => $validated['cover_image_url'] ?? null,
+            'artist_name'     => $validated['artist_name'] ?? null,
+            'platform_name'   => $validated['platform_name'] ?? null,
+            'description'     => $validated['description'] ?? null,
+            'show_on_page'    => $validated['show_on_page'] ?? true,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $spotlight->id,
-                'title' => $spotlight->title,
-                'slug' => $spotlight->slug,
-                'type' => $spotlight->type,
-                'status' => $spotlight->status,
-                'starts_at' => $spotlight->starts_at?->toISOString(),
-                'ends_at' => $spotlight->ends_at?->toISOString(),
-                'primary_url' => $spotlight->primary_url,
-                'description' => $spotlight->description,
-                'show_on_page' => $spotlight->show_on_page,
-                'created_at' => $spotlight->created_at->toISOString(),
-                'updated_at' => $spotlight->updated_at->toISOString(),
-            ],
-        ], 201);
+        return response()->json(['data' => $this->spotlightToArray($spotlight)], 201);
     }
 
     /**
@@ -164,18 +167,21 @@ class SpotlightController extends Controller
         Gate::authorize('update', $spotlight);
 
         $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'type' => 'sometimes|string|in:single,album,tour,event,video,merch,livestream,collab',
-            'starts_at' => 'nullable|date',
-            'ends_at' => 'nullable|date|after:starts_at',
-            'primary_url' => 'sometimes|url|max:1000',
-            'description' => 'nullable|string|max:1000',
-            'show_on_page' => 'sometimes|boolean',
+            'title'           => 'sometimes|string|max:255',
+            'type'            => 'sometimes|string|in:single,album,tour,event,video,merch,livestream,collab',
+            'starts_at'       => 'nullable|date',
+            'ends_at'         => 'nullable|date|after:starts_at',
+            'primary_url'     => 'sometimes|url|max:1000',
+            'cover_image_url' => 'nullable|url|max:1000',
+            'artist_name'     => 'nullable|string|max:255',
+            'platform_name'   => 'nullable|string|max:100',
+            'description'     => 'nullable|string|max:1000',
+            'show_on_page'    => 'sometimes|boolean',
         ]);
 
         $spotlight->update($validated);
 
-        return response()->json(['data' => ['ok' => true]]);
+        return response()->json(['data' => $this->spotlightToArray($spotlight->fresh())]);
     }
 
     /**
@@ -305,20 +311,6 @@ class SpotlightController extends Controller
 
         $spotlight->restore();
 
-        return response()->json(['data' => [
-            'id'          => $spotlight->id,
-            'title'       => $spotlight->title,
-            'slug'        => $spotlight->slug,
-            'type'        => $spotlight->type,
-            'status'      => $spotlight->status,
-            'starts_at'   => $spotlight->starts_at?->toISOString(),
-            'ends_at'     => $spotlight->ends_at?->toISOString(),
-            'primary_url' => $spotlight->primary_url,
-            'description' => $spotlight->description,
-            'show_on_page' => $spotlight->show_on_page,
-            'archived_at' => null,
-            'created_at'  => $spotlight->created_at->toISOString(),
-            'updated_at'  => $spotlight->updated_at->toISOString(),
-        ]]);
+        return response()->json(['data' => $this->spotlightToArray($spotlight->fresh())]);
     }
 }

@@ -10,6 +10,9 @@ export type SpotlightData = {
   show_on_page: boolean;
   starts_at: string | null;
   ends_at: string | null;
+  cover_image_url: string | null;
+  artist_name: string | null;
+  platform_name: string | null;
 };
 
 export type TopLinkData = {

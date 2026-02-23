@@ -39,7 +39,7 @@ export default function HomeClient({ data }: HomeClientProps) {
           label="Aktive Links"
         />
         <StudioStatCard
-          value={data.spotlight ? "AKTIV" : "—"}
+          value={data.spotlight ? (data.spotlight.status === "active" ? "AKTIV" : "GEPLANT") : "—"}
           label="Projekt-Status"
         />
       </div>

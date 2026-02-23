@@ -205,6 +205,9 @@ Leitprinzipien:
 | starts_at | datetime | nullable |
 | ends_at | datetime | nullable |
 | primary_url | string | nullable |
+| cover_image_url | string | nullable, auto-gefüllt via oEmbed (Spotify, YouTube, etc.) |
+| artist_name | string | nullable, auto-gefüllt via oEmbed oder manuell |
+| platform_name | string | nullable, auto-erkannt aus URL (z.B. "Spotify", "YouTube") |
 | description | text | nullable |
 | show_on_page | boolean | default true, steuert Hero-Banner |
 | archived_at | timestamp | nullable, soft delete |

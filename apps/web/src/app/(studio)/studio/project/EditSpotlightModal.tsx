@@ -17,10 +17,14 @@ type EditSpotlightModalProps = {
 };
 
 const SPOTLIGHT_TYPES: { value: SpotlightType; label: string }[] = [
-  { value: "single", label: "Single" },
-  { value: "album", label: "Album" },
-  { value: "tour", label: "Tour" },
-  { value: "event", label: "Event" },
+  { value: "single",     label: "Single" },
+  { value: "album",      label: "Album" },
+  { value: "video",      label: "Video" },
+  { value: "tour",       label: "Tour" },
+  { value: "event",      label: "Event" },
+  { value: "merch",      label: "Merch" },
+  { value: "livestream", label: "Livestream" },
+  { value: "collab",     label: "Kollaboration" },
 ];
 
 export default function EditSpotlightModal({
@@ -34,6 +38,7 @@ export default function EditSpotlightModal({
     title: spotlight.title,
     type: spotlight.type,
     primary_url: spotlight.primary_url,
+    artist_name: spotlight.artist_name || "",
     description: spotlight.description || "",
   });
 
@@ -128,6 +133,20 @@ export default function EditSpotlightModal({
                 }
                 className="studio-input w-full px-3 py-2 text-sm"
                 required
+              />
+            </div>
+
+            {/* Artist Name */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Interpret</label>
+              <input
+                type="text"
+                value={formData.artist_name || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, artist_name: e.target.value || null })
+                }
+                placeholder="z.B. Max Mustermann"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
             </div>
 

@@ -108,6 +108,7 @@ Route::prefix('v1')->group(function () {
 
         // Spotlights (V2 Stage)
         Route::get('/spotlights/active', [SpotlightController::class, 'active']);
+        Route::get('/spotlights/fetch-metadata', [SpotlightController::class, 'fetchMetadata']);
         Route::get('/spotlights', [SpotlightController::class, 'index']);
         Route::post('/spotlights', [SpotlightController::class, 'store']);
         Route::patch('/spotlights/{id}', [SpotlightController::class, 'update']);

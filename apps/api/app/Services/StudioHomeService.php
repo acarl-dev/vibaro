@@ -57,9 +57,12 @@ class StudioHomeService
      */
     protected function getActiveSpotlight(ArtistPage $artistPage): ?array
     {
+        // Prefer active spotlight; fall back to the most recent scheduled one
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
-            ->where('status', 'active')
             ->whereNull('archived_at')
+            ->whereIn('status', ['active', 'scheduled'])
+            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
+            ->orderByDesc('created_at')
             ->first();
 
         if (!$spotlight) {
@@ -81,6 +84,9 @@ class StudioHomeService
             'ends_at' => $spotlight->ends_at?->toIso8601String(),
             'days_active' => $daysActive,
             'show_on_page' => $spotlight->show_on_page,
+            'cover_image_url' => $spotlight->cover_image_url,
+            'artist_name' => $spotlight->artist_name,
+            'platform_name' => $spotlight->platform_name,
         ];
     }
 
