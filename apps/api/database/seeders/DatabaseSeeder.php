@@ -16,11 +16,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Lokaler Admin-Account für Entwicklung
-        User::factory()->create([
+        User::firstOrCreate(['email' => 'admin@vibaro.local'], [
             'name' => 'Admin',
-            'email' => 'admin@vibaro.local',
             'password' => 'admin1234',
             'is_admin' => true,
+        ]);
+
+        // Test account
+        User::firstOrCreate(['email' => 'test@vibaro.com'], [
+            'name' => 'Test User',
+            'password' => 'password',
+            'is_admin' => false,
         ]);
     }
 }
