@@ -57,10 +57,18 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
   if (!tracks || tracks.length === 0) return null;
 
   return (
-    <div ref={ref} className="space-y-4">
+    <div ref={ref} className="space-y-5">
       {isVisible ? (
         tracks.map((track, index) => (
-          <div key={index} className="overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30">
+          <div
+            key={index}
+            className="overflow-hidden"
+            style={{
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.06)",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.40)",
+            }}
+          >
             {track.platform === "spotify" && (
               <iframe
                 src={getSpotifyEmbedSrc(track)}
@@ -103,18 +111,47 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
             
             {/* Fallback: Link button if embed fails */}
             {!getEmbedId(track) && track.platform !== "spotify" && (
-              <div className="p-4">
-                <h3 className="text-sm font-medium text-zinc-100">{track.title}</h3>
+              <div style={{ padding: "24px" }}>
+                <h3
+                  style={{
+                    fontSize: "clamp(14px, 1.2vw, 16px)",
+                    fontWeight: 600,
+                    color: "#fff",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {track.title}
+                </h3>
                 {track.artist_name && (
-                  <p className="text-xs text-zinc-400 mt-1">{track.artist_name}</p>
+                  <p
+                    style={{
+                      fontSize: "clamp(11px, 0.9vw, 13px)",
+                      color: "rgba(255,255,255,0.35)",
+                      marginTop: "6px",
+                    }}
+                  >
+                    {track.artist_name}
+                  </p>
                 )}
                 <a
                   href={track.platform_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800"
+                  className="inline-flex items-center gap-2 transition-colors"
+                  style={{
+                    marginTop: "20px",
+                    padding: "10px 20px",
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.16)",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.80)",
+                  }}
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -126,11 +163,16 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
         ))
       ) : (
         // Placeholder skeleton while loading
-        <div className="space-y-4">
+        <div className="space-y-5">
           {tracks.map((_, index) => (
             <div
               key={index}
-              className="h-[152px] overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/30 animate-pulse"
+              className="h-[152px] overflow-hidden animate-pulse"
+              style={{
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.06)",
+                background: "rgba(255,255,255,0.03)",
+              }}
             />
           ))}
         </div>

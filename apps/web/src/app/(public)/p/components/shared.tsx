@@ -387,16 +387,24 @@ export function LinkList({ items }: { items: LinkItem[] }) {
   };
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+    <div className="flex flex-wrap justify-center" style={{ gap: "clamp(20px, 3vw, 36px)" }}>
       {items.map((link, index) => (
         <a
           key={index}
           href={link.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center text-zinc-400 transition-colors hover:text-white"
           title={link.title}
           aria-label={link.title}
+          style={{
+            color: "rgba(255,255,255,0.35)",
+            transition: "color 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
         >
           {getSocialIcon(link.type)}
         </a>
@@ -408,128 +416,162 @@ export function LinkList({ items }: { items: LinkItem[] }) {
 export function ShowList({ items }: { items: ShowItem[] }) {
   if (items.length === 0) return <EmptyShowsState />;
 
+  const monthShort = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("de-DE", { month: "short" }).replace(".", "");
+  const dayNum = (dateStr: string) =>
+    new Date(dateStr).getDate();
+
   return (
-    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+    <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
       {items.map((show, index) => (
         <li
           key={index}
-          className="h-full flex flex-col"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "24px",
+            padding: "20px 0",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+          }}
         >
+          {/* Date block */}
           <div
-            className="group h-full rounded-xl border border-zinc-800/50 bg-zinc-900/40 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition-all duration-200 hover:border-zinc-700/70"
+            style={{
+              flexShrink: 0,
+              width: "48px",
+              textAlign: "center",
+            }}
           >
-            <div className="flex h-full">
-              <div className="relative w-24 sm:w-28 md:w-32 shrink-0 aspect-[3/4] bg-zinc-900">
-                {show.flyer_url ? (
-                  <img
-                    src={show.flyer_url}
-                    alt={`${show.title} Flyer`}
-                    loading="lazy"
-                    className="h-full w-full object-contain bg-zinc-950"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center text-zinc-600 text-4xl">
-                    ♪
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1 p-4 sm:p-5 flex flex-col gap-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-base sm:text-lg font-semibold text-zinc-100 truncate">{show.venue}</p>
-                    <p className="text-sm text-zinc-400 truncate">{show.city}</p>
-                  </div>
-                  <span className="hidden sm:inline-flex text-xs text-white whitespace-nowrap bg-black/70 px-2 py-1 rounded-full">
-                    {formatDate(show.date)}
-                  </span>
-                </div>
-
-                {/* Time, Price, Support Acts */}
-                <div className="flex flex-col gap-2 text-xs sm:text-sm text-zinc-400">
-                  {/* Time */}
-                  {show.time && (
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                      </svg>
-                      <span>{show.time} Uhr</span>
-                    </div>
-                  )}
-
-                  {/* Price */}
-                  {(show.is_free || show.price) && (
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="1" />
-                        <path d="M12 2v4m0 8v4M4.22 4.22l2.83 2.83m3.95 3.95l2.83 2.83M2 12h4m8 0h4M4.22 19.78l2.83-2.83m3.95-3.95l2.83-2.83M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
-                      </svg>
-                      <span className="text-zinc-300 font-medium">
-                        {show.is_free ? "Kostenlos" : `${parseFloat(String(show.price)).toFixed(2)}€`}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Support Acts */}
-                  {show.support_acts && show.support_acts.length > 0 && (
-                    <div className="flex items-start gap-2">
-                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      </svg>
-                      <span className="text-zinc-300 line-clamp-2">
-                        mit {show.support_acts.join(", ")}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Location */}
-                  {show.address && (
-                    <button
-                      onClick={() => window.open(`https://www.google.com/maps/search/${encodeURIComponent(show.address)}`, '_blank')}
-                      className="flex gap-2 hover:text-accent transition-colors bg-none border-none cursor-pointer p-0 items-start"
-                    >
-                      <svg className="w-4 h-4 text-zinc-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      <div className="text-zinc-300 text-xs leading-snug">
-                        {show.address.split(',').map((part, idx) => (
-                          <div key={idx} className="whitespace-nowrap">
-                            {part.trim()}
-                          </div>
-                        ))}
-                      </div>
-                    </button>
-                  )}
-                </div>
-
-                <div className="mt-auto flex items-center justify-between gap-3 text-xs sm:text-sm text-zinc-400">
-                  <span className="inline-flex items-center gap-2 text-zinc-300">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.15)]" aria-hidden="true"></span>
-                    Live
-                  </span>
-                  {show.url && (
-                    <a
-                      href={show.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-accent font-medium hover:text-accent/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 rounded px-1 py-0.5"
-                    >
-                      Tickets
-                      <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                        <path d="M5 12h14" />
-                        <path d="M13 6l6 6-6 6" />
-                      </svg>
-                    </a>
-                  )}
-                </div>
-              </div>
+            <div
+              style={{
+                fontSize: "clamp(22px, 2.2vw, 30px)",
+                fontWeight: 700,
+                color: "#fff",
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {dayNum(show.date)}
+            </div>
+            <div
+              style={{
+                marginTop: "4px",
+                fontSize: "11px",
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.35)",
+              }}
+            >
+              {monthShort(show.date)}
             </div>
           </div>
+
+          {/* Divider */}
+          <div
+            style={{
+              flexShrink: 0,
+              width: "1px",
+              height: "40px",
+              background: "rgba(255,255,255,0.08)",
+            }}
+          />
+
+          {/* Info */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p
+              style={{
+                fontSize: "clamp(14px, 1.2vw, 16px)",
+                fontWeight: 600,
+                color: "#fff",
+                letterSpacing: "-0.01em",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {show.venue}
+            </p>
+            <p
+              style={{
+                marginTop: "3px",
+                fontSize: "clamp(11px, 0.9vw, 13px)",
+                color: "rgba(255,255,255,0.35)",
+                letterSpacing: "0.01em",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {show.city}
+              {show.time && <span style={{ marginLeft: "12px" }}>{show.time} Uhr</span>}
+              {show.is_free && <span style={{ marginLeft: "12px" }}>Kostenlos</span>}
+              {!show.is_free && show.price && (
+                <span style={{ marginLeft: "12px" }}>{parseFloat(String(show.price)).toFixed(2)}€</span>
+              )}
+            </p>
+            {show.support_acts && show.support_acts.length > 0 && (
+              <p
+                style={{
+                  marginTop: "3px",
+                  fontSize: "clamp(11px, 0.9vw, 13px)",
+                  color: "rgba(255,255,255,0.25)",
+                  letterSpacing: "0.01em",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                mit {show.support_acts.join(", ")}
+              </p>
+            )}
+          </div>
+
+          {/* Flyer thumbnail — only when present */}
+          {show.flyer_url && (
+            <div
+              style={{
+                flexShrink: 0,
+                width: "40px",
+                height: "53px",
+                borderRadius: "4px",
+                overflow: "hidden",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.06) inset",
+              }}
+            >
+              <img
+                src={show.flyer_url}
+                alt={`${show.venue} Flyer`}
+                loading="lazy"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+          )}
+
+          {/* Ticket CTA */}
+          {show.url && (
+            <a
+              href={show.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                flexShrink: 0,
+                padding: "8px 16px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.16)",
+                borderRadius: "6px",
+                fontSize: "11px",
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.80)",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Tickets
+            </a>
+          )}
         </li>
       ))}
     </ul>
@@ -540,54 +582,84 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
   if (items.length === 0) return <EmptyReleasesState />;
 
   return (
-    <ul className="grid gap-5 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid gap-6 grid-cols-2 lg:grid-cols-3">
       {items.map((release, index) => (
         <li key={index}>
           <a
             href={release.url ?? "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="group block rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col transition-all hover:border-zinc-700 hover:bg-zinc-900/50"
+            className="group block h-full flex flex-col"
           >
-            <div className="relative mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
+            {/* Cover */}
+            <div
+              className="relative overflow-hidden"
+              style={{
+                borderRadius: "8px",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06) inset",
+              }}
+            >
               <div className="relative w-full pb-[100%]">
                 {release.cover_url ? (
                   <img
                     src={release.cover_url}
                     alt={release.title}
                     loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">
-                    ♪
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ background: "rgba(255,255,255,0.04)" }}
+                  >
+                    <span style={{ fontSize: "3rem", color: "rgba(255,255,255,0.15)" }}>♪</span>
                   </div>
                 )}
               </div>
               {release.release_type && (
-                <div className="absolute top-2 left-2 rounded bg-zinc-900/80 px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-200">
+                <div
+                  className="absolute top-2 left-2"
+                  style={{
+                    padding: "3px 8px",
+                    borderRadius: "4px",
+                    background: "rgba(0,0,0,0.70)",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                    fontSize: "10px",
+                    fontWeight: 600,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.60)",
+                  }}
+                >
                   {release.release_type}
-                </div>
-              )}
-              {release.is_featured && (
-                <div className="absolute top-3 right-3 flex items-center gap-2">
-                  <div className="relative">
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 rounded-full bg-emerald-400/30 blur-md animate-pulse" />
-                    {/* Dot */}
-                    <div className="relative w-2 h-2 rounded-full bg-emerald-400" />
-                  </div>
-                  <span className="text-[10px] font-medium tracking-wider uppercase text-emerald-400/90 drop-shadow-sm">
-                    New
-                  </span>
                 </div>
               )}
             </div>
 
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-zinc-100 truncate group-hover:text-white transition-colors">{release.title}</p>
+            {/* Info */}
+            <div className="min-w-0" style={{ paddingTop: "12px" }}>
+              <p
+                className="truncate"
+                style={{
+                  fontSize: "clamp(13px, 1.1vw, 15px)",
+                  fontWeight: 600,
+                  color: "#fff",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {release.title}
+              </p>
               {release.release_date && (
-                <p className="text-xs text-zinc-500 mt-1">{release.release_date}</p>
+                <p
+                  style={{
+                    marginTop: "4px",
+                    fontSize: "clamp(11px, 0.9vw, 13px)",
+                    color: "rgba(255,255,255,0.35)",
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  {release.release_date}
+                </p>
               )}
             </div>
           </a>
@@ -604,17 +676,49 @@ export function VideoList({ items }: { items: VideoItem[] }) {
     <ul className="grid w-full gap-6 grid-cols-1 md:grid-cols-2">
       {items.map((video, index) => (
         <li key={index}>
-          <div className="block rounded-lg overflow-hidden bg-zinc-900/50 border border-zinc-800/50 transition-all hover:border-zinc-700/70">
+          <div
+            className="overflow-hidden"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06) inset",
+            }}
+          >
             <LazyVideoEmbed
               videoId={video.video_id}
               platform={video.platform}
               title={video.title}
               thumbnailUrl={video.thumbnail_url}
             />
-            <div className="p-4">
-              <p className="text-sm font-medium text-zinc-100 line-clamp-2">{video.title}</p>
+            <div style={{ padding: "16px 20px 20px" }}>
+              <p
+                style={{
+                  fontSize: "clamp(13px, 1.1vw, 15px)",
+                  fontWeight: 600,
+                  color: "#fff",
+                  letterSpacing: "-0.01em",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
+                {video.title}
+              </p>
               {video.description && (
-                <p className="text-xs text-zinc-500 mt-2 line-clamp-2">{video.description}</p>
+                <p
+                  style={{
+                    marginTop: "6px",
+                    fontSize: "clamp(11px, 0.9vw, 13px)",
+                    color: "rgba(255,255,255,0.35)",
+                    letterSpacing: "0.01em",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {video.description}
+                </p>
               )}
             </div>
           </div>

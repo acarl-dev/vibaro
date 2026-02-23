@@ -269,18 +269,6 @@ a:focus-visible,
   background: #050507;
 }
 
-/* Minimal top-light depth — no colour nebula */
-.stage-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(1200px 600px at 50% -220px, rgba(255,255,255,0.045), transparent 65%),
-    radial-gradient(900px 500px at 15% 10%, rgba(255,255,255,0.02), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 .stage-hero__container {
   position: relative;
   z-index: 2;
@@ -315,11 +303,7 @@ a:focus-visible,
 }
 
 .stage-hero__overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(900px 420px at 50% 35%, rgba(0,0,0,0.10), rgba(0,0,0,0.40) 70%);
-  pointer-events: none;
+  display: none;
 }
 
 /* Transition zone: name dock below the banner */
@@ -391,4 +375,9 @@ a:focus-visible,
   font-size: clamp(11px, 0.9vw, 13px);
   line-height: 1.45;
   letter-spacing: 0.01em;
+}
+
+/* Gallery Slider — hide scrollbar */
+.gallery-slider-track::-webkit-scrollbar {
+  display: none;
 }
