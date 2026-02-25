@@ -71,8 +71,8 @@ export default function SpotlightCard({
   const handleActivate = async () => {
     const confirmed = confirm(
       spotlight.status === "ended"
-        ? "Dieses Projekt wieder aktivieren? Ein eventuell aktives Projekt wird dabei beendet."
-        : "Dieses Projekt aktivieren? Ein eventuell aktives Projekt wird dabei beendet."
+        ? "Diese Phase wieder aktivieren? Eine eventuell aktive Phase wird dabei beendet."
+        : "Diese Phase aktivieren? Eine eventuell aktive Phase wird dabei beendet."
     );
     if (!confirmed) return;
 
@@ -81,7 +81,7 @@ export default function SpotlightCard({
     setLoading(false);
 
     if (result.success) {
-      showToast("Projekt aktiviert", "success");
+      showToast("Phase aktiviert", "success");
       onActivate(spotlight.id);
     } else {
       showToast(result.error || "Fehler beim Aktivieren", "error");
@@ -89,14 +89,14 @@ export default function SpotlightCard({
   };
 
   const handleEnd = async () => {
-    if (!confirm("Möchtest du dieses Projekt wirklich beenden?")) return;
+    if (!confirm("Möchtest du diese Phase wirklich beenden?")) return;
 
     setLoading(true);
     const result = await endSpotlight(spotlight.id);
     setLoading(false);
 
     if (result.success) {
-      showToast("Projekt beendet", "success");
+      showToast("Phase beendet", "success");
       onUpdate({ ...spotlight, status: "ended", show_on_page: false });
     } else {
       showToast(result.error || "Fehler beim Beenden", "error");
@@ -104,14 +104,14 @@ export default function SpotlightCard({
   };
 
   const handleArchive = async () => {
-    if (!confirm("Möchtest du dieses Projekt wirklich archivieren?")) return;
+    if (!confirm("Möchtest du diese Phase wirklich archivieren?")) return;
 
     setLoading(true);
     const result = await archiveSpotlight(spotlight.id);
     setLoading(false);
 
     if (result.success) {
-      showToast("Projekt archiviert", "success");
+      showToast("Phase archiviert", "success");
       onRemove(spotlight.id);
     } else {
       showToast(result.error || "Fehler beim Archivieren", "error");
@@ -139,7 +139,7 @@ export default function SpotlightCard({
   const handleEditSuccess = (updatedSpotlight: SpotlightData) => {
     onUpdate(updatedSpotlight);
     setShowEditModal(false);
-    showToast("Projekt aktualisiert", "success");
+    showToast("Phase aktualisiert", "success");
   };
 
   return (

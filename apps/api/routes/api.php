@@ -29,6 +29,9 @@ Route::prefix('v1')->group(function () {
     // Public Artist Page
     Route::get('/p/{handle}', [PublicArtistPageController::class, 'show']);
 
+    // Pageview tracking (public – no auth required)
+    Route::post('/analytics/pageview', [AnalyticsController::class, 'recordPageview']);
+
     // Auth (public)
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);

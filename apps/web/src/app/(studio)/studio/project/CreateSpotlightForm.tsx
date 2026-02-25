@@ -121,7 +121,7 @@ export default function CreateSpotlightForm({
     setLoading(false);
 
     if (result.success && result.data) {
-      showToast("Projekt erstellt", "success");
+      showToast("Phase erstellt", "success");
       onSuccess(result.data);
     } else {
       showToast(result.error || "Fehler beim Erstellen", "error");
@@ -130,7 +130,7 @@ export default function CreateSpotlightForm({
 
   return (
     <form onSubmit={handleSubmit} className="studio-card">
-      <h2 className="studio-h2 text-base mb-4">Neues Projekt erstellen</h2>
+      <h2 className="studio-h2 text-base mb-4">Neue Phase erstellen</h2>
 
       <div className="space-y-4">
 
@@ -226,20 +226,6 @@ export default function CreateSpotlightForm({
           />
         </div>
 
-        {/* Artist Name */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Interpret</label>
-          <input
-            type="text"
-            value={formData.artist_name || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, artist_name: e.target.value || null })
-            }
-            placeholder="z.B. Max Mustermann"
-            className="studio-input w-full px-3 py-2 text-sm"
-          />
-        </div>
-
         {/* Type */}
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -259,20 +245,6 @@ export default function CreateSpotlightForm({
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Beschreibung</label>
-          <textarea
-            value={formData.description || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            placeholder="Kurze Beschreibung (optional)"
-            rows={3}
-            className="studio-input w-full px-3 py-2 text-sm"
-          />
         </div>
 
         {/* Show on Page */}
@@ -308,7 +280,7 @@ export default function CreateSpotlightForm({
           <label htmlFor="activate" className="text-sm">
             <span className="font-medium" style={{ color: "var(--studio-success)" }}>Sofort aktivieren</span>
             <span className="block text-xs mt-0.5" style={{ color: "var(--studio-text-secondary)" }}>
-              Dieses Projekt wird direkt aktiv. Ein bestehendes aktives Projekt wird dabei beendet.
+              Diese Phase wird direkt aktiv. Eine bestehende aktive Phase wird dabei beendet.
             </span>
           </label>
         </div>

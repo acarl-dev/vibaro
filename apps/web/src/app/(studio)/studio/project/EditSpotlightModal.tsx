@@ -77,7 +77,7 @@ export default function EditSpotlightModal({
       <div className="rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="studio-h2 text-base">Projekt bearbeiten</h2>
+            <h2 className="studio-h2 text-base">Phase bearbeiten</h2>
             <StudioButton variant="secondary" size="icon" onClick={onClose} aria-label="Schließen" type="button">
               <X size={14} />
             </StudioButton>

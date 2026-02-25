@@ -89,8 +89,8 @@ export default function ResultsClient({
           title="Noch keine Daten"
           description="Sobald du Links teilst und deine Seite live ist, siehst du hier die Ergebnisse."
           action={
-            <a href="/studio/project" className="studio-btn studio-btn-primary">
-              Projekt starten →
+            <a href="/studio/share" className="studio-btn studio-btn-primary">
+              Phase starten →
             </a>
           }
         />
@@ -126,7 +126,7 @@ export default function ResultsClient({
               : undefined
           }
         />
-        <StudioStatCard value={spotlights.length} label="Projekte" />
+        <StudioStatCard value={spotlights.length} label="Phasen" />
         <StudioStatCard value={analytics.by_platform.length} label="Plattformen" />
       </div>
 
@@ -162,7 +162,7 @@ export default function ResultsClient({
             className="rounded px-3 py-2 text-sm"
             style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)" }}
           >
-            <option value="">Alle Projekte</option>
+            <option value="">Alle Phasen</option>
             {spotlights.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.title} ({s.status})
@@ -222,7 +222,7 @@ export default function ResultsClient({
         <div className="rounded-lg p-6 mb-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
           <h2 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--studio-text-secondary)" }}>Nach Platzierung</h2>
           <div className="text-xs mb-3" style={{ color: "var(--studio-text-secondary)" }}>
-            Wähle ein Projekt oben aus, um die hierarchische Ansicht zu sehen
+            Wähle eine Phase oben aus, um die hierarchische Ansicht zu sehen
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

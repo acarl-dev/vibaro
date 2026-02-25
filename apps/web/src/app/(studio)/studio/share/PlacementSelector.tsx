@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Platform, Placement } from "@/lib/platforms";
 
 type PlacementSelectorProps = {
@@ -9,28 +10,50 @@ type PlacementSelectorProps = {
 };
 
 export default function PlacementSelector({ platform, onSelect, selectedPlacementId }: PlacementSelectorProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   return (
     <div>
-      <h2 className="text-sm font-medium text-zinc-400 mb-3">
-        2. Platzierung wählen <span className="text-zinc-600">– {platform.label}</span>
-      </h2>
+      <p
+        className="text-[11px] font-semibold uppercase tracking-widest mb-3"
+        style={{ color: "var(--studio-text-secondary)" }}
+      >
+        2. Platzierung wählen
+        <span className="ml-2 normal-case font-normal" style={{ color: "var(--studio-text-secondary)", opacity: 0.6 }}>
+          – {platform.label}
+        </span>
+      </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {platform.placements.map((placement) => {
           const isSelected = selectedPlacementId === placement.id;
+          const isHovered = hoveredId === placement.id;
           return (
             <button
               key={placement.id}
               onClick={() => onSelect(placement)}
-              className={`rounded-lg border p-4 text-left transition-all ${
-                isSelected
-                  ? "border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/20"
-                  : "border-zinc-800 bg-zinc-950 hover:border-zinc-700 hover:bg-zinc-900"
-              }`}
+              onMouseEnter={() => setHoveredId(placement.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              className="rounded-lg p-4 text-left transition-all"
+              style={{
+                background: isSelected
+                  ? "var(--studio-accent-muted)"
+                  : isHovered
+                  ? "var(--studio-surface-elevated)"
+                  : "var(--studio-surface)",
+                border: isSelected
+                  ? "1px solid var(--studio-accent)"
+                  : "1px solid var(--studio-border)",
+                outline: isSelected ? "1px solid var(--studio-accent)" : "none",
+                outlineOffset: "1px",
+              }}
             >
-              <span className={`block text-sm font-medium mb-1 ${isSelected ? "text-blue-400" : "text-zinc-300"}`}>
+              <span
+                className="block text-sm font-semibold mb-1"
+                style={{ color: isSelected ? "var(--studio-accent)" : "var(--studio-text-primary)" }}
+              >
                 {placement.label}
               </span>
-              <span className="block text-xs text-zinc-500">
+              <span className="block text-xs" style={{ color: "var(--studio-text-secondary)" }}>
                 {placement.description}
               </span>
             </button>

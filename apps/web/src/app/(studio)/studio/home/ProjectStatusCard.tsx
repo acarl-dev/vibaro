@@ -56,15 +56,15 @@ export default function ProjectStatusCard({ spotlight }: ProjectStatusCardProps)
   if (!spotlight) {
     return (
       <div className="rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
-        <h2 className="text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>Aktuelles Projekt</h2>
-        <p className="mt-1 text-sm" style={{ color: "var(--studio-text-secondary)" }}>Noch kein Projekt erstellt</p>
+        <h2 className="text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>Aktive Phase</h2>
+        <p className="mt-1 text-sm" style={{ color: "var(--studio-text-secondary)" }}>Keine aktive Phase</p>
         <div className="mt-4">
           <Link
-            href="/studio/project"
+            href="/studio/share/new"
             className="text-sm font-medium transition-colors"
             style={{ color: "var(--studio-accent)" }}
           >
-            Projekt erstellen →
+            Phase starten →
           </Link>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function ProjectStatusCard({ spotlight }: ProjectStatusCardProps)
         className="text-xs font-semibold uppercase tracking-wider mb-3"
         style={{ color: "var(--studio-text-secondary)" }}
       >
-        Aktuelles Projekt
+        Aktive Phase
       </h2>
 
       {/* Cover + Info */}
@@ -164,18 +164,18 @@ export default function ProjectStatusCard({ spotlight }: ProjectStatusCardProps)
       {/* Actions */}
       <div className="flex gap-4">
         <Link
-          href="/studio/project"
+          href="/studio/share"
           className="text-sm font-medium transition-colors"
           style={{ color: "var(--studio-text-primary)" }}
         >
-          Bearbeiten
+          Zur Phase
         </Link>
         <Link
-          href="/studio/share"
+          href="/studio/share/distribution"
           className="text-sm font-medium transition-colors"
           style={{ color: "var(--studio-accent)" }}
         >
-          Links teilen →
+          Distribution →
         </Link>
       </div>
     </div>

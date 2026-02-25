@@ -30,9 +30,9 @@ function buildTips(data: StudioHomeData): Tip[] {
     tips.push({
       priority: 2,
       emoji: "⚡",
-      title: "Modul aktivieren",
-      text: "Starte ein Modul (Release, Live, Campaign …) um deiner Seite einen klaren Fokus zu geben.",
-      href: "/studio/project",
+      title: "Phase starten",
+      text: "Starte eine Phase (Release, Live, Merch …) um deine Seite gezielt zu pushen.",
+      href: "/studio/share/new",
     });
   }
 
@@ -62,8 +62,8 @@ function buildTips(data: StudioHomeData): Tip[] {
       priority: 10,
       emoji: "🎯",
       title: "Tipp: Ein Fokus zur Zeit",
-      text: "Aktiviere immer nur ein Modul. Fans folgen einem klaren Signal besser als vielen gleichzeitig.",
-      href: "/studio/project",
+      text: "Aktiviere immer nur eine Phase. Fans folgen einem klaren Signal besser als vielen gleichzeitig.",
+      href: "/studio/share",
     },
     {
       priority: 10,
@@ -109,8 +109,8 @@ const QUICK_ACTIONS = [
     ),
   },
   {
-    label: "Link teilen",
-    href: "/studio/share",
+    label: "Distribution",
+    href: "/studio/share/distribution",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 11l18-5v12L3 13"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
@@ -127,8 +127,8 @@ const QUICK_ACTIONS = [
     ),
   },
   {
-    label: "Module",
-    href: "/studio/project",
+    label: "Phase",
+    href: "/studio/share",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>

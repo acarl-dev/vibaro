@@ -88,7 +88,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
       if (result.data) {
         setSpotlights((prev) => [result.data!, ...prev]);
       }
-      showToast("Projekt wiederhergestellt", "success");
+      showToast("Phase wiederhergestellt", "success");
     } else {
       showToast(result.error || "Fehler beim Wiederherstellen", "error");
     }
@@ -101,7 +101,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
     setDeletingId(null);
     if (result.success) {
       setArchivedSpotlights((prev) => prev.filter((s) => s.id !== id));
-      showToast("Projekt gelöscht", "success");
+      showToast("Phase gelöscht", "success");
     } else {
       showToast(result.error || "Fehler beim Löschen", "error");
     }
@@ -110,8 +110,8 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
   return (
     <div className="max-w-4xl">
       <StudioPageHeader
-        title="PROJEKT"
-        subtitle="Verwalte deine Spotlights (Singles, Alben, Touren, Events)"
+        title="PHASEN"
+        subtitle="Alle Phasen überblicken und neue erstellen"
         action={
           <div className="flex items-center gap-2">
             <button
@@ -124,7 +124,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
               onClick={() => setShowCreateForm(!showCreateForm)}
               className="studio-btn studio-btn-primary text-xs"
             >
-              {showCreateForm ? "Abbrechen" : "+ Neues Projekt"}
+              {showCreateForm ? "Abbrechen" : "+ Neue Phase"}
             </button>
           </div>
         }
@@ -144,14 +144,14 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
       {spotlights.length === 0 && (
         <StudioEmptyState
           icon={Zap}
-          title="Noch keine Projekte"
-          description="Erstelle dein erstes Spotlight – Single, Album, Tour oder Event."
+          title="Noch keine Phasen"
+          description="Erstelle deine erste Phase – Release, Live, Merch oder Drop."
           action={
             <button
               onClick={() => setShowCreateForm(true)}
               className="studio-btn studio-btn-primary"
             >
-              Erstes Projekt erstellen
+              Erste Phase erstellen
             </button>
           }
         />
@@ -162,7 +162,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
         <div className="mb-8">
           <h2 className="text-xs font-semibold uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: "var(--studio-text-secondary)" }}>
             <span className="w-2 h-2 rounded-full" style={{ background: "var(--studio-success)" }}></span>
-            Aktives Projekt
+            Aktive Phase
           </h2>
           <SpotlightList
             spotlights={[activeSpotlight]}
@@ -211,7 +211,7 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
             <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Lade Archiv…</p>
           )}
           {!archiveLoading && archivedSpotlights.length === 0 && (
-            <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Keine archivierten Projekte.</p>
+            <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Keine archivierten Phasen.</p>
           )}
           {!archiveLoading && archivedSpotlights.length > 0 && (
             <div className="flex flex-col gap-2">

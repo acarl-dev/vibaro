@@ -14,7 +14,6 @@ const PAGE_SECTION_PREFIXES = [
   "/studio/videos",
   "/studio/gallery",
   "/studio/contact",
-  "/studio/spotlight",
   "/studio/stage",
 ];
 

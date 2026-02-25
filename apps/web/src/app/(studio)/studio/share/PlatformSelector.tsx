@@ -9,24 +9,45 @@ type PlatformSelectorProps = {
 };
 
 export default function PlatformSelector({ onSelect, selectedPlatformId }: PlatformSelectorProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   return (
     <div>
-      <h2 className="text-sm font-medium text-zinc-400 mb-3">1. Plattform wählen</h2>
+      <p
+        className="text-[11px] font-semibold uppercase tracking-widest mb-3"
+        style={{ color: "var(--studio-text-secondary)" }}
+      >
+        1. Plattform wählen
+      </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         {PLATFORMS.map((platform) => {
           const isSelected = selectedPlatformId === platform.id;
+          const isHovered = hoveredId === platform.id;
           return (
             <button
               key={platform.id}
               onClick={() => onSelect(platform)}
-              className={`flex flex-col items-center gap-2 rounded-lg border p-4 transition-all ${
-                isSelected
-                  ? "border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/20"
-                  : "border-zinc-800 bg-zinc-950 hover:border-zinc-700 hover:bg-zinc-900"
-              }`}
+              onMouseEnter={() => setHoveredId(platform.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              className="flex flex-col items-center gap-2 rounded-lg p-4 transition-all"
+              style={{
+                background: isSelected
+                  ? "var(--studio-accent-muted)"
+                  : isHovered
+                  ? "var(--studio-surface-elevated)"
+                  : "var(--studio-surface)",
+                border: isSelected
+                  ? "1px solid var(--studio-accent)"
+                  : "1px solid var(--studio-border)",
+                outline: isSelected ? "1px solid var(--studio-accent)" : "none",
+                outlineOffset: "1px",
+              }}
             >
               <span className="text-2xl">{platform.icon}</span>
-              <span className={`text-sm font-medium ${isSelected ? "text-blue-400" : "text-zinc-300"}`}>
+              <span
+                className="text-sm font-medium"
+                style={{ color: isSelected ? "var(--studio-accent)" : "var(--studio-text-primary)" }}
+              >
                 {platform.label}
               </span>
             </button>

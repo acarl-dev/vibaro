@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ArtistPage;
 use App\Models\ClickEvent;
+use App\Models\PageViewEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -133,17 +135,51 @@ class AnalyticsController extends Controller
                 ];
             });
 
+        // Pageview stats
+        $pvBase = PageViewEvent::realViews()
+            ->where('artist_page_id', $artistPage->id)
+            ->where('occurred_at', '>=', $startDate);
+
+        if ($spotlightId) {
+            $pvBase->where('spotlight_id', $spotlightId);
+        }
+
+        $totalPageviews  = (clone $pvBase)->count();
+        $uniquePageviews = (clone $pvBase)
+            ->whereNotNull('user_agent_hash')
+            ->distinct('user_agent_hash')
+            ->count('user_agent_hash');
+
+        $conversionRate = $totalPageviews > 0
+            ? round($totalClicks / $totalPageviews, 4)
+            : null;
+
+        // Pageview trend (clicks per day)
+        $pvTrend = (clone $pvBase)
+            ->select(
+                DB::raw('DATE(occurred_at) as date'),
+                DB::raw('count(*) as views')
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(fn ($item) => ['date' => $item->date, 'views' => $item->views]);
+
         return response()->json([
             'data' => [
-                'range' => $range,
-                'spotlight_id' => $spotlightId,
-                'campaign_id' => $campaignId,
-                'total_clicks' => $totalClicks,
-                'by_platform' => $byPlatform, // V2
-                'by_placement' => $byPlacement, // V2
-                'by_module' => $byModule, // Legacy
-                'by_referrer' => $byReferrer,
-                'trend' => $trend,
+                'range'            => $range,
+                'spotlight_id'     => $spotlightId,
+                'campaign_id'      => $campaignId,
+                'total_pageviews'  => $totalPageviews,
+                'unique_pageviews' => $uniquePageviews,
+                'total_clicks'     => $totalClicks,
+                'conversion_rate'  => $conversionRate,
+                'by_platform'      => $byPlatform,   // V2
+                'by_placement'     => $byPlacement,  // V2
+                'by_module'        => $byModule,      // Legacy
+                'by_referrer'      => $byReferrer,
+                'trend'            => $trend,
+                'pv_trend'         => $pvTrend,
             ],
         ]);
     }
@@ -172,5 +208,93 @@ class AnalyticsController extends Controller
         );
 
         return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Record a page view from a public artist page.
+     * Public endpoint – no authentication required.
+     */
+    public function recordPageview(Request $request)
+    {
+        $request->validate([
+            'handle'       => 'required|string|max:64',
+            'spotlight_id' => 'nullable|integer',
+            'referrer'     => 'nullable|string|max:255',
+        ]);
+
+        $artistPage = ArtistPage::where('handle', $request->input('handle'))
+            ->where('is_published', true)
+            ->first();
+
+        if (!$artistPage) {
+            return response()->noContent();
+        }
+
+        // Bot / preview detection
+        $userAgent = $request->userAgent() ?? '';
+        $isPreview = $this->isBot($userAgent);
+
+        // Hash UA for dedup (never store raw UA)
+        $uaHash = $userAgent ? hash('sha256', $userAgent) : null;
+
+        // Parse referrer host
+        $referrerRaw  = $request->input('referrer', '');
+        $referrerHost = null;
+        if ($referrerRaw) {
+            $parsed       = parse_url($referrerRaw, PHP_URL_HOST);
+            $referrerHost = $parsed ? strtolower($parsed) : null;
+        }
+
+        // Country from Cloudflare/proxy header (graceful fallback)
+        $country = $request->header('CF-IPCountry')
+            ?? $request->header('X-Country-Code')
+            ?? null;
+        if ($country && strlen($country) !== 2) {
+            $country = null;
+        }
+
+        // Spotlight: use provided id or resolve active spotlight for this page
+        $spotlightId = $request->input('spotlight_id');
+        if (!$spotlightId) {
+            $active      = $artistPage->spotlights()
+                ->where('status', 'active')
+                ->first();
+            $spotlightId = $active?->id;
+        }
+
+        PageViewEvent::create([
+            'artist_page_id'  => $artistPage->id,
+            'spotlight_id'    => $spotlightId,
+            'referrer_host'   => $referrerHost,
+            'country_code'    => $country,
+            'user_agent_hash' => $uaHash,
+            'is_preview'      => $isPreview,
+            'occurred_at'     => now(),
+        ]);
+
+        return response()->noContent();
+    }
+
+    private function isBot(string $userAgent): bool
+    {
+        if (empty($userAgent)) {
+            return true;
+        }
+
+        $botPatterns = [
+            'bot', 'crawl', 'spider', 'slurp', 'mediapartners',
+            'facebookexternalhit', 'whatsapp', 'telegrambot',
+            'twitterbot', 'linkedinbot', 'discordbot', 'slackbot',
+            'preview', 'iframely', 'embedly',
+        ];
+
+        $ua = strtolower($userAgent);
+        foreach ($botPatterns as $pattern) {
+            if (str_contains($ua, $pattern)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

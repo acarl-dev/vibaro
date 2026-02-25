@@ -203,7 +203,7 @@ export default function PageOverviewClient({ page, activeSpotlight }: Props) {
               }}
             >
               <p className="mb-2 leading-relaxed">
-                Aktives Projekt <strong>„{activeSpotlight.title}"</strong> auf der Seite anzeigen?
+                Aktive Phase <strong>„{activeSpotlight.title}"</strong> auf der Seite anzeigen?
               </p>
               <button
                 onClick={handleShowOnPage}

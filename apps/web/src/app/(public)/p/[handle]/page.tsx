@@ -6,6 +6,7 @@ import ModernTemplate from "../components/ModernTemplate";
 import StageTemplate from "../components/StageTemplate";
 import EditorialTemplate from "../components/EditorialTemplate";
 import MinimalTemplate from "../components/MinimalTemplate";
+import PageviewTracker from "../components/PageviewTracker";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -98,15 +99,26 @@ export default async function PublicArtistPage({
   // Select template based on theme_key (default: modern)
   const themeKey = page.theme?.key || "modern";
 
+  let template;
   switch (themeKey) {
     case "minimal":
-      return <MinimalTemplate page={page} />;
+      template = <MinimalTemplate page={page} />;
+      break;
     case "stage":
-      return <StageTemplate page={page} />;
+      template = <StageTemplate page={page} />;
+      break;
     case "editorial":
-      return <EditorialTemplate page={page} />;
+      template = <EditorialTemplate page={page} />;
+      break;
     case "modern":
     default:
-      return <ModernTemplate page={page} />;
+      template = <ModernTemplate page={page} />;
   }
+
+  return (
+    <>
+      <PageviewTracker handle={handle} />
+      {template}
+    </>
+  );
 }

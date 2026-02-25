@@ -128,7 +128,7 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
   if (!activeSpotlight) {
     return (
       <div>
-        <StudioPageHeader title="TEILEN" subtitle="Erstelle Tracking-Links für deine Kanäle." />
+        <StudioPageHeader title="DISTRIBUTION" subtitle="Erstelle Tracking-Links für deine Kanäle." />
         {pageUrl && (
           <div className="rounded-lg p-6 mb-8" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
             <h2 className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--studio-text-secondary)" }}>QR-Code</h2>
@@ -140,14 +140,14 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
         )}
         <StudioEmptyState
           icon={Megaphone}
-          title="Kein aktives Projekt"
-          description="Erstelle zuerst ein Projekt, um Tracking-Links zu generieren."
+          title="Keine aktive Phase"
+          description="Starte zuerst eine Phase, um Tracking-Links zu generieren."
           action={
             <button
-              onClick={() => router.push("/studio/project")}
+              onClick={() => router.push("/studio/share")}
               className="studio-btn studio-btn-primary"
             >
-              Projekt erstellen
+              Zur Phase-Übersicht
             </button>
           }
         />
@@ -158,8 +158,8 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
   return (
     <div>
       <StudioPageHeader
-        title="TEILEN"
-        subtitle={`Erstelle Tracking-Links für ${activeSpotlight.title}`}
+        title="DISTRIBUTION"
+        subtitle={`Phase: ${activeSpotlight.title}`}
       />
 
       <div className="space-y-8">
