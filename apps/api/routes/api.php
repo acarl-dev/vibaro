@@ -108,6 +108,7 @@ Route::prefix('v1')->group(function () {
         // Analytics (V2 Stage)
         Route::get('/analytics/overview', [AnalyticsController::class, 'overview']);
         Route::get('/analytics/breakdown', [AnalyticsController::class, 'breakdown']);
+        Route::get('/analytics/comparison', [AnalyticsController::class, 'comparison']);
 
         // Studio (V2 Home Dashboard)
         Route::get('/studio/home', [StudioController::class, 'home']);

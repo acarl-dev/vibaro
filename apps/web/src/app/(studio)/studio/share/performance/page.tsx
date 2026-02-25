@@ -1,9 +1,9 @@
 import { backendFetch } from "@/lib/api/backend";
 import StudioEmptyState from "../../../components/StudioEmptyState";
 import { TrendingUp } from "../../../components/StudioIcons";
-import PerformanceClient from "./PerformanceClient";
+import PerformanceClient, { ComparisonPhase } from "./PerformanceClient";
 
-async function fetchPerformanceData(): Promise<{
+type PerformanceData = {
   totalClicks: number;
   totalPageviews: number;
   uniquePageviews: number;
@@ -12,10 +12,17 @@ async function fetchPerformanceData(): Promise<{
   trend: { date: string; clicks: number }[];
   pvTrend: { date: string; views: number }[];
   phaseTitle: string | null;
-} | null> {
+  comparison: { current: ComparisonPhase | null; previous: ComparisonPhase | null };
+};
+
+async function fetchPerformanceData(): Promise<PerformanceData | null> {
   try {
-    // Fetch active spotlight first
-    const spotlightRes = await backendFetch("/api/v1/spotlights/active", { cache: "no-store" });
+    // Fetch active spotlight + comparison in parallel
+    const [spotlightRes, comparisonRes] = await Promise.all([
+      backendFetch("/api/v1/spotlights/active", { cache: "no-store" }),
+      backendFetch("/api/v1/analytics/comparison", { cache: "no-store" }),
+    ]);
+
     if (!spotlightRes.ok) return null;
     const spotlightJson = await spotlightRes.json();
     const spotlight = spotlightJson?.data;
@@ -26,10 +33,15 @@ async function fetchPerformanceData(): Promise<{
       `/api/v1/analytics/overview?range=7d&spotlight_id=${spotlight.id}`,
       { cache: "no-store" }
     );
+
+    const comparisonJson = comparisonRes.ok ? await comparisonRes.json() : null;
+    const cmp = comparisonJson?.data ?? { current: null, previous: null };
+
     if (!analyticsRes.ok) {
       return {
         totalClicks: 0, totalPageviews: 0, uniquePageviews: 0, conversionRate: null,
         byPlatform: [], trend: [], pvTrend: [], phaseTitle: spotlight.title,
+        comparison: cmp,
       };
     }
     const analyticsJson = await analyticsRes.json();
@@ -44,6 +56,7 @@ async function fetchPerformanceData(): Promise<{
       trend:           d?.trend            ?? [],
       pvTrend:         d?.pv_trend         ?? [],
       phaseTitle:      spotlight.title,
+      comparison:      cmp,
     };
   } catch {
     return null;
@@ -80,6 +93,7 @@ export default async function PerformancePage() {
       trend={data.trend}
       pvTrend={data.pvTrend}
       phaseTitle={data.phaseTitle}
+      comparison={data.comparison}
     />
   );
 }

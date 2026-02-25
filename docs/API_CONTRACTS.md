@@ -1083,6 +1083,56 @@ Notes:
 
 ---
 
+### GET /analytics/comparison
+
+Auth required. No query params.
+
+Returns all-time aggregated metrics for two phases to be compared side-by-side.
+
+**Phase selection logic (MVP):**
+- If an **active** spotlight exists: `current` = active, `previous` = last ended
+- If **no active** spotlight: `current` = last ended, `previous` = second-to-last ended
+- If fewer than two phases exist: `previous` is `null`
+
+**Conversion formula:** same Option A as overview — `total_clicks / unique_visitors × 100`. `null` when `unique_visitors = 0`.
+**Delta for Conversion:** displayed in percentage points (pp), not %. E.g. 51.3% → 52.9% = −1.6 pp.
+
+Response:
+
+```json
+{
+  "data": {
+    "current": {
+      "id": 42,
+      "title": "Release Week",
+      "visitors": 742,
+      "clicks": 381,
+      "qr_scans": 63,
+      "conversion": 51.3,
+      "top_platform": "instagram"
+    },
+    "previous": {
+      "id": 39,
+      "title": "Pre-Save Phase",
+      "visitors": 510,
+      "clicks": 270,
+      "qr_scans": 12,
+      "conversion": 52.9,
+      "top_platform": "instagram"
+    }
+  }
+}
+```
+
+Notes:
+
+* Metrics are **all-time** (no date range filter) — captures the full phase lifecycle.
+* `qr_scans` is excluded from `clicks` total in frontend display.
+* `top_platform` excludes QR (`platform != 'qr'`).
+* Both `current` and `previous` can be `null` if no phase data exists.
+
+---
+
 ### GET /analytics/breakdown
 
 Auth required.

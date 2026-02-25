@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ArtistPage;
 use App\Models\ClickEvent;
 use App\Models\PageViewEvent;
+use App\Models\Spotlight;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -279,6 +280,102 @@ class AnalyticsController extends Controller
         ]);
 
         return response()->noContent();
+    }
+
+    /**
+     * Compare current phase vs previous phase for the authenticated user's artist page.
+     * Current = active spotlight (or last ended if none active).
+     * Previous = last ended spotlight (or second-to-last ended).
+     */
+    public function comparison(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $artistPage = $request->user()->artistPage;
+
+        if (!$artistPage) {
+            return response()->json([
+                'error' => ['code' => 'no_artist_page', 'message' => 'No artist page found.'],
+            ], 404);
+        }
+
+        $current = Spotlight::where('artist_page_id', $artistPage->id)
+            ->where('status', 'active')
+            ->latest()
+            ->first();
+
+        if ($current) {
+            $previous = Spotlight::where('artist_page_id', $artistPage->id)
+                ->where('status', 'ended')
+                ->latest('ended_at')
+                ->first();
+        } else {
+            // No active phase: compare last two ended phases
+            $ended    = Spotlight::where('artist_page_id', $artistPage->id)
+                ->where('status', 'ended')
+                ->latest('ended_at')
+                ->limit(2)
+                ->get();
+            $current  = $ended->get(0);
+            $previous = $ended->get(1);
+        }
+
+        if (!$current) {
+            return response()->json(['data' => ['current' => null, 'previous' => null]]);
+        }
+
+        return response()->json([
+            'data' => [
+                'current'  => $this->aggregatePhase($current),
+                'previous' => $previous ? $this->aggregatePhase($previous) : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Aggregate all-time metrics for a single spotlight.
+     * No date range – captures the full phase lifecycle.
+     */
+    private function aggregatePhase(Spotlight $spotlight): array
+    {
+        $id = $spotlight->id;
+
+        $totalClicks = ClickEvent::where('spotlight_id', $id)
+            ->where('is_preview', false)
+            ->count();
+
+        $qrClicks = ClickEvent::where('spotlight_id', $id)
+            ->where('platform', 'qr')
+            ->where('is_preview', false)
+            ->count();
+
+        $uniqueVisitors = PageViewEvent::where('spotlight_id', $id)
+            ->realViews()
+            ->whereNotNull('user_agent_hash')
+            ->distinct('user_agent_hash')
+            ->count('user_agent_hash');
+
+        // Conversion: total_clicks / unique_visitors × 100 (same MVP Option A logic as overview)
+        $conversion = $uniqueVisitors > 0
+            ? round($totalClicks / $uniqueVisitors * 100, 1)
+            : null;
+
+        $topPlatform = ClickEvent::where('spotlight_id', $id)
+            ->where('is_preview', false)
+            ->where('platform', '!=', 'qr')
+            ->whereNotNull('platform')
+            ->selectRaw('platform, COUNT(*) as clicks')
+            ->groupBy('platform')
+            ->orderByDesc('clicks')
+            ->first();
+
+        return [
+            'id'           => $spotlight->id,
+            'title'        => $spotlight->title,
+            'visitors'     => $uniqueVisitors,
+            'clicks'       => $totalClicks,
+            'qr_scans'     => $qrClicks,
+            'conversion'   => $conversion,
+            'top_platform' => $topPlatform?->platform,
+        ];
     }
 
     private function isBot(string $userAgent): bool
