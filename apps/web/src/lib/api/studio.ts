@@ -46,11 +46,21 @@ export type TopLinkData = {
   placement: string | null;
 };
 
+export type CompletenessItem = {
+  key: string;
+  label: string;
+  done: boolean;
+};
+
 export type PageStatusData = {
   handle: string | null;
   url: string | null;
   is_published: boolean;
   display_name?: string | null;
+  completeness?: {
+    basis: CompletenessItem[];
+    praesenz: CompletenessItem[];
+  } | null;
 };
 
 export type StatsData = {

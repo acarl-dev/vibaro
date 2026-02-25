@@ -252,18 +252,58 @@ class StudioHomeService
     }
 
     /**
-     * Get page status.
+     * Get page status including field-level completeness data.
      *
      * @param ArtistPage $artistPage
      * @return array
      */
     protected function getPageStatus(ArtistPage $artistPage): array
     {
+        // Kontakt: prefer the new `contacts` JSON array (source of truth since 2026-02-23).
+        // A contact entry counts only when it has a non-empty value.
+        $contacts = $artistPage->contacts ?? [];
+        $hasContact = collect($contacts)->contains(
+            fn($c) => !empty($c['value'] ?? null)
+        );
+        // Fall back to the legacy individual fields in case of old rows not yet migrated.
+        if (!$hasContact) {
+            $hasContact = !empty($artistPage->booking_email)
+                || !empty($artistPage->management_email)
+                || !empty($artistPage->press_email)
+                || !empty($artistPage->whatsapp_number);
+        }
+
+        // Links: a row is only "filled" when it actually has a URL.
+        // Pre-created platform placeholder rows with url=null must not count.
+        $hasLinks = $artistPage->links()
+            ->whereNotNull('url')
+            ->where('url', '!=', '')
+            ->exists();
+
+        // Media: either FeaturedTracks (Spotify/SoundCloud embeds) or Videos count.
+        $hasMedia = $artistPage->featuredTracks()->exists()
+            || $artistPage->videos()->exists();
+
+        $hasShows = $artistPage->shows()->exists();
+
         return [
-            'handle' => $artistPage->handle,
+            'handle'       => $artistPage->handle,
             'is_published' => $artistPage->is_published,
             'display_name' => $artistPage->display_name,
-            'updated_at' => $artistPage->updated_at->toIso8601String(),
+            'updated_at'   => $artistPage->updated_at->toIso8601String(),
+            'completeness' => [
+                'basis' => [
+                    ['key' => 'name',    'label' => 'Künstlername',  'done' => !empty($artistPage->display_name)],
+                    ['key' => 'bio',     'label' => 'Bio',            'done' => !empty($artistPage->bio)],
+                    ['key' => 'header',  'label' => 'Headerbild',     'done' => !empty($artistPage->header_path)],
+                    ['key' => 'contact', 'label' => 'Kontakt',        'done' => $hasContact],
+                ],
+                'praesenz' => [
+                    ['key' => 'links', 'label' => 'Social Links',    'done' => $hasLinks],
+                    ['key' => 'media', 'label' => 'Media / Player',  'done' => $hasMedia],
+                    ['key' => 'shows', 'label' => 'Shows',           'done' => $hasShows],
+                ],
+            ],
         ];
     }
 
