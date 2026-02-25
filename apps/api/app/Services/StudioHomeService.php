@@ -7,6 +7,7 @@ use App\Models\ArtistPage;
 use App\Models\Spotlight;
 use App\Models\TrackingLink;
 use App\Models\ClickEvent;
+use App\Models\PageViewEvent;
 use Carbon\Carbon;
 
 class StudioHomeService
@@ -40,12 +41,141 @@ class StudioHomeService
         // 5. Generate contextual tip
         $tip = $this->generateTip($artistPage, $spotlight, $topLinks, $stats);
 
+        // 6. Phase stats (all-time for active spotlight)
+        if ($spotlight) {
+            $spotlight['phase_stats'] = $this->getPhaseStats($spotlight['id']);
+        }
+
+        // 7. Previous (last ended) spotlight + its metrics
+        $previousSpotlight = $this->getPreviousSpotlight($artistPage);
+
+        // 8. Traffic snapshot (7-day pageview summary)
+        $trafficSnapshot = $this->getTrafficSnapshot($artistPage, $spotlight);
+
         return [
             'spotlight' => $spotlight,
+            'previous_spotlight' => $previousSpotlight,
+            'traffic_snapshot' => $trafficSnapshot,
             'stats' => $stats,
             'top_links' => $topLinks,
             'page' => $page,
             'tip' => $tip,
+        ];
+    }
+
+    /**
+     * Get all-time metrics for a spotlight (used in hero card + comparison).
+     */
+    protected function getPhaseStats(int $spotlightId): array
+    {
+        $totalClicks = ClickEvent::where('spotlight_id', $spotlightId)
+            ->where('is_preview', false)
+            ->count();
+
+        $qrClicks = ClickEvent::where('spotlight_id', $spotlightId)
+            ->where('platform', 'qr')
+            ->where('is_preview', false)
+            ->count();
+
+        $uniqueVisitors = PageViewEvent::where('spotlight_id', $spotlightId)
+            ->realViews()
+            ->whereNotNull('user_agent_hash')
+            ->distinct('user_agent_hash')
+            ->count('user_agent_hash');
+
+        $conversion = $uniqueVisitors > 0
+            ? round($totalClicks / $uniqueVisitors * 100, 1)
+            : null;
+
+        $topPlatform = ClickEvent::where('spotlight_id', $spotlightId)
+            ->where('is_preview', false)
+            ->where('platform', '!=', 'qr')
+            ->whereNotNull('platform')
+            ->selectRaw('platform, COUNT(*) as cnt')
+            ->groupBy('platform')
+            ->orderByDesc('cnt')
+            ->value('platform');
+
+        return [
+            'visitors'     => $uniqueVisitors,
+            'clicks'       => $totalClicks,
+            'qr_scans'     => $qrClicks,
+            'conversion'   => $conversion,
+            'top_platform' => $topPlatform,
+        ];
+    }
+
+    /**
+     * Get last ended spotlight + its all-time metrics.
+     */
+    protected function getPreviousSpotlight(ArtistPage $artistPage): ?array
+    {
+        $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
+            ->where('status', 'ended')
+            ->latest('ended_at')
+            ->first();
+
+        if (!$spotlight) {
+            return null;
+        }
+
+        return [
+            'id'         => $spotlight->id,
+            'title'      => $spotlight->title,
+            'phase_stats' => $this->getPhaseStats($spotlight->id),
+        ];
+    }
+
+    /**
+     * 7-day traffic snapshot for the mini-analytics block.
+     */
+    protected function getTrafficSnapshot(ArtistPage $artistPage, ?array $spotlight): array
+    {
+        $since7d = now()->subDays(7)->startOfDay();
+        $since14d = now()->subDays(14)->startOfDay();
+
+        // Unique pageviews this week
+        $visitors7d = PageViewEvent::where('artist_page_id', $artistPage->id)
+            ->realViews()
+            ->where('occurred_at', '>=', $since7d)
+            ->whereNotNull('user_agent_hash')
+            ->distinct('user_agent_hash')
+            ->count('user_agent_hash');
+
+        // Unique pageviews previous week (for trend)
+        $visitorsPrev7d = PageViewEvent::where('artist_page_id', $artistPage->id)
+            ->realViews()
+            ->where('occurred_at', '>=', $since14d)
+            ->where('occurred_at', '<', $since7d)
+            ->whereNotNull('user_agent_hash')
+            ->distinct('user_agent_hash')
+            ->count('user_agent_hash');
+
+        $trendPct = $visitorsPrev7d > 0
+            ? (int) round((($visitors7d - $visitorsPrev7d) / $visitorsPrev7d) * 100)
+            : null;
+
+        // Top platform (scoped to spotlight if active, else all artist page clicks)
+        $clickQuery = ClickEvent::where('artist_page_id', $artistPage->id)
+            ->where('is_preview', false)
+            ->where('occurred_at', '>=', $since7d)
+            ->where('platform', '!=', 'qr')
+            ->whereNotNull('platform');
+
+        if ($spotlight) {
+            $clickQuery->where('spotlight_id', $spotlight['id']);
+        }
+
+        $topPlatform = $clickQuery
+            ->selectRaw('platform, COUNT(*) as cnt')
+            ->groupBy('platform')
+            ->orderByDesc('cnt')
+            ->value('platform');
+
+        return [
+            'visitors_7d' => $visitors7d,
+            'trend_pct'   => $trendPct,
+            'top_platform' => $topPlatform,
         ];
     }
 

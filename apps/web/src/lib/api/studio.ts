@@ -13,6 +13,27 @@ export type SpotlightData = {
   cover_image_url: string | null;
   artist_name: string | null;
   platform_name: string | null;
+  phase_stats?: PhaseStatsData;
+};
+
+export type PhaseStatsData = {
+  visitors: number;
+  clicks: number;
+  qr_scans: number;
+  conversion: number | null;
+  top_platform: string | null;
+};
+
+export type PreviousSpotlightData = {
+  id: number;
+  title: string;
+  phase_stats: PhaseStatsData;
+};
+
+export type TrafficSnapshotData = {
+  visitors_7d: number;
+  trend_pct: number | null;
+  top_platform: string | null;
 };
 
 export type TopLinkData = {
@@ -45,6 +66,8 @@ export type TipData = {
 
 export type StudioHomeData = {
   spotlight: SpotlightData | null;
+  previous_spotlight: PreviousSpotlightData | null;
+  traffic_snapshot: TrafficSnapshotData;
   top_links: TopLinkData[];
   page: PageStatusData | null;
   stats: StatsData;
