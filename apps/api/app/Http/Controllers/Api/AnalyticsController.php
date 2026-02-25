@@ -150,8 +150,14 @@ class AnalyticsController extends Controller
             ->distinct('user_agent_hash')
             ->count('user_agent_hash');
 
-        $conversionRate = $totalPageviews > 0
-            ? round($totalClicks / $totalPageviews, 4)
+        // Conversion only meaningful when scoped to a spotlight.
+        // Formula (MVP, Option A): total_clicks / unique_pageviews.
+        // Rationale: unique_pageviews dedupes crawlers/reloads;
+        // total_clicks is used instead of unique_clicks because
+        // click dedup per UA is not yet tracked.
+        // Revisit: switch to unique_clicks/unique_pageviews in V2.
+        $conversionRate = ($spotlightId && $uniquePageviews > 0)
+            ? round($totalClicks / $uniquePageviews, 4)
             : null;
 
         // Pageview trend (clicks per day)
