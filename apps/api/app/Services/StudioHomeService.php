@@ -112,7 +112,7 @@ class StudioHomeService
     {
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
             ->where('status', 'ended')
-            ->latest('ended_at')
+            ->latest('ends_at')
             ->first();
 
         if (!$spotlight) {
