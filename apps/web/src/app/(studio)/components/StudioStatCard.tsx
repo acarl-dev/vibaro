@@ -7,21 +7,22 @@ type StudioStatCardProps = {
 export default function StudioStatCard({ value, label, trend }: StudioStatCardProps) {
   return (
     <div
-      className="rounded-lg p-6"
+      className="rounded-lg"
       style={{
         background: "var(--studio-surface)",
         border: "1px solid var(--studio-border)",
+        padding: "18px 20px",
       }}
     >
       <div
-        className="text-4xl font-bold leading-none mb-2"
-        style={{ color: "var(--studio-text-primary)" }}
+        className="text-3xl font-bold leading-none"
+        style={{ color: "var(--studio-text-primary)", marginBottom: "5px" }}
       >
         {value === "" || value === null || value === undefined ? "—" : value}
       </div>
       <div
         className="text-sm"
-        style={{ color: "var(--studio-text-secondary)" }}
+        style={{ color: "var(--studio-text-secondary)", opacity: 0.75 }}
       >
         {label}
       </div>

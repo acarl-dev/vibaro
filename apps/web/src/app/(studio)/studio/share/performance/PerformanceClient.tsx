@@ -139,23 +139,44 @@ export default function PerformanceClient({
             </p>
           </div>
         )}
-        {conversionRate !== null && uniquePageviews > 0 && (
-          <div
-            className="text-right rounded px-3 py-1 self-start"
-            style={{ background: "var(--studio-accent-muted)", border: "1px solid var(--studio-accent)" }}
-          >
-            <p className="text-xl font-bold" style={{ color: "var(--studio-accent)" }}>
-              {Math.round(conversionRate * 100)}&thinsp;%
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--studio-accent)", opacity: 0.7 }}>
-              Conversion
-            </p>
-          </div>
-        )}
+        {conversionRate !== null && uniquePageviews > 0 && (() => {
+          const pct = Math.round(conversionRate * 100);
+          const hasClicks = (totalClicks - qrClicks) > 0;
+          // Neutral style when 0% (no clicks yet — not a failure, just empty)
+          const activeStyle = hasClicks && pct > 0
+            ? { bg: "var(--studio-accent-muted)", border: "rgba(230,57,70,0.3)", color: "var(--studio-accent)" }
+            : { bg: "var(--studio-surface-elevated)", border: "var(--studio-border)", color: "var(--studio-text-secondary)" };
+          return (
+            <div
+              className="text-right rounded px-3 py-1 self-start"
+              style={{ background: activeStyle.bg, border: `1px solid ${activeStyle.border}` }}
+            >
+              <p className="text-xl font-bold" style={{ color: activeStyle.color }}>
+                {pct}&thinsp;%
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: activeStyle.color, opacity: 0.7 }}>
+                Conversion
+              </p>
+            </div>
+          );
+        })()}
       </div>
       </div>
 
       {/* Trend */}
+      {trend.length === 0 && pvTrend.length === 0 && (
+        <div
+          className="rounded-lg p-8 text-center"
+          style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}
+        >
+          <p className="text-sm" style={{ color: "var(--studio-text-secondary)", marginBottom: "16px" }}>
+            Noch keine Daten. Teile zuerst einen Tracking-Link.
+          </p>
+          <a href="/studio/share/distribution" className="studio-btn studio-btn-primary inline-flex">
+            Zu Distribution \u2192
+          </a>
+        </div>
+      )}
       {(trend.length > 0 || pvTrend.length > 0) && (
         <div
           className="rounded-lg p-6"

@@ -22,6 +22,7 @@ export function OnboardingClient() {
   
   // Step 2: Profile (Bio + Avatar)
   const [bio, setBio] = useState("");
+  const [genre, setGenre] = useState("");
   const [profileSaveStatus, setProfileSaveStatus] = useState<SaveStatus>("idle");
   const [profileError, setProfileError] = useState<string | null>(null);
   
@@ -707,6 +708,8 @@ export function OnboardingClient() {
                 type="text"
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-sm text-zinc-100 outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-700"
                 placeholder="z.B. Indie-Folk, Electronic, Hip-Hop"
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
               />
               <p className="text-xs text-zinc-700">Erscheint als Tag auf deiner Seite.</p>
             </div>

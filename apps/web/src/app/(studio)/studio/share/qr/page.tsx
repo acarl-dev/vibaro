@@ -117,9 +117,14 @@ export default async function QRPage() {
           </p>
         </div>
         <div className="sm:col-span-2 flex items-center">
-          <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>
-            Standort-Tracking für QR-Scans ist für eine spätere Phase geplant.
-          </p>
+          <div>
+            <p className="text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>
+              QR-Scans werden automatisch in den Phase-Stats erfasst.
+            </p>
+            <p className="text-xs mt-1" style={{ color: "var(--studio-text-secondary)", opacity: 0.5 }}>
+              Standort-Insights folgen sp\u00e4ter.
+            </p>
+          </div>
         </div>
       </div>
     </div>
