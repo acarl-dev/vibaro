@@ -213,6 +213,11 @@ a:focus-visible,
     outline-offset: 2px;
   }
 
+  .studio-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
   .studio-btn-primary {
     background-color: var(--studio-accent);
     color: #ffffff;
@@ -243,19 +248,17 @@ a:focus-visible,
     background-color: rgba(230, 57, 70, 0.1);
   }
 
-  .studio-btn-ghost {
-    background-color: transparent;
-    border: none;
-    color: var(--studio-text-secondary);
-    padding: 8px 12px;
-    font-weight: 400;
-    text-transform: none;
-    letter-spacing: normal;
+  /* Size modifiers (combined with variant class) */
+  .studio-btn-sm {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 
-  .studio-btn-ghost:hover {
-    text-decoration: underline;
-    color: var(--studio-text-primary);
+  .studio-btn-icon {
+    padding: 7px;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
   }
 
   /* Focus state for studio interactive elements */

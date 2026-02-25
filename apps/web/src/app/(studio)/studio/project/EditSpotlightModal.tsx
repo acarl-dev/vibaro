@@ -8,6 +8,8 @@ import {
   updateSpotlight,
   fetchSpotlights,
 } from "@/lib/api/spotlights";
+import StudioButton from "../../components/StudioButton";
+import { X } from "../../components/StudioIcons";
 import { useToast } from "@/context/ToastContext";
 
 type EditSpotlightModalProps = {
@@ -76,12 +78,9 @@ export default function EditSpotlightModal({
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="studio-h2 text-base">Projekt bearbeiten</h2>
-            <button
-              onClick={onClose}
-              className="studio-subtitle hover:text-[var(--studio-text-primary)] transition-colors text-lg"
-            >
-              ✕
-            </button>
+            <StudioButton variant="secondary" size="icon" onClick={onClose} aria-label="Schließen" type="button">
+              <X size={14} />
+            </StudioButton>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

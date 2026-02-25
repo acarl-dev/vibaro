@@ -13,11 +13,10 @@ type StudioTopNavProps = {
 const PAGE_SECTION_PREFIX = "/studio/page";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",   href: "/studio",         exact: true  },
-  { label: "Meine Seite", href: "/studio/page",    exact: false, isPageSection: true },
-  { label: "Module",      href: "/studio/project", exact: false },
-  { label: "Teilen",      href: "/studio/share",   exact: false },
-  { label: "Ergebnisse",  href: "/studio/results", exact: false },
+  { label: "Dashboard",   href: "/studio",          exact: true  },
+  { label: "Meine Seite", href: "/studio/page",     exact: false, isPageSection: true },
+  { label: "Phase",       href: "/studio/share",    exact: false },
+  { label: "Analyse",     href: "/studio/results",  exact: false },
 ] as const;
 
 export default function StudioTopNav({ page }: StudioTopNavProps) {
@@ -28,6 +27,8 @@ export default function StudioTopNav({ page }: StudioTopNavProps) {
   const isActive = (href: string, exact: boolean, isPageSection?: boolean) => {
     if (isPageSection) return isPageSectionActive;
     if (exact) return pathname === href;
+    // Prevent "/studio" prefix from matching all studio routes
+    if (href === "/studio" && exact) return pathname === href;
     return pathname.startsWith(href);
   };
 

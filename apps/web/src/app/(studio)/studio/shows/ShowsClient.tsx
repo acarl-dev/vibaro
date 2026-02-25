@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
 
 type ArtistSuggestion = {
   id: number;
@@ -343,12 +344,9 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-medium text-zinc-300">Deine Shows</h2>
           {!isCreating && !editingId && (
-            <button
-              onClick={() => setIsCreating(true)}
-              className="text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
-            >
+            <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
               + Neue Show
-            </button>
+            </StudioButton>
           )}
         </div>
 
@@ -506,18 +504,12 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={handleCreate}
-                  className="rounded-lg bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition-all hover:bg-zinc-200"
-                >
+                <StudioButton variant="primary" size="sm" onClick={handleCreate}>
                   Erstellen
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-                >
+                </StudioButton>
+                <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                   Abbrechen
-                </button>
+                </StudioButton>
               </div>
             </div>
           )}
@@ -526,12 +518,9 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
           {shows.length === 0 && !isCreating ? (
             <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
               <p className="text-xs text-zinc-600 mb-2">Noch keine Shows hinzugefügt</p>
-              <button
-                onClick={() => setIsCreating(true)}
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-              >
+              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
                 Erste Show hinzufügen
-              </button>
+              </StudioButton>
             </div>
           ) : (
             shows.map((show) => (
@@ -696,18 +685,12 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                     </div>
 
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleUpdate(show.id)}
-                        className="rounded-lg bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition-all hover:bg-zinc-200"
-                      >
+                      <StudioButton variant="primary" size="sm" onClick={() => handleUpdate(show.id)}>
                         Speichern
-                      </button>
-                      <button
-                        onClick={cancelEdit}
-                        className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-                      >
+                      </StudioButton>
+                      <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                         Abbrechen
-                      </button>
+                      </StudioButton>
                     </div>
                   </div>
                 ) : (
@@ -765,27 +748,17 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                         </div>
                       )}
                       {show.flyer_path && (
-                        <button
-                          onClick={() => handleFlyerDelete(show.id)}
-                          className="text-xs text-zinc-400 hover:text-red-400"
-                          title="Flyer löschen"
-                        >
+                        <StudioButton variant="danger" size="sm" onClick={() => handleFlyerDelete(show.id)} title="Flyer löschen">
                           Flyer löschen
-                        </button>
+                        </StudioButton>
                       )}
                       <div className="ml-auto flex items-center gap-2">
-                        <button
-                          onClick={() => startEdit(show)}
-                          className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
-                        >
+                        <StudioButton variant="secondary" size="sm" onClick={() => startEdit(show)}>
                           Bearbeiten
-                        </button>
-                        <button
-                          onClick={() => handleDelete(show.id)}
-                          className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition-colors hover:border-red-500/50 hover:bg-red-500/20"
-                        >
+                        </StudioButton>
+                        <StudioButton variant="danger" size="sm" onClick={() => handleDelete(show.id)}>
                           Löschen
-                        </button>
+                        </StudioButton>
                       </div>
                     </div>
                   </div>

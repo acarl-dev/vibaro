@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
 
 type GalleryImage = {
   id: number;
@@ -539,18 +540,12 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
               autoFocus
             />
             <div className="flex gap-2 justify-end">
-              <button
-                onClick={cancelEdit}
-                className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
-              >
+              <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                 Abbrechen
-              </button>
-              <button
-                onClick={() => handleUpdateTitle(editingId, editTitle)}
-                className="px-4 py-2 text-sm bg-zinc-50 text-zinc-950 font-semibold rounded-lg hover:bg-zinc-200 transition-colors"
-              >
+              </StudioButton>
+              <StudioButton variant="primary" size="sm" onClick={() => handleUpdateTitle(editingId, editTitle)}>
                 Speichern
-              </button>
+              </StudioButton>
             </div>
           </div>
         </div>

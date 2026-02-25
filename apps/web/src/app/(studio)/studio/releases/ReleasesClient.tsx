@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
 
 type Release = {
   id: number;
@@ -290,12 +291,9 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-medium text-zinc-300">Deine Releases</h2>
           {!isCreating && !editingId && (
-            <button
-              onClick={() => setIsCreating(true)}
-              className="text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
-            >
+            <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
               + Neues Release
-            </button>
+            </StudioButton>
           )}
         </div>
 
@@ -383,18 +381,12 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={handleCreate}
-                  className="rounded-lg bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition-all hover:bg-zinc-200"
-                >
+                <StudioButton variant="primary" size="sm" onClick={handleCreate}>
                   Erstellen
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-                >
+                </StudioButton>
+                <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                   Abbrechen
-                </button>
+                </StudioButton>
               </div>
             </div>
           )}
@@ -403,12 +395,9 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
           {releases.length === 0 && !isCreating ? (
             <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
               <p className="text-xs text-zinc-600 mb-2">Noch keine Releases hinzugefügt</p>
-              <button
-                onClick={() => setIsCreating(true)}
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-              >
+              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
                 Erstes Release hinzufügen
-              </button>
+              </StudioButton>
             </div>
           ) : (
             releases.map((release) => {
@@ -506,18 +495,12 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                     </div>
 
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleUpdate(release.id)}
-                        className="rounded-lg bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition-all hover:bg-zinc-200"
-                      >
+                      <StudioButton variant="primary" size="sm" onClick={() => handleUpdate(release.id)}>
                         Speichern
-                      </button>
-                      <button
-                        onClick={cancelEdit}
-                        className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-                      >
+                      </StudioButton>
+                      <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                         Abbrechen
-                      </button>
+                      </StudioButton>
                     </div>
                   </div>
                 ) : (
@@ -577,27 +560,17 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                           </label>
                         </div>
                       ) : (
-                        <button
-                          onClick={() => handleCoverDelete(release.id)}
-                          className="text-xs text-zinc-400 hover:text-red-400"
-                          title="Cover löschen"
-                        >
+                        <StudioButton variant="danger" size="sm" onClick={() => handleCoverDelete(release.id)} title="Cover löschen">
                           Cover löschen
-                        </button>
+                        </StudioButton>
                       )}
                       <div className="ml-auto flex items-center gap-2">
-                        <button
-                          onClick={() => startEdit(release)}
-                          className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
-                        >
+                        <StudioButton variant="secondary" size="sm" onClick={() => startEdit(release)}>
                           Bearbeiten
-                        </button>
-                        <button
-                          onClick={() => handleDelete(release.id)}
-                          className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition-colors hover:border-red-500/50 hover:bg-red-500/20"
-                        >
+                        </StudioButton>
+                        <StudioButton variant="danger" size="sm" onClick={() => handleDelete(release.id)}>
                           Löschen
-                        </button>
+                        </StudioButton>
                       </div>
                     </div>
                   </div>

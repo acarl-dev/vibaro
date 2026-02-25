@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
 
 type ContactData = {
   booking_email: string | null;
@@ -163,17 +164,9 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
           <p className="text-xs text-zinc-600">
             Diese Informationen werden öffentlich auf deiner Artist-Seite angezeigt
           </p>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className={`rounded-lg px-6 py-2 text-sm font-semibold transition-all ${
-              saving
-                ? "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                : "bg-zinc-50 text-zinc-950 hover:bg-zinc-200"
-            }`}
-          >
+          <StudioButton variant="primary" size="md" onClick={handleSave} disabled={saving}>
             {saving ? "Speichern..." : "Speichern"}
-          </button>
+          </StudioButton>
         </div>
       </div>
 

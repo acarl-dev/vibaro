@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
+import { Plus, Pencil, X } from "../../components/StudioIcons";
 
 type Video = {
   id: number;
@@ -229,12 +231,10 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
             )}
           </div>
           {!isCreating && !editingId && videos.length < 8 && (
-            <button
-              onClick={() => setIsCreating(true)}
-              className="text-xs text-zinc-400 hover:text-zinc-100 transition-colors"
-            >
+            <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+              <Plus size={14} />
               + Neues Video
-            </button>
+            </StudioButton>
           )}
         </div>
 
@@ -279,18 +279,12 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
               />
 
               <div className="flex gap-2">
-                <button
-                  onClick={handleCreate}
-                  className="rounded-lg bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition-all hover:bg-zinc-200"
-                >
+                <StudioButton variant="primary" size="sm" onClick={handleCreate}>
                   Erstellen
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-                >
+                </StudioButton>
+                <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                   Abbrechen
-                </button>
+                </StudioButton>
               </div>
             </div>
           )}
@@ -299,12 +293,9 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
           {videos.length === 0 && !isCreating ? (
             <div className="rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
               <p className="text-xs text-zinc-600 mb-2">Noch keine Videos hinzugefügt</p>
-              <button
-                onClick={() => setIsCreating(true)}
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-              >
+              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
                 Erstes Video hinzufügen
-              </button>
+              </StudioButton>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
@@ -355,18 +346,12 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                       />
 
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleUpdate(video.id)}
-                          className="rounded-lg bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-950 transition-all hover:bg-zinc-200"
-                        >
+                        <StudioButton variant="primary" size="sm" onClick={() => handleUpdate(video.id)}>
                           Speichern
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-                        >
+                        </StudioButton>
+                        <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
                           Abbrechen
-                        </button>
+                        </StudioButton>
                       </div>
                     </div>
                   ) : (
@@ -436,20 +421,12 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                             >
                               ★
                             </button>
-                            <button
-                              onClick={() => startEdit(video)}
-                              className="text-xs text-zinc-500 hover:text-zinc-300 p-1"
-                              title="Bearbeiten"
-                            >
-                              ✎
-                            </button>
-                            <button
-                              onClick={() => handleDelete(video.id)}
-                              className="text-xs text-zinc-500 hover:text-red-400 p-1"
-                              title="Löschen"
-                            >
-                              ✕
-                            </button>
+                            <StudioButton variant="secondary" size="icon" onClick={() => startEdit(video)} title="Bearbeiten">
+                              <Pencil size={13} />
+                            </StudioButton>
+                            <StudioButton variant="danger" size="icon" onClick={() => handleDelete(video.id)} title="Löschen">
+                              <X size={13} />
+                            </StudioButton>
                           </div>
                         </div>
                       </div>

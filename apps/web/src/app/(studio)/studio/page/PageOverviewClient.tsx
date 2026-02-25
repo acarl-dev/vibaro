@@ -7,6 +7,7 @@ import { togglePublishAction, updateVisibleSectionsAction } from "./actions";
 import { toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
 import { useToast } from "@/context/ToastContext";
 import LivePreviewPanel from "./LivePreviewPanel";
+import StudioButton from "../../components/StudioButton";
 
 type ArtistPage = {
   id: number;
@@ -174,29 +175,19 @@ export default function PageOverviewClient({ page, activeSpotlight }: Props) {
             /@{page.handle}
           </p>
 
-          <button
+          <StudioButton
+            variant={page.is_published ? "secondary" : "primary"}
+            size="sm"
             onClick={handlePublish}
             disabled={isPublishing}
-            className="w-full py-2 rounded text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
-            style={
-              page.is_published
-                ? {
-                    background: "var(--studio-surface-elevated)",
-                    color: "var(--studio-text-primary)",
-                    border: "1px solid var(--studio-border)",
-                  }
-                : {
-                    background: "var(--studio-accent)",
-                    color: "#fff",
-                  }
-            }
+            className="w-full"
           >
             {isPublishing
               ? "…"
               : page.is_published
               ? "Verstecken"
               : "Veröffentlichen"}
-          </button>
+          </StudioButton>
         </div>
 
         {/* Spotlight hint */}

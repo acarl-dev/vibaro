@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import StudioButton from "../../components/StudioButton";
 
 // -----------------------------------------------------------------------------
 // Template Data (Canonical Copy from Instructions)
@@ -173,12 +174,9 @@ export default function AppearanceClient({
                 >
                   {isSaving ? "Wird angewendet..." : "Trotzdem wechseln"}
                 </button>
-                <button
-                  onClick={cancelSwitch}
-                  className="px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                >
+                <StudioButton variant="secondary" size="sm" onClick={cancelSwitch}>
                   Abbrechen
-                </button>
+                </StudioButton>
               </div>
             </div>
           </div>
@@ -300,16 +298,17 @@ export default function AppearanceClient({
                           Aktiv
                         </span>
                       ) : (
-                        <button
+                        <StudioButton
+                          variant="primary"
+                          size="sm"
                           onClick={() => handleApplyTemplate(template.key)}
                           disabled={isSaving}
-                          className="px-4 py-2 text-sm font-medium text-white bg-zinc-100/10 hover:bg-zinc-100/20 border border-zinc-100/20 hover:border-zinc-100/30 rounded-lg transition-all disabled:opacity-50"
                         >
-                          {isSaving && pendingSwitch === template.key 
-                            ? "Wird angewendet..." 
+                          {isSaving && pendingSwitch === template.key
+                            ? "Wird angewendet..."
                             : "Template anwenden"
                           }
-                        </button>
+                        </StudioButton>
                       )}
                       
                       {/* Preview Button */}
