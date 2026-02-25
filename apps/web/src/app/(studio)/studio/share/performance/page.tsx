@@ -1,6 +1,5 @@
+import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
-import StudioEmptyState from "../../../components/StudioEmptyState";
-import { TrendingUp } from "../../../components/StudioIcons";
 import PerformanceClient, { ComparisonPhase } from "./PerformanceClient";
 
 type PerformanceData = {
@@ -43,7 +42,7 @@ async function fetchPerformanceData(): Promise<PerformanceData | null> {
         byPlatform: [], trend: [], pvTrend: [], phaseTitle: spotlight.title,
         comparison: cmp,
       };
-    }
+    }    
     const analyticsJson = await analyticsRes.json();
     const d = analyticsJson?.data;
 
@@ -64,36 +63,22 @@ async function fetchPerformanceData(): Promise<PerformanceData | null> {
 }
 
 export default async function PerformancePage() {
+  // Guard: requires active phase — redirect if no active spotlight
   const data = await fetchPerformanceData();
-
-  if (!data) {
-    return (
-      <div>
-        <StudioEmptyState
-          icon={TrendingUp}
-          title="Keine aktive Phase"
-          description="Starte eine Phase, um Performance-Daten zu sehen."
-          action={
-            <a href="/studio/share" className="studio-btn studio-btn-primary">
-              Zur Phase-Übersicht
-            </a>
-          }
-        />
-      </div>
-    );
-  }
+  if (!data) redirect("/studio/share");
+  const d = data!;
 
   return (
     <PerformanceClient
-      totalClicks={data.totalClicks}
-      totalPageviews={data.totalPageviews}
-      uniquePageviews={data.uniquePageviews}
-      conversionRate={data.conversionRate}
-      byPlatform={data.byPlatform}
-      trend={data.trend}
-      pvTrend={data.pvTrend}
-      phaseTitle={data.phaseTitle}
-      comparison={data.comparison}
+      totalClicks={d.totalClicks}
+      totalPageviews={d.totalPageviews}
+      uniquePageviews={d.uniquePageviews}
+      conversionRate={d.conversionRate}
+      byPlatform={d.byPlatform}
+      trend={d.trend}
+      pvTrend={d.pvTrend}
+      phaseTitle={d.phaseTitle}
+      comparison={d.comparison}
     />
   );
 }

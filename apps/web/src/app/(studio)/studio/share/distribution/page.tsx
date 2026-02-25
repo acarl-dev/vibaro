@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
 import { fetchStudioHome } from "@/lib/api/studio";
 import ShareClient from "../ShareClient";
@@ -31,6 +32,12 @@ async function fetchBestSpotlight(): Promise<{ id: number; title: string; slug: 
 }
 
 export default async function DistributionPage() {
+  // Guard: requires active phase
+  const guardRes = await backendFetch("/api/v1/spotlights/active", { cache: "no-store" });
+  if (!guardRes.ok) redirect("/studio/share");
+  const guardJson = await guardRes.json();
+  if (!guardJson?.data?.id) redirect("/studio/share");
+
   const [activeSpotlight, homeData] = await Promise.all([
     fetchBestSpotlight(),
     fetchStudioHome(),

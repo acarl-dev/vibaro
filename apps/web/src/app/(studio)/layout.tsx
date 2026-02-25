@@ -29,6 +29,17 @@ async function fetchMe(): Promise<{ data: { artist_page?: { is_onboarded: boolea
   }
 }
 
+async function fetchHasActiveSpotlight(): Promise<boolean> {
+  try {
+    const res = await backendFetch("/api/v1/spotlights/active", { cache: "no-store" });
+    if (!res.ok) return false;
+    const json = await res.json();
+    return Boolean(json?.data?.id);
+  } catch {
+    return false;
+  }
+}
+
 async function fetchArtistPage(): Promise<{ data: ArtistPageData | null; status: number }> {
   try {
     const res = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
@@ -59,11 +70,12 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   const token = await getTokenFromCookies();
   if (!token) redirect("/login?next=/studio");
 
-  const { data: me, status: meStatus } = await fetchMe();
+  const [{ data: me, status: meStatus }, { data: page, status: pageStatus }, hasActivePhase] =
+    await Promise.all([fetchMe(), fetchArtistPage(), fetchHasActiveSpotlight()]);
+
   if (meStatus === 401 || meStatus === 403) redirect("/login?next=/studio");
   if (me?.artist_page?.is_onboarded === false) redirect("/studio/onboarding");
 
-  const { data: page, status: pageStatus } = await fetchArtistPage();
   if (pageStatus === 401 || pageStatus === 403) redirect("/login?next=/studio");
   if (!page) redirect("/studio/onboarding");
 
@@ -75,7 +87,7 @@ export default async function StudioLayout({ children }: { children: ReactNode }
         style={{ background: "var(--studio-bg)", color: "var(--studio-text-primary)" }}
       >
         <StudioTopNav page={page} />
-        <StudioPageSubNav />
+        <StudioPageSubNav hasActivePhase={hasActivePhase} />
         <main className="flex-1 pb-20 md:pb-0">
           <div
             className="mx-auto px-4 sm:px-6 py-8"

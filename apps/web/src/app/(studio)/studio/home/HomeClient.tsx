@@ -47,68 +47,73 @@ function HeroEmpty() {
         border: "1px solid var(--studio-border)",
         borderRadius: "20px",
         padding: "32px 28px",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div style={{ marginBottom: "28px" }}>
-        <h2
-          style={{
-            fontSize: "22px",
-            fontWeight: 600,
-            lineHeight: 1.3,
-            color: "var(--studio-text-primary)",
-            marginBottom: "8px",
-          }}
-        >
-          Keine aktive Phase
-        </h2>
-        <p style={{ fontSize: "14px", color: "var(--studio-text-secondary)", opacity: 0.8 }}>
-          Starte eine Phase, um deine Seite gezielt zu pushen.
-        </p>
+      {/* Decorative background icon */}
+      <div
+        style={{ position: "absolute", right: "-16px", top: "50%", transform: "translateY(-50%)", opacity: 0.07, pointerEvents: "none", userSelect: "none" }}
+        aria-hidden
+      >
+        <svg width="220" height="220" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--studio-text-primary)" }}>
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "28px" }}>
-        {[
-          "Links automatisch generieren",
-          "QR-Code fur Flyer & Poster",
-          "Performance & Phasenvergleich",
-        ].map((item) => (
-          <div key={item} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ color: "var(--studio-border)", fontSize: "14px" }}>-</span>
-            <span style={{ fontSize: "14px", color: "var(--studio-text-secondary)" }}>{item}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-        <Link
-          href="/studio/share/new"
-          style={{
-            background: "var(--studio-accent)",
-            color: "#fff",
-            padding: "10px 18px",
-            borderRadius: "10px",
-            fontWeight: 500,
-            fontSize: "14px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
-        >
-          Neue Phase starten
-        </Link>
-        <Link
-          href="/studio/page"
-          style={{
-            background: "transparent",
-            border: "1px solid var(--studio-border)",
-            color: "var(--studio-text-primary)",
-            padding: "10px 18px",
-            borderRadius: "10px",
-            fontWeight: 500,
-            fontSize: "14px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
-        >
-          Seite bearbeiten
-        </Link>
+
+      <div style={{ position: "relative" }}>
+        <div style={{ marginBottom: "24px" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 600, lineHeight: 1.3, color: "var(--studio-text-primary)", marginBottom: "8px" }}>
+            Keine aktive Phase
+          </h2>
+          <p style={{ fontSize: "14px", color: "var(--studio-text-secondary)", opacity: 0.8 }}>
+            Starte eine Phase, um deine Seite gezielt zu pushen.
+          </p>
+        </div>
+
+        {/* Clickable feature bullets */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "28px" }}>
+          {([
+            { label: "Links automatisch generieren", href: "/studio/share/distribution" },
+            { label: "QR-Code für Flyer & Poster", href: "/studio/share/qr" },
+            { label: "Performance & Phasenvergleich", href: "/studio/share/performance" },
+          ] as const).map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                gap: "8px", padding: "9px 12px", borderRadius: "10px",
+                background: "var(--studio-bg)", border: "1px solid var(--studio-border)",
+                textDecoration: "none", color: "var(--studio-text-secondary)",
+                fontSize: "13px", fontWeight: 500,
+              }}
+            >
+              <span>{label}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </Link>
+          ))}
+        </div>
+
+        {/* CTAs */}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+          <Link
+            href="/studio/share/new"
+            style={{ background: "var(--studio-accent)", color: "#fff", padding: "10px 18px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
+          >
+            Neue Phase starten
+          </Link>
+          <Link
+            href="/studio/page"
+            style={{ fontSize: "13px", fontWeight: 500, color: "var(--studio-text-secondary)", textDecoration: "none" }}
+          >
+            Seite bearbeiten →
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -225,7 +230,7 @@ function HeroActive({
           href="/studio/share/distribution"
           style={{ background: "transparent", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)", padding: "10px 18px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
         >
-          Links teilen
+          Distribution
         </Link>
         <Link
           href="/studio/share/performance"
@@ -304,8 +309,10 @@ function ComparisonCard({
   if (!previous) {
     return (
       <div style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", borderRadius: "16px", padding: "20px" }}>
-        <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.6 }}>
-          Vergleich — Schliesse mindestens eine Phase ab, um Vergleiche zu sehen.
+        <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)", marginBottom: "4px" }}>Vergleich</p>
+        <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.6, marginBottom: "12px" }}>Aktuell vs letzte Phase</p>
+        <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.5 }}>
+          Noch kein Vergleich möglich — beende eine Phase, um sie mit der nächsten zu vergleichen.
         </p>
       </div>
     );
@@ -382,9 +389,9 @@ function ComparisonRow({
 
 // 3. QUICK ACTIONS
 
-type ActionItem = { label: string; sub: string; href: string };
+type ActionItem = { label: string; sub: string; href: string; muted?: boolean; warn?: boolean };
 
-function QuickActionCard({ label, sub, href }: ActionItem) {
+function QuickActionCard({ label, sub, href, muted = false, warn = false }: ActionItem) {
   const [hovered, setHovered] = useState(false);
   return (
     <Link
@@ -393,14 +400,15 @@ function QuickActionCard({ label, sub, href }: ActionItem) {
       onMouseLeave={() => setHovered(false)}
       style={{
         display: "flex", flexDirection: "column", justifyContent: "flex-end", minHeight: "110px",
-        background: "var(--studio-surface)",
+        background: hovered ? "var(--studio-surface-elevated)" : "var(--studio-surface)",
         border: `1px solid ${hovered ? "var(--studio-accent-muted)" : "var(--studio-border)"}`,
         borderRadius: "16px", padding: "20px", textDecoration: "none", cursor: "pointer",
-        transition: "border-color 150ms ease",
+        transition: "background 150ms ease, border-color 150ms ease",
+        opacity: muted ? 0.55 : 1,
       }}
     >
       <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)", marginBottom: "4px" }}>{label}</p>
-      <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.7 }}>{sub}</p>
+      <p style={{ fontSize: "12px", color: warn ? "var(--studio-warning)" : "var(--studio-text-secondary)", opacity: warn ? 1 : 0.7 }}>{sub}</p>
     </Link>
   );
 }
@@ -408,9 +416,14 @@ function QuickActionCard({ label, sub, href }: ActionItem) {
 function QuickActions({ hasActivePhase }: { hasActivePhase: boolean }) {
   const actions: ActionItem[] = [
     { label: "Seite bearbeiten", sub: "Inhalte & Layout", href: "/studio/page" },
-    { label: "Neue Phase starten", sub: "Push starten & Links erzeugen", href: "/studio/share/new" },
-    { label: "Links teilen", sub: "Distribution & Tracking", href: "/studio/share/distribution" },
-    { label: "QR-Code", sub: "Fur Flyer & Poster", href: hasActivePhase ? "/studio/share/qr" : "/studio/share/new" },
+    { label: "Neue Phase starten", sub: "Push starten & Links erzeugen", href: "/studio/share/new", muted: hasActivePhase },
+    { label: "Distribution", sub: "Story · Bio · Ads Links", href: "/studio/share/distribution" },
+    {
+      label: "QR-Code",
+      sub: hasActivePhase ? "Für Flyer & Poster" : "Erfordert aktive Phase",
+      href: hasActivePhase ? "/studio/share/qr" : "/studio/share/new",
+      warn: !hasActivePhase,
+    },
   ];
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4" style={{ gap: "16px" }}>
@@ -421,22 +434,62 @@ function QuickActions({ hasActivePhase }: { hasActivePhase: boolean }) {
 
 // 4. TRAFFIC SNAPSHOT
 
-function TrafficSnapshot({ snap, page }: { snap: TrafficSnapshotData; page: StudioHomeData["page"] }) {
+function SnapStatCell({
+  label, value, trend,
+}: {
+  label: string;
+  value: string;
+  trend?: { pct: number } | null;
+}) {
+  return (
+    <div
+      style={{
+        background: "var(--studio-bg)",
+        border: "1px solid var(--studio-border)",
+        borderRadius: "12px",
+        padding: "14px 16px",
+      }}
+    >
+      <div style={{ fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--studio-text-secondary)", opacity: 0.6, marginBottom: "6px" }}>
+        {label}
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
+        <span style={{ fontSize: "22px", fontWeight: 600, lineHeight: 1, color: "var(--studio-text-primary)" }}>
+          {value}
+        </span>
+        {trend != null && (
+          <span style={{ fontSize: "11px", fontWeight: 600, color: trend.pct >= 0 ? "var(--studio-success)" : "#ef4444" }}>
+            {trend.pct >= 0 ? "↑" : "↓"} {Math.abs(trend.pct)}%
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TrafficSnapshot({
+  snap,
+  stats,
+  page,
+}: {
+  snap: TrafficSnapshotData;
+  stats: StudioHomeData["stats"];
+  page: StudioHomeData["page"];
+}) {
   const origin = process.env.NEXT_PUBLIC_APP_URL ?? "";
   const pageUrl = page?.handle ? `${origin}/p/${page.handle}` : null;
 
-  const rows: { label: string; value: string; positive?: boolean }[] = [
-    { label: "Besucher (7 Tage)", value: fmt(snap.visitors_7d) },
-    ...(snap.trend_pct !== null ? [{ label: "Trend ggue. Vorwoche", value: `${snap.trend_pct >= 0 ? "+" : ""}${snap.trend_pct}%`, positive: snap.trend_pct >= 0 }] : []),
-    ...(snap.top_platform ? [{ label: "Top Plattform", value: plat(snap.top_platform) }] : []),
-  ];
+  const visitors = snap.visitors_7d;
+  const clicks = stats.total_clicks_7d;
+  const conversion = visitors > 0 && clicks > 0 ? parseFloat((clicks / visitors * 100).toFixed(1)) : null;
 
   return (
     <div style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", borderRadius: "16px", padding: "20px" }}>
+      {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", gap: "12px", flexWrap: "wrap" }}>
         <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)" }}>
-          Ueberblick{" "}
-          <span style={{ fontSize: "12px", fontWeight: 400, color: "var(--studio-text-secondary)", opacity: 0.6 }}>7 Tage</span>
+          Überblick
+          <span style={{ fontSize: "12px", fontWeight: 400, color: "var(--studio-text-secondary)", opacity: 0.6, marginLeft: "8px" }}>7 Tage</span>
         </p>
         {pageUrl && page && (
           <a href={pageUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", fontWeight: 500, color: "var(--studio-accent)", textDecoration: "none" }}>
@@ -445,21 +498,94 @@ function TrafficSnapshot({ snap, page }: { snap: TrafficSnapshotData; page: Stud
           </a>
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-        {rows.map((row) => (
-          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
-            <span style={{ fontSize: "13px", color: "var(--studio-text-secondary)" }}>{row.label}</span>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: row.positive === true ? "var(--studio-success)" : row.positive === false ? "#ef4444" : "var(--studio-text-primary)" }}>
-              {row.value}
-            </span>
-          </div>
-        ))}
+
+      {/* Stat cells */}
+      <div className="grid grid-cols-3" style={{ gap: "10px", marginBottom: "16px" }}>
+        <SnapStatCell
+          label="Besucher"
+          value={fmt(visitors)}
+          trend={snap.trend_pct !== null ? { pct: snap.trend_pct } : null}
+        />
+        <SnapStatCell
+          label="Klicks"
+          value={fmt(clicks)}
+          trend={stats.trend !== 0 ? { pct: stats.trend } : null}
+        />
+        <SnapStatCell
+          label="Conversion"
+          value={conversion !== null ? `${conversion}%` : "—"}
+        />
       </div>
-      <div style={{ marginTop: "16px" }}>
-        <Link href="/studio/results" style={{ fontSize: "13px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}>
-          Zur Analyse
+
+      {/* Footer */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+        {snap.top_platform && (
+          <span style={{ fontSize: "12px", color: "var(--studio-text-secondary)", opacity: 0.6 }}>
+            Top: {plat(snap.top_platform)}
+          </span>
+        )}
+        <Link href="/studio/results" style={{ fontSize: "13px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none", marginLeft: "auto" }}>
+          Zur Analyse →
         </Link>
       </div>
+    </div>
+  );
+}
+
+// 5. PAGE STATUS CARD
+
+function PageStatusCard({ page }: { page: StudioHomeData["page"] }) {
+  const [copied, setCopied] = useState(false);
+  const origin = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  const pageUrl = page?.handle ? `${origin}/p/${page.handle}` : null;
+
+  function handleCopy() {
+    if (!pageUrl) return;
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  if (!page || !pageUrl) return null;
+
+  return (
+    <div style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", borderRadius: "16px", padding: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+        <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)" }}>Seite</p>
+        <span
+          style={{
+            background: page.is_published ? "rgba(34,197,94,0.1)" : "rgba(245,158,11,0.1)",
+            color: page.is_published ? "var(--studio-success)" : "var(--studio-warning)",
+            border: `1px solid ${page.is_published ? "rgba(34,197,94,0.25)" : "rgba(245,158,11,0.25)"}`,
+            padding: "3px 10px", borderRadius: "999px", fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em",
+          }}
+        >
+          {page.is_published ? "Live" : "Entwurf"}
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+        <span style={{ fontSize: "12px", color: "var(--studio-text-secondary)", fontFamily: "monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {pageUrl}
+        </span>
+        <button
+          onClick={handleCopy}
+          style={{
+            background: "transparent", border: "1px solid var(--studio-border)",
+            color: copied ? "var(--studio-success)" : "var(--studio-text-secondary)",
+            padding: "5px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: 500,
+            cursor: "pointer", flexShrink: 0, transition: "color 150ms ease",
+          }}
+        >
+          {copied ? "Kopiert ✓" : "Kopieren"}
+        </button>
+      </div>
+      <a
+        href={pageUrl} target="_blank" rel="noopener noreferrer"
+        style={{ fontSize: "13px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}
+      >
+        Vorschau öffnen →
+      </a>
     </div>
   );
 }
@@ -471,15 +597,26 @@ export default function HomeClient({ data }: HomeClientProps) {
   const prevConversion = data.previous_spotlight?.phase_stats?.conversion ?? null;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {isActive && data.spotlight ? (
-        <HeroActive spotlight={data.spotlight} prevConversion={prevConversion} />
-      ) : (
-        <HeroEmpty />
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ marginBottom: "32px" }}>
+        {isActive && data.spotlight ? (
+          <HeroActive spotlight={data.spotlight} prevConversion={prevConversion} />
+        ) : (
+          <HeroEmpty />
+        )}
+      </div>
+      <div style={{ marginBottom: "20px" }}>
+        <ComparisonCard current={isActive ? data.spotlight : null} previous={data.previous_spotlight} />
+      </div>
+      <div style={{ marginBottom: "20px" }}>
+        <QuickActions hasActivePhase={isActive} />
+      </div>
+      {data.traffic_snapshot && (
+        <div style={{ marginBottom: "20px" }}>
+          <TrafficSnapshot snap={data.traffic_snapshot} stats={data.stats} page={data.page} />
+        </div>
       )}
-      <ComparisonCard current={isActive ? data.spotlight : null} previous={data.previous_spotlight} />
-      <QuickActions hasActivePhase={isActive} />
-      {data.traffic_snapshot && <TrafficSnapshot snap={data.traffic_snapshot} page={data.page} />}
+      <PageStatusCard page={data.page} />
     </div>
   );
 }

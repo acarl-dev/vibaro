@@ -14,7 +14,6 @@ import {
 import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
 import StudioEmptyState from "../../components/StudioEmptyState";
-import StudioQRCode from "../../components/StudioQRCode";
 import { Megaphone } from "../../components/StudioIcons";
 
 type ShareClientProps = {
@@ -129,15 +128,6 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
     return (
       <div>
         <StudioPageHeader title="DISTRIBUTION" subtitle="Erstelle Tracking-Links für deine Kanäle." />
-        {pageUrl && (
-          <div className="rounded-lg p-6 mb-8" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
-            <h2 className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--studio-text-secondary)" }}>QR-Code</h2>
-            <StudioQRCode
-              url={pageUrl}
-              handle={pageUrl.split("/p/")[1] ?? undefined}
-            />
-          </div>
-        )}
         <StudioEmptyState
           icon={Megaphone}
           title="Keine aktive Phase"
@@ -163,16 +153,22 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
       />
 
       <div className="space-y-8">
-        {/* QR-Code Card */}
-        {pageUrl && (
-          <div className="rounded-lg p-6" style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}>
-            <h2 className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--studio-text-secondary)" }}>QR-Code</h2>
-            <StudioQRCode
-              url={pageUrl}
-              handle={pageUrl.split("/p/")[1] ?? undefined}
-            />
+        {/* QR link — full QR page is at /studio/share/qr */}
+        <div
+          className="rounded-lg p-4 flex items-center justify-between"
+          style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}
+        >
+          <div>
+            <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--studio-text-primary)" }}>QR & Offline</p>
+            <p style={{ fontSize: "12px", color: "var(--studio-text-secondary)", marginTop: "2px" }}>QR-Code für diese Phase</p>
           </div>
-        )}
+          <a
+            href="/studio/share/qr"
+            style={{ fontSize: "12px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}
+          >
+            Zum QR-Code →
+          </a>
+        </div>
 
         {/* Platform Selector */}
         <PlatformSelector 

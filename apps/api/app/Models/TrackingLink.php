@@ -75,10 +75,29 @@ class TrackingLink extends Model
     }
 
     /**
-     * Generate a unique short code (8 chars).
+     * Generate a human-readable, unique short code.
+     * Format: {platform}-{placement}-{spotlight-slug}[-{n}]
+     * Example: instagram-bio-downfall, tiktok-story-album-2024-2
+     * Falls back to random 8-char code if no context is available.
      */
-    public static function generateShortCode(): string
-    {
+    public static function generateShortCode(
+        ?string $platform = null,
+        ?string $placement = null,
+        ?string $spotlightSlug = null
+    ): string {
+        if ($platform && $placement && $spotlightSlug) {
+            $base = Str::slug("{$platform}-{$placement}-{$spotlightSlug}");
+            // Ensure uniqueness: append -2, -3, … if needed
+            $candidate = $base;
+            $n = 1;
+            while (static::where('short_code', $candidate)->orWhere('slug', $candidate)->exists()) {
+                $n++;
+                $candidate = "{$base}-{$n}";
+            }
+            return $candidate;
+        }
+
+        // Fallback: random 8-char code (no context available)
         do {
             $code = Str::random(8);
         } while (static::where('short_code', $code)->exists());
@@ -157,9 +176,30 @@ class TrackingLink extends Model
         parent::boot();
 
         static::creating(function ($link) {
-            // Generate short_code if not provided
+            // Generate human-readable short_code if not provided
             if (empty($link->short_code)) {
-                $link->short_code = static::generateShortCode();
+                // Resolve spotlight slug for readable code (e.g. instagram-bio-downfall)
+                $spotlightSlug = null;
+                if ($link->spotlight_id) {
+                    $spotlight = Spotlight::find($link->spotlight_id);
+                    $spotlightSlug = $spotlight?->slug ?? null;
+
+                    // Also pre-fill utm_campaign while we have the spotlight
+                    if ($spotlight?->slug) {
+                        $link->utm_campaign = $spotlight->slug;
+                    }
+                }
+
+                $link->short_code = static::generateShortCode(
+                    $link->platform,
+                    $link->placement,
+                    $spotlightSlug
+                );
+            }
+
+            // slug mirrors short_code (column is NOT NULL, kept for backwards compatibility)
+            if (empty($link->slug)) {
+                $link->slug = $link->short_code;
             }
 
             // Auto-generate label if not provided
@@ -168,18 +208,18 @@ class TrackingLink extends Model
             }
 
             // Generate UTM parameters
-            if ($link->platform) {
+            if ($link->platform && empty($link->utm_source)) {
                 $link->utm_source = $link->platform;
             }
 
-            if ($link->placement) {
+            if ($link->placement && empty($link->utm_medium)) {
                 $link->utm_medium = $link->placement;
             }
 
-            // Set utm_campaign from spotlight.slug
-            if ($link->spotlight_id) {
+            // Set utm_campaign from spotlight.slug (only if not already set above)
+            if ($link->spotlight_id && empty($link->utm_campaign)) {
                 $spotlight = Spotlight::find($link->spotlight_id);
-                if ($spotlight && $spotlight->slug) {
+                if ($spotlight?->slug) {
                     $link->utm_campaign = $spotlight->slug;
                 }
             }

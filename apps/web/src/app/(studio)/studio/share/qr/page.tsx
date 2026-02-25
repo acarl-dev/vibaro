@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
 import { fetchStudioHome } from "@/lib/api/studio";
 import StudioPageHeader from "../../../components/StudioPageHeader";
@@ -46,6 +47,9 @@ export default async function QRPage() {
   const { handle, phaseTitle, totalClicks } = await fetchActiveHandle();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const pageUrl = handle ? `${appUrl}/p/${handle}` : null;
+
+  // Guard: requires active phase
+  if (!phaseTitle) redirect("/studio/share");
 
   if (!pageUrl) {
     return (
