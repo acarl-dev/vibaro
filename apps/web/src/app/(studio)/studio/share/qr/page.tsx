@@ -5,6 +5,8 @@ import StudioPageHeader from "../../../components/StudioPageHeader";
 import StudioQRCode from "../../../components/StudioQRCode";
 import StudioEmptyState from "../../../components/StudioEmptyState";
 import { Megaphone } from "../../../components/StudioIcons";
+import ExplainPanel from "../../../components/ExplainPanel";
+import WhyButton from "../../../components/WhyButton";
 
 async function fetchActiveHandle(): Promise<{ handle: string | null; phaseTitle: string | null; totalClicks: number }> {
   try {
@@ -69,6 +71,36 @@ export default async function QRPage() {
       <StudioPageHeader
         title="QR & OFFLINE"
         subtitle={phaseTitle ? `Phase: ${phaseTitle}` : "QR-Code für deine Seite."}
+        action={
+          <WhyButton
+            label="Wozu ein QR-Code?"
+            content={{
+              title: "QR & Offline",
+              what: "Ein QR-Code ist der Brücke zwischen deiner Offline-Welt und deiner digitalen Präsenz.",
+              why: "Wenn du Flyer, Poster oder Merch hast, können Fans direkt zu deiner Seite gelangen – und du siehst genau, wie viele das gemacht haben. QR-Scans werden in deinen Phase-Stats separat ausgewiesen.",
+              example: "Du druckst 200 Flyer für ein Konzert. Nach dem Konzert siehst du: 47 QR-Scans. Das bedeutet: 23 % deiner Flüger haben den Code genutzt.",
+              tip: "Drucke immer denselben QR-Code für eine Phase aus. Dann kannst du Offline-Performance mit Online-Performance vergleichen.",
+            }}
+          />
+        }
+      />
+
+      <ExplainPanel
+        heading="Was ist QR & Offline?"
+        body={[
+          "QR-Codes bringen Fans von Flyern, Postern oder Merch direkt auf deine Seite – ganz ohne Social Media.",
+          "Jeder Scan wird gezählt. So kannst du sehen, ob dein Offline-Push genauso gut funktioniert wie dein Online-Push.",
+        ]}
+        nextSteps={[
+          "Lade den QR-Code unten herunter",
+          "Drucke ihn auf Flyer, Poster oder Merch",
+          "Schau nach dem Konzert/Event in Performance, wie viele Scans es gab",
+        ]}
+        examples={[
+          { icon: "🎭", label: "Konzert-Poster mit QR-Code", description: "200 Flyer gedruckt, 47 Scans → 23 % deiner Flüger haben den Code genutzt. Du siehst, ob Offline-Werbung für dich funktioniert." },
+          { icon: "👕", label: "QR-Code auf Merch", description: "Fans, die dein Merch tragen, können direkt deine Seite aufrufen. Der Scan wird getrennt von deinen Social-Media-Klicks gemessen." },
+        ]}
+        tip={{ text: "Drucke immer denselben QR-Code für eine Phase. Wenn du ihn während der Phase wechselst, verlierst du die Vergleichbarkeit." }}
       />
 
       {/* QR Card */}

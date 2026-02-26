@@ -269,6 +269,25 @@ class AnalyticsController extends Controller
             $spotlightId = $active?->id;
         }
 
+        // Deduplicate reloads: count at most one pageview per visitor hash/day
+        // for the same artist page + spotlight context.
+        if (!$isPreview && $uaHash) {
+            $alreadyTrackedToday = PageViewEvent::query()
+                ->where('artist_page_id', $artistPage->id)
+                ->where('user_agent_hash', $uaHash)
+                ->whereDate('occurred_at', now()->toDateString())
+                ->when(
+                    $spotlightId,
+                    fn ($query) => $query->where('spotlight_id', $spotlightId),
+                    fn ($query) => $query->whereNull('spotlight_id')
+                )
+                ->exists();
+
+            if ($alreadyTrackedToday) {
+                return response()->noContent();
+            }
+        }
+
         PageViewEvent::create([
             'artist_page_id'  => $artistPage->id,
             'spotlight_id'    => $spotlightId,

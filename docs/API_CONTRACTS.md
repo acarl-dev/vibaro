@@ -1077,7 +1077,7 @@ Notes:
 * `by_module`: Legacy field for backwards compatibility. Groups clicks by content module (spotlight, links, shows).
 * `direct` is used when referrer is missing.
 * All breakdown arrays only include entries with click_count > 0.
-* **Pageviews:** `total_pageviews` counts all non-preview page loads. `unique_pageviews` deduplicates by `user_agent_hash` (SHA-256 of UA+IP) per day. Pageviews without a `spotlight_id` are counted globally but excluded from conversion calculation.
+* **Pageviews:** Reloads are deduplicated at ingest time. For the same artist page + spotlight context, at most one non-preview pageview per `user_agent_hash` is stored per day. `total_pageviews` therefore reflects deduplicated daily visits (not raw reload count). `unique_pageviews` deduplicates by `user_agent_hash` across the selected range. Pageviews without a `spotlight_id` are counted globally but excluded from conversion calculation.
 * **Conversion rate (MVP, Option A):** `total_clicks / unique_pageviews`. `null` when no `spotlight_id` is provided or when `unique_pageviews = 0`. Rationale: unique_pageviews removes reload/crawler noise; total_clicks is used instead of unique_clicks because per-UA click deduplication is not yet implemented. To revisit for V2: switch to `unique_clicks / unique_pageviews`.
 * **`pv_trend`:** pageviews per day, same date range and spotlight filter as `trend`.
 

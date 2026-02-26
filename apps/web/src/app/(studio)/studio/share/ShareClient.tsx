@@ -15,6 +15,8 @@ import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
 import StudioEmptyState from "../../components/StudioEmptyState";
 import { Megaphone } from "../../components/StudioIcons";
+import ExplainPanel from "../../components/ExplainPanel";
+import WhyButton from "../../components/WhyButton";
 
 type ShareClientProps = {
   activeSpotlight: {
@@ -150,6 +152,37 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
       <StudioPageHeader
         title="DISTRIBUTION"
         subtitle={`Phase: ${activeSpotlight.title}`}
+        action={
+          <WhyButton
+            label="Wie funktioniert das?"
+            content={{
+              title: "Distribution verstehen",
+              what: "Du erzeugst hier spezielle Links für jede Plattform und Platzierung, die du nutzt.",
+              why: "Jeder Link wird separat gemessen. Wenn du überall denselben Link benutzt, siehst du nur eine Gesamtzahl. Mit getrennten Links siehst du genau: 3 Klicks aus Instagram Story, 1 aus YouTube, 1 aus dem Newsletter.",
+              example: "Song-Link für Instagram Story: 12 Klicks\nSong-Link für Instagram Bio: 4 Klicks\nSong-Link für YouTube-Kommentar: 2 Klicks\n\n→ Du weißt jetzt: Story performt am besten.",
+              tip: "Erstelle für jede Plattform mindestens einen Story- und einen Bio-Link. Das reicht für die meisten Releases.",
+            }}
+          />
+        }
+      />
+
+      <ExplainPanel
+        heading="Was ist Distribution?"
+        body={[
+          "Hier erzeugst du spezielle Tracking-Links – einen pro Plattform und Platzierung.",
+          "Wenn du überall denselben Link benutzt, siehst du nur \"5 Klicks gesamt\". Mit getrennten Links siehst du: 3 aus Instagram Story, 1 aus YouTube, 1 aus dem Newsletter.",
+        ]}
+        nextSteps={[
+          "Wähle unten eine Plattform (z. B. Instagram)",
+          "Wähle eine Platzierung (z. B. Story oder Bio)",
+          "Kopiere den generierten Link und poste ihn dort",
+        ]}
+        examples={[
+          { icon: "📱", label: "Du postest heute Abend eine Story: \"Neuer Song draußen!\"", description: "\u2192 Nimm den Instagram Story-Link. Nicht den Bio-Link. Sonst weißt du nicht, woher der Klick kam." },
+          { icon: "🔗", label: "Die Story läuft ab – du packst den Song für 2 Wochen in deine Bio", description: "\u2192 Nimm jetzt den Instagram Bio-Link. So bleiben Story und Bio getrennt messbar." },
+          { icon: "📊", label: "Du schaltest Werbung für deinen Song", description: "\u2192 Nimm den Instagram Ad-Link. Dann siehst du genau, wie viele Klicks deine Ads gebracht haben." },
+        ]}
+        tip={{ text: "Erstelle mindestens Story + Bio für jede Plattform, die du aktiv nutzt. Das reicht für einen guten Überblick." }}
       />
 
       <div className="space-y-8">
@@ -171,10 +204,24 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
         </div>
 
         {/* Platform Selector */}
-        <PlatformSelector 
-          onSelect={handlePlatformSelect} 
-          selectedPlatformId={selectedPlatform?.id}
-        />
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <WhyButton
+              label="Warum mehrere Links?"
+              content={{
+                title: "Warum mehrere Links?",
+                what: "Du kannst für dieselbe Seite mehrere verschiedene Tracking-Links erstellen – einen pro Plattform und Platzierung.",
+                why: "Weil du nie weeißt, wo deine Fans wirklich klicken. Wenn du überall denselben Link verwendest, siehst du nur \u201e5 Klicks\u201c. Mit getrennten Links siehst du: 3 Klicks aus Instagram Story, 1 aus YouTube, 1 aus dem Newsletter.",
+                example: "Gleicher Song, 3 verschiedene Links:\n\n📱 Story-Link: 12 Klicks\n🔗 Bio-Link: 4 Klicks\n📊 Ad-Link: 31 Klicks\n\n→ Deine Ads bringen am meisten. Das weißt du jetzt.",
+                tip: "Erstelle mindestens 2 Links (z. B. Story + Bio) für jede Plattform, die du aktiv nutzt.",
+              }}
+            />
+          </div>
+          <PlatformSelector 
+            onSelect={handlePlatformSelect} 
+            selectedPlatformId={selectedPlatform?.id}
+          />
+        </div>
 
         {/* Placement Selector */}
         {selectedPlatform && (

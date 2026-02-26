@@ -8,6 +8,8 @@ import StudioPageHeader from "../../components/StudioPageHeader";
 import StudioEmptyState from "../../components/StudioEmptyState";
 import StudioStatCard from "../../components/StudioStatCard";
 import { Megaphone } from "../../components/StudioIcons";
+import ExplainPanel from "../../components/ExplainPanel";
+import WhyButton from "../../components/WhyButton";
 
 export type PhaseSpotlight = {
   id: number;
@@ -113,7 +115,39 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics }: Prop
   if (!activeSpotlight) {
     return (
       <div>
-        <StudioPageHeader title="PHASE" subtitle="Zeitlich gezielte Kampagnen für deine Seite." />
+        <StudioPageHeader
+          title="PHASE"
+          subtitle="Zeitlich gezielte Kampagnen für deine Seite."
+          action={
+            <WhyButton
+              label="Was ist eine Phase?"
+              content={{
+                title: "Was ist eine Phase?",
+                what: "Eine Phase ist ein Zeitraum, in dem du etwas gezielt pushst – zum Beispiel eine neue Single, ein Album oder eine Tour-Ankündigung.",
+                why: "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und analysierst später, was am besten funktioniert hat. Wenn du eine neue Kampagne startest, beginnst du eine neue Phase – so bleiben deine Daten sauber und vergleichbar.",
+                example: "🎵 Single Release-Phase: Du pushst deinen neuen Song 2 Wochen lang.\n🎭 Tour-Phase: Du kommunizierst deine Tour 4 Wochen lang.\n🛏️ Studio-Phase: Du gibst Einblicke in dein Studio, um die Vorfreude zu steigern.",
+                tip: "Beende die aktuelle Phase, bevor du eine neue startest. So bleiben deine Statistiken klar trennbar.",
+              }}
+            />
+          }
+        />
+        <ExplainPanel
+          heading="Was ist eine Phase?"
+          body={[
+            "Eine Phase ist ein Zeitraum, in dem du etwas gezielt pushst – zum Beispiel eine neue Single, ein Album oder eine Tour-Ankündigung.",
+            "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und siehst hinterher, was am besten funktioniert hat.",
+          ]}
+          nextSteps={[
+            "Klick auf \"Neue Phase starten\"",
+            "Wähle ein Ziel (z. B. Single Release oder Tour)",
+            "Danach gehst du zu Distribution und erzeugst deine ersten Links",
+          ]}
+          examples={[
+            { icon: "🎵", label: "Single Release", description: "Du veröffentlichst einen neuen Song. Starte eine Phase, erstelle Story- und Bio-Links, und beobachte, wo die meisten Klicks herkommen." },
+            { icon: "🎭", label: "Tour-Ankündigung", description: "Du kündigst eine Tour an. Erstelle Links für Instagram, YouTube und deinen Newsletter – und vergleiche am Ende, was am besten funktioniert hat." },
+          ]}
+          tip={{ text: "Starte immer eine neue Phase für jede neue Kampagne – so bleiben deine Daten sauber und vergleichbar." }}
+        />
         <StudioEmptyState
           icon={Megaphone}
           title="Keine aktive Phase"
@@ -144,6 +178,30 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics }: Prop
       <StudioPageHeader
         title="PHASE"
         subtitle="Aktive Phase · Letzte 7 Tage"
+        action={
+          <WhyButton
+            label="Was ist eine Phase?"
+            content={{
+              title: "Was ist eine Phase?",
+              what: "Eine Phase ist ein Zeitraum, in dem du etwas gezielt pushst – zum Beispiel eine neue Single, ein Album oder eine Tour-Ankündigung.",
+              why: "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und analysierst später, was am besten funktioniert hat. Wenn du eine neue Kampagne startest, beginnst du eine neue Phase.",
+              example: "🎵 Single Release-Phase: Du pushst deinen neuen Song 2 Wochen lang.\n🎭 Tour-Phase: Du kommunizierst deine Tour 4 Wochen lang.",
+              tip: "Beende die aktuelle Phase, bevor du eine neue startest. So bleiben deine Statistiken klar trennbar.",
+            }}
+          />
+        }
+      />
+
+      <ExplainPanel
+        body={[
+          "Deine Phase läuft gerade. Erstelle jetzt Links für deine Kanäle und teile sie – dann siehst du hier, was passiert.",
+        ]}
+        nextSteps={[
+          "Geh zu Distribution und erstelle einen Story-Link für Instagram",
+          "Poste den Link heute in deiner Story",
+          "Komm in 2–3 Tagen zurück und schau in Performance",
+        ]}
+        tip={{ text: "Verteile verschiedene Links für Instagram Story, Bio und YouTube – und schau am Ende, welcher Kanal am besten funktioniert." }}
       />
 
       {/* Active Phase Card */}
@@ -246,12 +304,23 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics }: Prop
 
       {/* Quick Stats */}
       <div>
-        <p
-          className="text-[11px] font-semibold uppercase tracking-widest mb-4"
-          style={{ color: "var(--studio-text-secondary)" }}
-        >
-          Schnellübersicht
-        </p>
+        <div className="flex items-center gap-3 mb-4">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-widest"
+            style={{ color: "var(--studio-text-secondary)" }}
+          >
+            Schnellübersicht
+          </p>
+          <WhyButton
+            content={{
+              title: "Statistiken verstehen",
+              what: "Diese Zahlen zeigen dir, wie gut deine aktuelle Phase läuft.",
+              why: "Besucher sagt dir, wie viele Menschen deine Seite geöffnet haben. Klicks zeigen, wie viele davon auch auf einen deiner Links gedrückt haben. Conversion zeigt das Verhältnis: Wenn 100 Leute deine Seite besuchen und 30 klicken, ist deine Conversion 30 %.",
+              example: "100 Besucher, 30 Klicks = 30 % Conversion\n\nHohe Conversion = deine Seite überzeugt.\nNiedrige Conversion = vielleicht fehlt ein klarer Aufruf zum Handeln.",
+              tip: "Wenn deine Conversion unter 10 % liegt, überprüfe, ob deine wichtigsten Links gut sichtbar sind.",
+            }}
+          />
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StudioStatCard
             value={uniqueVisitors > 0 ? uniqueVisitors : "—"}

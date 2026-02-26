@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Settings, ExternalLink } from "./StudioIcons";
 import { ArtistPageData } from "../layout";
+import { useHelpMode } from "@/context/HelpModeContext";
+import HelpHub from "./HelpHub";
 
 type StudioTopNavProps = {
   page: ArtistPageData;
@@ -21,6 +23,8 @@ const NAV_ITEMS = [
 
 export default function StudioTopNav({ page }: StudioTopNavProps) {
   const pathname = usePathname();
+  const { helpMode, helpHubOpen, openHelpHub } = useHelpMode();
+  const helpActive = helpMode || helpHubOpen;
 
   const isPageSectionActive = pathname.startsWith(PAGE_SECTION_PREFIX);
 
@@ -33,6 +37,7 @@ export default function StudioTopNav({ page }: StudioTopNavProps) {
   };
 
   return (
+    <>
     <header
       className="sticky top-0 z-40 flex-shrink-0"
       style={{
@@ -106,6 +111,44 @@ export default function StudioTopNav({ page }: StudioTopNavProps) {
             {page.is_published ? "Live" : "Entwurf"}
           </div>
 
+          {/* Help button — opens Help Hub drawer */}
+          <button
+            type="button"
+            onClick={openHelpHub}
+            title="Hilfe & Erklärungen"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+            style={{
+              background: helpActive
+                ? "var(--studio-accent-muted)"
+                : "transparent",
+              color: helpActive
+                ? "var(--studio-accent)"
+                : "var(--studio-text-secondary)",
+              border: helpActive
+                ? "1px solid var(--studio-accent)"
+                : "1px solid var(--studio-border)",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              style={{
+                width: "13px",
+                height: "13px",
+                borderRadius: "50%",
+                border: "1.5px solid currentColor",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "8px",
+                fontWeight: 800,
+                flexShrink: 0,
+              }}
+            >
+              i
+            </span>
+            {helpMode ? "Hilfe aktiv" : "Hilfe"}
+          </button>
+
           {/* Preview link */}
           <Link
             href={`/p/${page.handle}`}
@@ -138,5 +181,7 @@ export default function StudioTopNav({ page }: StudioTopNavProps) {
         </div>
       </div>
     </header>
+    <HelpHub />
+    </>
   );
 }

@@ -5,6 +5,7 @@ import StudioTopNav from "./components/StudioTopNav";
 import StudioPageSubNav from "./components/StudioPageSubNav";
 import StudioBottomNav from "./components/StudioBottomNav";
 import { ToastProvider } from "@/context/ToastContext";
+import { HelpModeProvider } from "@/context/HelpModeContext";
 
 export type ArtistPageData = {
   id: number;
@@ -80,6 +81,7 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   if (!page) redirect("/studio/onboarding");
 
   return (
+    <HelpModeProvider>
     <ToastProvider>
       <div
         data-theme="studio"
@@ -99,5 +101,6 @@ export default async function StudioLayout({ children }: { children: ReactNode }
         <StudioBottomNav />
       </div>
     </ToastProvider>
+    </HelpModeProvider>
   );
 }
