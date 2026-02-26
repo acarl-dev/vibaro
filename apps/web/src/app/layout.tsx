@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vibaro - Your music, your page",
-  description: "Create a stunning mini-homepage for your music in minutes. Simple, beautiful, yours.",
+  title: {
+    default: "Vibaro – Die digitale Bühne für Musiker",
+    template: "%s | Vibaro",
+  },
+  description:
+    "Erstelle deine professionelle Musiker-Homepage in Minuten. Profil, Shows, Releases und Performance-Tracking – alles an einem Ort.",
+  metadataBase: new URL("https://vibaro.de"),
 };
 
 export default function RootLayout({
@@ -23,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">  
+    <html lang="de">  
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
