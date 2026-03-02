@@ -10,7 +10,7 @@ import {
   getUpcomingShows,
 } from "./shared";
 import { PreviewBanner } from "./PreviewBanner";
-import ProjectHeroBanner from "@/components/public-page/ProjectHeroBanner";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 /**
  * MinimalTemplate - Ultra-reduced, typography-first, no decoration
@@ -146,14 +146,10 @@ export default function MinimalTemplate({
           {/* About - Section 6.1 */}
           {hasBio && <MinimalAbout bio={page.bio!} />}
 
-          {/* Active Project Hero Banner */}
+          {/* Phase Hero — dominant spotlight section */}
           {page.active_spotlight && (
-            <div style={{ marginBottom: TOKENS.space[6] }}>
-              <ProjectHeroBanner
-                title={page.active_spotlight.title}
-                type={page.active_spotlight.type}
-                primaryUrl={page.active_spotlight.primary_url}
-              />
+            <div style={{ marginLeft: `calc(-1 * clamp(${TOKENS.padMobile}, 5vw, ${TOKENS.padDesktop}))`, marginRight: `calc(-1 * clamp(${TOKENS.padMobile}, 5vw, ${TOKENS.padDesktop}))`, marginBottom: TOKENS.space[6] }}>
+              <PhaseHero spotlight={page.active_spotlight} />
             </div>
           )}
 

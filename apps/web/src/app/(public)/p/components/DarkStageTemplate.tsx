@@ -11,6 +11,7 @@ import {
   getFocusItems,
   getOptionalSections,
 } from "./shared";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 export default function DarkStageTemplate({
   page,
@@ -29,6 +30,11 @@ export default function DarkStageTemplate({
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       {/* Hero (stage style - more dramatic) */}
       <Hero page={page} />
+
+      {/* Phase Hero — dominant spotlight section */}
+      {page.active_spotlight && (
+        <PhaseHero spotlight={page.active_spotlight} />
+      )}
 
       {/* Main Content - wider layout for stage-inspired design */}
       <main className="mx-auto max-w-3xl px-6 pb-24">

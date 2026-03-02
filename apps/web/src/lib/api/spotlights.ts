@@ -19,6 +19,12 @@ export type SpotlightData = {
   artist_name: string | null;
   platform_name: string | null;
   description: string | null;
+  subtitle: string | null;
+  cta_label: string | null;
+  secondary_cta_url: string | null;
+  secondary_cta_label: string | null;
+  background_image_url: string | null;
+  meta: Record<string, unknown> | null;
   show_on_page: boolean;
   archived_at: string | null;
   created_at: string;
@@ -43,6 +49,12 @@ export type CreateSpotlightRequest = {
   artist_name?: string | null;
   platform_name?: string | null;
   description?: string | null;
+  subtitle?: string | null;
+  cta_label?: string | null;
+  secondary_cta_url?: string | null;
+  secondary_cta_label?: string | null;
+  background_image_url?: string | null;
+  meta?: Record<string, unknown> | null;
   show_on_page?: boolean;
   activate?: boolean;
 };

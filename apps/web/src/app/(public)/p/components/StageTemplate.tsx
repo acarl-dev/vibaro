@@ -13,7 +13,7 @@ import {
 import MusicPlayer from "./MusicPlayer";
 import { PreviewBanner } from "./PreviewBanner";
 import LazyVideoEmbed from "./LazyVideoEmbed";
-import ProjectHeroBanner from "@/components/public-page/ProjectHeroBanner";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 /**
  * StageTemplate - Energy-focused template for live-oriented bands
@@ -79,14 +79,10 @@ export default function StageTemplate({
             padding: "0 clamp(16px, 4vw, 32px)",
           }}
         >
-          {/* Active Project Hero Banner - Top Priority */}
+          {/* Phase Hero — dominant spotlight section */}
           {page.active_spotlight && (
-            <section style={{ paddingTop: "32px", paddingBottom: "32px" }}>
-              <ProjectHeroBanner
-                title={page.active_spotlight.title}
-                type={page.active_spotlight.type}
-                primaryUrl={page.active_spotlight.primary_url}
-              />
+            <section style={{ marginLeft: "calc(-1 * clamp(16px, 4vw, 32px))", marginRight: "calc(-1 * clamp(16px, 4vw, 32px))" }}>
+              <PhaseHero spotlight={page.active_spotlight} />
             </section>
           )}
 

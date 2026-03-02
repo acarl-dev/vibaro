@@ -412,8 +412,17 @@ Returns the currently active spotlight for the authenticated user's artist page.
     "starts_at": "2026-02-01T00:00:00Z",
     "ends_at": null,
     "primary_url": "https://open.spotify.com/album/...",
+    "cover_image_url": "https://i.scdn.co/image/...",
+    "artist_name": "VOIDCULT",
+    "platform_name": "Spotify",
     "description": "Our heaviest record so far.",
     "show_on_page": true,
+    "subtitle": null,
+    "cta_label": null,
+    "secondary_cta_url": null,
+    "secondary_cta_label": null,
+    "background_image_url": null,
+    "meta": { "track_count": 10 },
     "created_at": "2026-02-01T10:00:00Z",
     "updated_at": "2026-02-10T18:30:00Z"
   }
@@ -452,8 +461,17 @@ Returns all non-archived spotlights for the authenticated user's artist page.
       "starts_at": "2026-02-01T00:00:00Z",
       "ends_at": null,
       "primary_url": "https://open.spotify.com/album/...",
+      "cover_image_url": "https://i.scdn.co/image/...",
+      "artist_name": "VOIDCULT",
+      "platform_name": "Spotify",
       "description": "Our heaviest record so far.",
       "show_on_page": true,
+      "subtitle": null,
+      "cta_label": null,
+      "secondary_cta_url": null,
+      "secondary_cta_label": null,
+      "background_image_url": null,
+      "meta": { "track_count": 10 },
       "created_at": "2026-02-01T10:00:00Z",
       "updated_at": "2026-02-10T18:30:00Z"
     },
@@ -466,8 +484,17 @@ Returns all non-archived spotlights for the authenticated user's artist page.
       "starts_at": "2026-03-01T00:00:00Z",
       "ends_at": null,
       "primary_url": "https://tickets.example.com",
+      "cover_image_url": null,
+      "artist_name": null,
+      "platform_name": null,
       "description": "New dates announced.",
       "show_on_page": false,
+      "subtitle": "15 Städte, 4 Länder",
+      "cta_label": "Tickets sichern",
+      "secondary_cta_url": null,
+      "secondary_cta_label": null,
+      "background_image_url": null,
+      "meta": { "city_count": 15, "country_count": 4 },
       "created_at": "2026-01-15T10:00:00Z",
       "updated_at": "2026-01-15T10:00:00Z"
     }
@@ -497,18 +524,30 @@ Creates a new spotlight.
   "ends_at": null,
   "primary_url": "https://spotify.com/...",
   "description": "Feel-good summer anthem.",
-  "show_on_page": true
+  "show_on_page": true,
+  "subtitle": "feat. Guest Artist",
+  "cta_label": "Jetzt hören",
+  "secondary_cta_url": "https://apple.music.com/...",
+  "secondary_cta_label": "Apple Music",
+  "background_image_url": "https://example.com/hero-bg.jpg",
+  "meta": { "track_count": 12 }
 }
 ```
 
 **Field validation:**
 - `title`: required, string, max 255 chars
-- `type`: required, one of: `single`, `album`, `tour`, `event`
+- `type`: required, one of: `single`, `album`, `tour`, `event`, `video`, `merch`, `livestream`, `collab`
 - `starts_at`: optional, date
 - `ends_at`: optional, date (must be after `starts_at`)
 - `primary_url`: required, URL, max 1000 chars
 - `description`: optional, string, max 1000 chars
 - `show_on_page`: optional, boolean (default: true)
+- `subtitle`: optional, string, max 500 chars
+- `cta_label`: optional, string, max 100 chars
+- `secondary_cta_url`: optional, URL, max 1000 chars
+- `secondary_cta_label`: optional, string, max 100 chars
+- `background_image_url`: optional, URL, max 1000 chars
+- `meta`: optional, JSON object (type-specific display metadata)
 
 **Response (201 Created):**
 
@@ -523,8 +562,17 @@ Creates a new spotlight.
     "starts_at": "2026-03-01T00:00:00Z",
     "ends_at": null,
     "primary_url": "https://spotify.com/...",
+    "cover_image_url": "https://i.scdn.co/image/...",
+    "artist_name": "Summer Band",
+    "platform_name": "Spotify",
     "description": "Feel-good summer anthem.",
     "show_on_page": true,
+    "subtitle": "feat. Guest Artist",
+    "cta_label": "Jetzt hören",
+    "secondary_cta_url": "https://apple.music.com/...",
+    "secondary_cta_label": "Apple Music",
+    "background_image_url": "https://example.com/hero-bg.jpg",
+    "meta": {},
     "created_at": "2026-02-20T12:00:00Z",
     "updated_at": "2026-02-20T12:00:00Z"
   }

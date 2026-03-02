@@ -29,6 +29,12 @@ class Spotlight extends Model
         'artist_name',
         'platform_name',
         'description',
+        'subtitle',
+        'cta_label',
+        'secondary_cta_url',
+        'secondary_cta_label',
+        'background_image_url',
+        'meta',
         'show_on_page',
         'archived_at',
     ];
@@ -41,6 +47,7 @@ class Spotlight extends Model
         'ends_at' => 'datetime',
         'show_on_page' => 'boolean',
         'archived_at' => 'datetime',
+        'meta' => 'array',
     ];
 
     public function artistPage(): BelongsTo

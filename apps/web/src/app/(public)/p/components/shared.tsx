@@ -84,6 +84,14 @@ export type SpotlightItem = {
   title: string;
   type: string;
   primary_url: string;
+  cover_image_url?: string | null;
+  subtitle?: string | null;
+  description?: string | null;
+  cta_label?: string | null;
+  secondary_cta_url?: string | null;
+  secondary_cta_label?: string | null;
+  background_image_url?: string | null;
+  meta?: Record<string, unknown> | null;
 };
 
 export type ContactItem = {

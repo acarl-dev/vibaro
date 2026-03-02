@@ -11,6 +11,7 @@ import {
   getFocusItems,
   getOptionalSections,
 } from "./shared";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 export default function DarkMinimalTemplate({
   page,
@@ -29,6 +30,11 @@ export default function DarkMinimalTemplate({
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       {/* Hero (minimal style - tighter spacing) */}
       <Hero page={page} />
+
+      {/* Phase Hero — dominant spotlight section */}
+      {page.active_spotlight && (
+        <PhaseHero spotlight={page.active_spotlight} />
+      )}
 
       {/* Main Content - minimal spacing */}
       <main className="mx-auto max-w-xl px-6 pb-16">

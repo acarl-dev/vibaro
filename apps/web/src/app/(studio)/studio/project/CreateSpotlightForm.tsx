@@ -11,6 +11,7 @@ import {
   fetchSpotlightMetadata,
 } from "@/lib/api/spotlights";
 import { useToast } from "@/context/ToastContext";
+import { PhaseDisplayFields } from "./PhaseDisplayFields";
 
 type CreateSpotlightFormProps = {
   onSuccess: (spotlight: SpotlightData) => void;
@@ -246,6 +247,18 @@ export default function CreateSpotlightForm({
             ))}
           </select>
         </div>
+
+        {/* Phase Display Fields (collapsible) */}
+        <PhaseDisplayFields
+          type={formData.type}
+          subtitle={formData.subtitle ?? ""}
+          ctaLabel={formData.cta_label ?? ""}
+          secondaryCtaUrl={formData.secondary_cta_url ?? ""}
+          secondaryCtaLabel={formData.secondary_cta_label ?? ""}
+          backgroundImageUrl={formData.background_image_url ?? ""}
+          meta={formData.meta ?? {}}
+          onChange={(fields) => setFormData({ ...formData, ...fields })}
+        />
 
         {/* Show on Page */}
         <div className="flex items-center gap-2">

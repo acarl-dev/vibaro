@@ -21,6 +21,18 @@ async function fetchActiveSpotlight(): Promise<PhaseSpotlight | null> {
   }
 }
 
+async function fetchScheduledCount(): Promise<number> {
+  try {
+    const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
+    if (!res.ok) return 0;
+    const json = await res.json();
+    const all = json?.data ?? [];
+    return all.filter((s: { status: string }) => s.status === "scheduled").length;
+  } catch {
+    return 0;
+  }
+}
+
 async function fetchPhasAnalytics(spotlightId: number): Promise<PhaseAnalytics | null> {
   try {
     const res = await backendFetch(
@@ -45,10 +57,13 @@ async function fetchPhasAnalytics(spotlightId: number): Promise<PhaseAnalytics |
 }
 
 export default async function PhasePage() {
-  const activeSpotlight = await fetchActiveSpotlight();
+  const [activeSpotlight, scheduledCount] = await Promise.all([
+    fetchActiveSpotlight(),
+    fetchScheduledCount(),
+  ]);
   const analytics = activeSpotlight
     ? await fetchPhasAnalytics(activeSpotlight.id)
     : null;
 
-  return <PhaseOverviewClient activeSpotlight={activeSpotlight} analytics={analytics} />;
+  return <PhaseOverviewClient activeSpotlight={activeSpotlight} analytics={analytics} scheduledCount={scheduledCount} />;
 }

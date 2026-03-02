@@ -43,13 +43,21 @@ class PublicArtistPageController extends Controller
             ->where('show_on_page', true)
             ->first();
 
-        // Prepare spotlight data for Hero Banner
+        // Prepare rich spotlight data for PhaseHero
         $spotlightData = null;
         if ($activeSpotlight) {
             $spotlightData = [
-                'title' => $activeSpotlight->title,
-                'type' => $activeSpotlight->type,
-                'primary_url' => $activeSpotlight->primary_url,
+                'title'               => $activeSpotlight->title,
+                'type'                => $activeSpotlight->type,
+                'primary_url'         => $activeSpotlight->primary_url,
+                'cover_image_url'     => $activeSpotlight->cover_image_url,
+                'subtitle'            => $activeSpotlight->subtitle,
+                'description'         => $activeSpotlight->description,
+                'cta_label'           => $activeSpotlight->cta_label,
+                'secondary_cta_url'   => $activeSpotlight->secondary_cta_url,
+                'secondary_cta_label' => $activeSpotlight->secondary_cta_label,
+                'background_image_url'=> $activeSpotlight->background_image_url,
+                'meta'                => $activeSpotlight->meta,
             ];
         }
 

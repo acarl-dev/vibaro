@@ -20,6 +20,7 @@ import { ContentSection } from "./ContentSection";
 import { SCROLL_THRESHOLD_NAV } from "./constants";
 import { useThrottledScroll } from "../hooks/useThrottledScroll";
 import { useActiveSectionObserver } from "../hooks/useActiveSectionObserver";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 export default function DarkEditorialFullTemplate({
   page,
@@ -99,6 +100,11 @@ export default function DarkEditorialFullTemplate({
         isVisible={showNav}
         onSectionClick={scrollToSection}
       />
+
+      {/* Phase Hero — dominant spotlight section */}
+      {page.active_spotlight && (
+        <PhaseHero spotlight={page.active_spotlight} />
+      )}
 
       {/* Featured Release */}
       {featuredRelease && <FeaturedReleaseHero release={featuredRelease} />}

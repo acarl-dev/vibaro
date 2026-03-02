@@ -32,6 +32,7 @@ export type PhaseAnalytics = {
 type Props = {
   activeSpotlight: PhaseSpotlight | null;
   analytics: PhaseAnalytics | null;
+  scheduledCount?: number;
 };
 
 function moduleLabel(type: string): string {
@@ -91,7 +92,7 @@ function NavKachel({ label, desc, href }: { label: string; desc: string; href: s
   );
 }
 
-export default function PhaseOverviewClient({ activeSpotlight, analytics }: Props) {
+export default function PhaseOverviewClient({ activeSpotlight, analytics, scheduledCount = 0 }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const [isEnding, setIsEnding] = useState(false);
@@ -153,12 +154,23 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics }: Prop
           title="Keine aktive Phase"
           description="Starte eine neue Phase, um deine Seite gezielt zu pushen."
           action={
-            <button
-              onClick={() => router.push("/studio/share/new")}
-              className="studio-btn studio-btn-primary"
-            >
-              Neue Phase starten
-            </button>
+            <div className="flex flex-col items-center gap-3">
+              <button
+                onClick={() => router.push("/studio/share/new")}
+                className="studio-btn studio-btn-primary"
+              >
+                Neue Phase starten
+              </button>
+              {scheduledCount > 0 && (
+                <button
+                  onClick={() => router.push("/studio/share/phases")}
+                  className="text-xs underline"
+                  style={{ color: "var(--studio-accent)", background: "none", border: "none", cursor: "pointer" }}
+                >
+                  {scheduledCount} geplante {scheduledCount === 1 ? "Phase" : "Phasen"} anzeigen
+                </button>
+              )}
+            </div>
           }
         />
       </div>

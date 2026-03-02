@@ -14,7 +14,7 @@ import {
 import MusicPlayer from "./MusicPlayer";
 import GallerySlider from "./GallerySlider";
 import { PreviewBanner } from "./PreviewBanner";
-import ProjectHeroBanner from "@/components/public-page/ProjectHeroBanner";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 /**
  * ModernTemplate - Block-based artist page with hierarchical structure
@@ -79,14 +79,10 @@ export default function ModernTemplate({
             padding: '0 clamp(20px, 5vw, 40px)',
           }}
         >
-          {/* Active Project Hero Banner */}
+          {/* Phase Hero — dominant spotlight section */}
           {page.active_spotlight && (
-            <div className="pt-12 pb-6">
-              <ProjectHeroBanner
-                title={page.active_spotlight.title}
-                type={page.active_spotlight.type}
-                primaryUrl={page.active_spotlight.primary_url}
-              />
+            <div style={{ marginLeft: "calc(-1 * clamp(20px, 5vw, 40px))", marginRight: "calc(-1 * clamp(20px, 5vw, 40px))" }}>
+              <PhaseHero spotlight={page.active_spotlight} />
             </div>
           )}
 

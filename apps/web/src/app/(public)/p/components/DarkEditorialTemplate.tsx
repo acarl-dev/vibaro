@@ -12,6 +12,7 @@ import {
   getOptionalSections,
 } from "./shared";
 import { containerStyle } from "./constants";
+import PhaseHero from "@/components/public-page/PhaseHero";
 
 export default function DarkEditorialTemplate({
   page,
@@ -31,6 +32,11 @@ export default function DarkEditorialTemplate({
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       {/* Full-bleed Hero with overlay text */}
       <Hero page={page} />
+
+      {/* Phase Hero — dominant spotlight section */}
+      {page.active_spotlight && (
+        <PhaseHero spotlight={page.active_spotlight} />
+      )}
 
       {/* First section: Links (directly after hero) */}
       <FocusSection

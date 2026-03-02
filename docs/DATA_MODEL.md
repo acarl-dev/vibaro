@@ -211,10 +211,28 @@ Leitprinzipien:
 | artist_name | string | nullable, auto-gefüllt via oEmbed oder manuell |
 | platform_name | string | nullable, auto-erkannt aus URL (z.B. "Spotify", "YouTube") |
 | description | text | nullable |
+| subtitle | string(500) | nullable, ergänzende Zeile unter Titel |
+| cta_label | string(100) | nullable, überschreibt den Standard-CTA-Text |
+| secondary_cta_url | string(1000) | nullable, zweiter CTA Link |
+| secondary_cta_label | string(100) | nullable, Label für zweiten CTA |
+| background_image_url | string(1000) | nullable, Custom Hero-Hintergrund |
+| meta | jsonb | nullable, typ-spezifische Zusatzdaten (siehe unten) |
 | show_on_page | boolean | default true, steuert Hero-Banner |
 | archived_at | timestamp | nullable, soft delete |
 | created_at | timestamp | |
 | updated_at | timestamp | |
+
+**meta (jsonb) – typ-spezifische Felder**
+| Type | Mögliche Keys | Beispiel |
+|----|----|----|
+| album | track_count | `{"track_count": 12}` |
+| video | duration | `{"duration": "4:32"}` |
+| tour | city_count, country_count | `{"city_count": 15, "country_count": 4}` |
+| event | venue, date | `{"venue": "Wacken", "date": "2026-08-06"}` |
+| livestream | stream_date | `{"stream_date": "2026-03-15T20:00:00Z"}` |
+| collab | partner_name | `{"partner_name": "Meshuggah"}` |
+| single | *(keine)* | `{}` |
+| merch | *(keine)* | `{}` |
 
 **Regeln**
 - Maximal ein `active` Spotlight pro artist_page.

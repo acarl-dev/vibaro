@@ -11,6 +11,7 @@ import {
 import StudioButton from "../../components/StudioButton";
 import { X } from "../../components/StudioIcons";
 import { useToast } from "@/context/ToastContext";
+import { PhaseDisplayFields } from "./PhaseDisplayFields";
 
 type EditSpotlightModalProps = {
   spotlight: SpotlightData;
@@ -42,6 +43,12 @@ export default function EditSpotlightModal({
     primary_url: spotlight.primary_url,
     artist_name: spotlight.artist_name || "",
     description: spotlight.description || "",
+    subtitle: spotlight.subtitle || "",
+    cta_label: spotlight.cta_label || "",
+    secondary_cta_url: spotlight.secondary_cta_url || "",
+    secondary_cta_label: spotlight.secondary_cta_label || "",
+    background_image_url: spotlight.background_image_url || "",
+    meta: spotlight.meta || {},
   });
 
   const handleSubmit = async (e: FormEvent) => {
@@ -161,6 +168,18 @@ export default function EditSpotlightModal({
                 className="studio-input w-full px-3 py-2 text-sm"
               />
             </div>
+
+            {/* Phase Display Fields */}
+            <PhaseDisplayFields
+              type={(formData.type || spotlight.type) as SpotlightType}
+              subtitle={formData.subtitle ?? ""}
+              ctaLabel={formData.cta_label ?? ""}
+              secondaryCtaUrl={formData.secondary_cta_url ?? ""}
+              secondaryCtaLabel={formData.secondary_cta_label ?? ""}
+              backgroundImageUrl={formData.background_image_url ?? ""}
+              meta={formData.meta ?? {}}
+              onChange={(fields) => setFormData({ ...formData, ...fields })}
+            />
 
             {/* Note about slug */}
             <div className="rounded-lg p-3 text-sm" style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-accent-muted)", color: "var(--studio-text-secondary)" }}>
