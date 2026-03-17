@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Services\StudioHomeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class StudioController extends Controller
 {
+    use ApiResponse;
+
     protected StudioHomeService $homeService;
 
     public function __construct(StudioHomeService $homeService)
@@ -20,23 +24,11 @@ class StudioController extends Controller
      *
      * GET /api/v1/studio/home
      */
-    public function home(Request $request)
+    public function home(Request $request): JsonResponse
     {
         $user = $request->user();
-
-        if (!$user->artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
-
         $data = $this->homeService->getHomeData($user);
 
-        return response()->json([
-            'data' => $data,
-        ]);
+        return $this->success($data);
     }
 }

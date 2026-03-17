@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\TrackingLink;
 use App\Models\ArtistPage;
@@ -57,7 +58,7 @@ class ClickEvent extends Model
     /**
      * Scope to exclude preview/bot clicks from analytics.
      */
-    public function scopeRealClicks($query)
+    public function scopeRealClicks(Builder $query): Builder
     {
         return $query->where('is_preview', false);
     }

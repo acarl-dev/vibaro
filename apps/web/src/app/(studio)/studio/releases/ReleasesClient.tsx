@@ -194,7 +194,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
     setEditingId(release.id);
     setFormData({
       title: release.title,
-      release_date: release.release_date,
+      release_date: release.release_date ?? "",
       url: release.url || "",
       is_featured: release.is_featured,
     });

@@ -158,28 +158,100 @@ class PublicArtistPageController extends Controller
     }
 
     /**
-     * Return the contacts array.
-     * Always builds from the 4 legacy individual fields (studio writes to these).
-     * The contacts JSONB column is reserved for the future studio UI.
+     * Return the contacts array for public display.
+     * SECURITY: Only returns label + type. Actual email/phone values are PRIVATE
+     * and never exposed in the public response (see SECURITY.md §3).
+     * Contact URLs are resolved via the /p/{handle}/contact/{label} redirect endpoint.
      */
     private function resolveContacts(ArtistPage $page): array
     {
         $contacts = [];
-        if ($page->booking_email)    $contacts[] = ['label' => 'Booking',    'type' => 'email',    'value' => $page->booking_email];
-        if ($page->management_email) $contacts[] = ['label' => 'Management', 'type' => 'email',    'value' => $page->management_email];
-        if ($page->press_email)      $contacts[] = ['label' => 'Press',      'type' => 'email',    'value' => $page->press_email];
-        if ($page->whatsapp_number)  $contacts[] = ['label' => 'WhatsApp',   'type' => 'whatsapp', 'value' => $page->whatsapp_number];
+        if ($page->booking_email)    $contacts[] = ['label' => 'Booking',    'type' => 'email'];
+        if ($page->management_email) $contacts[] = ['label' => 'Management', 'type' => 'email'];
+        if ($page->press_email)      $contacts[] = ['label' => 'Press',      'type' => 'email'];
+        if ($page->whatsapp_number)  $contacts[] = ['label' => 'WhatsApp',   'type' => 'whatsapp'];
 
         // Merge any extra contacts from the JSONB column (future studio-managed entries)
         if (!empty($page->contacts)) {
             $legacyLabels = array_column($contacts, 'label');
             foreach ($page->contacts as $c) {
                 if (!in_array($c['label'] ?? '', $legacyLabels, true)) {
-                    $contacts[] = $c;
+                    $contacts[] = [
+                        'label' => $c['label'] ?? '',
+                        'type'  => $c['type'] ?? 'email',
+                    ];
                 }
             }
         }
 
         return $contacts;
+    }
+
+    /**
+     * GET /p/{handle}/contact/{label}
+     *
+     * Returns the contact URL (mailto: / wa.me) for a given contact label.
+     * The URL is computed server-side so the actual email/phone is never in the
+     * public page JSON, but the visitor can still initiate contact.
+     */
+    public function contactRedirect(string $handle, string $label): JsonResponse
+    {
+        $page = ArtistPage::where('handle', $handle)
+            ->where('is_published', true)
+            ->first();
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        // Resolve the contact URL from legacy fields or JSONB column
+        $url = $this->resolveContactUrl($page, $label);
+
+        if (!$url) {
+            return $this->error('NOT_FOUND', 'Contact not found.', 404);
+        }
+
+        return $this->success(['url' => $url]);
+    }
+
+    /**
+     * Find the contact URL for a given label.
+     * Checks legacy fields first, then the JSONB contacts column.
+     */
+    private function resolveContactUrl(ArtistPage $page, string $label): ?string
+    {
+        $normalised = strtolower(trim($label));
+
+        // Legacy fields
+        $legacyMap = [
+            'booking'    => ['value' => $page->booking_email,    'type' => 'email'],
+            'management' => ['value' => $page->management_email, 'type' => 'email'],
+            'press'      => ['value' => $page->press_email,      'type' => 'email'],
+            'whatsapp'   => ['value' => $page->whatsapp_number,  'type' => 'whatsapp'],
+        ];
+
+        if (isset($legacyMap[$normalised]) && !empty($legacyMap[$normalised]['value'])) {
+            return $this->buildContactUrl($legacyMap[$normalised]['type'], $legacyMap[$normalised]['value']);
+        }
+
+        // JSONB contacts column
+        if (!empty($page->contacts)) {
+            foreach ($page->contacts as $c) {
+                if (strtolower(trim($c['label'] ?? '')) === $normalised && !empty($c['value'])) {
+                    return $this->buildContactUrl($c['type'] ?? 'email', $c['value']);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function buildContactUrl(string $type, string $value): string
+    {
+        if ($type === 'whatsapp') {
+            return 'https://wa.me/' . preg_replace('/[^0-9+]/', '', $value);
+        }
+
+        return 'mailto:' . $value;
     }
 }

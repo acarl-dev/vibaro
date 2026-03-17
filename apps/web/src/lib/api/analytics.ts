@@ -1,6 +1,7 @@
 /**
- * Server-side API client for Analytics
- * Used in React Server Components
+ * API client for Analytics
+ * Server-side functions used in React Server Components
+ * Client-side functions used in "use client" components (via proxy routes)
  */
 
 export type AnalyticsRange = "7d" | "30d";
@@ -49,33 +50,43 @@ export type AnalyticsParams = {
   campaign_id?: number;
 };
 
+// ============================================
+// Client-side functions (via Next.js proxy)
+// ============================================
+
+export type AnalyticsBreakdown = {
+  total_clicks: number;
+  trend: number;
+  period: string;
+  by_platform: {
+    platform: string;
+    clicks: number;
+    placements: {
+      placement: string;
+      clicks: number;
+    }[];
+  }[];
+};
+
 /**
- * Fetch analytics overview (server-side only)
+ * Fetch analytics breakdown (client-side via proxy)
  */
-export async function fetchAnalytics(
-  params: AnalyticsParams = {}
-): Promise<AnalyticsData | null> {
-  try {
-    const { backendFetch } = await import("@/lib/api/backend");
-    
-    const searchParams = new URLSearchParams();
-    if (params.range) searchParams.append("range", params.range);
-    if (params.spotlight_id) searchParams.append("spotlight_id", params.spotlight_id.toString());
-    if (params.campaign_id) searchParams.append("campaign_id", params.campaign_id.toString());
+export async function fetchAnalyticsBreakdown(
+  spotlightId: number,
+  period: string = "7d"
+): Promise<AnalyticsBreakdown> {
+  const params = new URLSearchParams({
+    spotlight_id: spotlightId.toString(),
+    period,
+  });
 
-    const url = `/api/v1/analytics/overview${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-    
-    const res = await backendFetch(url, { cache: "no-store" });
+  const res = await fetch(`/api/studio/analytics/breakdown?${params.toString()}`);
 
-    if (!res.ok) {
-      console.error("Failed to fetch analytics:", res.status);
-      return null;
-    }
-
-    const json = await res.json();
-    return json?.data ?? null;
-  } catch (error) {
-    console.error("Error fetching analytics:", error);
-    return null;
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.error?.message || `Failed to fetch analytics breakdown: ${res.status}`);
   }
+
+  const json = await res.json();
+  return json.data;
 }

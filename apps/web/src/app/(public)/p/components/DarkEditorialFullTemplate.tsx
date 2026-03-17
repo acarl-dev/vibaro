@@ -40,10 +40,10 @@ export default function DarkEditorialFullTemplate({
   // Define available sections based on page data
   const availableSections = useMemo(() => {
     const sections = ["music"];
-    if (page.shows?.length > 0) sections.push("shows");
-    if (page.releases?.length > 0) sections.push("releases");
-    if (page.videos?.length > 0) sections.push("videos");
-    if (page.gallery_images?.length > 0) sections.push("gallery");
+    if ((page.shows?.length ?? 0) > 0) sections.push("shows");
+    if ((page.releases?.length ?? 0) > 0) sections.push("releases");
+    if ((page.videos?.length ?? 0) > 0) sections.push("videos");
+    if ((page.gallery_images?.length ?? 0) > 0) sections.push("gallery");
     if (page.bio || page.images.avatar_url) sections.push("about");
     sections.push("contact");
     return sections;
@@ -176,11 +176,9 @@ export default function DarkEditorialFullTemplate({
       {/* Contact Section */}
       <ContentSection id="contact" title="Contact" noBorder>
         <ContactInquiryButton
-          booking_email={page.booking_email}
-          management_email={page.management_email}
-          press_email={page.press_email}
-          whatsapp_number={page.whatsapp_number}
+          contacts={page.contacts}
           contact_message={page.contact_message}
+          handle={page.handle}
         />
       </ContentSection>
 

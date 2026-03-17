@@ -2,27 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Platform;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\TrackingLink;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Enum;
 
 class TrackingLinkController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get all tracking links for authenticated user's artist page.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $trackingLinks = TrackingLink::where('artist_page_id', $artistPage->id)
             ->active()
@@ -53,28 +50,19 @@ class TrackingLinkController extends Controller
                 ];
             });
 
-        return response()->json(['data' => $trackingLinks]);
+        return $this->success($trackingLinks);
     }
 
     /**
      * Create a new tracking link.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
 
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
-
         $validated = $request->validate([
             'spotlight_id' => 'required|exists:spotlights,id',
-            'platform' => 'required|string|in:instagram,tiktok,youtube,facebook,twitter,whatsapp,telegram,email,other',
+            'platform' => ['required', 'string', new Enum(Platform::class)],
             'placement' => 'required|string|max:50',
             'target_url' => 'required|url|max:1000',
         ]);
@@ -92,15 +80,11 @@ class TrackingLinkController extends Controller
             ->first();
 
         if ($existing) {
-            return response()->json([
-                'message' => 'Ein Link für diese Plattform und Platzierung existiert bereits.',
-                'data' => [
-                    'id' => $existing->id,
-                    'tracking_url' => $existing->tracking_url,
-                    'platform' => $existing->platform,
-                    'placement' => $existing->placement,
-                ],
-            ], 409);
+            return $this->error(
+                'DUPLICATE_LINK',
+                'Ein Link für diese Plattform und Platzierung existiert bereits.',
+                409
+            );
         }
 
         // Campaign auto-create or find
@@ -124,39 +108,28 @@ class TrackingLinkController extends Controller
             'is_active' => true,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $trackingLink->id,
-                'short_code' => $trackingLink->short_code,
-                'tracking_url' => $trackingLink->tracking_url,
-                'target_url' => $trackingLink->target_url,
-                'platform' => $trackingLink->platform,
-                'placement' => $trackingLink->placement,
-                'label' => $trackingLink->label,
-                'click_count' => $trackingLink->click_count,
-                'utm_source' => $trackingLink->utm_source,
-                'utm_medium' => $trackingLink->utm_medium,
-                'utm_campaign' => $trackingLink->utm_campaign,
-                'created_at' => $trackingLink->created_at->toISOString(),
-            ],
+        return $this->success([
+            'id' => $trackingLink->id,
+            'short_code' => $trackingLink->short_code,
+            'tracking_url' => $trackingLink->tracking_url,
+            'target_url' => $trackingLink->target_url,
+            'platform' => $trackingLink->platform,
+            'placement' => $trackingLink->placement,
+            'label' => $trackingLink->label,
+            'click_count' => $trackingLink->click_count,
+            'utm_source' => $trackingLink->utm_source,
+            'utm_medium' => $trackingLink->utm_medium,
+            'utm_campaign' => $trackingLink->utm_campaign,
+            'created_at' => $trackingLink->created_at->toISOString(),
         ], 201);
     }
 
     /**
      * Check if a tracking link exists for given spotlight/platform/placement.
      */
-    public function check(Request $request)
+    public function check(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $validated = $request->validate([
             'spotlight_id' => 'required|integer',
@@ -171,41 +144,37 @@ class TrackingLinkController extends Controller
             ->active()
             ->first();
 
-        return response()->json([
-            'data' => [
-                'exists' => $link !== null,
-                'link' => $link ? [
-                    'id' => $link->id,
-                    'tracking_url' => $link->tracking_url,
-                    'platform' => $link->platform,
-                    'placement' => $link->placement,
-                    'click_count' => $link->click_count,
-                ] : null,
-            ],
+        return $this->success([
+            'exists' => $link !== null,
+            'link' => $link ? [
+                'id' => $link->id,
+                'tracking_url' => $link->tracking_url,
+                'platform' => $link->platform,
+                'placement' => $link->placement,
+                'click_count' => $link->click_count,
+            ] : null,
         ]);
     }
 
     /**
      * Archive a tracking link.
      */
-    public function archive(TrackingLink $trackingLink)
+    public function archive(TrackingLink $trackingLink): JsonResponse
     {
         $this->authorize('update', $trackingLink);
 
         $trackingLink->archive();
 
-        return response()->json([
-            'data' => [
-                'id' => $trackingLink->id,
-                'archived_at' => $trackingLink->archived_at->toISOString(),
-            ],
+        return $this->success([
+            'id' => $trackingLink->id,
+            'archived_at' => $trackingLink->archived_at->toISOString(),
         ]);
     }
 
     /**
      * Delete a tracking link.
      */
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
         $trackingLink = TrackingLink::findOrFail($id);
 
@@ -213,6 +182,6 @@ class TrackingLinkController extends Controller
 
         $trackingLink->delete();
 
-        return response()->json(['data' => ['ok' => true]]);
+        return $this->success(['ok' => true]);
     }
 }

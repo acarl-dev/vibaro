@@ -42,9 +42,6 @@ export default function DarkStageTemplate({
         <FocusSection
           type={focusType}
           items={focusItems}
-          links={page.links}
-          shows={page.shows}
-          releases={page.releases}
         />
 
         {/* Featured Release Section */}

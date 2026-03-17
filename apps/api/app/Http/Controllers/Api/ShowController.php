@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\Show;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -12,39 +14,39 @@ use Illuminate\Validation\ValidationException;
 
 class ShowController extends Controller
 {
+    use ApiResponse;
+
     /**
      * GET /artist-pages/{id}/shows
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
         $shows = $artistPage->shows()->orderBy('starts_at')->get();
 
-        return response()->json([
-            'data' => $shows->map(fn($show) => [
-                'id' => $show->id,
-                'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
-                'venue' => $show->venue,
-                'city' => $show->city,
-                'address' => $show->address,
-                'ticket_url' => $show->ticket_url,
-                'price' => $show->price,
-                'is_free' => $show->is_free,
-                'support_acts' => $show->support_acts,
-                'flyer_path' => $show->flyer_path,
-                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
-                'status' => $show->status,
-                'position' => $show->position,
-            ])
-        ]);
+        return $this->success($shows->map(fn($show) => [
+            'id' => $show->id,
+            'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
+            'venue' => $show->venue,
+            'city' => $show->city,
+            'address' => $show->address,
+            'ticket_url' => $show->ticket_url,
+            'price' => $show->price,
+            'is_free' => $show->is_free,
+            'support_acts' => $show->support_acts,
+            'flyer_path' => $show->flyer_path,
+            'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
+            'status' => $show->status,
+            'position' => $show->position,
+        ]));
     }
 
     /**
      * POST /artist-pages/{id}/shows
      */
-    public function store(Request $request, int $id)
+    public function store(Request $request, int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -78,29 +80,27 @@ class ShowController extends Controller
             'position' => $maxPosition + 1,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $show->id,
-                'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
-                'venue' => $show->venue,
-                'city' => $show->city,
-                'address' => $show->address,
-                'ticket_url' => $show->ticket_url,
-                'price' => $show->price,
-                'is_free' => $show->is_free,
-                'support_acts' => $show->support_acts,
-                'flyer_path' => $show->flyer_path,
-                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
-                'status' => $show->status,
-                'position' => $show->position,
-            ]
+        return $this->success([
+            'id' => $show->id,
+            'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
+            'venue' => $show->venue,
+            'city' => $show->city,
+            'address' => $show->address,
+            'ticket_url' => $show->ticket_url,
+            'price' => $show->price,
+            'is_free' => $show->is_free,
+            'support_acts' => $show->support_acts,
+            'flyer_path' => $show->flyer_path,
+            'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
+            'status' => $show->status,
+            'position' => $show->position,
         ], 201);
     }
 
     /**
      * PATCH /artist-pages/{id}/shows/{showId}
      */
-    public function update(Request $request, int $id, int $showId)
+    public function update(Request $request, int $id, int $showId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -122,29 +122,27 @@ class ShowController extends Controller
 
         $show->update($validated);
 
-        return response()->json([
-            'data' => [
-                'id' => $show->id,
-                'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
-                'venue' => $show->venue,
-                'city' => $show->city,
-                'address' => $show->address,
-                'ticket_url' => $show->ticket_url,
-                'price' => $show->price,
-                'is_free' => $show->is_free,
-                'support_acts' => $show->support_acts,
-                'flyer_path' => $show->flyer_path,
-                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
-                'status' => $show->status,
-                'position' => $show->position,
-            ]
+        return $this->success([
+            'id' => $show->id,
+            'starts_at' => $show->starts_at->format('Y-m-d\TH:i:s'),
+            'venue' => $show->venue,
+            'city' => $show->city,
+            'address' => $show->address,
+            'ticket_url' => $show->ticket_url,
+            'price' => $show->price,
+            'is_free' => $show->is_free,
+            'support_acts' => $show->support_acts,
+            'flyer_path' => $show->flyer_path,
+            'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
+            'status' => $show->status,
+            'position' => $show->position,
         ]);
     }
 
     /**
      * DELETE /artist-pages/{id}/shows/{showId}
      */
-    public function destroy(int $id, int $showId)
+    public function destroy(int $id, int $showId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -152,15 +150,13 @@ class ShowController extends Controller
         $show = $artistPage->shows()->findOrFail($showId);
         $show->delete();
 
-        return response()->json([
-            'data' => ['ok' => true]
-        ]);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * POST /artist-pages/{id}/shows/reorder
      */
-    public function reorder(Request $request, int $id)
+    public function reorder(Request $request, int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -176,15 +172,13 @@ class ShowController extends Controller
             $artistPage->shows()->where('id', $showId)->update(['position' => $index]);
         }
 
-        return response()->json([
-            'data' => ['ok' => true]
-        ]);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * POST /artist-pages/{id}/shows/{showId}/upload-flyer
      */
-    public function uploadFlyer(Request $request, int $id, int $showId)
+    public function uploadFlyer(Request $request, int $id, int $showId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -196,13 +190,7 @@ class ShowController extends Controller
                 'flyer' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // 5MB max
             ]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'error' => [
-                    'code' => 'VALIDATION_ERROR',
-                    'message' => 'Validation failed',
-                    'details' => $e->errors(),
-                ]
-            ], 422);
+            return $this->validationError($e->errors());
         }
 
         // Delete old flyer if exists
@@ -215,19 +203,17 @@ class ShowController extends Controller
         $show->flyer_path = $path;
         $show->save();
 
-        return response()->json([
-            'data' => [
-                'id' => $show->id,
-                'flyer_path' => $show->flyer_path,
-                'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
-            ]
+        return $this->success([
+            'id' => $show->id,
+            'flyer_path' => $show->flyer_path,
+            'flyer_url' => $show->flyer_path ? Storage::disk('public')->url($show->flyer_path) : null,
         ]);
     }
 
     /**
      * DELETE /artist-pages/{id}/shows/{showId}/flyer
      */
-    public function deleteFlyer(int $id, int $showId)
+    public function deleteFlyer(int $id, int $showId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -240,8 +226,6 @@ class ShowController extends Controller
             $show->save();
         }
 
-        return response()->json([
-            'data' => ['ok' => true]
-        ]);
+        return $this->success(['ok' => true]);
     }
 }

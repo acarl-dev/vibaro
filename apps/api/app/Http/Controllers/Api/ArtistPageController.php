@@ -220,11 +220,6 @@ class ArtistPageController extends Controller
     public function uploadAvatar(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         try {
@@ -251,11 +246,6 @@ class ArtistPageController extends Controller
     public function uploadHero(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         try {
@@ -282,11 +272,6 @@ class ArtistPageController extends Controller
     public function uploadLogo(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         try {
@@ -311,11 +296,6 @@ class ArtistPageController extends Controller
     public function deleteLogo(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         if ($page->logo_path) {
@@ -330,11 +310,6 @@ class ArtistPageController extends Controller
     public function updateHeroFocal(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         try {
@@ -356,11 +331,6 @@ class ArtistPageController extends Controller
     public function deleteAvatar(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         // Delete avatar file if exists
@@ -376,11 +346,6 @@ class ArtistPageController extends Controller
     public function deleteHero(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         // Delete hero image file if exists

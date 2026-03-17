@@ -3,64 +3,60 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\Link;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class LinkController extends Controller
 {
+    use ApiResponse;
+
     /**
      * GET /artist-pages/me/links
      */
-    public function myLinks(Request $request)
+    public function myLinks(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
 
-        if (!$artistPage) {
-            return response()->json(['error' => 'Artist page not found'], 404);
-        }
-
         $links = $artistPage->links()->orderBy('position')->get();
 
-        return response()->json([
-            'data' => $links->map(fn($link) => [
-                'id' => $link->id,
-                'type' => $link->type,
-                'title' => $link->title,
-                'url' => $link->url,
-                'position' => $link->position,
-                'is_visible' => $link->is_visible,
-            ])
-        ]);
+        return $this->success($links->map(fn($link) => [
+            'id' => $link->id,
+            'type' => $link->type,
+            'title' => $link->title,
+            'url' => $link->url,
+            'position' => $link->position,
+            'is_visible' => $link->is_visible,
+        ]));
     }
 
     /**
      * GET /artist-pages/{id}/links
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
         $links = $artistPage->links()->orderBy('position')->get();
 
-        return response()->json([
-            'data' => $links->map(fn($link) => [
-                'id' => $link->id,
-                'type' => $link->type,
-                'title' => $link->title,
-                'url' => $link->url,
-                'position' => $link->position,
-                'is_visible' => $link->is_visible,
-            ])
-        ]);
+        return $this->success($links->map(fn($link) => [
+            'id' => $link->id,
+            'type' => $link->type,
+            'title' => $link->title,
+            'url' => $link->url,
+            'position' => $link->position,
+            'is_visible' => $link->is_visible,
+        ]));
     }
 
     /**
      * POST /artist-pages/{id}/links
      */
-    public function store(Request $request, int $id)
+    public function store(Request $request, int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -81,22 +77,20 @@ class LinkController extends Controller
             'is_visible' => true,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $link->id,
-                'type' => $link->type,
-                'title' => $link->title,
-                'url' => $link->url,
-                'position' => $link->position,
-                'is_visible' => $link->is_visible,
-            ]
+        return $this->success([
+            'id' => $link->id,
+            'type' => $link->type,
+            'title' => $link->title,
+            'url' => $link->url,
+            'position' => $link->position,
+            'is_visible' => $link->is_visible,
         ], 201);
     }
 
     /**
      * PATCH /artist-pages/{id}/links/{linkId}
      */
-    public function update(Request $request, int $id, int $linkId)
+    public function update(Request $request, int $id, int $linkId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -112,22 +106,20 @@ class LinkController extends Controller
 
         $link->update($validated);
 
-        return response()->json([
-            'data' => [
-                'id' => $link->id,
-                'type' => $link->type,
-                'title' => $link->title,
-                'url' => $link->url,
-                'position' => $link->position,
-                'is_visible' => $link->is_visible,
-            ]
+        return $this->success([
+            'id' => $link->id,
+            'type' => $link->type,
+            'title' => $link->title,
+            'url' => $link->url,
+            'position' => $link->position,
+            'is_visible' => $link->is_visible,
         ]);
     }
 
     /**
      * DELETE /artist-pages/{id}/links/{linkId}
      */
-    public function destroy(int $id, int $linkId)
+    public function destroy(int $id, int $linkId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -135,15 +127,13 @@ class LinkController extends Controller
         $link = $artistPage->links()->findOrFail($linkId);
         $link->delete();
 
-        return response()->json([
-            'data' => ['ok' => true]
-        ]);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * POST /artist-pages/{id}/links/reorder
      */
-    public function reorder(Request $request, int $id)
+    public function reorder(Request $request, int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -160,8 +150,6 @@ class LinkController extends Controller
             $artistPage->links()->where('id', $linkId)->update(['position' => $index]);
         }
 
-        return response()->json([
-            'data' => ['ok' => true]
-        ]);
+        return $this->success(['ok' => true]);
     }
 }

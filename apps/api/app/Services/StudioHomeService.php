@@ -8,10 +8,13 @@ use App\Models\Spotlight;
 use App\Models\TrackingLink;
 use App\Models\ClickEvent;
 use App\Models\PageViewEvent;
-use Carbon\Carbon;
 
 class StudioHomeService
 {
+    public function __construct(
+        protected AnalyticsService $analyticsService,
+    ) {}
+
     /**
      * Get Studio Home dashboard data for a user.
      *
@@ -64,45 +67,11 @@ class StudioHomeService
     }
 
     /**
-     * Get all-time metrics for a spotlight (used in hero card + comparison).
+     * Get all-time metrics for a spotlight (delegates to shared AnalyticsService).
      */
     protected function getPhaseStats(int $spotlightId): array
     {
-        $totalClicks = ClickEvent::where('spotlight_id', $spotlightId)
-            ->where('is_preview', false)
-            ->count();
-
-        $qrClicks = ClickEvent::where('spotlight_id', $spotlightId)
-            ->where('platform', 'qr')
-            ->where('is_preview', false)
-            ->count();
-
-        $uniqueVisitors = PageViewEvent::where('spotlight_id', $spotlightId)
-            ->realViews()
-            ->whereNotNull('user_agent_hash')
-            ->distinct('user_agent_hash')
-            ->count('user_agent_hash');
-
-        $conversion = $uniqueVisitors > 0
-            ? round($totalClicks / $uniqueVisitors * 100, 1)
-            : null;
-
-        $topPlatform = ClickEvent::where('spotlight_id', $spotlightId)
-            ->where('is_preview', false)
-            ->where('platform', '!=', 'qr')
-            ->whereNotNull('platform')
-            ->selectRaw('platform, COUNT(*) as cnt')
-            ->groupBy('platform')
-            ->orderByDesc('cnt')
-            ->value('platform');
-
-        return [
-            'visitors'     => $uniqueVisitors,
-            'clicks'       => $totalClicks,
-            'qr_scans'     => $qrClicks,
-            'conversion'   => $conversion,
-            'top_platform' => $topPlatform,
-        ];
+        return $this->analyticsService->getPhaseStats($spotlightId);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\GalleryImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,16 +12,13 @@ use Illuminate\Validation\ValidationException;
 
 class GalleryImageController extends Controller
 {
+    use ApiResponse;
     /**
      * List all gallery images for authenticated user's artist page
      */
     public function index(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
 
         $images = $page->galleryImages()->orderBy('position')->get();
 
@@ -41,28 +39,13 @@ class GalleryImageController extends Controller
     public function store(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
-        // Check limit (max 16 images for Artist plan)
-        if ($page->galleryImages()->count() >= 16) {
-            return $this->error('LIMIT_EXCEEDED', 'Maximum 16 gallery images allowed.', 400);
+        // Check limit
+        $maxImages = config('vibaro.limits.max_gallery_images', 16);
+        if ($page->galleryImages()->count() >= $maxImages) {
+            return $this->error('LIMIT_EXCEEDED', "Maximum {$maxImages} gallery images allowed.", 400);
         }
-
-        // Log request details for debugging
-        \Log::info('Gallery image store request', [
-            'content-type' => $request->header('content-type'),
-            'all_keys' => array_keys($request->all()),
-            'has_file' => $request->hasFile('image'),
-            'file_exists' => isset($_FILES['image']),
-            'files_dump' => count($_FILES),
-            'request_method' => $_SERVER['REQUEST_METHOD'],
-            'content_length' => $_SERVER['CONTENT_LENGTH'] ?? 'not set',
-        ]);
 
         try {
             $validated = $request->validate([
@@ -70,16 +53,7 @@ class GalleryImageController extends Controller
                 'title' => ['nullable', 'string', 'max:255'],
             ]);
         } catch (ValidationException $e) {
-            $file = $request->file('image');
-            \Log::warning('Gallery image validation failed', [
-                'errors' => $e->errors(),
-                'file' => $file ? [
-                    'name' => $file->getClientOriginalName(),
-                    'size' => $file->getSize(),
-                    'originalExtension' => $file->getClientOriginalExtension(),
-                ] : 'no file',
-            ]);
-            return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
+            return $this->validationError($e->errors());
         }
 
         // Store image
@@ -119,7 +93,7 @@ class GalleryImageController extends Controller
 
         $page = $request->user()->artistPage;
 
-        if (!$page || $image->artist_page_id !== $page->id) {
+        if ($image->artist_page_id !== $page->id) {
             return $this->error('FORBIDDEN', 'Access denied.', 403);
         }
 
@@ -131,7 +105,7 @@ class GalleryImageController extends Controller
                 'position' => ['sometimes', 'integer', 'min:0'],
             ]);
         } catch (ValidationException $e) {
-            return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
+            return $this->validationError($e->errors());
         }
 
         $image->update($validated);
@@ -160,7 +134,7 @@ class GalleryImageController extends Controller
 
         $page = $request->user()->artistPage;
 
-        if (!$page || $image->artist_page_id !== $page->id) {
+        if ($image->artist_page_id !== $page->id) {
             return $this->error('FORBIDDEN', 'Access denied.', 403);
         }
 
@@ -182,11 +156,6 @@ class GalleryImageController extends Controller
     public function reorder(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         try {
@@ -195,7 +164,7 @@ class GalleryImageController extends Controller
                 'image_ids.*' => ['integer', 'exists:gallery_images,id'],
             ]);
         } catch (ValidationException $e) {
-            return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
+            return $this->validationError($e->errors());
         }
 
         // Update positions
@@ -206,29 +175,5 @@ class GalleryImageController extends Controller
         }
 
         return $this->success(null);
-    }
-
-    /**
-     * Standard response helpers
-     */
-    private function success($data, int $status = 200): JsonResponse
-    {
-        return response()->json(['data' => $data], $status);
-    }
-
-    private function error(string $code, string $message, int $status = 400, ?array $errors = null): JsonResponse
-    {
-        $response = [
-            'error' => [
-                'code' => $code,
-                'message' => $message,
-            ],
-        ];
-
-        if ($errors) {
-            $response['error']['errors'] = $errors;
-        }
-
-        return response()->json($response, $status);
     }
 }

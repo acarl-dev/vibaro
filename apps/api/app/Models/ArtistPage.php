@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Spotlight;
 use App\Models\TrackingLink;
 use App\Models\ClickEvent;
@@ -94,7 +95,7 @@ class ArtistPage extends Model
         return $this->hasMany(Spotlight::class)->orderBy('starts_at', 'desc');
     }
 
-    public function activeSpotlight()
+    public function activeSpotlight(): HasOne
     {
         return $this->hasOne(Spotlight::class)->where('status', 'active');
     }

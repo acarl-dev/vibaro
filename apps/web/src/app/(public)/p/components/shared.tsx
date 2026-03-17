@@ -51,6 +51,7 @@ export type ReleaseItem = {
   cover_url?: string;
   url?: string;
   release_date?: string;
+  release_type?: string;
   is_featured?: boolean;
 };
 
@@ -97,7 +98,7 @@ export type SpotlightItem = {
 export type ContactItem = {
   label: string;
   type: "email" | "whatsapp";
-  value: string;
+  value?: string;
 };
 
 export type PublicArtistPageData = {
@@ -836,18 +837,38 @@ export function ContactSection({
 }
 
 // Public contact component — shows each contact type as a direct row (no emails exposed)
+// Fetches contact URL on click from the backend to avoid exposing emails/numbers in page source
+const CONTACT_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export function ContactInquiryButton({
   contacts,
   contact_message,
+  handle,
 }: {
   contacts?: ContactItem[];
   contact_message?: string | null;
+  handle: string;
 }) {
-  if (!contacts?.length) return null;
+  const validContacts = contacts?.filter((c) => c.label) ?? [];
+  if (!validContacts.length) return null;
 
-  const getLink = (c: ContactItem) => {
-    if (c.type === "whatsapp") return `https://wa.me/${c.value.replace(/[^0-9+]/g, "")}`;
-    return `mailto:${c.value}`;
+  const handleContactClick = async (contact: ContactItem) => {
+    try {
+      const res = await fetch(
+        `${CONTACT_API_BASE}/api/v1/p/${encodeURIComponent(handle)}/contact/${encodeURIComponent(contact.label)}`,
+      );
+      if (!res.ok) return;
+      const json = await res.json();
+      const url: string | undefined = json?.data?.url;
+      if (!url) return;
+      if (contact.type === "whatsapp") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = url;
+      }
+    } catch {
+      // silently ignore – button simply does nothing on network failure
+    }
   };
 
   // Email icon
@@ -873,7 +894,7 @@ export function ContactInquiryButton({
         </p>
       )}
       <div>
-        {contacts.map((contact, i) => (
+        {validContacts.map((contact, i) => (
           <div
             key={contact.label}
             style={{
@@ -881,16 +902,15 @@ export function ContactInquiryButton({
               alignItems: "center",
               justifyContent: "space-between",
               padding: "20px 0",
-              borderBottom: i < contacts.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              borderBottom: i < validContacts.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
             }}
           >
             <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#fff", letterSpacing: "-0.01em" }}>
               {contact.label}
             </span>
-            <a
-              href={getLink(contact)}
-              target={contact.type === "whatsapp" ? "_blank" : undefined}
-              rel={contact.type === "whatsapp" ? "noopener noreferrer" : undefined}
+            <button
+              type="button"
+              onClick={() => handleContactClick(contact)}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -904,7 +924,7 @@ export function ContactInquiryButton({
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 borderRadius: "4px",
-                textDecoration: "none",
+                cursor: "pointer",
                 transition: "background 0.2s, color 0.2s",
               }}
               onMouseEnter={(e) => {
@@ -918,7 +938,7 @@ export function ContactInquiryButton({
             >
               {contact.type === "whatsapp" ? <WhatsAppIcon /> : <EmailIcon />}
               {contact.type === "whatsapp" ? "Message" : "Email"}
-            </a>
+            </button>
           </div>
         ))}
       </div>
@@ -1075,7 +1095,7 @@ export function getAvailableSections(page: PublicArtistPageData) {
   return {
     hasVideos: (page.videos?.length ?? 0) > 0 && isSectionVisible("videos"),
     hasGallery: (page.gallery_images?.length ?? 0) > 0 && isSectionVisible("gallery"),
-    hasContact: !!(page.booking_email || page.management_email || page.press_email || page.whatsapp_number) && isSectionVisible("contact"),
+    hasContact: (page.contacts?.length ?? 0) > 0 && isSectionVisible("contact"),
     hasMusicPlayer: (page.featured_tracks?.length ?? 0) > 0 && isSectionVisible("music"),
     hasLinks: (page.links?.length ?? 0) > 0 && isSectionVisible("links"),
     hasShows: (page.shows?.length ?? 0) > 0 && isSectionVisible("shows"),
@@ -1108,11 +1128,9 @@ export function OptionalSections({ page }: { page: PublicArtistPageData }) {
       {hasContact && (
         <Section title="Contact">
           <ContactInquiryButton
-            booking_email={page.booking_email}
-            management_email={page.management_email}
-            press_email={page.press_email}
-            whatsapp_number={page.whatsapp_number}
+            contacts={page.contacts}
             contact_message={page.contact_message}
+            handle={page.handle}
           />
         </Section>
       )}

@@ -11,6 +11,7 @@ type Video = {
   description: string | null;
   thumbnail_url: string | null;
   position: number;
+  is_featured: boolean;
 };
 
 async function fetchVideos(): Promise<Video[]> {

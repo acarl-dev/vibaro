@@ -106,15 +106,6 @@ class TrackingLink extends Model
     }
 
     /**
-     * Legacy method for backward compatibility.
-     * @deprecated Use generateShortCode() instead
-     */
-    public static function generateSlug(): string
-    {
-        return static::generateShortCode();
-    }
-
-    /**
      * Increment click count atomically.
      */
     public function incrementClicks(): void

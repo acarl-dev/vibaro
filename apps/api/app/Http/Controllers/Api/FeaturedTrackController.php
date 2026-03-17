@@ -3,40 +3,42 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\FeaturedTrack;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class FeaturedTrackController extends Controller
 {
+    use ApiResponse;
+
     /**
      * GET /artist-pages/{id}/featured-tracks
      */
-    public function index(int $id)
+    public function index(int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
         $tracks = $artistPage->featuredTracks()->orderBy('position')->get();
 
-        return response()->json([
-            'data' => $tracks->map(fn($track) => [
-                'id' => $track->id,
-                'title' => $track->title,
-                'artist_name' => $track->artist_name,
-                'platform' => $track->platform,
-                'platform_url' => $track->platform_url,
-                'embed_id' => $track->embed_id,
-                'position' => $track->position,
-            ]),
-        ]);
+        return $this->success($tracks->map(fn($track) => [
+            'id' => $track->id,
+            'title' => $track->title,
+            'artist_name' => $track->artist_name,
+            'platform' => $track->platform,
+            'platform_url' => $track->platform_url,
+            'embed_id' => $track->embed_id,
+            'position' => $track->position,
+        ]));
     }
 
     /**
      * POST /artist-pages/{id}/featured-tracks
      */
-    public function store(Request $request, int $id)
+    public function store(Request $request, int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -63,23 +65,21 @@ class FeaturedTrackController extends Controller
 
         $track = $artistPage->featuredTracks()->create($validated);
 
-        return response()->json([
-            'data' => [
-                'id' => $track->id,
-                'title' => $track->title,
-                'artist_name' => $track->artist_name,
-                'platform' => $track->platform,
-                'platform_url' => $track->platform_url,
-                'embed_id' => $track->embed_id,
-                'position' => $track->position,
-            ],
+        return $this->success([
+            'id' => $track->id,
+            'title' => $track->title,
+            'artist_name' => $track->artist_name,
+            'platform' => $track->platform,
+            'platform_url' => $track->platform_url,
+            'embed_id' => $track->embed_id,
+            'position' => $track->position,
         ], 201);
     }
 
     /**
      * PATCH /artist-pages/{id}/featured-tracks/{trackId}
      */
-    public function update(Request $request, int $id, int $trackId)
+    public function update(Request $request, int $id, int $trackId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -103,23 +103,21 @@ class FeaturedTrackController extends Controller
 
         $track->update($validated);
 
-        return response()->json([
-            'data' => [
-                'id' => $track->id,
-                'title' => $track->title,
-                'artist_name' => $track->artist_name,
-                'platform' => $track->platform,
-                'platform_url' => $track->platform_url,
-                'embed_id' => $track->embed_id,
-                'position' => $track->position,
-            ],
+        return $this->success([
+            'id' => $track->id,
+            'title' => $track->title,
+            'artist_name' => $track->artist_name,
+            'platform' => $track->platform,
+            'platform_url' => $track->platform_url,
+            'embed_id' => $track->embed_id,
+            'position' => $track->position,
         ]);
     }
 
     /**
      * DELETE /artist-pages/{id}/featured-tracks/{trackId}
      */
-    public function destroy(int $id, int $trackId)
+    public function destroy(int $id, int $trackId): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -127,13 +125,13 @@ class FeaturedTrackController extends Controller
         $track = $artistPage->featuredTracks()->findOrFail($trackId);
         $track->delete();
 
-        return response()->json(null, 204);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * POST /artist-pages/{id}/featured-tracks/reorder
      */
-    public function reorder(Request $request, int $id)
+    public function reorder(Request $request, int $id): JsonResponse
     {
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
@@ -149,7 +147,7 @@ class FeaturedTrackController extends Controller
                 ->update(['position' => $position]);
         }
 
-        return response()->json(['message' => 'Reordered successfully']);
+        return $this->success(['ok' => true]);
     }
 
     /**

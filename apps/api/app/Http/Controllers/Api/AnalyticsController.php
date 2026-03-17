@@ -3,19 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\ClickEvent;
 use App\Models\PageViewEvent;
 use App\Models\Spotlight;
+use App\Services\BotDetectionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class AnalyticsController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get analytics overview for authenticated user's artist page.
      */
-    public function overview(Request $request)
+    public function overview(Request $request): JsonResponse
     {
         $request->validate([
             'range' => 'in:7d,30d',
@@ -29,15 +35,6 @@ class AnalyticsController extends Controller
         $campaignId = $request->input('campaign_id');
 
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $startDate = now()->subDays($days)->startOfDay();
 
@@ -172,29 +169,27 @@ class AnalyticsController extends Controller
             ->get()
             ->map(fn ($item) => ['date' => $item->date, 'views' => $item->views]);
 
-        return response()->json([
-            'data' => [
-                'range'            => $range,
-                'spotlight_id'     => $spotlightId,
-                'campaign_id'      => $campaignId,
-                'total_pageviews'  => $totalPageviews,
-                'unique_pageviews' => $uniquePageviews,
-                'total_clicks'     => $totalClicks,
-                'conversion_rate'  => $conversionRate,
-                'by_platform'      => $byPlatform,   // V2
-                'by_placement'     => $byPlacement,  // V2
-                'by_module'        => $byModule,      // Legacy
-                'by_referrer'      => $byReferrer,
-                'trend'            => $trend,
-                'pv_trend'         => $pvTrend,
-            ],
+        return $this->success([
+            'range'            => $range,
+            'spotlight_id'     => $spotlightId,
+            'campaign_id'      => $campaignId,
+            'total_pageviews'  => $totalPageviews,
+            'unique_pageviews' => $uniquePageviews,
+            'total_clicks'     => $totalClicks,
+            'conversion_rate'  => $conversionRate,
+            'by_platform'      => $byPlatform,   // V2
+            'by_placement'     => $byPlacement,  // V2
+            'by_module'        => $byModule,      // Legacy
+            'by_referrer'      => $byReferrer,
+            'trend'            => $trend,
+            'pv_trend'         => $pvTrend,
         ]);
     }
 
     /**
      * Get breakdown of clicks by platform and placement for a spotlight.
      */
-    public function breakdown(Request $request, \App\Services\AnalyticsService $service)
+    public function breakdown(Request $request, \App\Services\AnalyticsService $service): JsonResponse
     {
         $validated = $request->validate([
             'spotlight_id' => 'required|integer',
@@ -214,14 +209,14 @@ class AnalyticsController extends Controller
             $validated['period'] ?? '7d'
         );
 
-        return response()->json(['data' => $data]);
+        return $this->success($data);
     }
 
     /**
      * Record a page view from a public artist page.
      * Public endpoint – no authentication required.
      */
-    public function recordPageview(Request $request)
+    public function recordPageview(Request $request, BotDetectionService $botDetection): Response
     {
         $request->validate([
             'handle'       => 'required|string|max:64',
@@ -239,7 +234,7 @@ class AnalyticsController extends Controller
 
         // Bot / preview detection
         $userAgent = $request->userAgent() ?? '';
-        $isPreview = $this->isBot($userAgent);
+        $isPreview = $botDetection->isPreviewBot($userAgent);
 
         // Hash UA for dedup (never store raw UA)
         $uaHash = $userAgent ? hash('sha256', $userAgent) : null;
@@ -306,15 +301,9 @@ class AnalyticsController extends Controller
      * Current = active spotlight (or last ended if none active).
      * Previous = last ended spotlight (or second-to-last ended).
      */
-    public function comparison(Request $request): \Illuminate\Http\JsonResponse
+    public function comparison(Request $request, \App\Services\AnalyticsService $service): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => ['code' => 'no_artist_page', 'message' => 'No artist page found.'],
-            ], 404);
-        }
 
         $current = Spotlight::where('artist_page_id', $artistPage->id)
             ->where('status', 'active')
@@ -338,85 +327,17 @@ class AnalyticsController extends Controller
         }
 
         if (!$current) {
-            return response()->json(['data' => ['current' => null, 'previous' => null]]);
+            return $this->success(['current' => null, 'previous' => null]);
         }
 
-        return response()->json([
-            'data' => [
-                'current'  => $this->aggregatePhase($current),
-                'previous' => $previous ? $this->aggregatePhase($previous) : null,
-            ],
+        $formatPhase = fn (Spotlight $s) => array_merge(
+            ['id' => $s->id, 'title' => $s->title],
+            $service->getPhaseStats($s->id),
+        );
+
+        return $this->success([
+            'current'  => $formatPhase($current),
+            'previous' => $previous ? $formatPhase($previous) : null,
         ]);
-    }
-
-    /**
-     * Aggregate all-time metrics for a single spotlight.
-     * No date range – captures the full phase lifecycle.
-     */
-    private function aggregatePhase(Spotlight $spotlight): array
-    {
-        $id = $spotlight->id;
-
-        $totalClicks = ClickEvent::where('spotlight_id', $id)
-            ->where('is_preview', false)
-            ->count();
-
-        $qrClicks = ClickEvent::where('spotlight_id', $id)
-            ->where('platform', 'qr')
-            ->where('is_preview', false)
-            ->count();
-
-        $uniqueVisitors = PageViewEvent::where('spotlight_id', $id)
-            ->realViews()
-            ->whereNotNull('user_agent_hash')
-            ->distinct('user_agent_hash')
-            ->count('user_agent_hash');
-
-        // Conversion: total_clicks / unique_visitors × 100 (same MVP Option A logic as overview)
-        $conversion = $uniqueVisitors > 0
-            ? round($totalClicks / $uniqueVisitors * 100, 1)
-            : null;
-
-        $topPlatform = ClickEvent::where('spotlight_id', $id)
-            ->where('is_preview', false)
-            ->where('platform', '!=', 'qr')
-            ->whereNotNull('platform')
-            ->selectRaw('platform, COUNT(*) as clicks')
-            ->groupBy('platform')
-            ->orderByDesc('clicks')
-            ->first();
-
-        return [
-            'id'           => $spotlight->id,
-            'title'        => $spotlight->title,
-            'visitors'     => $uniqueVisitors,
-            'clicks'       => $totalClicks,
-            'qr_scans'     => $qrClicks,
-            'conversion'   => $conversion,
-            'top_platform' => $topPlatform?->platform,
-        ];
-    }
-
-    private function isBot(string $userAgent): bool
-    {
-        if (empty($userAgent)) {
-            return true;
-        }
-
-        $botPatterns = [
-            'bot', 'crawl', 'spider', 'slurp', 'mediapartners',
-            'facebookexternalhit', 'whatsapp', 'telegrambot',
-            'twitterbot', 'linkedinbot', 'discordbot', 'slackbot',
-            'preview', 'iframely', 'embedly',
-        ];
-
-        $ua = strtolower($userAgent);
-        foreach ($botPatterns as $pattern) {
-            if (str_contains($ua, $pattern)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

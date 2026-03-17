@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { togglePublishAction, updateVisibleSectionsAction } from "./actions";
-import { toggleShowOnPage, type Spotlight } from "@/lib/api/stage";
+import { toggleSpotlightVisibility } from "@/lib/api/spotlights";
+import type { SpotlightData as Spotlight } from "@/lib/api/spotlights";
 import { useToast } from "@/context/ToastContext";
 import LivePreviewPanel from "./LivePreviewPanel";
 import StudioButton from "../../components/StudioButton";
@@ -108,7 +109,11 @@ export default function PageOverviewClient({ page, activeSpotlight }: Props) {
     if (!activeSpotlight) return;
     setShowingOnPage(true);
     try {
-      await toggleShowOnPage(activeSpotlight.id);
+      const result = await toggleSpotlightVisibility(activeSpotlight.id, !activeSpotlight.show_on_page);
+      if (!result.success) {
+        showToast(result.error || "Fehler beim Aktualisieren", "error");
+        return;
+      }
       router.refresh();
     } catch {
       showToast("Fehler beim Aktualisieren", "error");

@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
         "Content-Type": request.headers.get("content-type") || "application/octet-stream",
       },
       body: bodyBuffer,
-      duplex: "half" as any,
+      // @ts-expect-error -- duplex is required for streaming bodies but not in RequestInit types
+      duplex: "half",
     });
 
     // Get response text first to debug HTML errors

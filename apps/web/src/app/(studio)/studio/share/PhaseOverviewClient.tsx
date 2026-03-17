@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { endSpotlight } from "@/lib/api/stage";
+import { endSpotlight } from "@/lib/api/spotlights";
 import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
 import StudioEmptyState from "../../components/StudioEmptyState";
@@ -102,7 +102,11 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics, schedu
     if (!activeSpotlight) return;
     setIsEnding(true);
     try {
-      await endSpotlight(activeSpotlight.id);
+      const result = await endSpotlight(activeSpotlight.id);
+      if (!result.success) {
+        showToast(result.error || "Fehler beim Beenden der Phase.", "error");
+        return;
+      }
       showToast("Phase beendet.", "success");
       router.refresh();
     } catch {

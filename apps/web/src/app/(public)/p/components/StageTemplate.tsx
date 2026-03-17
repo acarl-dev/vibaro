@@ -50,12 +50,7 @@ export default function StageTemplate({
   const hasReleases = (page.releases?.length ?? 0) > 0;
   const hasFeaturedTracks = (page.featured_tracks?.length ?? 0) > 0;
   const hasLinks = (page.links?.length ?? 0) > 0;
-  const hasContact = !!(
-    page.booking_email ||
-    page.management_email ||
-    page.press_email ||
-    page.whatsapp_number
-  );
+  const hasContact = (page.contacts?.length ?? 0) > 0;
 
   return (
     <>
@@ -132,11 +127,9 @@ export default function StageTemplate({
               className="flex justify-center"
             >
               <ContactInquiryButton
-                booking_email={page.booking_email}
-                management_email={page.management_email}
-                press_email={page.press_email}
-                whatsapp_number={page.whatsapp_number}
+                contacts={page.contacts}
                 contact_message={page.contact_message}
+                handle={page.handle}
               />
             </section>
           )}

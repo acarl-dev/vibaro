@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import Image from "next/image";
 import {
   PublicArtistPageData,
+  ContactItem,
   ReleaseItem,
   ShowItem,
   LinkItem,
@@ -113,11 +114,7 @@ export default function MinimalTemplate({
   const hasShows = upcomingShows.length > 0;
   const hasVideos = (page.videos?.length ?? 0) > 0;
   const hasLinks = (page.links?.length ?? 0) > 0;
-  const hasContact = !!(
-    page.booking_email ||
-    page.management_email ||
-    page.press_email
-  );
+  const hasContact = (page.contacts?.length ?? 0) > 0;
 
   return (
     <>
@@ -168,9 +165,8 @@ export default function MinimalTemplate({
           {/* Contact - Section 6.6 */}
           {hasContact && (
             <MinimalContact
-              booking_email={page.booking_email}
-              management_email={page.management_email}
-              press_email={page.press_email}
+              contacts={page.contacts}
+              handle={page.handle}
             />
           )}
         </main>
@@ -599,22 +595,34 @@ function MinimalLinks({ items }: { items: LinkItem[] }) {
 // -----------------------------------------------------------------------------
 
 function MinimalContact({
-  booking_email,
-  management_email,
-  press_email,
+  contacts,
+  handle,
 }: {
-  booking_email?: string | null;
-  management_email?: string | null;
-  press_email?: string | null;
+  contacts?: ContactItem[];
+  handle: string;
 }) {
-  // Only include email contacts - phone numbers are NOT rendered in Minimal
-  const contacts = [
-    { label: "Booking", email: booking_email },
-    { label: "Management", email: management_email },
-    { label: "Press", email: press_email },
-  ].filter((c) => c.email);
+  const validContacts = contacts?.filter((c) => c.label) ?? [];
+  if (validContacts.length === 0) return null;
 
-  if (contacts.length === 0) return null;
+  const handleContactClick = async (contact: ContactItem) => {
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const res = await fetch(
+        `${API_BASE}/api/v1/p/${encodeURIComponent(handle)}/contact/${encodeURIComponent(contact.label)}`,
+      );
+      if (!res.ok) return;
+      const json = await res.json();
+      const url: string | undefined = json?.data?.url;
+      if (!url) return;
+      if (contact.type === "whatsapp") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = url;
+      }
+    } catch {
+      // silently ignore
+    }
+  };
 
   return (
     <MinimalSection title="Contact">
@@ -628,11 +636,12 @@ function MinimalContact({
           gap: TOKENS.space[3],
         }}
       >
-        {contacts.map((contact, index) => (
+        {validContacts.map((contact, index) => (
           <li key={index}>
-            {/* Only the label is visible - email is hidden in mailto: href */}
-            <a
-              href={`mailto:${contact.email}`}
+            {/* Only the label is visible - contact resolved server-side on click */}
+            <button
+              type="button"
+              onClick={() => handleContactClick(contact)}
               className="minimal-link"
               style={{
                 display: "block",
@@ -642,10 +651,15 @@ function MinimalContact({
                 fontWeight: TOKENS.bodyWeight,
                 color: TOKENS.fg,
                 textDecoration: "none",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                textAlign: "left",
+                width: "100%",
               }}
             >
               {contact.label}
-            </a>
+            </button>
           </li>
         ))}
       </ul>

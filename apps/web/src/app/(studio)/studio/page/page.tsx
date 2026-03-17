@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/api/backend";
 import PageOverviewClient from "./PageOverviewClient";
-import type { Spotlight } from "@/lib/api/stage";
+import type { SpotlightData as Spotlight } from "@/lib/api/spotlights";
 
 type ArtistPage = {
   id: number;

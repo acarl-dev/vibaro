@@ -54,7 +54,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
 
       setSaveStatus("saving");
       try {
-        const res = await fetch("/api/studio/artist-page", {
+        const res = await fetch("/api/studio/artist-pages", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

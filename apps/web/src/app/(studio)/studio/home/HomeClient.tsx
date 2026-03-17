@@ -7,7 +7,7 @@ import type {
   PreviousSpotlightData,
   TrafficSnapshotData,
   CompletenessItem,
-} from "@/lib/api/studio";
+} from "@/lib/api/studio.types";
 import { PLATFORMS } from "@/lib/platforms";
 
 type HomeClientProps = {

@@ -117,7 +117,7 @@ class Spotlight extends Model
     /**
      * Ensure only one active spotlight per artist page.
      */
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
 

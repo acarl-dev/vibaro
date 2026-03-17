@@ -12,16 +12,19 @@ class ReleasePolicy
 
     public function view(User $user, Release $release): bool
     {
-        return $user->id === $release->artistPage->user_id;
+        $artistPage = $user->artistPage;
+        return $artistPage && $release->artist_page_id === $artistPage->id;
     }
 
     public function update(User $user, Release $release): bool
     {
-        return $user->id === $release->artistPage->user_id;
+        $artistPage = $user->artistPage;
+        return $artistPage && $release->artist_page_id === $artistPage->id;
     }
 
     public function delete(User $user, Release $release): bool
     {
-        return $user->id === $release->artistPage->user_id;
+        $artistPage = $user->artistPage;
+        return $artistPage && $release->artist_page_id === $artistPage->id;
     }
 }

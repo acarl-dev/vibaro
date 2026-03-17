@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
  */
 export function useLazyLoad<T extends HTMLElement = HTMLDivElement>(
   options?: IntersectionObserverInit
-): [React.RefObject<T>, boolean] {
+): [React.RefObject<T | null>, boolean] {
   const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
 

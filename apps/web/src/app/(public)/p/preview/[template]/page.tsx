@@ -95,9 +95,11 @@ const PREVIEW_DATA: Record<string, PublicArtistPageData> = {
       { title: "Foto 3", image_url: "/images/preview/gallery-3.jpg" },
       { title: "Foto 4", image_url: "/images/preview/gallery-4.jpg" },
     ],
-    booking_email: "booking@example.com",
-    management_email: "management@example.com",
-    press_email: "press@example.com",
+    contacts: [
+      { label: "Booking", type: "email" },
+      { label: "Management", type: "email" },
+      { label: "Press", type: "email" },
+    ],
   },
 
   stage: {
@@ -192,8 +194,10 @@ const PREVIEW_DATA: Record<string, PublicArtistPageData> = {
       { title: "Live 3", image_url: "/images/preview/stage-gallery-3.jpg" },
       { title: "Backstage", image_url: "/images/preview/stage-gallery-4.jpg" },
     ],
-    booking_email: "booking@example.com",
-    management_email: "management@example.com",
+    contacts: [
+      { label: "Booking", type: "email" },
+      { label: "Management", type: "email" },
+    ],
   },
 
   editorial: {
@@ -258,8 +262,10 @@ const PREVIEW_DATA: Record<string, PublicArtistPageData> = {
       { title: "Studio", image_url: "/images/preview/editorial-gallery-2.jpg" },
       { title: "Artwork", image_url: "/images/preview/editorial-gallery-3.jpg" },
     ],
-    booking_email: "booking@example.com",
-    press_email: "press@example.com",
+    contacts: [
+      { label: "Booking", type: "email" },
+      { label: "Press", type: "email" },
+    ],
   },
 
   minimal: {
@@ -305,7 +311,9 @@ const PREVIEW_DATA: Record<string, PublicArtistPageData> = {
         url: "https://vimeo.com/123456789",
       },
     ],
-    booking_email: "contact@example.com",
+    contacts: [
+      { label: "Contact", type: "email" },
+    ],
   },
 };
 

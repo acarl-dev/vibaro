@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -33,7 +34,7 @@ class PageViewEvent extends Model
     }
 
     /** Exclude preview / bot clicks. */
-    public function scopeRealViews($query)
+    public function scopeRealViews(Builder $query): Builder
     {
         return $query->where('is_preview', false);
     }

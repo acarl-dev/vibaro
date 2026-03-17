@@ -3,11 +3,11 @@ services:
     image: postgres:16
     container_name: vibaro-db
     environment:
-      POSTGRES_DB: vibaro
-      POSTGRES_USER: vibaro
-      POSTGRES_PASSWORD: vibaro
+      POSTGRES_DB: ${POSTGRES_DB:-vibaro}
+      POSTGRES_USER: ${POSTGRES_USER:-vibaro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vibaro}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - vibaro_db_data:/var/lib/postgresql/data
 

@@ -23,11 +23,25 @@ return Application::configure(basePath: dirname(__DIR__))
                 
                 return Limit::perMinute(60)->by($key);
             });
+
+            RateLimiter::for('auth', function (Request $request) {
+                // 5 attempts per minute per IP for auth endpoints
+                return Limit::perMinute(5)->by($request->ip());
+            });
+
+            RateLimiter::for('public-api', function (Request $request) {
+                // 30 requests per minute per IP for public endpoints
+                return Limit::perMinute(30)->by($request->ip());
+            });
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+
+        $middleware->alias([
+            'artist-page' => \App\Http\Middleware\EnsureHasArtistPage::class,
         ]);
         
         // API should return 401, not redirect to login

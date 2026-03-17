@@ -3,28 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Campaign;
 use App\Models\Spotlight;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class CampaignController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get all campaigns for authenticated user's artist page.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $campaigns = Campaign::where('artist_page_id', $artistPage->id)
             ->with(['spotlight:id,title'])
@@ -45,24 +40,15 @@ class CampaignController extends Controller
                 ];
             });
 
-        return response()->json(['data' => $campaigns]);
+        return $this->success($campaigns);
     }
 
     /**
      * Create a new campaign.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -77,12 +63,7 @@ class CampaignController extends Controller
         if (!empty($validated['spotlight_id'])) {
             $spotlight = Spotlight::find($validated['spotlight_id']);
             if (!$spotlight || $spotlight->artist_page_id !== $artistPage->id) {
-                return response()->json([
-                    'error' => [
-                        'code' => 'invalid_spotlight',
-                        'message' => 'Spotlight does not belong to your artist page.',
-                    ],
-                ], 403);
+                return $this->error('INVALID_SPOTLIGHT', 'Spotlight does not belong to your artist page.', 403);
             }
         }
 
@@ -96,18 +77,16 @@ class CampaignController extends Controller
             'ends_at' => $validated['ends_at'] ?? null,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $campaign->id,
-                'name' => $campaign->name,
-            ],
+        return $this->success([
+            'id' => $campaign->id,
+            'name' => $campaign->name,
         ], 201);
     }
 
     /**
      * Update an existing campaign.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id): JsonResponse
     {
         $campaign = Campaign::findOrFail($id);
 
@@ -126,24 +105,19 @@ class CampaignController extends Controller
         if (isset($validated['spotlight_id']) && $validated['spotlight_id'] !== null) {
             $spotlight = Spotlight::find($validated['spotlight_id']);
             if (!$spotlight || $spotlight->artist_page_id !== $campaign->artist_page_id) {
-                return response()->json([
-                    'error' => [
-                        'code' => 'invalid_spotlight',
-                        'message' => 'Spotlight does not belong to your artist page.',
-                    ],
-                ], 403);
+                return $this->error('INVALID_SPOTLIGHT', 'Spotlight does not belong to your artist page.', 403);
             }
         }
 
         $campaign->update($validated);
 
-        return response()->json(['data' => ['ok' => true]]);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * Delete a campaign.
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(Request $request, int $id): JsonResponse
     {
         $campaign = Campaign::findOrFail($id);
 
@@ -151,6 +125,6 @@ class CampaignController extends Controller
 
         $campaign->delete();
 
-        return response()->json(['data' => ['ok' => true]]);
+        return $this->success(['ok' => true]);
     }
 }

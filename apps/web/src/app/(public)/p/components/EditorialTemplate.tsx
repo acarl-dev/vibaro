@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import {
   PublicArtistPageData,
+  ContactItem,
   ReleaseItem,
   ShowItem,
   LinkItem,
@@ -149,9 +150,8 @@ export default function EditorialTemplate({
         {/* Footer */}
         <EditorialFooter
           links={hasLinks ? page.links : []}
-          booking_email={page.booking_email}
-          management_email={page.management_email}
-          press_email={page.press_email}
+          contacts={page.contacts}
+          handle={page.handle}
           displayName={page.display_name}
         />
       </div>
@@ -701,25 +701,37 @@ function EditorialGallery({
 
 function EditorialFooter({
   links,
-  booking_email,
-  management_email,
-  press_email,
+  contacts,
+  handle,
   displayName,
 }: {
   links: LinkItem[];
-  booking_email?: string | null;
-  management_email?: string | null;
-  press_email?: string | null;
+  contacts?: ContactItem[];
+  handle: string;
   displayName: string;
 }) {
-  const contacts = [
-    { label: "Booking", value: booking_email },
-    { label: "Management", value: management_email },
-    { label: "Press", value: press_email },
-  ].filter((c) => c.value);
-
   const hasLinks = links.length > 0;
-  const hasContacts = contacts.length > 0;
+  const hasContacts = (contacts?.length ?? 0) > 0;
+
+  const handleContactClick = async (contact: ContactItem) => {
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const res = await fetch(
+        `${API_BASE}/api/v1/p/${encodeURIComponent(handle)}/contact/${encodeURIComponent(contact.label)}`,
+      );
+      if (!res.ok) return;
+      const json = await res.json();
+      const url: string | undefined = json?.data?.url;
+      if (!url) return;
+      if (contact.type === "whatsapp") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = url;
+      }
+    } catch {
+      // silently ignore
+    }
+  };
 
   return (
     <footer
@@ -786,18 +798,23 @@ function EditorialFooter({
                 Contact
               </p>
               <div className="flex flex-col gap-1">
-                {contacts.map((contact, index) => (
-                  <a
+                {contacts!.map((contact, index) => (
+                  <button
                     key={index}
-                    href={`mailto:${contact.value}`}
-                    className="hover:opacity-70 transition-opacity duration-200"
+                    type="button"
+                    onClick={() => handleContactClick(contact)}
+                    className="hover:opacity-70 transition-opacity duration-200 text-left"
                     style={{
                       fontSize: "13px",
                       color: TOKENS.textMuted,
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
                     }}
                   >
                     {contact.label}
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>

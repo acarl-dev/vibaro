@@ -3,24 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class VideoController extends Controller
 {
+    use ApiResponse;
     /**
      * List all videos for authenticated user's artist page
      */
     public function index(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
 
         $videos = $page->videos()->orderBy('position')->get();
 
@@ -43,16 +40,12 @@ class VideoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
-        // Check limit (max 8 videos for Artist plan)
-        if ($page->videos()->count() >= 8) {
-            return $this->error('LIMIT_EXCEEDED', 'Maximum 8 videos allowed.', 400);
+        // Check limit
+        $maxVideos = config('vibaro.limits.max_videos', 8);
+        if ($page->videos()->count() >= $maxVideos) {
+            return $this->error('LIMIT_EXCEEDED', "Maximum {$maxVideos} videos allowed.", 400);
         }
 
         try {
@@ -63,7 +56,7 @@ class VideoController extends Controller
                 'description' => ['nullable', 'string', 'max:1000'],
             ]);
         } catch (ValidationException $e) {
-            return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
+            return $this->validationError($e->errors());
         }
 
         // Extract video ID from URL
@@ -112,7 +105,7 @@ class VideoController extends Controller
 
         $page = $request->user()->artistPage;
 
-        if (!$page || $video->artist_page_id !== $page->id) {
+        if ($video->artist_page_id !== $page->id) {
             return $this->error('FORBIDDEN', 'Access denied.', 403);
         }
 
@@ -127,7 +120,7 @@ class VideoController extends Controller
                 'position' => ['sometimes', 'integer', 'min:0'],
             ]);
         } catch (ValidationException $e) {
-            return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
+            return $this->validationError($e->errors());
         }
 
         // If URL or platform changed, re-extract video ID
@@ -171,7 +164,7 @@ class VideoController extends Controller
 
         $page = $request->user()->artistPage;
 
-        if (!$page || $video->artist_page_id !== $page->id) {
+        if ($video->artist_page_id !== $page->id) {
             return $this->error('FORBIDDEN', 'Access denied.', 403);
         }
 
@@ -188,11 +181,6 @@ class VideoController extends Controller
     public function reorder(Request $request): JsonResponse
     {
         $page = $request->user()->artistPage;
-
-        if (!$page) {
-            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
-        }
-
         $this->authorize('update', $page);
 
         try {
@@ -201,7 +189,7 @@ class VideoController extends Controller
                 'video_ids.*' => ['integer', 'exists:videos,id'],
             ]);
         } catch (ValidationException $e) {
-            return $this->error('VALIDATION_ERROR', 'Validation failed.', 400, $e->errors());
+            return $this->validationError($e->errors());
         }
 
         // Update positions
@@ -228,7 +216,7 @@ class VideoController extends Controller
 
         $page = $request->user()->artistPage;
 
-        if (!$page || $video->artist_page_id !== $page->id) {
+        if ($video->artist_page_id !== $page->id) {
             return $this->error('FORBIDDEN', 'Access denied.', 403);
         }
 
@@ -250,29 +238,5 @@ class VideoController extends Controller
             'id' => $video->id,
             'is_featured' => $video->is_featured,
         ]);
-    }
-
-    /**
-     * Standard response helpers
-     */
-    private function success($data, int $status = 200): JsonResponse
-    {
-        return response()->json(['data' => $data], $status);
-    }
-
-    private function error(string $code, string $message, int $status = 400, ?array $errors = null): JsonResponse
-    {
-        $response = [
-            'error' => [
-                'code' => $code,
-                'message' => $message,
-            ],
-        ];
-
-        if ($errors) {
-            $response['error']['errors'] = $errors;
-        }
-
-        return response()->json($response, $status);
     }
 }

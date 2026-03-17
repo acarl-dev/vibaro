@@ -228,6 +228,7 @@ export default function ModernTemplate({
                 <ContactInquiryButton
                   contacts={page.contacts}
                   contact_message={page.contact_message}
+                  handle={page.handle}
                 />
               </div>
             </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { AnalyticsBreakdown } from "@/lib/api/stage";
+import { AnalyticsBreakdown } from "@/lib/api/analytics";
 import { getPlatform, getPlacement } from "@/lib/platforms";
 
 type Props = {

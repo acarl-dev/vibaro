@@ -1,4 +1,4 @@
-import { fetchAnalytics } from "@/lib/api/analytics";
+import { fetchAnalytics } from "@/lib/api/analytics.server";
 import { fetchSpotlights, SpotlightData } from "@/lib/api/spotlights";
 import { backendFetch } from "@/lib/api/backend";
 import ResultsClient from "./ResultsClient";

@@ -11,6 +11,8 @@ type ArtistPage = {
   avatar_url: string | null;
   hero_image_url: string | null;
   logo_url: string | null;
+  hero_focal_x: number;
+  hero_focal_y: number;
 };
 
 async function fetchArtistPage(): Promise<ArtistPage | null> {

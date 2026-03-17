@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AnalyticsData } from "@/lib/api/analytics";
-import { SpotlightData } from "@/lib/api/spotlights";
+import type { AnalyticsData } from "@/lib/api/analytics";
+import type { SpotlightData } from "@/lib/api/spotlights";
 import { PLATFORMS } from "@/lib/platforms";
-import { getAnalyticsBreakdown, AnalyticsBreakdown } from "@/lib/api/stage";
+import { fetchAnalyticsBreakdown, type AnalyticsBreakdown } from "@/lib/api/analytics";
 import PlatformBreakdown from "@/components/studio/results/PlatformBreakdown";
 import StudioPageHeader from "../../components/StudioPageHeader";
 import StudioEmptyState from "../../components/StudioEmptyState";
@@ -38,7 +38,7 @@ export default function ResultsClient({
   useEffect(() => {
     if (spotlightFilter) {
       setLoadingBreakdown(true);
-      getAnalyticsBreakdown(spotlightFilter, range)
+      fetchAnalyticsBreakdown(spotlightFilter, range)
         .then(setBreakdownData)
         .catch((error) => {
           console.error("Failed to load breakdown:", error);

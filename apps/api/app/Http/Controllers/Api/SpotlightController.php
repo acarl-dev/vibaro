@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Spotlight;
 use App\Services\MetadataService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class SpotlightController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Shared formatter: convert a Spotlight model instance to API array.
      */
@@ -45,7 +49,7 @@ class SpotlightController extends Controller
      * Fetch oEmbed metadata from a public URL (Spotify, YouTube, SoundCloud, etc.).
      * Used by the frontend to auto-fill project details on URL paste.
      */
-    public function fetchMetadata(Request $request, MetadataService $metadataService)
+    public function fetchMetadata(Request $request, MetadataService $metadataService): JsonResponse
     {
         $validated = $request->validate([
             'url' => 'required|url|max:1000',
@@ -53,50 +57,30 @@ class SpotlightController extends Controller
 
         $meta = $metadataService->fetchFromUrl($validated['url']);
 
-        return response()->json(['data' => $meta]);
+        return $this->success($meta);
     }
 
     /**
      * Get active spotlight for authenticated user's artist page.
      */
-    public function active(Request $request)
+    public function active(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
             ->active()
             ->where('status', 'active')
             ->first();
 
-        return response()->json([
-            'data' => $spotlight ? $this->spotlightToArray($spotlight) : null,
-        ]);
+        return $this->success($spotlight ? $this->spotlightToArray($spotlight) : null);
     }
 
     /**
      * Get all spotlights for authenticated user's artist page.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $showArchived = $request->boolean('archived');
 
@@ -109,24 +93,15 @@ class SpotlightController extends Controller
             ->get()
             ->map(fn($s) => $this->spotlightToArray($s));
 
-        return response()->json(['data' => $spotlights]);
+        return $this->success($spotlights);
     }
 
     /**
      * Create a new spotlight.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
-
-        if (!$artistPage) {
-            return response()->json([
-                'error' => [
-                    'code' => 'no_artist_page',
-                    'message' => 'No artist page found for this user.',
-                ],
-            ], 404);
-        }
 
         $validated = $request->validate([
             'title'              => 'required|string|max:255',
@@ -172,13 +147,13 @@ class SpotlightController extends Controller
             'show_on_page'       => $validated['show_on_page'] ?? true,
         ]);
 
-        return response()->json(['data' => $this->spotlightToArray($spotlight)], 201);
+        return $this->success($this->spotlightToArray($spotlight), 201);
     }
 
     /**
      * Update an existing spotlight.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
@@ -205,13 +180,13 @@ class SpotlightController extends Controller
 
         $spotlight->update($validated);
 
-        return response()->json(['data' => $this->spotlightToArray($spotlight->fresh())]);
+        return $this->success($this->spotlightToArray($spotlight->fresh()));
     }
 
     /**
      * Activate a spotlight (only one active per artist page).
      */
-    public function activate(Request $request, int $id)
+    public function activate(Request $request, int $id): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
@@ -220,15 +195,13 @@ class SpotlightController extends Controller
         // Model boot hook handles deactivating other spotlights
         $spotlight->update(['status' => 'active']);
 
-        return response()->json([
-            'data' => ['active_spotlight_id' => $spotlight->id],
-        ]);
+        return $this->success(['active_spotlight_id' => $spotlight->id]);
     }
 
     /**
      * End a spotlight.
      */
-    public function end(Request $request, int $id)
+    public function end(Request $request, int $id): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
@@ -245,15 +218,13 @@ class SpotlightController extends Controller
             ->active()
             ->update(['archived_at' => now()]);
 
-        return response()->json([
-            'data' => ['ended_spotlight_id' => $spotlight->id],
-        ]);
+        return $this->success(['ended_spotlight_id' => $spotlight->id]);
     }
 
     /**
      * Toggle show_on_page for a spotlight.
      */
-    public function toggleShowOnPage(Spotlight $spotlight)
+    public function toggleShowOnPage(Spotlight $spotlight): JsonResponse
     {
         Gate::authorize('update', $spotlight);
 
@@ -261,80 +232,63 @@ class SpotlightController extends Controller
             'show_on_page' => !$spotlight->show_on_page,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $spotlight->id,
-                'show_on_page' => $spotlight->show_on_page,
-            ],
+        return $this->success([
+            'id' => $spotlight->id,
+            'show_on_page' => $spotlight->show_on_page,
         ]);
     }
 
     /**
      * Archive a spotlight (soft delete).
      */
-    public function archive(Request $request, int $id)
+    public function archive(Request $request, int $id): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
         Gate::authorize('archive', $spotlight);
 
         if ($spotlight->isArchived()) {
-            return response()->json([
-                'error' => [
-                    'code' => 'already_archived',
-                    'message' => 'This spotlight is already archived.',
-                ],
-            ], 400);
+            return $this->error('ALREADY_ARCHIVED', 'This spotlight is already archived.', 400);
         }
 
         $spotlight->archive();
 
-        return response()->json(['data' => ['ok' => true]]);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * Permanently delete an archived spotlight.
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(Request $request, int $id): JsonResponse
     {
         $spotlight = Spotlight::withoutGlobalScopes()->findOrFail($id);
 
         Gate::authorize('delete', $spotlight);
 
         if (!$spotlight->isArchived()) {
-            return response()->json([
-                'error' => [
-                    'code' => 'not_archived',
-                    'message' => 'Only archived spotlights can be permanently deleted.',
-                ],
-            ], 400);
+            return $this->error('NOT_ARCHIVED', 'Only archived spotlights can be permanently deleted.', 400);
         }
 
         $spotlight->delete();
 
-        return response()->json(['data' => ['ok' => true]]);
+        return $this->success(['ok' => true]);
     }
 
     /**
      * Restore an archived spotlight.
      */
-    public function restore(Request $request, int $id)
+    public function restore(Request $request, int $id): JsonResponse
     {
         $spotlight = Spotlight::withoutGlobalScopes()->findOrFail($id);
 
         Gate::authorize('restore', $spotlight);
 
         if (!$spotlight->isArchived()) {
-            return response()->json([
-                'error' => [
-                    'code' => 'not_archived',
-                    'message' => 'This spotlight is not archived.',
-                ],
-            ], 400);
+            return $this->error('NOT_ARCHIVED', 'This spotlight is not archived.', 400);
         }
 
         $spotlight->restore();
 
-        return response()->json(['data' => $this->spotlightToArray($spotlight->fresh())]);
+        return $this->success($this->spotlightToArray($spotlight->fresh()));
     }
 }
