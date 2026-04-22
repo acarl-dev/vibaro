@@ -14,29 +14,50 @@ class PublicArtistPageController extends Controller
 
     public function show(string $handle): JsonResponse
     {
-        $query = ArtistPage::where('handle', $handle);
-
-        // If user is authenticated, check if they own this page
-        $user = auth('sanctum')->user();
-        $isOwner = false;
-
-        if ($user) {
-            $artistPage = ArtistPage::where('handle', $handle)->first();
-            $isOwner = $artistPage && $artistPage->user_id === $user->id;
-        }
-
-        // If not owner, only show published pages
-        if (!$isOwner) {
-            $query->where('is_published', true);
-        }
-
-        $page = $query->with(['links', 'shows', 'releases', 'featuredTracks', 'videos', 'galleryImages'])
+        $page = ArtistPage::where('handle', $handle)
+            ->where('is_published', true)
+            ->with(['links', 'shows', 'releases', 'featuredTracks', 'videos', 'galleryImages'])
             ->first();
 
         if (!$page) {
             return $this->error('NOT_FOUND', 'Artist page not found or unpublished.', 404);
         }
 
+        return $this->buildPageResponse($page);
+    }
+
+    /**
+     * GET /p/{handle}/preview
+     *
+     * Auth + ownership required. Returns full page data regardless of is_published.
+     * Used by the Next.js Server Component owner-preview flow (never cached).
+     * The public route GET /p/{handle} is cacheable because it only serves published pages.
+     */
+    public function preview(string $handle): JsonResponse
+    {
+        $user = auth('sanctum')->user();
+
+        $page = ArtistPage::where('handle', $handle)
+            ->with(['links', 'shows', 'releases', 'featuredTracks', 'videos', 'galleryImages'])
+            ->first();
+
+        if (!$page) {
+            return $this->error('NOT_FOUND', 'Artist page not found.', 404);
+        }
+
+        if ($page->user_id !== $user->id) {
+            return $this->error('FORBIDDEN', 'You do not own this artist page.', 403);
+        }
+
+        return $this->buildPageResponse($page);
+    }
+
+    /**
+     * Build the shared JSON response for both show() and preview().
+     * Contains all page data including spotlight, links, shows, releases, etc.
+     */
+    private function buildPageResponse(ArtistPage $page): JsonResponse
+    {
         // Load active spotlight that should be shown on page (Hero Banner)
         $activeSpotlight = $page->spotlights()
             ->where('status', 'active')

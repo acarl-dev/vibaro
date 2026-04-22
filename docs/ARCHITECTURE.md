@@ -31,8 +31,21 @@ Vibaro is a B2C SaaS to create and publish musician mini-homepages. MVP focuses 
 
 ### Public Artist Page Rendering
 - Public pages are served by Next.js route `/p/[handle]`.
-- Data is fetched from API public endpoint.
-- Must be fast and cache-friendly.
+- Data is fetched from API public endpoint with `next: { revalidate: 60 }` (cache-friendly).
+- Owner preview (`is_published=false`) uses a separate authenticated endpoint `GET /api/v1/p/{handle}/preview` with `cache: "no-store"`. The public route and the preview route are intentionally separate so the public path remains uniformly cacheable.
+
+## Route Handler Categories (When to use a BFF Route Handler)
+
+The BFF pattern (Route Handlers in `apps/web/src/app/api/`) is intentional and mandatory for auth security. Not every call needs to go through a Route Handler. Use this classification:
+
+| Category | Rule | Example |
+|---|---|---|
+| **Auth-sensitive** | Must use Route Handler — token must never reach the browser | All Studio endpoints (`/api/v1/studio/**`) |
+| **Upload proxy** | Must use Route Handler — multipart must be proxied via `request.arrayBuffer()` | `upload-flyer`, `upload-cover`, `upload-avatar` |
+| **Public, directly fetchable** | Server Components may call the Laravel API directly (no Route Handler needed) | `GET /api/v1/p/{handle}` (anonymous, published pages) |
+| **Public but transformed** | Use a Route Handler only if the Server Component needs data from multiple sources merged, or the shape must differ from what Laravel returns | Future: aggregated landing-page data |
+
+The key invariant: if a call requires the `vibaro_token` cookie, it must go through a Route Handler or a server-only utility (`backendFetch()` in `src/lib/api/backend.ts`). Direct client-side calls to Laravel are only acceptable for truly public, unauthenticated endpoints.
 
 ## Non-Goals (MVP)
 - No mobile app, no AI features, no complex analytics platform.

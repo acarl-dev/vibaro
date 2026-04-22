@@ -7,8 +7,7 @@ import StageTemplate from "../components/StageTemplate";
 import EditorialTemplate from "../components/EditorialTemplate";
 import MinimalTemplate from "../components/MinimalTemplate";
 import PageviewTracker from "../components/PageviewTracker";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { backendFetch, getBackendBaseUrl } from "@/lib/api/backend";
 
 type PublicPageApiData = Record<string, unknown>;
 
@@ -28,21 +27,44 @@ function normalizePublicPageData(data: PublicPageApiData): PublicArtistPageData 
 // Data Fetching
 // -----------------------------------------------------------------------------
 
-async function fetchPublicPage(handle: string, token?: string): Promise<PublicArtistPageData | null> {
-  if (!API_BASE_URL) return null;
+/**
+ * Public fetch — served only when the page is published.
+ * Cache-friendly: revalidate every 60s. A short delay after Publish is acceptable for MVP.
+ * No auth header is sent, so the response is uniform and safe to cache.
+ */
+async function fetchPublicPage(handle: string): Promise<PublicArtistPageData | null> {
+  const baseUrl = getBackendBaseUrl();
+  if (!baseUrl) return null;
 
   try {
-    const headers: HeadersInit = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const res = await fetch(`${API_BASE_URL}/api/v1/p/${handle}`, {
-      cache: "no-store",
-      headers,
+    const res = await fetch(`${baseUrl}/api/v1/p/${handle}`, {
+      next: { revalidate: 60 },
     });
 
     if (res.status === 404) return null;
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    const data = json?.data as PublicPageApiData | null;
+    if (!data) return null;
+    return normalizePublicPageData(data);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Owner preview fetch — bypasses is_published, requires auth + ownership.
+ * Always fresh (no-store). Only called when the visitor has a vibaro_token cookie,
+ * i.e. is a logged-in user viewing their own unpublished page in preview mode.
+ */
+async function fetchOwnerPreview(handle: string): Promise<PublicArtistPageData | null> {
+  try {
+    const res = await backendFetch(`/api/v1/p/${handle}/preview`, {
+      cache: "no-store",
+    });
+
+    if (res.status === 403 || res.status === 404) return null;
     if (!res.ok) return null;
 
     const json = await res.json();
@@ -65,8 +87,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { handle } = await params;
   const cookieStore = await cookies();
-  const token = cookieStore.get("vibaro_token")?.value;
-  const page = await fetchPublicPage(handle, token);
+  const hasToken = !!cookieStore.get("vibaro_token")?.value;
+  const page = hasToken
+    ? await fetchOwnerPreview(handle) ?? await fetchPublicPage(handle)
+    : await fetchPublicPage(handle);
 
   if (!page) {
     return { title: "Not Found" };
@@ -89,8 +113,15 @@ export default async function PublicArtistPage({
 }) {
   const { handle } = await params;
   const cookieStore = await cookies();
-  const token = cookieStore.get("vibaro_token")?.value;
-  const page = await fetchPublicPage(handle, token);
+  const hasToken = !!cookieStore.get("vibaro_token")?.value;
+
+  // If the visitor has a session token, try the owner preview endpoint first.
+  // This lets the owner see their own unpublished page.
+  // Fall back to the public (published-only, cached) fetch if preview returns null
+  // (e.g. the page belongs to another user).
+  const page = hasToken
+    ? await fetchOwnerPreview(handle) ?? await fetchPublicPage(handle)
+    : await fetchPublicPage(handle);
 
   if (!page) {
     notFound();

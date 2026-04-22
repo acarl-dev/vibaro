@@ -46,6 +46,10 @@ Route::prefix('v1')->group(function () {
 
     // Auth (protected)
     Route::middleware('auth:sanctum')->group(function () {
+        // Owner preview for artist pages (bypasses is_published; auth + ownership required).
+        // Used by the Next.js Server Component to render an unpublished page for the owner.
+        Route::get('/p/{handle}/preview', [PublicArtistPageController::class, 'preview']);
+
         // Auth & onboarding (no artist page required)
         Route::get('/artist-pages/me', [ArtistPageController::class, 'me']);
         Route::post('/artist-pages', [ArtistPageController::class, 'store']);
