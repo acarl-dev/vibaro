@@ -313,13 +313,13 @@ class AnalyticsController extends Controller
         if ($current) {
             $previous = Spotlight::where('artist_page_id', $artistPage->id)
                 ->where('status', 'ended')
-                ->latest('ended_at')
+                ->latest('ends_at')
                 ->first();
         } else {
             // No active phase: compare last two ended phases
             $ended    = Spotlight::where('artist_page_id', $artistPage->id)
                 ->where('status', 'ended')
-                ->latest('ended_at')
+                ->latest('ends_at')
                 ->limit(2)
                 ->get();
             $current  = $ended->get(0);

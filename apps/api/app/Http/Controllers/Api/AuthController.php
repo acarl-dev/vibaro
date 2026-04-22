@@ -99,11 +99,18 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
+        $page = $user->artistPage;
 
         return $this->success([
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'artist_page' => $page ? [
+                'id' => $page->id,
+                'handle' => $page->handle,
+                'is_published' => (bool) $page->is_published,
+                'published_at' => $page->published_at?->toISOString(),
+            ] : null,
         ]);
     }
 }

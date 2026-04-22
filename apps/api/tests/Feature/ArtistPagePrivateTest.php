@@ -237,6 +237,8 @@ class ArtistPagePrivateTest extends TestCase
             'display_name' => 'Hacker',
         ]);
 
-        $response->assertStatus(403);
+        // Controller returns 404 (not 403) to avoid revealing that the resource
+        // exists for another user — intentional enumeration protection (see SECURITY.md).
+        $response->assertStatus(404);
     }
 }

@@ -300,7 +300,8 @@ Leitprinzipien:
 - **Keine Duplikate**: Pro Spotlight kann es nur einen aktiven Link pro (platform, placement) geben.
 - Archivierung löscht keine Click-Historie.
 - **utm_campaign basiert immer auf spotlight.slug**, nicht auf spotlight.title.
-- click_count ist ein Cache für Performance (Top-Listen), echte Analytics basieren auf click_events.
+- click_count is a Cache für Performance (Top-Listen), echte Analytics basieren auf click_events.
+- **click_count zählt ausschließlich nicht als Preview klassifizierte Klicks** (`is_preview = false`). Preview-Bots (WhatsApp, Telegram, Facebook Link Crawler etc.) werden zwar als ClickEvent gespeichert, erhöhen aber `click_count` nicht. Deshalb kann `click_count` kleiner sein als die Gesamtzahl der ClickEvents für denselben Link.
 
 ---
 
@@ -326,6 +327,12 @@ Leitprinzipien:
 - No fingerprinting.
 - No personal user profiles.
 
+**Unique-Visitor-Einschränkung (MVP)**
+- `user_agent_hash` wird als Näherungswert für Besucher-Deduplizierung genutzt (ein Visit pro UA-Hash/Tag/Kontext).
+- Das ist eine **grobe Heuristik**: Mehrere echte Nutzer mit demselben Browser/Gerät/Version teilen denselben Hash und werden als ein Besucher gezählt.
+- Folge: `unique_pageviews` und `visitors` unterschätzen die reale Besucherzahl. Für grobe Trendanalysen ausreichend, für präzise Attribution oder Conversion-Vergleiche nicht belastbar.
+- **MVP-only.** Für Stage Pro / Insights ist ein robusteres Modell notwendig (z.B. serverseitig generierte Session-Token ohne personenbezogene Daten).
+
 ---
 
 ## Optional: daily_rollups
@@ -350,3 +357,36 @@ Leitprinzipien:
 - FK constraints must always be active.
 - Public queries must never expose internal IDs.
 - New development must align with PRODUCT_V2.md.
+
+---
+
+# V1 → V2 Konsolidierungsplan
+
+## Aktueller Status
+
+V1 (Mini-Homepage) und V2 (Stage System) laufen im Schema und in der API parallel. Das ist für die MVP-Übergangsphase bewusst so.
+
+## Was ist Source of Truth
+
+| Bereich | Führende Version | Begründung |
+|---|---|---|
+| Spotlight / Phase / Analytics | **V2** | Aktives Produkt |
+| TrackingLinks, ClickEvents, PageViews | **V2** | Aktives Produkt |
+| Artist Page Metadaten | **V1 + V2 gemischt** | `contacts`-Array ist neue SoT, Legacy-Felder bleiben kompatibel |
+| Links, Shows, Releases, Videos, Gallery | **V1** | Noch aktiv, kein V2-Äquivalent geplant |
+| `focus_type` | **Legacy / abgekündigt** | Nicht mehr im Produkt, Feld lebt im Schema aber wird nicht mehr befüllt |
+
+## Regeln für neue Features
+
+- **Neue Features landen ausschließlich in V2-Strukturen** (Spotlights, TrackingLinks, ClickEvents).
+- V1-Felder werden nicht erweitert; sie werden nur noch kompatibel gehalten.
+- Neue API-Endpunkte folgen V2-Konventionen und Contracts.
+
+## Exit-Bedingung für V1
+
+V1-Felder und -Logik werden erst entfernt, wenn:
+1. Das V2-Äquivalent stabil ist und genutzt wird.
+2. Keine aktiven Nutzer mehr V1-only-Daten haben.
+3. Ein expliziter Migrations-Plan existiert (inkl. Backfill-Migration).
+
+Bis dahin gilt: **V1-Code nicht aktiv löschen, aber auch nicht erweitern.**

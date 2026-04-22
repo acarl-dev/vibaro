@@ -100,7 +100,6 @@ Response:
 ## GET /me
 
 Auth required.
-Wird für Redirect- & Onboarding-Logik genutzt.
 
 Response:
 
@@ -113,13 +112,15 @@ Response:
     "artist_page": {
       "id": 10,
       "handle": "emily-j",
-      "is_onboarded": true,
       "is_published": false,
       "published_at": null
     }
   }
 }
 ```
+
+> `artist_page` is `null` when the user has not yet created a page (→ redirect to onboarding).
+> Use `artist_page === null` as the onboarding gate; there is no `is_onboarded` field.
 
 ---
 
@@ -140,15 +141,11 @@ Response:
     "bio": "Independent artist from Berlin",
     "avatar_url": "https://cdn...",
     "hero_image_url": null,
-    "focus_type": "links",
-    "is_onboarded": true,
     "is_published": false,
     "published_at": null
   }
 }
 ```
-
-> Note: `focus_type` is part of V1 product logic. In V2 it may be removed or repurposed.
 
 ---
 

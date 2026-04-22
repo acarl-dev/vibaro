@@ -19,17 +19,6 @@ export type ArtistPageData = {
   theme_variant?: string | null;
 };
 
-async function fetchMe(): Promise<{ data: { artist_page?: { is_onboarded: boolean } | null } | null; status: number }> {
-  try {
-    const res = await backendFetch("/api/v1/me", { cache: "no-store" });
-    if (!res.ok) return { data: null, status: res.status };
-    const json = await res.json();
-    return { data: json?.data ?? null, status: res.status };
-  } catch {
-    return { data: null, status: 500 };
-  }
-}
-
 async function fetchHasActiveSpotlight(): Promise<boolean> {
   try {
     const res = await backendFetch("/api/v1/spotlights/active", { cache: "no-store" });
@@ -71,11 +60,8 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   const token = await getTokenFromCookies();
   if (!token) redirect("/login?next=/studio");
 
-  const [{ data: me, status: meStatus }, { data: page, status: pageStatus }, hasActivePhase] =
-    await Promise.all([fetchMe(), fetchArtistPage(), fetchHasActiveSpotlight()]);
-
-  if (meStatus === 401 || meStatus === 403) redirect("/login?next=/studio");
-  if (me?.artist_page?.is_onboarded === false) redirect("/studio/onboarding");
+  const [{ data: page, status: pageStatus }, hasActivePhase] =
+    await Promise.all([fetchArtistPage(), fetchHasActiveSpotlight()]);
 
   if (pageStatus === 401 || pageStatus === 403) redirect("/login?next=/studio");
   if (!page) redirect("/studio/onboarding");

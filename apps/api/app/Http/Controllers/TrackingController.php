@@ -83,8 +83,12 @@ class TrackingController extends Controller
             'occurred_at' => now()->utc(), // Always store in UTC
         ]);
 
-        // Increment denormalized click counter on tracking link
-        $trackingLink->increment('click_count');
+        // Only increment the human-click cache for real (non-preview) clicks.
+        // Preview bots (WhatsApp, Telegram, Facebook link crawlers, etc.) must not
+        // inflate click_count, as it is used for top-link rankings and quick stats.
+        if (!$isPreview) {
+            $trackingLink->increment('click_count');
+        }
     }
 
     /**
