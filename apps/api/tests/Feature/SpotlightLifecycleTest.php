@@ -314,6 +314,28 @@ class SpotlightLifecycleTest extends TestCase
         $this->assertNull($newActive->archived_at);
     }
 
+    public function test_model_archive_helper_normalizes_active_spotlight_state(): void
+    {
+        [, $page] = $this->createUserWithArtistPage('model-archive-owner');
+
+        $spotlight = Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Model Archive Active',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/model-archive-active',
+            'show_on_page' => true,
+        ]);
+
+        $spotlight->archive();
+        $spotlight->refresh();
+
+        $this->assertSame('ended', $spotlight->status);
+        $this->assertFalse((bool) $spotlight->show_on_page);
+        $this->assertNotNull($spotlight->archived_at);
+        $this->assertNotNull($spotlight->ends_at);
+    }
+
     private function createUserWithArtistPage(string $handle = 'artist'): array
     {
         $user = User::factory()->create();

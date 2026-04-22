@@ -22,7 +22,7 @@ class TrackingLinkController extends Controller
         $artistPage = $request->user()->artistPage;
 
         $trackingLinks = TrackingLink::where('artist_page_id', $artistPage->id)
-            ->active()
+            ->notArchived()
             ->with(['spotlight:id,title', 'campaign:id,name'])
             ->orderByDesc('created_at')
             ->get()
@@ -76,7 +76,7 @@ class TrackingLinkController extends Controller
         $existing = TrackingLink::where('spotlight_id', $spotlight->id)
             ->where('platform', $validated['platform'])
             ->where('placement', $validated['placement'])
-            ->active()
+            ->notArchived()
             ->first();
 
         if ($existing) {
@@ -141,7 +141,7 @@ class TrackingLinkController extends Controller
             ->where('platform', $validated['platform'])
             ->where('placement', $validated['placement'])
             ->where('artist_page_id', $artistPage->id)
-            ->active()
+            ->notArchived()
             ->first();
 
         return $this->success([

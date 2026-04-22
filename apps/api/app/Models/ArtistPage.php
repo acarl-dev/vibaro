@@ -97,7 +97,7 @@ class ArtistPage extends Model
 
     public function activeSpotlight(): HasOne
     {
-        return $this->hasOne(Spotlight::class)->active();
+        return $this->hasOne(Spotlight::class)->currentlyActive();
     }
 
     public function trackingLinks(): HasMany

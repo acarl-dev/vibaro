@@ -60,7 +60,7 @@ class PublicArtistPageController extends Controller
     {
         // Load active spotlight that should be shown on page (Hero Banner)
         $activeSpotlight = $page->spotlights()
-            ->active()
+            ->currentlyActive()
             ->where('show_on_page', true)
             ->first();
 

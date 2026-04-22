@@ -67,9 +67,9 @@ class TrackingLink extends Model
     }
 
     /**
-     * Scope to only include non-archived tracking links.
+     * Scope to only include tracking links that are not archived.
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeNotArchived(Builder $query): Builder
     {
         return $query->whereNull('archived_at');
     }

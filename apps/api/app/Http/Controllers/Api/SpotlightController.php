@@ -69,7 +69,7 @@ class SpotlightController extends Controller
         $artistPage = $request->user()->artistPage;
 
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
-            ->active()
+            ->currentlyActive()
             ->first();
 
         return $this->success($spotlight ? $this->spotlightToArray($spotlight) : null);

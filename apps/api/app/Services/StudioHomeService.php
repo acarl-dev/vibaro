@@ -206,7 +206,7 @@ class StudioHomeService
 
         $links = TrackingLink::where('spotlight_id', $spotlight['id'])
             ->where('artist_page_id', $artistPage->id)
-            ->active()
+            ->notArchived()
             ->orderByDesc('click_count')
             ->limit(3)
             ->get();

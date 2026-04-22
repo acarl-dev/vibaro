@@ -27,7 +27,7 @@ class SpotlightLifecycleService
             Spotlight::query()
                 ->where('artist_page_id', $spotlight->artist_page_id)
                 ->where('id', '!=', $spotlight->id)
-                ->active()
+                ->currentlyActive()
                 ->lockForUpdate()
                 ->get()
                 ->each(fn (Spotlight $other) => $this->endInternal($other, $endedAt));

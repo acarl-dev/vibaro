@@ -66,9 +66,9 @@ class Spotlight extends Model
     }
 
     /**
-     * Scope to only include the current active spotlight state.
+     * Scope to only include spotlights that are currently active.
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeCurrentlyActive(Builder $query): Builder
     {
         return $query
             ->where('status', 'active')
@@ -97,7 +97,19 @@ class Spotlight extends Model
      */
     public function archive(): void
     {
-        $this->update(['archived_at' => now()]);
+        $archivedAt = now();
+
+        $updates = [
+            'archived_at' => $archivedAt,
+        ];
+
+        if ($this->status === 'active') {
+            $updates['status'] = 'ended';
+            $updates['ends_at'] = $this->ends_at ?? $archivedAt;
+            $updates['show_on_page'] = false;
+        }
+
+        $this->update($updates);
     }
 
     /**

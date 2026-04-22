@@ -273,7 +273,7 @@ class AnalyticsController extends Controller
         $spotlightId = $request->input('spotlight_id');
         if (!$spotlightId) {
             $active      = $artistPage->spotlights()
-                ->active()
+                ->currentlyActive()
                 ->first();
             $spotlightId = $active?->id;
         }
@@ -329,7 +329,7 @@ class AnalyticsController extends Controller
         $artistPage = $request->user()->artistPage;
 
         $current = Spotlight::where('artist_page_id', $artistPage->id)
-            ->active()
+            ->currentlyActive()
             ->latest()
             ->first();
 
