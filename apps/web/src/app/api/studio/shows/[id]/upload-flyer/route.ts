@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { backendFetch, getBackendBaseUrl, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/backend";
+import { backendFetch, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/backend";
 
 
+/**
+ * POST /api/studio/shows/[id]/upload-flyer
+ * Uploads a flyer image for a show
+ * Forwards to: POST /api/v1/artist-pages/{artistPageId}/shows/{showId}/upload-flyer
+ *
+ * Uses arrayBuffer() to forward the raw multipart body without re-encoding,
+ * preserving the exact Content-Type boundary that Laravel's parser expects.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -17,14 +25,18 @@ export async function POST(
   try {
     const { id } = await params;
     const artistPageId = await getMyArtistPageId();
-    const formData = await request.formData();
+    const bodyBuffer = await request.arrayBuffer();
 
-    const response = await fetch(
-      `${getBackendBaseUrl()}/api/v1/artist-pages/${artistPageId}/shows/${id}/upload-flyer`,
+    const response = await backendFetch(
+      `/api/v1/artist-pages/${artistPageId}/shows/${id}/upload-flyer`,
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+        headers: {
+          "Content-Type": request.headers.get("content-type") || "application/octet-stream",
+        },
+        body: bodyBuffer,
+        // @ts-expect-error -- duplex required for streaming bodies
+        duplex: "half",
       }
     );
 

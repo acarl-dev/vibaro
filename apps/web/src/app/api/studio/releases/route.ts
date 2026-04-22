@@ -1,78 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMyArtistPageId } from "@/lib/api/backend";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-/**
- * Get the current user's artist page ID by calling /api/v1/artist-pages/me
- */
-async function safeJson(response: Response): Promise<unknown | null> {
-  try {
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
+import { backendFetch, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/backend";
 
 /**
  * GET /api/studio/releases
  * Gets all releases for current user's artist page
  * Forwards to: GET /api/v1/artist-pages/{id}/releases
  */
-export async function GET(request: NextRequest) {
-  if (!API_BASE_URL) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "CONFIG_ERROR",
-          message: "API base URL is not configured.",
-        },
-      },
-      { status: 500 }
-    );
-  }
-
-  const token = request.cookies.get("vibaro_token")?.value;
+export async function GET() {
+  const token = await getTokenFromCookies();
   if (!token) {
     return NextResponse.json(
-      {
-        error: {
-          code: "UNAUTHORIZED",
-          message: "Authentication required",
-        },
-      },
+      { error: { code: "UNAUTHORIZED", message: "Authentication required" } },
       { status: 401 }
     );
   }
 
   try {
     const artistPageId = await getMyArtistPageId();
-
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/artist-pages/${artistPageId}/releases`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    const response = await backendFetch(
+      `/api/v1/artist-pages/${artistPageId}/releases`,
+      { method: "GET" }
     );
 
-    const data = await safeJson(response);
-    if (data) {
-      return NextResponse.json(data, { status: response.status });
-    }
-
-    return NextResponse.json(
-      {
-        error: {
-          code: "UPSTREAM_ERROR",
-          message: "Release service did not return valid JSON.",
-        },
-      },
-      { status: 502 }
-    );
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
     return NextResponse.json(
       {
@@ -92,27 +43,10 @@ export async function GET(request: NextRequest) {
  * Forwards to: POST /api/v1/artist-pages/{id}/releases
  */
 export async function POST(request: NextRequest) {
-  if (!API_BASE_URL) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "CONFIG_ERROR",
-          message: "API base URL is not configured.",
-        },
-      },
-      { status: 500 }
-    );
-  }
-
-  const token = request.cookies.get("vibaro_token")?.value;
+  const token = await getTokenFromCookies();
   if (!token) {
     return NextResponse.json(
-      {
-        error: {
-          code: "UNAUTHORIZED",
-          message: "Authentication required",
-        },
-      },
+      { error: { code: "UNAUTHORIZED", message: "Authentication required" } },
       { status: 401 }
     );
   }
@@ -121,32 +55,17 @@ export async function POST(request: NextRequest) {
     const artistPageId = await getMyArtistPageId();
     const body = await request.json();
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/artist-pages/${artistPageId}/releases`,
+    const response = await backendFetch(
+      `/api/v1/artist-pages/${artistPageId}/releases`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       }
     );
 
-    const data = await safeJson(response);
-    if (data) {
-      return NextResponse.json(data, { status: response.status });
-    }
-
-    return NextResponse.json(
-      {
-        error: {
-          code: "UPSTREAM_ERROR",
-          message: "Release service did not return valid JSON.",
-        },
-      },
-      { status: 502 }
-    );
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
     return NextResponse.json(
       {

@@ -6,6 +6,9 @@ import { backendFetch, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/
  * POST /api/studio/releases/[id]/upload-cover
  * Uploads a cover image for a release
  * Forwards to: POST /api/v1/artist-pages/{artistPageId}/releases/{releaseId}/upload-cover
+ *
+ * Uses arrayBuffer() to forward the raw multipart body without re-encoding,
+ * preserving the exact Content-Type boundary that Laravel's parser expects.
  */
 export async function POST(
   request: NextRequest,
@@ -27,18 +30,18 @@ export async function POST(
   try {
     const { id } = await params;
     const artistPageId = await getMyArtistPageId();
-    const formData = await request.formData();
+    const bodyBuffer = await request.arrayBuffer();
 
-    // Forward the request to Laravel backend
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const response = await fetch(
-      `${backendUrl}/api/v1/artist-pages/${artistPageId}/releases/${id}/upload-cover`,
+    const response = await backendFetch(
+      `/api/v1/artist-pages/${artistPageId}/releases/${id}/upload-cover`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": request.headers.get("content-type") || "application/octet-stream",
         },
-        body: formData,
+        body: bodyBuffer,
+        // @ts-expect-error -- duplex required for streaming bodies
+        duplex: "half",
       }
     );
 

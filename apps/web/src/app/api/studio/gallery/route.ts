@@ -60,16 +60,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const token = await getTokenFromCookies();
-    
     // Read the entire request body as a buffer to preserve the exact multipart encoding
     const bodyBuffer = await request.arrayBuffer();
-    
-    console.log("[Gallery POST] Forwarding request to backend", {
-      token: token ? "present" : "missing",
-      contentType: request.headers.get("content-type"),
-      bodySize: bodyBuffer.byteLength,
-    });
 
     // Forward the entire body buffer with the original Content-Type header
     const response = await backendFetch("/api/v1/studio/gallery", {
@@ -88,14 +80,7 @@ export async function POST(request: NextRequest) {
     let data;
     try {
       data = JSON.parse(responseText);
-    } catch (e) {
-      // Response is not JSON - likely an error page
-      console.error("[Gallery Upload] Backend returned non-JSON response:", {
-        status: response.status,
-        contentType: response.headers.get("content-type"),
-        responsePreview: responseText.substring(0, 500),
-      });
-      
+    } catch {
       return NextResponse.json(
         {
           error: {
@@ -106,15 +91,7 @@ export async function POST(request: NextRequest) {
         { status: response.status || 500 }
       );
     }
-    
-    console.log("[Gallery Upload]", {
-      status: response.status,
-      ok: response.ok,
-      errorCode: data.error?.code,
-      errorMessage: data.error?.message,
-      uploadedId: data.data?.id,
-    });
-    
+
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });
     }

@@ -1,33 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!API_BASE_URL) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "CONFIG_ERROR",
-          message: "API base URL is not configured.",
-        },
-      },
-      { status: 500 }
-    );
-  }
-
-  const token = request.cookies.get("vibaro_token")?.value;
-
+  const token = await getTokenFromCookies();
   if (!token) {
     return NextResponse.json(
-      {
-        error: {
-          code: "UNAUTHENTICATED",
-          message: "User is not authenticated.",
-        },
-      },
+      { error: { code: "UNAUTHENTICATED", message: "User is not authenticated." } },
       { status: 401 }
     );
   }
@@ -50,30 +31,13 @@ export async function PATCH(
   }
 
   try {
-    const apiResponse = await fetch(`${API_BASE_URL}/api/v1/artist-pages/${id}`, {
+    const apiResponse = await backendFetch(`/api/v1/artist-pages/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
-    let json: unknown;
-    try {
-      json = await apiResponse.json();
-    } catch {
-      return NextResponse.json(
-        {
-          error: {
-            code: "UPSTREAM_ERROR",
-            message: "Artist page service did not return valid JSON.",
-          },
-        },
-        { status: 502 }
-      );
-    }
-
+    const json = await apiResponse.json();
     return NextResponse.json(json, { status: apiResponse.status });
   } catch {
     return NextResponse.json(
