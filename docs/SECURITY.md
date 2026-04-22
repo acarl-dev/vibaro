@@ -18,29 +18,52 @@ Zielbilder oder härtere Soll-Vorgaben gehören nicht hierher.
 
 ---
 
-## 2) Authentifizierung: tatsächlicher Token-Fluss
+## 2) Authentifizierung: Auth-Architektur und Token-Fluss
 
-Aktuell wird token-basierte Auth mit Laravel Sanctum Personal Access Tokens verwendet.
+### Bewusstes Modell: Bearer-Token im httpOnly Cookie via BFF
 
-Der reale Login-/Register-Pfad ist:
+Vibaro verwendet **kein klassisches Sanctum-Session/CSRF-Cookie-Modell**, sondern ein bewusstes BFF-Muster:
+
+| Eigenschaft | Klassisch (Session/CSRF) | Vibaro (Bearer via BFF) |
+|---|---|---|
+| Token-Typ | Session-Cookie + CSRF-Token | Sanctum Personal Access Token |
+| Token-Speicherort | Server-Session + Browser-Cookie | httpOnly Cookie (`vibaro_token`) |
+| Authorization-Header | keiner (Cookie automatisch) | Bearer-Token, nur serverseitig gesetzt |
+| Wer setzt den Header | Laravel intern | ausschließlich `backendFetch()` |
+| Browser-JS-Zugriff auf Token | nein | nein |
+
+**Warum kein klassisches Session-Modell:**
+- Sanctum-Session-Auth erfordert `cookie`-Middleware und SPA-Domain-Konfiguration, die für das BFF-Muster überflüssige Komplexität erzeugt.
+- Personal Access Tokens funktionieren stateless; die Next.js-BFF-Schicht übernimmt die Zustandshaltung im httpOnly Cookie.
+- Das Modell bleibt erweiterbar (zukünftige Token-Rotation, Multi-Device-Sessions) ohne Laravel-Session-Infrastruktur.
+
+### Token-Fluss
 
 ```text
-Browser -> Next.js Route Handler -> Laravel API -> Next.js Route Handler -> httpOnly Cookie
+Browser -> Next.js Route Handler (BFF) -> Laravel API
+                                                 |
+                              Token in JSON-Response (server-only)
+                                                 |
+                    Next.js setzt httpOnly Cookie <- 
+                    Browser erhält: { user, next } (kein Token)
 ```
 
-Wichtig dabei:
+Präzise Aussagen für den Ist-Zustand:
 
-- Laravel `POST /api/v1/auth/login` und `POST /api/v1/auth/register` liefern aktuell `data.token` in ihrer JSON-Response.
-- Dieser Token wird nicht an Browser-JavaScript weitergereicht, sondern im Next.js Route Handler gelesen und als `vibaro_token`-Cookie gesetzt.
-- Die BFF-Responses an den Browser enthalten aktuell `user` und `next`, aber keinen Token.
-- Der Token ist danach browserseitig nicht über Client-JS lesbar, weil der Cookie `httpOnly` gesetzt wird.
+- Laravel `POST /api/v1/auth/login` und `POST /api/v1/auth/register` liefern `data.token` in der JSON-Response — aber nur an den Next.js Route Handler, nicht an den Browser.
+- Dieser Token wird im Route Handler gelesen und als `vibaro_token`-Cookie mit `HttpOnly` gesetzt.
+- Die BFF-Response an den Browser enthält `user` und `next`, aber keinen Token.
+- Der Token ist für Browser-JavaScript nicht lesbar.
 
-Die präzise Aussage für den Ist-Zustand lautet daher:
+### Zwingend geltende Regeln
 
-- Der Token ist nicht browserseitig lesbar.
-- Der Token wird aber intern vom Laravel-Auth-Endpoint an die Next.js-BFF-Route ausgeliefert.
+Diese Regeln sind nicht optional:
 
-Nicht korrekt als Current-State wäre die Aussage, der Token tauche nirgends in einer API-Response auf.
+1. **Token darf nie an Browser-JS gelangen.** Kein Route Handler darf den Token als JSON-Feld zurückgeben.
+2. **Nur `backendFetch()` darf den Authorization-Header setzen.** Direkte `fetch()`-Aufrufe mit manuellem `Authorization: Bearer ...` in Route Handlern sind verboten — ausgenommen die initialen Auth-Endpunkte (`/auth/login`, `/auth/register`, `/auth/logout`), die den Token noch nicht aus dem Cookie lesen können.
+3. **Kein direkter Laravel-Aufruf aus Client Components.** Authentifizierte Requests aus Client Components laufen immer über einen Next.js-BFF-Endpunkt unter `/api/...`.
+4. **`backendFetch()` ist server-only.** Die Datei `apps/web/src/lib/api/backend.ts` enthält `import "server-only"` — sie darf nicht in Client Components importiert werden.
+5. **Token nie in Client-Storage.** `localStorage`, `sessionStorage` und explizite Cookies per Client-JS sind verboten.
 
 ---
 
@@ -138,11 +161,46 @@ Schutzgedanke:
 
 ---
 
-## 10) Never-Do-Liste
+## 10) Token-Lifecycle und Session-Invalidation
 
-- ❌ Tokens in Client-Storage speichern
+### Aktuelles Modell (MVP)
+
+- Sanctum Personal Access Tokens haben kein serverseitiges Ablaufdatum im MVP. Der Token bleibt gültig, bis er explizit revoziert wird.
+- **Logout** ruft `DELETE /api/v1/auth/logout` auf, wodurch Laravel den Token aus der `personal_access_tokens`-Tabelle löscht. Anschließend wird das `vibaro_token`-Cookie im Browser gelöscht.
+- **Session-Invalidation** durch Logout ist damit vollständig: Token ist weder im Cookie noch in der Datenbank vorhanden.
+
+### Token-Rotation (zukünftig)
+
+Wenn Token-Rotation eingeführt wird, muss sie ausschließlich serverseitig ablaufen:
+
+```text
+BFF-Route empfängt Request -> Token abgelaufen? -> backendFetch refresh-Endpoint
+                                                          |
+                                          neuer Token in JSON-Response
+                                                          |
+                                    httpOnly Cookie aktualisieren <- 
+                                    Response mit neuem Token an Client weitergeben
+```
+
+Der Client bekommt dabei keinen Token zu sehen — er erhält lediglich eine neue erfolgreiche Response.
+
+### Was NICHT erlaubt ist
+
+- Token-Expiry-Prüfung im Client-JS
+- Token-Refresh aus Client Components direkt gegen Laravel
+- Ablaufzeit oder Token-Value in JSON-Responses an den Browser
+
+---
+
+## 11) Never-Do-Liste
+
+- ❌ Tokens in Client-Storage speichern (`localStorage`, `sessionStorage`, explizite Client-Cookies)
 - ❌ BFF umgehen, wenn Browser-Auth nötig ist
-- ❌ Token-Re-Exposure über einen Next.js Route Handler
+- ❌ Token als JSON-Feld in BFF-Response an den Browser zurückgeben
+- ❌ Direkte `fetch()`-Aufrufe mit manuellem `Authorization: Bearer ...` in Studio Route Handlern (stattdessen `backendFetch()` verwenden)
+- ❌ Authentifizierte Laravel-Calls direkt aus Client Components
+- ❌ `backendFetch()` oder `getTokenFromCookies()` in Client Components importieren
 - ❌ CORS-Wildcards in Production
 - ❌ Uploads ohne Server-Prüfung
 - ❌ öffentliche Responses mit privaten Userdaten
+- ❌ Token-Expiry-Logik im Browser
