@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/artist-pages/search?q=${encodeURIComponent(q)}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/artist-pages/search?q=${encodeURIComponent(q)}`,
       { cache: "no-store" }
     );
 

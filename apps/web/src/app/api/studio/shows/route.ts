@@ -1,25 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
+import { backendFetch, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/backend";
 
-/**
- * Get the current user's artist page ID by calling /api/v1/artist-pages/me
- */
-async function getMyArtistPageId(): Promise<number> {
-  const response = await backendFetch("/api/v1/artist-pages/me");
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch artist page");
-  }
-
-  const json = await response.json();
-  const id = json?.data?.id;
-
-  if (!id) {
-    throw new Error("Artist page ID not found");
-  }
-
-  return id;
-}
 
 /**
  * GET /api/studio/shows

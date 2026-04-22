@@ -60,3 +60,24 @@ export async function backendFetch(
     headers,
   });
 }
+
+/**
+ * Get the current user's artist page ID.
+ * Throws if the user is unauthenticated or has no artist page.
+ */
+export async function getMyArtistPageId(): Promise<number> {
+  const response = await backendFetch("/api/v1/artist-pages/me");
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch artist page: ${response.status}`);
+  }
+
+  const json = await response.json();
+  const id = json?.data?.id;
+
+  if (!id) {
+    throw new Error("Artist page ID not found");
+  }
+
+  return id;
+}

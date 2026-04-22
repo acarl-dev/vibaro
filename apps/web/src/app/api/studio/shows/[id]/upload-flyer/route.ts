@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { backendFetch, getTokenFromCookies, getBackendBaseUrl } from "@/lib/api/backend";
+import { backendFetch, getBackendBaseUrl, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/backend";
 
-async function getMyArtistPageId(): Promise<number> {
-  const response = await backendFetch("/api/v1/artist-pages/me");
-  if (!response.ok) throw new Error("Failed to fetch artist page");
-  const json = await response.json();
-  return json?.data?.id;
-}
 
 export async function POST(
   request: NextRequest,

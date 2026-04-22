@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getMyArtistPageId } from "@/lib/api/backend";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -13,32 +14,6 @@ async function safeJson(response: Response): Promise<unknown | null> {
   }
 }
 
-async function getMyArtistPageId(token: string): Promise<number> {
-  if (!API_BASE_URL) {
-    throw new Error("API base URL not configured");
-  }
-
-  const response = await fetch(`${API_BASE_URL}/api/v1/artist-pages/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const payload = await safeJson(response);
-    const message = (payload as { error?: { message?: string } })?.error?.message;
-    throw new Error(message || "Failed to fetch artist page");
-  }
-
-  const json = await response.json();
-  const id = json?.data?.id;
-
-  if (!id) {
-    throw new Error("Artist page ID not found");
-  }
-
-  return id;
-}
 
 /**
  * GET /api/studio/releases
@@ -72,7 +47,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const artistPageId = await getMyArtistPageId(token);
+    const artistPageId = await getMyArtistPageId();
 
     const response = await fetch(
       `${API_BASE_URL}/api/v1/artist-pages/${artistPageId}/releases`,
@@ -143,7 +118,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const artistPageId = await getMyArtistPageId(token);
+    const artistPageId = await getMyArtistPageId();
     const body = await request.json();
 
     const response = await fetch(

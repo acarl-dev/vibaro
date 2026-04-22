@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getTokenFromCookies } from "@/lib/api/backend";
+import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
 
 export async function DELETE() {
   const token = await getTokenFromCookies();
@@ -12,11 +12,8 @@ export async function DELETE() {
   }
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/artist-pages/delete-hero`, {
+    const res = await backendFetch("/api/v1/artist-pages/delete-hero", {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
     const data = await res.json();

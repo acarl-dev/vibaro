@@ -1,21 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
 
 export async function POST(request: NextRequest) {
-  if (!API_BASE_URL) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "CONFIG_ERROR",
-          message: "API base URL is not configured.",
-        },
-      },
-      { status: 500 }
-    );
-  }
-
-  const token = request.cookies.get("vibaro_token")?.value;
+  const token = await getTokenFromCookies();
 
   if (!token) {
     return NextResponse.json(
@@ -50,12 +37,8 @@ export async function POST(request: NextRequest) {
   };
 
   try {
-    const apiResponse = await fetch(`${API_BASE_URL}/api/v1/handles/check`, {
+    const apiResponse = await backendFetch("/api/v1/handles/check", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(payload),
     });
 

@@ -58,6 +58,8 @@ Minimal:
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
 ```
 
+> **Kanonischer Name:** `NEXT_PUBLIC_API_BASE_URL` ist der einzige korrekte Variablenname für die Backend-URL im Web-Projekt. Alle Route Handlers und Server-Utilities in `apps/web` lesen ausschließlich diese Variable (via `getBackendBaseUrl()` in `src/lib/api/backend.ts`).
+
 #### 2.3.2 API: `apps/api/.env`
 
 Minimal (Postgres + Redis + Mailhog):
