@@ -5,13 +5,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
-
-type ArtistSuggestion = {
-  id: number;
-  handle: string;
-  display_name: string;
-  avatar_url: string | null;
-};
+import ShowForm, { type ShowFormData } from "./ShowForm";
 
 type Show = {
   id: number;
@@ -32,87 +26,131 @@ type ShowsClientProps = {
   initialShows: Show[];
 };
 
+const EMPTY_FORM: ShowFormData = {
+  date: "",
+  time: "",
+  venue: "",
+  city: "",
+  address: "",
+  ticket_url: "",
+  price: "",
+  is_free: false,
+  support_acts: "",
+};
+
+function buildPayload(formData: ShowFormData) {
+  const starts_at = `${formData.date}T${formData.time}:00`;
+  const support_acts = formData.support_acts
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  return {
+    starts_at,
+    venue: formData.venue,
+    city: formData.city,
+    address: formData.address || null,
+    ticket_url: formData.ticket_url || null,
+    price: formData.is_free ? null : formData.price ? parseFloat(formData.price) : null,
+    is_free: formData.is_free,
+    support_acts: support_acts.length > 0 ? support_acts : null,
+  };
+}
+
 export default function ShowsClient({ initialShows }: ShowsClientProps) {
   const [shows, setShows] = useState<Show[]>(initialShows);
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
-    date: "",
-    time: "",
-    venue: "",
-    city: "",
-    address: "",
-    ticket_url: "",
-    price: "",
-    is_free: false,
-    support_acts: "",
-  });
+  const [formData, setFormData] = useState<ShowFormData>(EMPTY_FORM);
   const [error, setError] = useState("");
   const [uploadingFlyer, setUploadingFlyer] = useState<number | null>(null);
-  const [supportActSuggestions, setSupportActSuggestions] = useState<ArtistSuggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [flyerFile, setFlyerFile] = useState<File | null>(null);
   const [flyerPreview, setFlyerPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const sortByDate = (list: Show[]) =>
+    [...list].sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
+
+  const handleFlyerSelect = (file: File) => {
+    setFlyerFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setFlyerPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleFlyerUpload = async (showId: number, file: File) => {
+    setUploadingFlyer(showId);
+    const data = new FormData();
+    data.append("flyer", file);
+    try {
+      const res = await fetch(`/api/studio/shows/${showId}/upload-flyer`, {
+        method: "POST",
+        body: data,
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const flyerSrc =
+          json.data.flyer_url ||
+          (json.data.flyer_path
+            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${json.data.flyer_path}`
+            : null);
+        setShows((prev) =>
+          prev.map((s) =>
+            s.id === showId ? { ...s, flyer_path: json.data.flyer_path, flyer_url: flyerSrc } : s
+          )
+        );
+      }
+    } catch {
+      // silent
+    } finally {
+      setUploadingFlyer(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFlyerDelete = async (showId: number) => {
+    try {
+      const res = await fetch(`/api/studio/shows/${showId}/flyer`, { method: "DELETE" });
+      if (res.ok) {
+        setShows((prev) => prev.map((s) => (s.id === showId ? { ...s, flyer_path: null } : s)));
+      }
+    } catch {
+      // silent
+    }
+  };
+
+  const resetForm = () => {
+    setFormData(EMPTY_FORM);
+    setFlyerFile(null);
+    setFlyerPreview(null);
+    setError("");
+  };
 
   const handleCreate = async () => {
     if (!formData.date || !formData.time || !formData.venue || !formData.city) {
       setError("Datum, Uhrzeit, Venue und Stadt sind erforderlich");
       return;
     }
-
-    // Send time as naive string (no timezone conversion)
-    // This way local time = stored time
-    const starts_at = `${formData.date}T${formData.time}:00`;
-    
-    const support_acts_array = formData.support_acts
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
     try {
-      const res = await fetch(`/api/studio/shows`, {
+      const res = await fetch("/api/studio/shows", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          starts_at,
-          venue: formData.venue,
-          city: formData.city,
-          address: formData.address || null,
-          ticket_url: formData.ticket_url || null,
-          price: formData.is_free ? null : (formData.price ? parseFloat(formData.price) : null),
-          is_free: formData.is_free,
-          support_acts: support_acts_array.length > 0 ? support_acts_array : null,
-        }),
+        body: JSON.stringify(buildPayload(formData)),
       });
-
-      if (res.ok) {
-        const json = await res.json();
-        let newShow = json.data;
-        
-        // Upload flyer if selected
-        if (flyerFile) {
-          await handleFlyerUpload(newShow.id, flyerFile);
-          // Refresh show data to get flyer_path
-          const refreshRes = await fetch(`/api/studio/shows`);
-          if (refreshRes.ok) {
-            const refreshJson = await refreshRes.json();
-            const updatedShow = refreshJson.data.find((s: Show) => s.id === newShow.id);
-            if (updatedShow) newShow = updatedShow;
-          }
+      if (!res.ok) { setError("Erstellen fehlgeschlagen"); return; }
+      const json = await res.json();
+      let newShow: Show = json.data;
+      if (flyerFile) {
+        await handleFlyerUpload(newShow.id, flyerFile);
+        const refreshRes = await fetch("/api/studio/shows");
+        if (refreshRes.ok) {
+          const refreshJson = await refreshRes.json();
+          const updated = refreshJson.data.find((s: Show) => s.id === newShow.id);
+          if (updated) newShow = updated;
         }
-        
-        setShows([...shows, newShow].sort((a, b) => 
-          new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
-        ));
-        setFormData({ date: "", time: "", venue: "", city: "", address: "", ticket_url: "", price: "", is_free: false, support_acts: "" });
-        setFlyerFile(null);
-        setFlyerPreview(null);
-        setIsCreating(false);
-        setError("");
-      } else {
-        setError("Erstellen fehlgeschlagen");
       }
+      setShows((prev) => sortByDate([...prev, newShow]));
+      resetForm();
+      setIsCreating(false);
     } catch {
       setError("Erstellen fehlgeschlagen");
     }
@@ -123,82 +161,46 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       setError("Datum, Uhrzeit, Venue und Stadt sind erforderlich");
       return;
     }
-
-    // Send time as naive string (no timezone conversion)
-    // This way local time = stored time
-    const starts_at = `${formData.date}T${formData.time}:00`;
-    const support_acts_array = formData.support_acts
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
     try {
       const res = await fetch(`/api/studio/shows/${showId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          starts_at,
-          venue: formData.venue,
-          city: formData.city,
-          address: formData.address || null,
-          ticket_url: formData.ticket_url || null,
-          price: formData.is_free ? null : (formData.price ? parseFloat(formData.price) : null),
-          is_free: formData.is_free,
-          support_acts: support_acts_array.length > 0 ? support_acts_array : null,
-        }),
+        body: JSON.stringify(buildPayload(formData)),
       });
-
-      if (res.ok) {
-        const json = await res.json();
-        let updatedShow = json.data;
-        
-        // Upload flyer if selected
-        if (flyerFile) {
-          await handleFlyerUpload(showId, flyerFile);
-          // Refresh show data to get flyer_path
-          const refreshRes = await fetch(`/api/studio/shows`);
-          if (refreshRes.ok) {
-            const refreshJson = await refreshRes.json();
-            const refreshedShow = refreshJson.data.find((s: Show) => s.id === showId);
-            if (refreshedShow) updatedShow = refreshedShow;
-          }
+      if (!res.ok) { setError("Aktualisieren fehlgeschlagen"); return; }
+      const json = await res.json();
+      let updatedShow: Show = json.data;
+      if (flyerFile) {
+        await handleFlyerUpload(showId, flyerFile);
+        const refreshRes = await fetch("/api/studio/shows");
+        if (refreshRes.ok) {
+          const refreshJson = await refreshRes.json();
+          const refreshed = refreshJson.data.find((s: Show) => s.id === showId);
+          if (refreshed) updatedShow = refreshed;
         }
-        
-        setShows(shows.map((s) => (s.id === showId ? updatedShow : s)).sort((a, b) => 
-          new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
-        ));
-        setEditingId(null);
-        setFormData({ date: "", time: "", venue: "", city: "", address: "", ticket_url: "", price: "", is_free: false, support_acts: "" });
-        setFlyerFile(null);
-        setFlyerPreview(null);
-        setError("");
-      } else {
-        setError("Aktualisieren fehlgeschlagen");
       }
+      setShows((prev) => sortByDate(prev.map((s) => (s.id === showId ? updatedShow : s))));
+      setEditingId(null);
+      resetForm();
     } catch {
       setError("Aktualisieren fehlgeschlagen");
     }
   };
 
   const handleDelete = async (showId: number) => {
-    if (!confirm("Diese Show wirklich löschen?")) return;
-
+    if (!confirm("Diese Show wirklich l\u00f6schen?")) return;
     try {
-      const res = await fetch(`/api/studio/shows/${showId}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setShows(shows.filter((s) => s.id !== showId));
-      }
+      const res = await fetch(`/api/studio/shows/${showId}`, { method: "DELETE" });
+      if (res.ok) setShows((prev) => prev.filter((s) => s.id !== showId));
     } catch {
-      // Fehler wird stillschweigend behandelt
+      // silent
     }
   };
 
   const startEdit = (show: Show) => {
     const date = new Date(show.starts_at);
     setEditingId(show.id);
+    setIsCreating(false);
     setFormData({
       date: format(date, "yyyy-MM-dd"),
       time: format(date, "HH:mm"),
@@ -210,116 +212,15 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       is_free: show.is_free,
       support_acts: show.support_acts?.join(", ") || "",
     });
-    setIsCreating(false);
-    setError("");
     setFlyerFile(null);
     setFlyerPreview(null);
+    setError("");
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setIsCreating(false);
-    setFormData({ date: "", time: "", venue: "", city: "", address: "", ticket_url: "", price: "", is_free: false, support_acts: "" });
-    setError("");
-    setSupportActSuggestions([]);
-    setShowSuggestions(false);
-    setFlyerFile(null);
-    setFlyerPreview(null);
-  };
-
-  const handleFlyerSelect = (file: File) => {
-    setFlyerFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFlyerPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleFlyerUpload = async (showId: number, file: File) => {
-    setUploadingFlyer(showId);
-    const formData = new FormData();
-    formData.append("flyer", file);
-
-    try {
-      const res = await fetch(`/api/studio/shows/${showId}/upload-flyer`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        const flyerSrc = json.data.flyer_url || (json.data.flyer_path ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${json.data.flyer_path}` : null);
-        setShows(shows.map((s) => 
-          s.id === showId ? { ...s, flyer_path: json.data.flyer_path, flyer_url: flyerSrc } : s
-        ));
-      }
-    } catch {
-      // Silent error handling
-    } finally {
-      setUploadingFlyer(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
-
-  const handleFlyerDelete = async (showId: number) => {
-    try {
-      const res = await fetch(`/api/studio/shows/${showId}/flyer`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setShows(shows.map((s) => 
-          s.id === showId ? { ...s, flyer_path: null } : s
-        ));
-      }
-    } catch {
-      // Silent error handling
-    }
-  };
-
-  const searchArtists = async (query: string) => {
-    if (query.length < 2) {
-      setSupportActSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/artist-pages/search?q=${encodeURIComponent(query)}`);
-      if (res.ok) {
-        const json = await res.json();
-        setSupportActSuggestions(json.data || []);
-        setShowSuggestions(true);
-      }
-    } catch {
-      setSupportActSuggestions([]);
-    }
-  };
-
-  const handleSupportActsChange = (value: string) => {
-    setFormData({ ...formData, support_acts: value });
-    const lastComma = value.lastIndexOf(",");
-    const currentInput = lastComma >= 0 ? value.slice(lastComma + 1).trim() : value.trim();
-    searchArtists(currentInput);
-  };
-
-  const addSupportAct = (displayName: string) => {
-    const current = formData.support_acts;
-    const lastComma = current.lastIndexOf(",");
-    const newValue = lastComma >= 0 
-      ? current.slice(0, lastComma + 1) + " " + displayName + ", "
-      : displayName + ", ";
-    setFormData({ ...formData, support_acts: newValue });
-    setSupportActSuggestions([]);
-    setShowSuggestions(false);
-  };
-
-  const formatShowDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, "EEE, d. MMM yyyy • HH:mm", { locale: de });
+    resetForm();
   };
 
   const getFlyerSrc = (show: Show): string | null => {
@@ -331,13 +232,14 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
     return null;
   };
 
+  const formatShowDate = (dateString: string) =>
+    format(new Date(dateString), "EEE, d. MMM yyyy \u2022 HH:mm", { locale: de });
+
   return (
-    <StudioTabPage
-      title="Shows"
-      description="Verwalte deine kommenden Konzerte und Auftritte."
-    >
+    <StudioTabPage title="Shows" description="Verwalte deine kommenden Konzerte und Auftritte.">
       <div className="mb-4 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
-        💡 <span className="font-medium">Info:</span> Shows werden auf deiner öffentlichen Seite nicht mehr angezeigt, sobald das Veranstaltungsdatum vorbei ist.
+        \u{1F4A1} <span className="font-medium">Info:</span> Shows werden auf deiner \u00f6ffentlichen Seite
+        nicht mehr angezeigt, sobald das Veranstaltungsdatum vorbei ist.
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -357,408 +259,80 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
         )}
 
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {/* Create Form */}
           {isCreating && (
-            <div className="col-span-full rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  placeholder="Datum auswählen"
-                  className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 cursor-pointer"
-                  style={{ colorScheme: 'dark' }}
-                />
-                <input
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  placeholder="Uhrzeit"
-                  className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 cursor-pointer"
-                  style={{ colorScheme: 'dark' }}
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="Venue / Location"
-                value={formData.venue}
-                onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            <div className="col-span-full">
+              <ShowForm
+                formData={formData}
+                onChange={setFormData}
+                flyerPreview={flyerPreview}
+                onFlyerSelect={handleFlyerSelect}
+                onFlyerClear={() => { setFlyerFile(null); setFlyerPreview(null); }}
+                onSubmit={handleCreate}
+                onCancel={cancelEdit}
+                submitLabel="Erstellen"
               />
-              <input
-                type="text"
-                placeholder="Stadt"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-              />
-              <input
-                type="text"
-                placeholder="Vollständige Adresse (optional)"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-              />
-              <input
-                type="url"
-                placeholder="Ticket-Link (optional)"
-                value={formData.ticket_url}
-                onChange={(e) => setFormData({ ...formData, ticket_url: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-              />
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs text-zinc-400">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_free}
-                    onChange={(e) => setFormData({ ...formData, is_free: e.target.checked, price: e.target.checked ? "" : formData.price })}
-                    className="rounded border-zinc-700 bg-zinc-950 text-zinc-100"
-                  />
-                  Freier Eintritt
-                </label>
-                {!formData.is_free && (
-                  <div className="space-y-1">
-                    <input
-                      type="number"
-                      placeholder="Preis (€)"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      step="0.01"
-                      min="0"
-                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                    />
-                    <p className="text-[11px] text-zinc-600">
-                      Wird als „Abendkasse" angezeigt, wenn kein Ticket-Link angegeben ist
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Support Acts (Name eintippen für Vorschläge, kommagetrennt)"
-                  value={formData.support_acts}
-                  onChange={(e) => handleSupportActsChange(e.target.value)}
-                  onFocus={() => formData.support_acts && searchArtists(formData.support_acts.split(",").pop()?.trim() || "")}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                />
-                {showSuggestions && supportActSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 rounded-lg border border-zinc-800 bg-zinc-950 shadow-lg max-h-48 overflow-y-auto">
-                    {supportActSuggestions.map((artist) => (
-                      <button
-                        key={artist.id}
-                        type="button"
-                        onClick={() => addSupportAct(artist.display_name)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800 transition-colors"
-                      >
-                        {artist.avatar_url && (
-                          <img src={artist.avatar_url} alt={artist.display_name} className="w-6 h-6 rounded-full object-cover" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{artist.display_name}</p>
-                          <p className="text-xs text-zinc-500 truncate">@{artist.handle}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              {/* Flyer Upload */}
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-400">Flyer (optional)</label>
-                {flyerPreview ? (
-                  <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
-                    <img src={flyerPreview} alt="Flyer preview" className="w-full h-full object-cover" />
-                    <button
-                      onClick={() => {
-                        setFlyerFile(null);
-                        setFlyerPreview(null);
-                      }}
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleFlyerSelect(file);
-                      }}
-                      className="hidden"
-                      id="flyer-create"
-                    />
-                    <label
-                      htmlFor="flyer-create"
-                      className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-600 cursor-pointer transition-colors"
-                    >
-                      📎 Flyer hinzufügen
-                    </label>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-2">
-                <StudioButton variant="primary" size="sm" onClick={handleCreate}>
-                  Erstellen
-                </StudioButton>
-                <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
-                  Abbrechen
-                </StudioButton>
-              </div>
             </div>
           )}
 
-          {/* Shows List */}
           {shows.length === 0 && !isCreating ? (
             <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
-              <p className="text-xs text-zinc-600 mb-2">Noch keine Shows hinzugefügt</p>
+              <p className="text-xs text-zinc-600 mb-2">Noch keine Shows hinzugef\u00fcgt</p>
               <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-                Erste Show hinzufügen
+                Erste Show hinzuf\u00fcgen
               </StudioButton>
             </div>
           ) : (
             shows.map((show) => (
               <div key={show.id} className={editingId === show.id ? "col-span-full" : ""}>
                 {editingId === show.id ? (
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="date"
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        placeholder="Datum auswählen"
-                        className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 cursor-pointer"
-                        style={{ colorScheme: 'dark' }}
-                      />
-                      <input
-                        type="time"
-                        value={formData.time}
-                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                        placeholder="Uhrzeit"
-                        className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 cursor-pointer"
-                        style={{ colorScheme: 'dark' }}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={formData.venue}
-                      onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                    />
-                    <input
-                      type="text"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Vollständige Adresse (optional)"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                    />
-                    <input
-                      type="url"
-                      placeholder="Ticket-Link (optional)"
-                      value={formData.ticket_url}
-                      onChange={(e) => setFormData({ ...formData, ticket_url: e.target.value })}
-                      className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                    />
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-xs text-zinc-400">
-                        <input
-                          type="checkbox"
-                          checked={formData.is_free}
-                          onChange={(e) => setFormData({ ...formData, is_free: e.target.checked, price: e.target.checked ? "" : formData.price })}
-                          className="rounded border-zinc-700 bg-zinc-950 text-zinc-100"
-                        />
-                        Freier Eintritt
-                      </label>
-                      {!formData.is_free && (
-                        <div className="space-y-1">
-                          <input
-                            type="number"
-                            placeholder="Preis (€)"
-                            value={formData.price}
-                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                            step="0.01"
-                            min="0"
-                            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                          />
-                          <p className="text-[11px] text-zinc-600">
-                            Wird als „Abendkasse" angezeigt, wenn kein Ticket-Link angegeben ist
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Support Acts (Name eintippen für Vorschläge, kommagetrennt)"
-                        value={formData.support_acts}
-                        onChange={(e) => handleSupportActsChange(e.target.value)}
-                        onFocus={() => formData.support_acts && searchArtists(formData.support_acts.split(",").pop()?.trim() || "")}
-                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
-                      />
-                      {showSuggestions && supportActSuggestions.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 rounded-lg border border-zinc-800 bg-zinc-950 shadow-lg max-h-48 overflow-y-auto">
-                          {supportActSuggestions.map((artist) => (
-                            <button
-                              key={artist.id}
-                              type="button"
-                              onClick={() => addSupportAct(artist.display_name)}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800 transition-colors"
-                            >
-                              {artist.avatar_url && (
-                                <img src={artist.avatar_url} alt={artist.display_name} className="w-6 h-6 rounded-full object-cover" />
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">{artist.display_name}</p>
-                                <p className="text-xs text-zinc-500 truncate">@{artist.handle}</p>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Flyer Upload in Edit */}
-                    <div className="space-y-2">
-                      <label className="text-xs text-zinc-400">Flyer (optional)</label>
-                      {show.flyer_path && !flyerPreview ? (
-                        <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
-                          {getFlyerSrc(show) && (
-                            <img 
-                              src={getFlyerSrc(show)!}
-                              alt="Current flyer" 
-                              className="w-full h-full object-cover" 
-                            />
-                          )}
-                          <button
-                            onClick={() => handleFlyerDelete(show.id)}
-                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ) : flyerPreview ? (
-                        <div className="relative w-32 h-44 rounded-lg overflow-hidden border border-zinc-800">
-                          <img src={flyerPreview} alt="Flyer preview" className="w-full h-full object-cover" />
-                          <button
-                            onClick={() => {
-                              setFlyerFile(null);
-                              setFlyerPreview(null);
-                            }}
-                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-900/80 text-zinc-400 hover:text-red-400 text-sm flex items-center justify-center"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ) : (
-                        <div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleFlyerSelect(file);
-                            }}
-                            className="hidden"
-                            id={`flyer-edit-${show.id}`}
-                          />
-                          <label
-                            htmlFor={`flyer-edit-${show.id}`}
-                            className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-600 cursor-pointer transition-colors"
-                          >
-                            📎 Flyer hinzufügen
-                          </label>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <StudioButton variant="primary" size="sm" onClick={() => handleUpdate(show.id)}>
-                        Speichern
-                      </StudioButton>
-                      <StudioButton variant="secondary" size="sm" onClick={cancelEdit}>
-                        Abbrechen
-                      </StudioButton>
-                    </div>
-                  </div>
+                  <ShowForm
+                    formData={formData}
+                    onChange={setFormData}
+                    flyerPreview={flyerPreview}
+                    onFlyerSelect={handleFlyerSelect}
+                    onFlyerClear={() => { setFlyerFile(null); setFlyerPreview(null); }}
+                    existingFlyerSrc={getFlyerSrc(show)}
+                    onExistingFlyerDelete={() => handleFlyerDelete(show.id)}
+                    onSubmit={() => handleUpdate(show.id)}
+                    onCancel={cancelEdit}
+                    submitLabel="Speichern"
+                  />
                 ) : (
                   <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col">
                     <div className="mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
                       {getFlyerSrc(show) ? (
-                        <img
-                          src={getFlyerSrc(show)!}
-                          alt="Show flyer"
-                          className="h-56 w-full object-contain"
-                        />
+                        <img src={getFlyerSrc(show)!} alt="Show flyer" className="h-56 w-full object-contain" />
                       ) : (
-                        <div className="h-56 w-full bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">
-                          ♪
-                        </div>
+                        <div className="h-56 w-full bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">\u266a</div>
                       )}
                     </div>
-
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-zinc-500 mb-1">{formatShowDate(show.starts_at)}</p>
                       <p className="text-sm font-medium text-zinc-100 truncate">{show.venue}</p>
                       <p className="text-xs text-zinc-500 truncate">{show.city}</p>
                       {show.price !== null || show.is_free ? (
-                        <p className="text-xs text-zinc-500 mt-1">
-                          {show.is_free ? "Freier Eintritt" : `${show.price} €`}
-                        </p>
+                        <p className="text-xs text-zinc-500 mt-1">{show.is_free ? "Freier Eintritt" : `${show.price} \u20ac`}</p>
                       ) : null}
                       {show.support_acts && show.support_acts.length > 0 && (
-                        <p className="text-xs text-zinc-500 mt-1 line-clamp-2">
-                          Support: {show.support_acts.join(", ")}
-                        </p>
+                        <p className="text-xs text-zinc-500 mt-1 line-clamp-2">Support: {show.support_acts.join(", ")}</p>
                       )}
                     </div>
-
                     <div className="mt-3 flex items-center justify-between gap-2">
-                      {!show.flyer_path && (
+                      {!show.flyer_path ? (
                         <div>
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleFlyerUpload(show.id, file);
-                            }}
-                            className="hidden"
-                            id={`flyer-upload-${show.id}`}
-                          />
-                          <label
-                            htmlFor={`flyer-upload-${show.id}`}
-                            className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block"
-                          >
-                            {uploadingFlyer === show.id ? "⏳ Hochladen..." : "📎 Flyer hinzufügen"}
+                          <input ref={fileInputRef} type="file" accept="image/*"
+                            onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleFlyerUpload(show.id, file); }}
+                            className="hidden" id={`flyer-upload-${show.id}`} />
+                          <label htmlFor={`flyer-upload-${show.id}`} className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block">
+                            {uploadingFlyer === show.id ? "\u23f3 Hochladen..." : "\u{1F4CE} Flyer hinzuf\u00fcgen"}
                           </label>
                         </div>
-                      )}
-                      {show.flyer_path && (
-                        <StudioButton variant="danger" size="sm" onClick={() => handleFlyerDelete(show.id)} title="Flyer löschen">
-                          Flyer löschen
-                        </StudioButton>
+                      ) : (
+                        <StudioButton variant="danger" size="sm" onClick={() => handleFlyerDelete(show.id)}>Flyer l\u00f6schen</StudioButton>
                       )}
                       <div className="ml-auto flex items-center gap-2">
-                        <StudioButton variant="secondary" size="sm" onClick={() => startEdit(show)}>
-                          Bearbeiten
-                        </StudioButton>
-                        <StudioButton variant="danger" size="sm" onClick={() => handleDelete(show.id)}>
-                          Löschen
-                        </StudioButton>
+                        <StudioButton variant="secondary" size="sm" onClick={() => startEdit(show)}>Bearbeiten</StudioButton>
+                        <StudioButton variant="danger" size="sm" onClick={() => handleDelete(show.id)}>L\u00f6schen</StudioButton>
                       </div>
                     </div>
                   </div>
