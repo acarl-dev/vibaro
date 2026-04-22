@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\Release;
+use App\Services\ImageProcessingService;
 use App\Services\ReleaseMetadataService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class ReleaseController extends Controller
 {
@@ -19,6 +21,7 @@ class ReleaseController extends Controller
 
     public function __construct(
         protected ReleaseMetadataService $metadata,
+        private readonly ImageProcessingService $imageProcessor,
     ) {}
 
     /**
@@ -214,21 +217,25 @@ class ReleaseController extends Controller
         $release = $artistPage->releases()->findOrFail($releaseId);
 
         try {
-            $validated = $request->validate([
+            $request->validate([
                 'cover' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // 5MB max
             ]);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         }
 
-        // Delete old cover if exists
+        try {
+            $result = $this->imageProcessor->process($request->file('cover'), 'cover', 'covers');
+        } catch (RuntimeException $e) {
+            return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
+        }
+
         if ($release->cover_path) {
             Storage::disk('public')->delete($release->cover_path);
         }
 
-        // Store new cover
-        $path = $request->file('cover')->store('covers', 'public');
-        $release->cover_path = $path;
+        Storage::disk('public')->put($result['path'], $result['contents']);
+        $release->cover_path = $result['path'];
         $release->save();
 
         return $this->success([

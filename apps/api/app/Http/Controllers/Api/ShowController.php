@@ -6,15 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\Show;
+use App\Services\ImageProcessingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class ShowController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(private readonly ImageProcessingService $imageProcessor) {}
 
     /**
      * GET /artist-pages/{id}/shows
@@ -186,21 +190,25 @@ class ShowController extends Controller
         $show = $artistPage->shows()->findOrFail($showId);
 
         try {
-            $validated = $request->validate([
+            $request->validate([
                 'flyer' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'], // 5MB max
             ]);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         }
 
-        // Delete old flyer if exists
+        try {
+            $result = $this->imageProcessor->process($request->file('flyer'), 'flyer', 'flyers');
+        } catch (RuntimeException $e) {
+            return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
+        }
+
         if ($show->flyer_path) {
             Storage::disk('public')->delete($show->flyer_path);
         }
 
-        // Store new flyer
-        $path = $request->file('flyer')->store('flyers', 'public');
-        $show->flyer_path = $path;
+        Storage::disk('public')->put($result['path'], $result['contents']);
+        $show->flyer_path = $result['path'];
         $show->save();
 
         return $this->success([

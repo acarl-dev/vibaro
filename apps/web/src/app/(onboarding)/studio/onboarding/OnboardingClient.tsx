@@ -168,7 +168,7 @@ export function OnboardingClient() {
   const handleHeroFile = useCallback(async (file: File) => {
     setHeroUploadError(null);
     if (!file.type.startsWith("image/")) { setHeroUploadError("Nur Bilddateien erlaubt (JPG, PNG, WebP)."); return; }
-    if (file.size > 5 * 1024 * 1024) { setHeroUploadError("Maximale Dateigr\u00f6\u00dfe: 5 MB."); return; }
+    if (file.size > 10 * 1024 * 1024) { setHeroUploadError("Maximale Dateigröße: 10 MB."); return; }
     const reader = new FileReader();
     reader.onload = (e) => setHeroPreviewUrl(e.target?.result as string);
     reader.readAsDataURL(file);

@@ -113,8 +113,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
   }, [bio, editingBio]);
 
   const handleHeroUpload = async (file: File) => {
-    if (file.size > 2 * 1024 * 1024) {
-      showToast("Datei zu groß. Maximal 2 MB erlaubt.", "error");
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("Datei zu groß. Maximal 10 MB erlaubt.", "error");
       return;
     }
 
@@ -144,21 +144,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
             firstFieldError?.toLowerCase().includes("size") ||
             firstFieldError?.toLowerCase().includes("too large"))
         ) {
-          showToast("Datei zu groß. Maximal 2 MB erlaubt.", "error");
-        } else {
-          showToast(
-            "Upload fehlgeschlagen",
-            "error",
-            firstFieldError ?? errorMsg ?? "Unbekannter Fehler"
-          );
-        }
-      }
-    } catch (err) {
-      showToast("Netzwerkfehler. Bitte versuche es erneut.", "error");
-    } finally {
-      setHeroUploading(false);
-    }
-  };
+          showToast("Datei zu groß. Maximal 10 MB erlaubt.", "error");
 
   const handleHeroDelete = async () => {
     if (!confirm("Hero-Bild wirklich entfernen?")) return;
@@ -182,8 +168,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
   };
 
   const handleLogoUpload = async (file: File) => {
-    if (file.size > 2 * 1024 * 1024) {
-      showToast("Datei zu groß. Maximal 2 MB erlaubt.", "error");
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Datei zu groß. Maximal 5 MB erlaubt.", "error");
       return;
     }
 
@@ -415,7 +401,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span className="text-sm font-medium">Header-Bild hochladen</span>
-                    <span className="text-xs mt-1">JPG, PNG oder WebP (max. 2 MB)</span>
+                    <span className="text-xs mt-1">JPG, PNG oder WebP (max. 10 MB)</span>
                   </>
                 )}
               </label>

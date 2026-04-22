@@ -5,15 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
+use App\Services\ImageProcessingService;
 use App\Services\LinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class ArtistPageController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(private readonly ImageProcessingService $imageProcessor) {}
 
     public function me(Request $request): JsonResponse
     {
@@ -223,21 +227,25 @@ class ArtistPageController extends Controller
         $this->authorize('update', $page);
 
         try {
-            $validated = $request->validate([
-                'avatar' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            $request->validate([
+                'avatar' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
             ]);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         }
 
-        // Delete old avatar if exists
+        try {
+            $result = $this->imageProcessor->process($request->file('avatar'), 'avatar', 'avatars');
+        } catch (RuntimeException $e) {
+            return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
+        }
+
         if ($page->avatar_path) {
             Storage::disk('public')->delete($page->avatar_path);
         }
 
-        // Store new avatar
-        $path = $request->file('avatar')->store('avatars', 'public');
-        $page->avatar_path = $path;
+        Storage::disk('public')->put($result['path'], $result['contents']);
+        $page->avatar_path = $result['path'];
         $page->save();
 
         return $this->success($this->transform($page));
@@ -249,21 +257,25 @@ class ArtistPageController extends Controller
         $this->authorize('update', $page);
 
         try {
-            $validated = $request->validate([
-                'hero_image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            $request->validate([
+                'hero_image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             ]);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         }
 
-        // Delete old hero image if exists
+        try {
+            $result = $this->imageProcessor->process($request->file('hero_image'), 'hero', 'hero-images');
+        } catch (RuntimeException $e) {
+            return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
+        }
+
         if ($page->header_path) {
             Storage::disk('public')->delete($page->header_path);
         }
 
-        // Store new hero image
-        $path = $request->file('hero_image')->store('hero-images', 'public');
-        $page->header_path = $path;
+        Storage::disk('public')->put($result['path'], $result['contents']);
+        $page->header_path = $result['path'];
         $page->save();
 
         return $this->success($this->transform($page));
@@ -275,19 +287,25 @@ class ArtistPageController extends Controller
         $this->authorize('update', $page);
 
         try {
-            $validated = $request->validate([
-                'logo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            $request->validate([
+                'logo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
             ]);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
+        }
+
+        try {
+            $result = $this->imageProcessor->process($request->file('logo'), 'logo', 'logos');
+        } catch (RuntimeException $e) {
+            return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
         }
 
         if ($page->logo_path) {
             Storage::disk('public')->delete($page->logo_path);
         }
 
-        $path = $request->file('logo')->store('logos', 'public');
-        $page->logo_path = $path;
+        Storage::disk('public')->put($result['path'], $result['contents']);
+        $page->logo_path = $result['path'];
         $page->save();
 
         return $this->success($this->transform($page));

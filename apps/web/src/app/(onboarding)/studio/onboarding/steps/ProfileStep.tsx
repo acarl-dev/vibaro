@@ -154,7 +154,7 @@ export default function ProfileStep({
                     </svg>
                     <div>
                       <p className="text-sm text-zinc-400">Hierher ziehen oder klicken</p>
-                      <p className="text-xs text-zinc-700 mt-0.5">JPG, PNG, WebP \u00b7 max. 5 MB \u00b7 Empfohlen: 1500\u00d7500 px</p>
+                      <p className="text-xs text-zinc-700 mt-0.5">JPG, PNG, WebP · max. 10 MB · Empfohlen: 1500×500 px</p>
                     </div>
                   </>
                 )}

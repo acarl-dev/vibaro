@@ -5,14 +5,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\GalleryImage;
+use App\Services\ImageProcessingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class GalleryImageController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(private readonly ImageProcessingService $imageProcessor) {}
     /**
      * List all gallery images for authenticated user's artist page
      */
@@ -56,8 +60,14 @@ class GalleryImageController extends Controller
             return $this->validationError($e->errors());
         }
 
-        // Store image
-        $path = $request->file('image')->store('gallery', 'public');
+        try {
+            $result = $this->imageProcessor->process($request->file('image'), 'gallery', 'gallery');
+        } catch (RuntimeException $e) {
+            return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
+        }
+
+        Storage::disk('public')->put($result['path'], $result['contents']);
+        $path = $result['path'];
 
         // Get next position
         $nextPosition = $page->galleryImages()->max('position') + 1;
