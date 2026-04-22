@@ -14,6 +14,7 @@ class PageViewEvent extends Model
         'referrer_host',
         'country_code',
         'user_agent_hash',
+        'visitor_key_hash',
         'is_preview',
         'occurred_at',
     ];
@@ -37,5 +38,19 @@ class PageViewEvent extends Model
     public function scopeRealViews(Builder $query): Builder
     {
         return $query->where('is_preview', false);
+    }
+
+    /**
+     * Count unique visitors using the current visitor key and a fallback for legacy rows.
+     */
+    public static function countDistinctVisitors(Builder $baseQuery): int
+    {
+        return (int) (clone $baseQuery)
+            ->where(function (Builder $query): void {
+                $query->whereNotNull('visitor_key_hash')
+                    ->orWhereNotNull('user_agent_hash');
+            })
+            ->selectRaw('COUNT(DISTINCT COALESCE(visitor_key_hash, user_agent_hash)) as aggregate')
+            ->value('aggregate');
     }
 }

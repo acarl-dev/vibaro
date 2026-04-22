@@ -108,21 +108,19 @@ class StudioHomeService
         $since14d = now()->subDays(14)->startOfDay();
 
         // Unique pageviews this week
-        $visitors7d = PageViewEvent::where('artist_page_id', $artistPage->id)
-            ->realViews()
-            ->where('occurred_at', '>=', $since7d)
-            ->whereNotNull('user_agent_hash')
-            ->distinct('user_agent_hash')
-            ->count('user_agent_hash');
+        $visitors7d = PageViewEvent::countDistinctVisitors(
+            PageViewEvent::where('artist_page_id', $artistPage->id)
+                ->realViews()
+                ->where('occurred_at', '>=', $since7d)
+        );
 
         // Unique pageviews previous week (for trend)
-        $visitorsPrev7d = PageViewEvent::where('artist_page_id', $artistPage->id)
-            ->realViews()
-            ->where('occurred_at', '>=', $since14d)
-            ->where('occurred_at', '<', $since7d)
-            ->whereNotNull('user_agent_hash')
-            ->distinct('user_agent_hash')
-            ->count('user_agent_hash');
+        $visitorsPrev7d = PageViewEvent::countDistinctVisitors(
+            PageViewEvent::where('artist_page_id', $artistPage->id)
+                ->realViews()
+                ->where('occurred_at', '>=', $since14d)
+                ->where('occurred_at', '<', $since7d)
+        );
 
         $trendPct = $visitorsPrev7d > 0
             ? (int) round((($visitors7d - $visitorsPrev7d) / $visitorsPrev7d) * 100)

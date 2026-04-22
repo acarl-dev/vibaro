@@ -30,11 +30,9 @@ class AnalyticsService
             ->where('is_preview', false)
             ->count();
 
-        $uniqueVisitors = PageViewEvent::where('spotlight_id', $spotlightId)
-            ->realViews()
-            ->whereNotNull('user_agent_hash')
-            ->distinct('user_agent_hash')
-            ->count('user_agent_hash');
+        $uniqueVisitors = PageViewEvent::countDistinctVisitors(
+            PageViewEvent::where('spotlight_id', $spotlightId)->realViews()
+        );
 
         $conversion = $uniqueVisitors > 0
             // MVP approximation, capped at 1.0 for display safety.

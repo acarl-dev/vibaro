@@ -318,6 +318,7 @@ Leitprinzipien:
 | referrer_host | string |
 | country_code | string (optional, derived transiently from IP; IP is never stored) |
 | user_agent_hash | string (optional, abuse-only) |
+| visitor_key_hash | string (optional, privacy-aware dedupe key for pageview unique metrics) |
 | occurred_at | datetime |
 | created_at | timestamp |
 
@@ -328,9 +329,9 @@ Leitprinzipien:
 - No personal user profiles.
 
 **Unique-Visitor-Einschränkung (MVP)**
-- `user_agent_hash` wird als Näherungswert für Besucher-Deduplizierung genutzt (ein Visit pro UA-Hash/Tag/Kontext).
-- Das ist eine **grobe Heuristik**: Mehrere echte Nutzer mit demselben Browser/Gerät/Version teilen denselben Hash und werden als ein Besucher gezählt.
-- Folge: `unique_pageviews` und `visitors` unterschätzen die reale Besucherzahl. Für grobe Trendanalysen ausreichend, für präzise Attribution oder Conversion-Vergleiche nicht belastbar.
+- `unique_pageviews` und `visitors` werden über einen privacy-aware Visitor-Key dedupliziert (UA-Hash + coarse IP bucket + primäre Sprache; legacy fallback: `user_agent_hash`).
+- Das ist weiterhin eine **grobe Heuristik**: Kollisionen und Fehltrennungen bleiben möglich, daher sind die Werte nur trendtauglich.
+- Folge: Conversion-Metriken bleiben Approximationen und sind nicht als belastbare Attribution zu interpretieren.
 - **MVP-only.** Für Stage Pro / Insights ist ein robusteres Modell notwendig (z.B. serverseitig generierte Session-Token ohne personenbezogene Daten).
 
 ---

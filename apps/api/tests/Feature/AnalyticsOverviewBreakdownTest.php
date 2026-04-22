@@ -80,6 +80,31 @@ class AnalyticsOverviewBreakdownTest extends TestCase
         $this->assertDatabaseCount('page_view_events', 1);
     }
 
+    public function test_record_pageview_does_not_merge_different_ip_buckets_with_same_ua(): void
+    {
+        [, $page] = $this->createUserWithArtistPage('pv-ip-bucket-owner');
+
+        $headers = [
+            'User-Agent' => 'Mozilla/5.0 (Vibaro Test Browser)',
+            'Accept-Language' => 'de-DE,de;q=0.9',
+        ];
+
+        $payload = [
+            'handle' => $page->handle,
+            'referrer' => 'https://instagram.com/some-profile',
+        ];
+
+        $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.10'])
+            ->postJson('/api/v1/analytics/pageview', $payload, $headers)
+            ->assertNoContent();
+
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.25'])
+            ->postJson('/api/v1/analytics/pageview', $payload, $headers)
+            ->assertNoContent();
+
+        $this->assertDatabaseCount('page_view_events', 2);
+    }
+
     public function test_breakdown_groups_clicks_by_platform_and_placement_for_owner(): void
     {
         [$user, $page] = $this->createUserWithArtistPage('breakdown-owner');

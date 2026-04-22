@@ -9,6 +9,7 @@ use App\Models\ClickEvent;
 use App\Models\PageViewEvent;
 use App\Models\Spotlight;
 use App\Services\BotDetectionService;
+use App\Services\VisitorIdentityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -143,15 +144,13 @@ class AnalyticsController extends Controller
         }
 
         $totalPageviews  = (clone $pvBase)->count();
-        $uniquePageviews = (clone $pvBase)
-            ->whereNotNull('user_agent_hash')
-            ->distinct('user_agent_hash')
-            ->count('user_agent_hash');
+        $uniquePageviews = PageViewEvent::countDistinctVisitors($pvBase);
 
         // Conversion only meaningful when scoped to a spotlight.
         // Formula (MVP approximation, capped for display safety):
         //   total_clicks / unique_pageviews, capped at 1.0.
-        // Rationale: unique_pageviews dedupes crawlers/reloads via UA-hash;
+        // Rationale: unique_pageviews dedupes crawlers/reloads via a privacy-aware
+        // visitor key (with fallback for legacy UA-only rows);
         // total_clicks is NOT deduplicated, so the ratio can exceed 1.0 on
         // repeat-clickers. The cap prevents misleading UI output.
         // This is intentionally NOT a true unique-click conversion metric.
@@ -220,7 +219,11 @@ class AnalyticsController extends Controller
      * Record a page view from a public artist page.
      * Public endpoint – no authentication required.
      */
-    public function recordPageview(Request $request, BotDetectionService $botDetection): Response
+    public function recordPageview(
+        Request $request,
+        BotDetectionService $botDetection,
+        VisitorIdentityService $visitorIdentity
+    ): Response
     {
         $request->validate([
             'handle'       => 'required|string|max:64',
@@ -242,6 +245,13 @@ class AnalyticsController extends Controller
 
         // Hash UA for dedup (never store raw UA)
         $uaHash = $userAgent ? hash('sha256', $userAgent) : null;
+
+        // Privacy-aware visitor key for approximation-grade dedupe.
+        $visitorKeyHash = $visitorIdentity->buildPageViewVisitorKey(
+            $uaHash,
+            $request->ip(),
+            $request->header('Accept-Language')
+        );
 
         // Parse referrer host
         $referrerRaw  = $request->input('referrer', '');
@@ -268,12 +278,12 @@ class AnalyticsController extends Controller
             $spotlightId = $active?->id;
         }
 
-        // Deduplicate reloads: count at most one pageview per visitor hash/day
+        // Deduplicate reloads: count at most one pageview per visitor key/day
         // for the same artist page + spotlight context.
-        if (!$isPreview && $uaHash) {
+        if (!$isPreview && $visitorKeyHash) {
             $alreadyTrackedToday = PageViewEvent::query()
                 ->where('artist_page_id', $artistPage->id)
-                ->where('user_agent_hash', $uaHash)
+                ->where('visitor_key_hash', $visitorKeyHash)
                 ->whereDate('occurred_at', now()->toDateString())
                 ->when(
                     $spotlightId,
@@ -293,6 +303,7 @@ class AnalyticsController extends Controller
             'referrer_host'   => $referrerHost,
             'country_code'    => $country,
             'user_agent_hash' => $uaHash,
+            'visitor_key_hash' => $visitorKeyHash,
             'is_preview'      => $isPreview,
             'occurred_at'     => now(),
         ]);
