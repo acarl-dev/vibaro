@@ -17,9 +17,20 @@ Sie ist verbindlich für Implementierung, Reviews und Copilot.
 ## 2) Authentifizierung (MVP)
 
 ### Empfohlenes MVP-Modell
-- Token-basierte Auth (Sanctum Token oder ähnliches)
-- Token wird im Frontend **nicht** in LocalStorage gespeichert.
-- Speicherung idealerweise als **HttpOnly Cookie** (z.B. über Next Route Handler), oder alternativ in Memory (kurze Sessions).
+- Token-basierte Auth (Sanctum Token)
+- Token wird bei Login/Register vom Next.js Route Handler (BFF) als **httpOnly Cookie** gesetzt.
+- Token ist **niemals** in Client-JS sichtbar – weder in LocalStorage noch in einer API-Response.
+
+### BFF-Pflicht (Backend-for-Frontend)
+Alle Requests vom Browser, die Auth erfordern, **müssen** über einen Next.js Route Handler gehen:
+
+```
+Browser → Next.js Route Handler (liest httpOnly Cookie) → Laravel API
+```
+
+❌ Direkter Aufruf der Laravel-API aus Client-JS (Bearer Token landet in JS)
+❌ Route Handler, der den Token als JSON zurückgibt (z.B. `/api/auth/token`)
+✅ FormData, Multipart-Uploads etc. über Route Handler mit `request.arrayBuffer()` proxyen
 
 ### Regeln
 - Passwort-Hashing: Laravel Standard (bcrypt/argon).
@@ -170,3 +181,5 @@ Sie ist verbindlich für Implementierung, Reviews und Copilot.
 - ❌ HTML in Bio ohne Sanitizing
 - ❌ Public endpoints, die Userdaten leaken (email/user_id)
 - ❌ `node_modules` oder `vendor` committen
+- ❌ Route Handler erstellen, die den httpOnly-Cookie-Token als JSON zurückgeben (Token-Re-Exposure)
+- ❌ Direkte Requests vom Browser an die Laravel-API mit Bearer Token (Umgehung der BFF-Schicht)

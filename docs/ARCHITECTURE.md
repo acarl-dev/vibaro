@@ -23,7 +23,10 @@ Vibaro is a B2C SaaS to create and publish musician mini-homepages. MVP focuses 
 
 ## Key Flows
 ### Authentication
-- MVP: token-based auth OR Sanctum cookie auth (choose one and keep consistent across the codebase).
+- Token-based auth via Sanctum. Token is stored as a **httpOnly cookie** (`vibaro_token`), set by the Next.js Route Handler on login/register.
+- **BFF pattern is mandatory**: the browser never holds the raw token. All authenticated API calls flow through Next.js Route Handlers, which read the cookie server-side and add the `Authorization: Bearer` header.
+- Never create a Route Handler whose sole purpose is to expose the token to the browser (e.g. `GET /api/auth/token`).
+- FormData / multipart uploads must also be proxied through Route Handlers using `request.arrayBuffer()` – do not bypass the BFF to avoid encoding issues.
 - Web uses API endpoints only; no direct DB access.
 
 ### Public Artist Page Rendering

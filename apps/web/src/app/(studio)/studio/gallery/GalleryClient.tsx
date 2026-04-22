@@ -44,20 +44,6 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
     return { valid: true };
   };
 
-  const getAuthToken = async (): Promise<string | null> => {
-    try {
-      const res = await fetch("/api/auth/token");
-      if (!res.ok) {
-        return null;
-      }
-      const data = await res.json();
-      return data.token || null;
-    } catch (error) {
-      console.error("[Gallery] Failed to get auth token:", error);
-      return null;
-    }
-  };
-
   const handleUpload = async (file: File) => {
     // Validate file before upload
     const validation = validateFile(file);
@@ -69,20 +55,10 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
     formData.append("image", file);
 
     try {
-      // Get the token from cookies to send directly to backend
-      const token = await getAuthToken();
-      if (!token) {
-        return { success: false, error: "Authentifizierung erforderlich" };
-      }
-
-      // POST directly to Laravel backend to avoid FormData corruption in Next.js proxy
-      const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-      const res = await fetch(`${backendUrl}/api/v1/studio/gallery`, {
+      // Route via BFF – auth token is read from httpOnly cookie server-side
+      const res = await fetch("/api/studio/gallery", {
         method: "POST",
         body: formData,
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
       });
 
       if (res.ok) {
@@ -91,8 +67,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
       } else {
         const errorData = await res.json();
         let errorMsg = errorData.error?.message || "Upload fehlgeschlagen";
-        
-        // If there are validation errors, include them
+
         if (errorData.error?.errors) {
           const errors = errorData.error.errors;
           if (typeof errors === 'object' && errors !== null) {
@@ -102,20 +77,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
             }
           }
         }
-        
-        // Log full error details for debugging
-        console.error(`[Upload Error] ${file.name}:`, JSON.stringify({
-          status: res.status,
-          file: {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-          },
-          errorCode: errorData.error?.code,
-          errorMessage: errorData.error?.message,
-          validationErrors: errorData.error?.errors,
-        }, null, 2));
-        
+
         return { success: false, error: `${file.name}: ${errorMsg}` };
       }
     } catch {
