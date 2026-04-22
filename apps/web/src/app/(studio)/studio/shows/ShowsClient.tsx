@@ -238,7 +238,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
   return (
     <StudioTabPage title="Shows" description="Verwalte deine kommenden Konzerte und Auftritte.">
       <div className="mb-4 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
-        \u{1F4A1} <span className="font-medium">Info:</span> Shows werden auf deiner \u00f6ffentlichen Seite
+        💡 <span className="font-medium">Info:</span> Shows werden auf deiner \u00f6ffentlichen Seite
         nicht mehr angezeigt, sobald das Veranstaltungsdatum vorbei ist.
       </div>
 
@@ -324,7 +324,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                             onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleFlyerUpload(show.id, file); }}
                             className="hidden" id={`flyer-upload-${show.id}`} />
                           <label htmlFor={`flyer-upload-${show.id}`} className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block">
-                            {uploadingFlyer === show.id ? "\u23f3 Hochladen..." : "\u{1F4CE} Flyer hinzuf\u00fcgen"}
+                            {uploadingFlyer === show.id ? "\u23f3 Hochladen..." : "📎 Flyer hinzuf\u00fcgen"}
                           </label>
                         </div>
                       ) : (

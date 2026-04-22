@@ -223,7 +223,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   return (
     <StudioTabPage title="Releases" description="Pr\u00e4sentiere deine Alben, EPs und Singles.">
       <div className="mb-4 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
-        \u{1F4A1} <span className="font-medium">Info:</span> Markierte Releases erscheinen als \u201eNew Release\u201c ganz oben auf deiner K\u00fcnstlerseite.
+        💡 <span className="font-medium">Info:</span> Markierte Releases erscheinen als \u201eNew Release\u201c ganz oben auf deiner K\u00fcnstlerseite.
       </div>
 
       <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
@@ -329,7 +329,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                               htmlFor={`cover-upload-${release.id}`}
                               className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block"
                             >
-                              {uploadingCover === release.id ? "\u23f3 Hochladen..." : "\u{1F3A8} Cover hinzuf\u00fcgen"}
+                              {uploadingCover === release.id ? "\u23f3 Hochladen..." : "🎨 Cover hinzuf\u00fcgen"}
                             </label>
                           </div>
                         ) : (
