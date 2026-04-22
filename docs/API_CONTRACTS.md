@@ -669,6 +669,7 @@ Archives a spotlight (soft delete via `archived_at`).
 
 **Behavior:**
 - Sets `archived_at` to current timestamp
+- If the spotlight was active, its lifecycle is normalized to inactive state: `status = ended`, `ends_at` is set when missing, and `show_on_page = false`
 - Archived spotlights are excluded from GET /spotlights and GET /spotlights/active
 - Does NOT delete associated tracking links or click events
 - Releases the unique constraint for (artist_page_id + slug)

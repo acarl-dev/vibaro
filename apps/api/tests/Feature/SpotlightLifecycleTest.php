@@ -259,6 +259,61 @@ class SpotlightLifecycleTest extends TestCase
         ]);
     }
 
+    public function test_archive_normalizes_active_spotlight_state(): void
+    {
+        [$user, $page] = $this->createUserWithArtistPage('archive-active-owner');
+
+        $spotlight = Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Archive Active',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/archive-active',
+            'show_on_page' => true,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/v1/spotlights/{$spotlight->id}/archive")
+            ->assertOk()
+            ->assertJsonPath('data.ok', true);
+
+        $spotlight->refresh();
+
+        $this->assertSame('ended', $spotlight->status);
+        $this->assertFalse((bool) $spotlight->show_on_page);
+        $this->assertNotNull($spotlight->archived_at);
+        $this->assertNotNull($spotlight->ends_at);
+    }
+
+    public function test_archived_active_spotlight_does_not_block_new_active_spotlight(): void
+    {
+        [, $page] = $this->createUserWithArtistPage('archived-active-cleanup-owner');
+
+        Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Archived Former Active',
+            'type' => 'single',
+            'status' => 'ended',
+            'primary_url' => 'https://example.com/archived-former-active',
+            'show_on_page' => false,
+            'archived_at' => now(),
+            'ends_at' => now(),
+        ]);
+
+        $newActive = Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Fresh Active',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/fresh-active',
+            'show_on_page' => true,
+        ]);
+
+        $this->assertSame('active', $newActive->status);
+        $this->assertNull($newActive->archived_at);
+    }
+
     private function createUserWithArtistPage(string $handle = 'artist'): array
     {
         $user = User::factory()->create();

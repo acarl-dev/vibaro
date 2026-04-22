@@ -241,6 +241,7 @@ Leitprinzipien:
 - **slug ist die stabile Campaign-Identität** – Titeländerung beeinflusst Analytics nicht.
 - slug wird bei Erstellung generiert (lowercase, url-safe, unique).
 - `show_on_page = true` + `status = active` + `archived_at IS NULL` → Hero-Banner sichtbar auf öffentlicher Seite.
+- Archivierung eines aktiven Spotlights normalisiert den Status auf `ended`, setzt `ends_at` falls nötig und entfernt es aus dem Hero-Zustand.
 - Archivierung (`archived_at`) entfernt Spotlight aus Studio-Ansichten, löscht aber keine TrackingLinks oder ClickEvents.
 
 ---

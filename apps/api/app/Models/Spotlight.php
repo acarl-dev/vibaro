@@ -66,11 +66,13 @@ class Spotlight extends Model
     }
 
     /**
-     * Scope to only include non-archived spotlights.
+     * Scope to only include the current active spotlight state.
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->whereNull('archived_at');
+        return $query
+            ->where('status', 'active')
+            ->whereNull('archived_at');
     }
 
     /**

@@ -27,7 +27,7 @@ class SpotlightLifecycleService
             Spotlight::query()
                 ->where('artist_page_id', $spotlight->artist_page_id)
                 ->where('id', '!=', $spotlight->id)
-                ->where('status', 'active')
+                ->active()
                 ->lockForUpdate()
                 ->get()
                 ->each(fn (Spotlight $other) => $this->endInternal($other, $endedAt));
@@ -59,7 +59,19 @@ class SpotlightLifecycleService
                 throw new DomainException('Spotlight is already archived.');
             }
 
-            $spotlight->update(['archived_at' => now()]);
+            $archivedAt = now();
+
+            $updates = [
+                'archived_at' => $archivedAt,
+            ];
+
+            if ($spotlight->status === 'active') {
+                $updates['status'] = 'ended';
+                $updates['ends_at'] = $spotlight->ends_at ?? $archivedAt;
+                $updates['show_on_page'] = false;
+            }
+
+            $spotlight->update($updates);
         });
     }
 
