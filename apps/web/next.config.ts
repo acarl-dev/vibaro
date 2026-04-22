@@ -34,8 +34,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "is4-ssl.mzstatic.com" },
       { protocol: "https", hostname: "is5-ssl.mzstatic.com" },
     ],
-    // Allow localhost in development
-    dangerouslyAllowSVG: true,
     unoptimized: process.env.NODE_ENV === "development",
   },
 };
