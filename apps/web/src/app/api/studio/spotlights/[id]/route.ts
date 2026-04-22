@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
+import { NextRequest } from "next/server";
+import { studioEndpoints } from "@/lib/bff/studio-endpoints";
+import { forwardStudioRequest } from "@/lib/bff/studio-proxy";
 
 /**
  * PATCH /api/studio/spotlights/[id]
@@ -9,40 +10,15 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    const token = await getTokenFromCookies();
-    if (!token) {
-      return NextResponse.json(
-        { error: { code: "unauthorized", message: "Not authenticated" } },
-        { status: 401 }
-      );
-    }
+  const { id } = await params;
+  const body = await request.json();
 
-    const body = await request.json();
-
-    const res = await backendFetch(`/api/v1/spotlights/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    const json = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json(json, { status: res.status });
-    }
-
-    return NextResponse.json(json);
-  } catch (error) {
-    console.error("Error updating spotlight:", error);
-    return NextResponse.json(
-      { error: { code: "internal_error", message: "Internal server error" } },
-      { status: 500 }
-    );
-  }
+  return forwardStudioRequest({
+    method: "PATCH",
+    upstreamPath: studioEndpoints.spotlightById(id),
+    body,
+    errorContext: "Error updating spotlight:",
+  });
 }
 
 /**
@@ -53,32 +29,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    const token = await getTokenFromCookies();
-    if (!token) {
-      return NextResponse.json(
-        { error: { code: "unauthorized", message: "Not authenticated" } },
-        { status: 401 }
-      );
-    }
+  const { id } = await params;
 
-    const res = await backendFetch(`/api/v1/spotlights/${id}`, {
-      method: "DELETE",
-    });
-
-    const json = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json(json, { status: res.status });
-    }
-
-    return NextResponse.json(json);
-  } catch (error) {
-    console.error("Error deleting spotlight:", error);
-    return NextResponse.json(
-      { error: { code: "internal_error", message: "Internal server error" } },
-      { status: 500 }
-    );
-  }
+  return forwardStudioRequest({
+    method: "DELETE",
+    upstreamPath: studioEndpoints.spotlightById(id),
+    errorContext: "Error deleting spotlight:",
+  });
 }

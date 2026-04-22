@@ -20,7 +20,7 @@ class PublicArtistPageTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => 'Berlin artist',
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => '#123456',
@@ -48,7 +48,7 @@ class PublicArtistPageTest extends TestCase
                 'shows' => [],
                 'releases' => [],
                 'theme' => [
-                    'key' => 'dark-editorial',
+                    'key' => 'modern',
                     'variant' => 'auto',
                     'accent_color' => null,
                 ],

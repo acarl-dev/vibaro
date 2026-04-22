@@ -171,8 +171,8 @@ class PublicArtistPageController extends Controller
             'contacts' => $this->resolveContacts($page),
             'contact_message' => $page->contact_message,
             'theme' => [
-                'key' => $page->theme_key,
-                'variant' => $page->theme_variant,
+                'key' => 'modern',
+                'variant' => 'auto',
                 'accent_color' => $page->accent_mode === 'manual' ? $page->accent_color : null,
             ],
         ]);

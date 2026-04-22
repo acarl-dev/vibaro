@@ -46,8 +46,8 @@ async function fetchArtistPage(): Promise<{ data: ArtistPageData | null; status:
         is_published: Boolean(raw.is_published),
         avatar_url: raw.avatar_url ?? null,
         hero_image_url: raw.hero_image_url ?? null,
-        theme_key: raw.theme_key ?? "modern",
-        theme_variant: raw.theme_variant ?? "auto",
+        theme_key: "modern",
+        theme_variant: "auto",
       },
       status: 200,
     };

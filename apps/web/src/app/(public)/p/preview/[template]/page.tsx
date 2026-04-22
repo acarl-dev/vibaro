@@ -2,9 +2,6 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { PublicArtistPageData } from "../../components/shared";
 import ModernTemplate from "../../components/ModernTemplate";
-import StageTemplate from "../../components/StageTemplate";
-import EditorialTemplate from "../../components/EditorialTemplate";
-import MinimalTemplate from "../../components/MinimalTemplate";
 
 // -----------------------------------------------------------------------------
 // Preview Data - Platzhalter für kuratierte Inhalte
@@ -324,7 +321,7 @@ const DEFAULT_PREVIEW = PREVIEW_DATA.modern;
 // Valid Templates
 // -----------------------------------------------------------------------------
 
-const VALID_TEMPLATES = ["modern", "stage", "editorial", "minimal"];
+const VALID_TEMPLATES = ["modern"];
 
 // -----------------------------------------------------------------------------
 // Metadata
@@ -365,19 +362,7 @@ export default async function TemplatePreviewPage({
     notFound();
   }
 
-  const previewData = PREVIEW_DATA[template] || DEFAULT_PREVIEW;
+  const previewData = PREVIEW_DATA.modern || DEFAULT_PREVIEW;
 
-  // Template auswählen
-  switch (template) {
-    case "modern":
-      return <ModernTemplate page={previewData} />;
-    case "stage":
-      return <StageTemplate page={previewData} />;
-    case "editorial":
-      return <EditorialTemplate page={previewData} />;
-    case "minimal":
-      return <MinimalTemplate page={previewData} />;
-    default:
-      return <ModernTemplate page={previewData} />;
-  }
+  return <ModernTemplate page={previewData} />;
 }

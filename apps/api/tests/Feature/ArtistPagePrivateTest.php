@@ -20,7 +20,7 @@ class ArtistPagePrivateTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => 'Berlin artist',
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,
@@ -39,7 +39,7 @@ class ArtistPagePrivateTest extends TestCase
                 'handle' => 'emily-j',
                 'display_name' => 'Emily J.',
                 'bio' => 'Berlin artist',
-                'theme_key' => 'dark-editorial',
+                'theme_key' => 'modern',
                 'theme_variant' => 'auto',
                 'accent_color' => null,
                 'is_published' => true,
@@ -104,7 +104,7 @@ class ArtistPagePrivateTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => null,
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,
@@ -131,7 +131,7 @@ class ArtistPagePrivateTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => null,
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,
@@ -149,6 +149,33 @@ class ArtistPagePrivateTest extends TestCase
         $response->assertJsonPath('error.fields.accent_color.0', 'Accent color is required when accent_mode is manual.');
     }
 
+    public function test_update_rejects_non_modern_theme_key(): void
+    {
+        $user = User::factory()->create();
+
+        $page = ArtistPage::create([
+            'user_id' => $user->id,
+            'handle' => 'emily-j',
+            'display_name' => 'Emily J.',
+            'bio' => null,
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'accent_color' => null,
+            'is_published' => false,
+        ]);
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->patchJson("/api/v1/artist-pages/{$page->id}", [
+            'theme_key' => 'stage',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('error.code', 'VALIDATION_ERROR');
+        $response->assertJsonPath('error.fields.theme_key.0', 'The selected theme key is invalid.');
+    }
+
     public function test_update_sets_manual_accent_color(): void
     {
         $user = User::factory()->create();
@@ -158,7 +185,7 @@ class ArtistPagePrivateTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => null,
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,
@@ -191,7 +218,7 @@ class ArtistPagePrivateTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => null,
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'manual',
             'accent_color' => '#123456',
@@ -224,7 +251,7 @@ class ArtistPagePrivateTest extends TestCase
             'handle' => 'emily-j',
             'display_name' => 'Emily J.',
             'bio' => null,
-            'theme_key' => 'dark-editorial',
+            'theme_key' => 'modern',
             'theme_variant' => 'auto',
             'accent_mode' => 'auto',
             'accent_color' => null,

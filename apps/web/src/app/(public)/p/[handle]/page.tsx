@@ -3,9 +3,6 @@ import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { PublicArtistPageData } from "../components/shared";
 import ModernTemplate from "../components/ModernTemplate";
-import StageTemplate from "../components/StageTemplate";
-import EditorialTemplate from "../components/EditorialTemplate";
-import MinimalTemplate from "../components/MinimalTemplate";
 import PageviewTracker from "../components/PageviewTracker";
 import { backendFetch, getBackendBaseUrl } from "@/lib/api/backend";
 
@@ -127,29 +124,10 @@ export default async function PublicArtistPage({
     notFound();
   }
 
-  // Select template based on theme_key (default: modern)
-  const themeKey = page.theme?.key || "modern";
-
-  let template;
-  switch (themeKey) {
-    case "minimal":
-      template = <MinimalTemplate page={page} />;
-      break;
-    case "stage":
-      template = <StageTemplate page={page} />;
-      break;
-    case "editorial":
-      template = <EditorialTemplate page={page} />;
-      break;
-    case "modern":
-    default:
-      template = <ModernTemplate page={page} />;
-  }
-
   return (
     <>
       <PageviewTracker handle={handle} />
-      {template}
+      <ModernTemplate page={page} />
     </>
   );
 }

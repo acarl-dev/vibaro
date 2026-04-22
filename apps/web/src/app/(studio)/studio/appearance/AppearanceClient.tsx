@@ -31,40 +31,6 @@ const TEMPLATES: Template[] = [
     suitableFor: "Pop · Indie · Singer-Songwriter · Hip-Hop · Elektronisch · Bands",
     isDefault: true,
   },
-  {
-    key: "stage",
-    name: "Stage",
-    shortDescription: "Energiegeladenes Layout für Live-Bands.",
-    longDescription: [
-      "Stage stellt Auftritte, Videos und Performance in den Mittelpunkt.",
-      "Große Bilder, klare Kontraste und ein direkter Aufbau machen dieses Template ideal für Artists, deren Musik live erlebt werden will.",
-      "Wenn Bühne, Energie und Präsenz entscheidend sind, ist Stage die passende Wahl.",
-    ],
-    suitableFor: "Rock · Metal · Punk · Hardcore · Alternative · Live-Bands",
-  },
-  {
-    key: "editorial",
-    name: "Editorial",
-    shortDescription: "Typografisch, großzügig – Kunst statt Dekoration.",
-    longDescription: [
-      "Editorial fühlt sich weniger wie ein Tool an und mehr wie eine gestaltete Künstlerseite.",
-      "Große Typografie, viel Weißraum und starke Bilder schaffen eine ruhige, hochwertige Atmosphäre.",
-      "Ideal für Artists, die ihre Musik bewusst inszenieren, ohne laut zu sein.",
-    ],
-    suitableFor: "Indie · Alternative · Jazz · Singer-Songwriter · Elektronische Artists",
-  },
-  {
-    key: "minimal",
-    name: "Minimal",
-    shortDescription: "Ultra-reduziert, typografisch, Schwarz/Weiß.",
-    longDescription: [
-      "Minimal verzichtet bewusst auf Effekte, Dekoration und visuelle Ablenkung.",
-      "Typografie, Rhythmus und Inhalt stehen im Vordergrund. Bilder sind optional – und nur sinnvoll, wenn sie wirklich etwas beitragen.",
-      "Dieses Template ist eine Haltung, keine Gestaltungsspielerei.",
-    ],
-    suitableFor: "Ambient · Experimental · Klassik · Neo-Klassik · Jazz · Komponisten · Produzenten",
-    hint: "Minimal funktioniert besonders gut ohne Bilder oder mit genau einem sehr starken Bild.",
-  },
 ];
 
 // -----------------------------------------------------------------------------
@@ -82,7 +48,7 @@ export default function AppearanceClient({
   initialThemeKey,
   initialThemeVariant,
 }: AppearanceClientProps) {
-  const [themeKey, setThemeKey] = useState(initialThemeKey);
+  const [themeKey, setThemeKey] = useState(initialThemeKey === "modern" ? initialThemeKey : "modern");
   const [themeVariant] = useState(initialThemeVariant);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);

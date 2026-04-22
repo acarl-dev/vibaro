@@ -47,8 +47,8 @@ Zentrale Entität für Musiker-Seiten.
 | bio | text | nullable |
 | avatar_path | string | nullable |
 | header_path | string | nullable |
-| theme_key | string | z.B. `dark-editorial` |
-| theme_variant | string | z.B. `auto`, `stage-blue` |
+| theme_key | string | aktuell nur `modern` |
+| theme_variant | string | aktuell nur `auto` |
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
 | booking_email | string | nullable, PRIVATE (legacy) |

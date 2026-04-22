@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Throwable;
 
 class PageViewEvent extends Model
 {
@@ -45,6 +46,16 @@ class PageViewEvent extends Model
      */
     public static function countDistinctVisitors(Builder $baseQuery): int
     {
+        // Backward-compatibility: some environments may not have the
+        // visitor_key_hash migration yet. In that case, keep using the
+        // legacy UA-hash approximation instead of failing with SQL errors.
+        if (!static::hasVisitorKeyColumn()) {
+            return (int) (clone $baseQuery)
+                ->whereNotNull('user_agent_hash')
+                ->distinct('user_agent_hash')
+                ->count('user_agent_hash');
+        }
+
         return (int) (clone $baseQuery)
             ->where(function (Builder $query): void {
                 $query->whereNotNull('visitor_key_hash')
@@ -52,5 +63,17 @@ class PageViewEvent extends Model
             })
             ->selectRaw('COUNT(DISTINCT COALESCE(visitor_key_hash, user_agent_hash)) as aggregate')
             ->value('aggregate');
+    }
+
+    private static function hasVisitorKeyColumn(): bool
+    {
+        try {
+            $model = new static();
+            return $model->getConnection()
+                ->getSchemaBuilder()
+                ->hasColumn($model->getTable(), 'visitor_key_hash');
+        } catch (Throwable) {
+            return false;
+        }
     }
 }
