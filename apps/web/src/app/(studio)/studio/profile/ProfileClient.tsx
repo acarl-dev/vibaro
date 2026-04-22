@@ -145,6 +145,16 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
             firstFieldError?.toLowerCase().includes("too large"))
         ) {
           showToast("Datei zu groß. Maximal 10 MB erlaubt.", "error");
+        } else {
+          showToast(errorMsg ?? firstFieldError ?? "Upload fehlgeschlagen", "error");
+        }
+      }
+    } catch {
+      showToast("Netzwerkfehler. Bitte versuche es erneut.", "error");
+    } finally {
+      setHeroUploading(false);
+    }
+  };
 
   const handleHeroDelete = async () => {
     if (!confirm("Hero-Bild wirklich entfernen?")) return;

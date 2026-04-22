@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SpotlightResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Spotlight;
 use App\Services\MetadataService;
@@ -14,37 +15,6 @@ use Illuminate\Support\Facades\Gate;
 class SpotlightController extends Controller
 {
     use ApiResponse;
-
-    /**
-     * Shared formatter: convert a Spotlight model instance to API array.
-     */
-    private function spotlightToArray(Spotlight $spotlight): array
-    {
-        return [
-            'id'                  => $spotlight->id,
-            'title'               => $spotlight->title,
-            'slug'                => $spotlight->slug,
-            'type'                => $spotlight->type,
-            'status'              => $spotlight->status,
-            'starts_at'           => $spotlight->starts_at?->toISOString(),
-            'ends_at'             => $spotlight->ends_at?->toISOString(),
-            'primary_url'         => $spotlight->primary_url,
-            'cover_image_url'     => $spotlight->cover_image_url,
-            'artist_name'         => $spotlight->artist_name,
-            'platform_name'       => $spotlight->platform_name,
-            'description'         => $spotlight->description,
-            'subtitle'            => $spotlight->subtitle,
-            'cta_label'           => $spotlight->cta_label,
-            'secondary_cta_url'   => $spotlight->secondary_cta_url,
-            'secondary_cta_label' => $spotlight->secondary_cta_label,
-            'background_image_url'=> $spotlight->background_image_url,
-            'meta'                => $spotlight->meta,
-            'show_on_page'        => $spotlight->show_on_page,
-            'archived_at'         => $spotlight->archived_at?->toISOString(),
-            'created_at'          => $spotlight->created_at->toISOString(),
-            'updated_at'          => $spotlight->updated_at->toISOString(),
-        ];
-    }
 
     /**
      * Fetch oEmbed metadata from a public URL (Spotify, YouTube, SoundCloud, etc.).
@@ -72,7 +42,7 @@ class SpotlightController extends Controller
             ->currentlyActive()
             ->first();
 
-        return $this->success($spotlight ? $this->spotlightToArray($spotlight) : null);
+        return $this->success($spotlight ? (new SpotlightResource($spotlight))->resolve() : null);
     }
 
     /**
@@ -90,10 +60,9 @@ class SpotlightController extends Controller
                 fn($q) => $q->whereNull('archived_at')
             )
             ->orderByDesc('created_at')
-            ->get()
-            ->map(fn($s) => $this->spotlightToArray($s));
+            ->get();
 
-        return $this->success($spotlights);
+        return $this->success(SpotlightResource::collection($spotlights)->resolve());
     }
 
     /**
@@ -153,7 +122,7 @@ class SpotlightController extends Controller
             $spotlight->refresh();
         }
 
-        return $this->success($this->spotlightToArray($spotlight), 201);
+        return $this->success((new SpotlightResource($spotlight))->resolve(), 201);
     }
 
     /**
@@ -186,7 +155,7 @@ class SpotlightController extends Controller
 
         $spotlight->update($validated);
 
-        return $this->success($this->spotlightToArray($spotlight->fresh()));
+        return $this->success((new SpotlightResource($spotlight->fresh()))->resolve());
     }
 
     /**
@@ -289,6 +258,6 @@ class SpotlightController extends Controller
 
         $lifecycle->restore($spotlight);
 
-        return $this->success($this->spotlightToArray($spotlight->fresh()));
+        return $this->success((new SpotlightResource($spotlight->fresh()))->resolve());
     }
 }
