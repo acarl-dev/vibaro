@@ -9,19 +9,19 @@ import { backendFetch, getTokenFromCookies } from "@/lib/api/backend";
 export async function GET() {
   const token = await getTokenFromCookies();
   if (!token) {
-    return NextResponse.json({ error: { code: "UNAUTHORIZED" } }, { status: 401 });
+    return NextResponse.json({ error: { code: "unauthorized" } }, { status: 401 });
   }
 
   // First get the artist page ID (needed for some endpoints)
   let pageId: number;
   try {
     const pageRes = await backendFetch("/api/v1/artist-pages/me", { cache: "no-store" });
-    if (!pageRes.ok) return NextResponse.json({ error: { code: "NOT_FOUND" } }, { status: 404 });
+    if (!pageRes.ok) return NextResponse.json({ error: { code: "not_found" } }, { status: 404 });
     const pageJson = await pageRes.json();
     pageId = pageJson?.data?.id;
-    if (!pageId) return NextResponse.json({ error: { code: "NOT_FOUND" } }, { status: 404 });
+    if (!pageId) return NextResponse.json({ error: { code: "not_found" } }, { status: 404 });
   } catch {
-    return NextResponse.json({ error: { code: "SERVER_ERROR" } }, { status: 500 });
+    return NextResponse.json({ error: { code: "internal_error" } }, { status: 500 });
   }
 
   // Fetch all 6 counts in parallel

@@ -1,29 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { backendFetch } from "@/lib/api/backend";
+import { type NextRequest } from "next/server";
+import { forwardStudioRequest } from "@/lib/bff/studio-proxy";
+import { studioEndpoints } from "@/lib/bff/studio-endpoints";
 
 export async function POST(
-  req: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    
-    const res = await backendFetch(`/api/v1/studio/videos/${id}/featured`, {
-      method: "POST",
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Toggle failed" } }));
-      return NextResponse.json(errorData, { status: res.status });
-    }
-
-    const data = await res.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("[Video Featured] Error:", error);
-    return NextResponse.json(
-      { error: { message: "Internal server error" } },
-      { status: 500 }
-    );
-  }
+  const { id } = await params;
+  return forwardStudioRequest({
+    method: "POST",
+    upstreamPath: studioEndpoints.videoFeatured(id),
+    errorContext: `[videos/${id}/featured] POST`,
+  });
 }

@@ -1,40 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-import { backendFetch, getMyArtistPageId, getTokenFromCookies } from "@/lib/api/backend";
+import { type NextRequest } from "next/server";
+import { withArtistPage, forwardStudioRequest } from "@/lib/bff/studio-proxy";
+import { studioEndpoints } from "@/lib/bff/studio-endpoints";
 
-/**
- * GET /api/studio/releases
- * Gets all releases for current user's artist page
- * Forwards to: GET /api/v1/artist-pages/{id}/releases
- */
 export async function GET() {
-  const token = await getTokenFromCookies();
-  if (!token) {
-    return NextResponse.json(
-      { error: { code: "UNAUTHORIZED", message: "Authentication required" } },
-      { status: 401 }
-    );
-  }
+  return withArtistPage((artistPageId) =>
+    forwardStudioRequest({
+      method: "GET",
+      upstreamPath: studioEndpoints.releases(artistPageId),
+      errorContext: "[releases] GET",
+    })
+  );
+}
 
-  try {
-    const artistPageId = await getMyArtistPageId();
-    const response = await backendFetch(
-      `/api/v1/artist-pages/${artistPageId}/releases`,
-      { method: "GET" }
-    );
-
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: error instanceof Error ? error.message : "Unknown error",
-        },
-      },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  return withArtistPage((artistPageId) =>
+    forwardStudioRequest({
+      method: "POST",
+      upstreamPath: studioEndpoints.releases(artistPageId),
+      body,
+      errorContext: "[releases] POST",
+    })
+  );
 }
 
 /**
