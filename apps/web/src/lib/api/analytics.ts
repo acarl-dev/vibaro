@@ -17,11 +17,6 @@ export type PlacementStats = {
   clicks: number;
 };
 
-export type ModuleStats = {
-  module: string;
-  clicks: number;
-};
-
 export type ReferrerStats = {
   referrer: string;
   clicks: number;
@@ -39,7 +34,6 @@ export type AnalyticsData = {
   total_clicks: number;
   by_platform: PlatformStats[];
   by_placement: PlacementStats[];
-  by_module: ModuleStats[];
   by_referrer: ReferrerStats[];
   trend: TrendDataPoint[];
 };

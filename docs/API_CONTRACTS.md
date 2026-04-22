@@ -1089,11 +1089,6 @@ Response:
       { "platform": "youtube", "placement": "bio", "clicks": 50 },
       { "platform": "x", "placement": "bio", "clicks": 100 }
     ],
-    "by_module": [
-      { "module": "spotlight", "clicks": 740 },
-      { "module": "links", "clicks": 310 },
-      { "module": "shows", "clicks": 190 }
-    ],
     "by_referrer": [
       { "referrer": "instagram.com", "clicks": 820 },
       { "referrer": "t.co", "clicks": 110 },
@@ -1119,11 +1114,11 @@ Notes:
 * **V2 Platform Tracking:** `by_platform` and `by_placement` provide granular breakdown of clicks by platform (Instagram, TikTok, etc.) and placement (Story, Bio, etc.).
 * `by_platform`: Groups clicks by platform only. Only includes platforms with clicks.
 * `by_placement`: Groups clicks by (platform, placement) pairs. Limited to top 15 results ordered by clicks DESC.
-* `by_module`: Legacy field for backwards compatibility. Groups clicks by content module (spotlight, links, shows).
+* `by_module` is **not returned**. The legacy `module` column is no longer meaningfully populated (defaults to `'legacy'`). Use `by_platform` + `by_placement` instead.
 * `direct` is used when referrer is missing.
 * All breakdown arrays only include entries with click_count > 0.
 * **Pageviews:** Reloads are deduplicated at ingest time. For the same artist page + spotlight context, at most one non-preview pageview per `user_agent_hash` is stored per day. `total_pageviews` therefore reflects deduplicated daily visits (not raw reload count). `unique_pageviews` deduplicates by `user_agent_hash` across the selected range. Pageviews without a `spotlight_id` are counted globally but excluded from conversion calculation.
-* **Conversion rate (MVP, Option A):** `total_clicks / unique_pageviews`. `null` when no `spotlight_id` is provided or when `unique_pageviews = 0`. Rationale: unique_pageviews removes reload/crawler noise; total_clicks is used instead of unique_clicks because per-UA click deduplication is not yet implemented. To revisit for V2: switch to `unique_clicks / unique_pageviews`.
+* **Conversion rate (MVP approximation):** `total_clicks / unique_pageviews`, capped at `1.0` for display safety. `null` when no `spotlight_id` is provided or when `unique_pageviews = 0`. This is NOT a true unique-click conversion metric: `total_clicks` is not deduplicated, so a repeat-clicker inflates the numerator while the denominator counts them once. The cap prevents values > 100% in the UI. V2: switch to `unique_clicks / unique_pageviews`.
 * **`pv_trend`:** pageviews per day, same date range and spotlight filter as `trend`.
 
 ---
@@ -1139,8 +1134,14 @@ Returns all-time aggregated metrics for two phases to be compared side-by-side.
 - If **no active** spotlight: `current` = last ended, `previous` = second-to-last ended
 - If fewer than two phases exist: `previous` is `null`
 
-**Conversion formula:** same Option A as overview — `total_clicks / unique_visitors × 100`. `null` when `unique_visitors = 0`.
-**Delta for Conversion:** displayed in percentage points (pp), not %. E.g. 51.3% → 52.9% = −1.6 pp.
+**Comparison semantics:**
+- This is a **chronological** comparison only (most recent vs. the one before).
+- `previous` is selected purely by `ends_at` recency, not by content, type, or theme similarity.
+- Use case: trend/progress view ("how am I doing now vs. last time?"), not campaign benchmarking.
+- No content or thematic relationship between `current` and `previous` is implied.
+
+**Conversion formula:** `total_clicks / unique_visitors × 100`, capped at 100.0 (MVP approximation — see overview notes). `null` when `unique_visitors = 0`.
+**Delta for Conversion:** displayed in percentage points (pp), not %. E.g. 51.3% → 52.9% = +1.6 pp.
 
 Response:
 

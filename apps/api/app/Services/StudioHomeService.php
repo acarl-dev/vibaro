@@ -32,7 +32,11 @@ class StudioHomeService
         // 1. Get active spotlight
         $spotlight = $this->getActiveSpotlight($artistPage);
 
-        // 2. Get top tracking links (max 3, by click_count)
+        // 2. Get top tracking links (max 3, sorted by click_count)
+        // Note: click_count is a denormalized display/listing cache, NOT the analytics
+        // source of truth. It may diverge from ClickEvent::realClicks() counts due to
+        // race conditions or pre-migration data. It is intentionally used here for
+        // fast sorting only — not for precise metric display.
         $topLinks = $this->getTopLinks($artistPage, $spotlight);
 
         // 3. Get 7-day stats with trend

@@ -149,13 +149,15 @@ class AnalyticsController extends Controller
             ->count('user_agent_hash');
 
         // Conversion only meaningful when scoped to a spotlight.
-        // Formula (MVP, Option A): total_clicks / unique_pageviews.
-        // Rationale: unique_pageviews dedupes crawlers/reloads;
-        // total_clicks is used instead of unique_clicks because
-        // click dedup per UA is not yet tracked.
-        // Revisit: switch to unique_clicks/unique_pageviews in V2.
+        // Formula (MVP approximation, capped for display safety):
+        //   total_clicks / unique_pageviews, capped at 1.0.
+        // Rationale: unique_pageviews dedupes crawlers/reloads via UA-hash;
+        // total_clicks is NOT deduplicated, so the ratio can exceed 1.0 on
+        // repeat-clickers. The cap prevents misleading UI output.
+        // This is intentionally NOT a true unique-click conversion metric.
+        // V2: switch numerator to unique_clicks (deduplicated per UA+day).
         $conversionRate = ($spotlightId && $uniquePageviews > 0)
-            ? round($totalClicks / $uniquePageviews, 4)
+            ? min(1.0, round($totalClicks / $uniquePageviews, 4))
             : null;
 
         // Pageview trend (clicks per day)
@@ -177,9 +179,11 @@ class AnalyticsController extends Controller
             'unique_pageviews' => $uniquePageviews,
             'total_clicks'     => $totalClicks,
             'conversion_rate'  => $conversionRate,
-            'by_platform'      => $byPlatform,   // V2
-            'by_placement'     => $byPlacement,  // V2
-            'by_module'        => $byModule,      // Legacy
+            'by_platform'      => $byPlatform,
+            'by_placement'     => $byPlacement,
+            // by_module intentionally omitted: the legacy 'module' column is no longer
+            // populated meaningfully (defaults to 'legacy'). Platform + placement
+            // are the canonical breakdown dimensions in V2.
             'by_referrer'      => $byReferrer,
             'trend'            => $trend,
             'pv_trend'         => $pvTrend,
@@ -298,8 +302,16 @@ class AnalyticsController extends Controller
 
     /**
      * Compare current phase vs previous phase for the authenticated user's artist page.
-     * Current = active spotlight (or last ended if none active).
-     * Previous = last ended spotlight (or second-to-last ended).
+     *
+     * Semantics:
+     *   current  = active spotlight (if one exists), otherwise the most recently ended spotlight.
+     *   previous = most recently ended spotlight (if current is active), or the
+     *              second-most-recently ended spotlight (if no active spotlight).
+     *
+     * This is a CHRONOLOGICAL comparison, not a semantic/content-based one.
+     * It serves as a trend/progress view ("how am I doing now vs. before?"),
+     * not as a benchmark between comparable campaigns.
+     * No similarity or content relationship between current and previous is implied.
      */
     public function comparison(Request $request, \App\Services\AnalyticsService $service): JsonResponse
     {

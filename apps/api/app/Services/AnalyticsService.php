@@ -12,6 +12,11 @@ class AnalyticsService
     /**
      * Aggregate all-time metrics for a single spotlight (no date range).
      *
+     * Source of truth: ClickEvent / PageViewEvent tables (event-based).
+     * NOT click_count on tracking_links — that column is a display/listing cache
+     * and can diverge from real event counts (race conditions, retroactive
+     * preview corrections, pre-migration data gaps). Always use events for analytics.
+     *
      * Used by AnalyticsController::comparison and StudioHomeService::getPhaseStats.
      */
     public function getPhaseStats(int $spotlightId): array
@@ -32,7 +37,10 @@ class AnalyticsService
             ->count('user_agent_hash');
 
         $conversion = $uniqueVisitors > 0
-            ? round($totalClicks / $uniqueVisitors * 100, 1)
+            // MVP approximation, capped at 1.0 for display safety.
+            // total_clicks is not deduplicated; result can exceed 1.0 on
+            // repeat-clickers without the cap. V2: use unique_clicks.
+            ? min(100.0, round($totalClicks / $uniqueVisitors * 100, 1))
             : null;
 
         $topPlatform = ClickEvent::where('spotlight_id', $spotlightId)
