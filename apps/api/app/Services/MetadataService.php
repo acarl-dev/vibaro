@@ -15,6 +15,12 @@ class MetadataService
      */
     public function fetchFromUrl(string $url): array
     {
+        // Reject non-http(s) schemes before touching any external service.
+        $scheme = strtolower(parse_url($url, PHP_URL_SCHEME) ?? '');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return [];
+        }
+
         $platform = $this->detectPlatform($url);
 
         $meta = match ($platform['name']) {

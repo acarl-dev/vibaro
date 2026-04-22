@@ -153,6 +153,46 @@ Schutzgedanke:
 
 ---
 
+## 8a) SSRF-Schutz für serverseitige Remote-Fetches
+
+Bestimmte Services holen Metadaten oder Inhalte von nutzergegebenen oder oEmbed-zurückgegebenen URLs serverseitig ab (`ReleaseMetadataService`, `MetadataService`). Alle solchen Fetches laufen über `SafeHttpService`.
+
+### Implementierte Maßnahmen
+
+| Maßnahme | Umsetzung |
+|---|---|
+| Nur `http` / `https` erlaubt | Scheme-Check in `SafeHttpService::isAllowed()` und in `MetadataService::fetchFromUrl()` |
+| Private / reservierte IP-Ranges blockiert | `FILTER_FLAG_NO_PRIV_RANGE \| FILTER_FLAG_NO_RES_RANGE` + DNS-Auflösung aller A/AAAA-Records |
+| Redirect-Guard | Jeder Redirect-Hop wird via Guzzle `on_redirect`-Callback erneut validiert |
+| Redirect-Limit | max. 3 Hops |
+| Timeout | 10 Sekunden (konfigurierbar per Aufruf) |
+| Max Response Size | 10 MB; Response wird nach dem Download geprüft |
+| Logging | Jede blockierte oder fehlgeschlagene Anfrage wird mit URL und Grund geloggt (`Log::warning`) |
+
+### Blockierte IP-Ranges (via PHP-Flags)
+
+- `127.0.0.0/8` — Loopback
+- `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` — Private Ranges
+- `169.254.0.0/16` — Link-Local / AWS EC2 Metadata Service
+- `240.0.0.0/4` — Reserviert
+- `::1/128` — IPv6 Loopback
+- `fc00::/7` — IPv6 Unique Local
+- `fe80::/10` — IPv6 Link-Local
+
+Hostname-Literale `localhost`, `ip6-localhost`, `ip6-loopback` werden zusätzlich vor DNS-Auflösung blockiert.
+
+### Scope
+
+- `ReleaseMetadataService`: direkter Fetch von Spotify-URLs (Release-Type-Scraping), Plattform-URLs (Release-Date-Scraping), oEmbed-Thumbnail-URLs
+- `MetadataService`: kein direkter User-URL-Fetch; URL wird nur als Query-Param an fixe oEmbed-Endpoints weitergegeben; Scheme-Validierung (`http`/`https`) greift trotzdem frühzeitig
+
+### Was NICHT durch `SafeHttpService` abgesichert ist
+
+- oEmbed-Endpunkte selbst sind hardcodiert (z. B. `open.spotify.com/oembed`) — kein SSRF-Risiko
+- DNS-Rebinding zwischen Pre-Flight-Check und TCP-Connect: TOCTOU-Restrisiko, akzeptiert im MVP; vollständige Abhilfe würde einen Guzzle-Post-Connect-IP-Check erfordern
+
+---
+
 ## 9) Secrets, Logs und Datenminimierung
 
 - Keine Secrets im Git

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Release;
+use App\Services\SafeHttpService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
  */
 class ReleaseMetadataService
 {
+    public function __construct(private readonly SafeHttpService $safeHttp) {}
+
     /**
      * Try to auto-fill the cover image from oEmbed thumbnail.
      */
@@ -30,8 +33,8 @@ class ReleaseMetadataService
                 return;
             }
 
-            $imageResponse = Http::retry(2, 100, throw: false)->get($thumbnailUrl);
-            if (!$imageResponse->successful()) {
+            $imageResponse = $this->safeHttp->safeGet($thumbnailUrl);
+            if (!$imageResponse || !$imageResponse->successful()) {
                 return;
             }
 
@@ -175,23 +178,22 @@ class ReleaseMetadataService
             return null;
         }
 
-        try {
-            $response = Http::retry(2, 100, throw: false)
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (compatible; VibaroBot/1.0; +https://vibaro.app)',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                ])
-                ->get($url);
+        $response = $this->safeHttp->safeGet(
+            $url,
+            [],
+            SafeHttpService::DEFAULT_TIMEOUT,
+            [
+                'User-Agent'      => 'Mozilla/5.0 (compatible; VibaroBot/1.0; +https://vibaro.app)',
+                'Accept-Language' => 'en-US,en;q=0.9',
+            ]
+        );
 
-            if (!$response->successful()) {
-                return null;
-            }
-
-            $html = $response->body();
-            return $html ? $this->extractReleaseTypeFromHtml($html) : null;
-        } catch (\Throwable) {
+        if (!$response || !$response->successful()) {
             return null;
         }
+
+        $html = $response->body();
+        return $html ? $this->extractReleaseTypeFromHtml($html) : null;
     }
 
     private function extractReleaseTypeFromHtml(string $html): ?string
@@ -220,17 +222,14 @@ class ReleaseMetadataService
             return null;
         }
 
-        try {
-            $response = Http::retry(2, 100, throw: false)->get($url);
-            if (!$response->successful()) {
-                return null;
-            }
+        $response = $this->safeHttp->safeGet($url);
 
-            $html = $response->body();
-            return $html ? $this->extractReleaseDateFromHtml($html) : null;
-        } catch (\Throwable) {
+        if (!$response || !$response->successful()) {
             return null;
         }
+
+        $html = $response->body();
+        return $html ? $this->extractReleaseDateFromHtml($html) : null;
     }
 
     private function extractReleaseDateFromOembed(?array $oembed): ?string
