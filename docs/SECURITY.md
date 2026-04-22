@@ -1,185 +1,148 @@
 # Vibaro Security
 
-Diese Datei definiert die Sicherheitsregeln für Vibaro (Web + API).
-Sie ist verbindlich für Implementierung, Reviews und Copilot.
+Status: current
+Last verified: 2026-04-22
+Scope: aktueller Ist-Zustand von Web (`apps/web`) und API (`apps/api`)
+
+Diese Datei beschreibt die aktuell implementierten Sicherheitsregeln.
+Zielbilder oder härtere Soll-Vorgaben gehören nicht hierher.
 
 ---
 
 ## 1) Grundprinzipien
 
-- **Public by default** gilt nur für veröffentlichte Artist Pages (`is_published = true`).
-- Alles andere ist **private** und benötigt Auth.
-- Web (apps/web) greift **nie direkt** auf DB zu. Nur über API.
-- Keine sensiblen Daten in Public Responses.
+- Öffentlich ist nur, was explizit als public Endpoint gedacht ist.
+- Für Artist Pages bedeutet das aktuell: veröffentlicht (`is_published = true`) und ohne private Felder.
+- `apps/web` greift nie direkt auf die Datenbank zu, sondern nur per HTTP auf `apps/api`.
+- Öffentliche Responses dürfen keine privaten Benutzerfelder enthalten.
 
 ---
 
-## 2) Authentifizierung (MVP)
+## 2) Authentifizierung: tatsächlicher Token-Fluss
 
-### Empfohlenes MVP-Modell
-- Token-basierte Auth (Sanctum Token)
-- Token wird bei Login/Register vom Next.js Route Handler (BFF) als **httpOnly Cookie** gesetzt.
-- Token ist **niemals** in Client-JS sichtbar – weder in LocalStorage noch in einer API-Response.
+Aktuell wird token-basierte Auth mit Laravel Sanctum Personal Access Tokens verwendet.
 
-### BFF-Pflicht (Backend-for-Frontend)
-Alle Requests vom Browser, die Auth erfordern, **müssen** über einen Next.js Route Handler gehen:
+Der reale Login-/Register-Pfad ist:
 
-```
-Browser → Next.js Route Handler (liest httpOnly Cookie) → Laravel API
+```text
+Browser -> Next.js Route Handler -> Laravel API -> Next.js Route Handler -> httpOnly Cookie
 ```
 
-❌ Direkter Aufruf der Laravel-API aus Client-JS (Bearer Token landet in JS)
-❌ Route Handler, der den Token als JSON zurückgibt (z.B. `/api/auth/token`)
-✅ FormData, Multipart-Uploads etc. über Route Handler mit `request.arrayBuffer()` proxyen
+Wichtig dabei:
 
-### Regeln
-- Passwort-Hashing: Laravel Standard (bcrypt/argon).
-- Rate Limit für Login/Register.
-- E-Mail bleibt private Information.
+- Laravel `POST /api/v1/auth/login` und `POST /api/v1/auth/register` liefern aktuell `data.token` in ihrer JSON-Response.
+- Dieser Token wird nicht an Browser-JavaScript weitergereicht, sondern im Next.js Route Handler gelesen und als `vibaro_token`-Cookie gesetzt.
+- Die BFF-Responses an den Browser enthalten aktuell `user` und `next`, aber keinen Token.
+- Der Token ist danach browserseitig nicht über Client-JS lesbar, weil der Cookie `httpOnly` gesetzt wird.
 
----
+Die präzise Aussage für den Ist-Zustand lautet daher:
 
-## 3) Autorisierung (Policies)
+- Der Token ist nicht browserseitig lesbar.
+- Der Token wird aber intern vom Laravel-Auth-Endpoint an die Next.js-BFF-Route ausgeliefert.
 
-- Jede private Ressource muss per Policy abgesichert sein.
-- `artist_pages`:
-  - **Nur Owner** darf lesen/ändern/publishen.
-- Public Endpoint `/api/v1/p/{handle}`:
-  - darf nur veröffentlichte Daten ausliefern
-  - niemals `user_id`, `email`, interne IDs des Users
-  - **Kontakt-Daten (booking_email, management_email, press_email) sind PRIVATE** und werden nicht in Public Response ausgeliefert
-  - Besucher können über "Get in Touch"-Button eine Anfrage einreichen (Besucher-Email wird nicht erfasst)
+Nicht korrekt als Current-State wäre die Aussage, der Token tauche nirgends in einer API-Response auf.
 
 ---
 
-## 4) CORS & Cookies
+## 3) BFF-Regel für authentifizierte Browser-Requests
 
-### CORS-Regeln
-- Nur erlaubte Origins:
-  - dev: `http://localhost:3000`
-  - prod: `https://app.<domain>` und ggf. `https://<domain>`
-- Keine Wildcards in Production.
-- Wenn Cookies genutzt werden: `supports_credentials = true`.
+Für Browser-Requests mit Auth gilt aktuell weiterhin die BFF-Regel:
 
-### Cookies (falls verwendet)
-- `HttpOnly`, `Secure` (prod), `SameSite=Lax` oder passendes Modell.
-- In Prod niemals `SameSite=None` ohne Bedarf.
+```text
+Browser -> Next.js Route Handler / server-only utility -> Laravel API
+```
 
----
+Das bedeutet:
 
-## 5) Input Validation (API)
+- Client-Komponenten rufen für authentifizierte Aktionen Next.js-Endpunkte unter `/api/**` auf.
+- Server-seitige authentifizierte Fetches laufen über `backendFetch()` und lesen den Cookie serverseitig.
+- Der Browser soll keinen Bearer-Token kennen oder direkt an Laravel senden.
 
-- Jede schreibende Route validiert Input strikt.
-- Keine ungeprüften `mass assignment` Updates:
-  - `$fillable` sauber pflegen
-  - oder DTO/Request Klassen nutzen
-- Validation Errors müssen dem Standard aus `CONVENTIONS.md` folgen.
+Nicht erlaubt:
+
+- Tokens in `localStorage` oder `sessionStorage`
+- ein Route Handler, der den Token wieder als JSON an den Browser herausgibt
+- direkte Browser-Requests an Laravel mit Bearer-Token
 
 ---
 
-## 6) Rate Limiting & Abuse Protection
+## 4) Autorisierung und Sichtbarkeit
 
-- Rate Limits (mindestens):
-  - `POST /auth/login`
-  - `POST /auth/register`
-  - Public Page Endpoint `/p/{handle}` (light)
-- Optional später:
-  - per-IP + per-handle Limits
-- Schutz vor Enumeration:
-  - Handle ist public, aber keine “user lookup” endpoints.
+- Private Ressourcen laufen hinter `auth:sanctum`.
+- Owner-Preview für unveröffentlichte Seiten läuft über `GET /api/v1/p/{handle}/preview` und benötigt Auth.
+- Der öffentliche Endpoint `GET /api/v1/p/{handle}` darf nur veröffentlichte Daten ausliefern.
 
----
+Private Felder dürfen nicht in Public Responses erscheinen, insbesondere:
 
-## 7) File Upload Security (Bilder)
+- `email`
+- `user_id`
+- interne User-IDs oder Tokenwerte
+- interne Billing-Informationen
 
-### Regeln
-- Nur Bilder: `jpg`, `png`, `webp` (optional `avif` später)
-- Max-Größe (MVP): z.B. 5 MB
-- MIME-Type prüfen + Server-seitige Prüfung (nicht nur Client)
-- Dateinamen nie vom User übernehmen (UUID verwenden)
-- Bilder serverseitig neu encoden (empfohlen), um Payloads zu entfernen
-- Keine direkten Uploads in public webroot ohne Kontrolle
-
-### Storage
-- Prefer S3-compatible Object Storage.
-- URLs signieren oder über CDN ausliefern.
-- Keine internen Pfade in Responses.
+Kontaktdaten bleiben privat, solange sie nicht explizit als veröffentlichte öffentliche Felder modelliert und abgesichert sind.
 
 ---
 
-## 8) XSS / Content Safety
+## 5) Cookies, CORS und Same-Origin-Verhalten
 
-- Artist Bio ist User-Content:
-  - als Plain Text behandeln
-  - HTML nicht erlauben (MVP)
-  - bei Ausgabe immer escapen
-- Links:
-  - URL validieren (scheme http/https)
-  - optional: allowlist für bekannte Provider später
+Aktuell relevant:
 
----
+- Auth-Cookie: `vibaro_token`
+- Cookie-Flags: `HttpOnly`, `SameSite=Lax`, `Secure` in Production
+- Browser spricht im Regelfall mit derselben Next.js-Origin; Laravel wird für Auth-Fälle über BFF bzw. serverseitige Fetches angesprochen
 
-## 9) CSRF
+Deshalb bleibt die CORS-Regel konservativ:
 
-- Wenn Token Auth: CSRF-Risiko geringer, aber sichere Cookie-Strategie beachten.
-- Wenn Cookie-Session Auth genutzt wird:
-  - CSRF Protection aktiv halten
-  - Sanctum/Cookie Setup korrekt konfigurieren
-  - CORS + SameSite exakt prüfen
+- keine Wildcards in Production
+- nur explizit erlaubte Origins
+- Credential-Handling nur dort aktivieren, wo es wirklich gebraucht wird
 
 ---
 
-## 10) Secrets & Konfiguration
+## 6) Input Validation und Schreibzugriffe
 
-- Niemals Secrets committen:
-  - `.env` ist verboten im Git
-  - nur `.env.example`
-- Rotationsfähigkeit:
-  - Stripe Keys etc. müssen austauschbar sein
-- In Logs:
-  - keine Tokens
-  - keine Passwörter
-  - keine kompletten Request Bodies
+- Schreibende API-Routen validieren Input serverseitig.
+- Responses für Fehler und Validierung müssen `CONVENTIONS.md` folgen.
+- Ungeprüfte Massenupdates bleiben verboten.
 
 ---
 
-## 11) Logging, Monitoring, Alerts
+## 7) Rate Limiting und Abuse Protection
 
-- Error Tracking empfohlen:
-  - Sentry (web + api)
-- Logs:
-  - API: strukturierte Logs (MVP reicht Standard)
-- Uptime Monitoring (später):
-  - mindestens API Healthcheck
+Aktuell dokumentiert und im Routing sichtbar:
 
----
+- strengeres Throttling für `POST /api/v1/auth/login` und `POST /api/v1/auth/register`
+- Public-Rate-Limit für öffentliche Artist-Page- und Analytics-Endpoints
 
-## 12) Daten-Minimierung (Public vs Private)
+Schutzgedanke:
 
-### Public (erlaubt)
-- handle
-- display_name
-- bio
-- images (public URLs)
-- links/shows/releases (wenn veröffentlicht)
-- theme key/variant + accent_color
-
-### Private (niemals public)
-- email
-- user_id
-- interne IDs des Users
-- tokens
-- billing/status intern (später)
+- keine öffentlichen User-Lookup-Endpoints
+- keine vermeidbare Enumeration privater Daten
 
 ---
 
-## 13) “Never do” Liste
+## 8) Upload- und Content-Sicherheit
 
-- ❌ Tokens in LocalStorage speichern
-- ❌ CORS `*` in Production
-- ❌ Uploads ohne MIME/Size Check
-- ❌ HTML in Bio ohne Sanitizing
-- ❌ Public endpoints, die Userdaten leaken (email/user_id)
-- ❌ `node_modules` oder `vendor` committen
-- ❌ Route Handler erstellen, die den httpOnly-Cookie-Token als JSON zurückgeben (Token-Re-Exposure)
-- ❌ Direkte Requests vom Browser an die Laravel-API mit Bearer Token (Umgehung der BFF-Schicht)
+- Uploads laufen nicht direkt vom Browser an Laravel mit Browser-Token, sondern über die Web-Schicht
+- MIME-Type, Größe und Dateiname müssen serverseitig kontrolliert werden
+- HTML in frei editierbaren Textfeldern ist im MVP nicht vorgesehen
+- User-URLs müssen validiert werden
+
+---
+
+## 9) Secrets, Logs und Datenminimierung
+
+- Keine Secrets im Git
+- Keine Tokens oder Passwörter in Logs
+- Public Responses nur mit den wirklich öffentlichen Feldern
+
+---
+
+## 10) Never-Do-Liste
+
+- ❌ Tokens in Client-Storage speichern
+- ❌ BFF umgehen, wenn Browser-Auth nötig ist
+- ❌ Token-Re-Exposure über einen Next.js Route Handler
+- ❌ CORS-Wildcards in Production
+- ❌ Uploads ohne Server-Prüfung
+- ❌ öffentliche Responses mit privaten Userdaten

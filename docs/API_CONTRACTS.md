@@ -1,13 +1,48 @@
 # Vibaro API Contracts (v1 + v2)
 
-Diese Datei ist die **verbindliche Quelle** für alle API-Endpunkte.  
-Frontend (`apps/web`) und Backend (`apps/api`) müssen sich exakt daran halten.
+Status: historical / needs update
+Last verified: 2026-04-22
+Scope: gemischter Vertragsbestand mit teilweise aktuellem, teilweise historischem Inhalt
 
-Alle Responses folgen dem Standard aus `CONVENTIONS.md`.
+Diese Datei ist **aktuell nicht mehr als Ganzes bindend**.
 
-**Product Definition**
-- V1 (Legacy): Mini-Homepage / Free + Artist (historisch)
-- V2 (Active): Stage System (docs/PRODUCT_V2.md)
+Grund:
+
+- sie mischt historische Produktstände und aktuelle Endpunkte in einem Dokument
+- sie verwendet gleichzeitig V1-/V2-Sprache und Current-Contract-Sprache
+- einzelne Claims sind im aktuellen Routen-Scan nicht eindeutig verifiziert
+
+Bis zur Aufteilung in kleinere Vertragsdateien gilt:
+
+- `apps/api/routes/api.php` ist der Referenzpunkt für die existierende API-Fläche
+- diese Datei ist vor allem Kontext- und Migrationsdokumentation
+- neue Arbeit an Endpunkten sollte Verträge domänenscharf dokumentieren
+
+Empfohlene Zielaufteilung:
+
+- Auth
+- Public Page
+- Studio CRUD
+- Tracking / Analytics
+- Spotlight / Campaign
+
+Alle Responses folgen weiterhin dem Standard aus `CONVENTIONS.md`.
+
+## Domain Map In This File
+
+- Auth
+- Private Artist Page / Studio CRUD
+- Public Artist Page
+- Spotlights / Campaigns
+- Tracking / Analytics
+- Studio Dashboard
+
+## Historical Context
+
+- V1 (Legacy): Mini-Homepage / Free + Artist
+- V2 (Product target / active product language): Stage System (`docs/PRODUCT_V2.md`)
+
+Die V1-/V2-Begriffe in dieser Datei sind daher Kontext, nicht automatisch gleichbedeutend mit vollständig verifiziertem Current Contract.
 
 ---
 
@@ -28,7 +63,7 @@ Alle Responses folgen dem Standard aus `CONVENTIONS.md`.
 Success:
 ```json
 { "data": {} }
-````
+```
 
 Error:
 
@@ -38,15 +73,10 @@ Error:
 
 ---
 
-# ===============================
+## Legacy Baseline Sections
 
-# V1 (Legacy) – Current Implementation Baseline
-
-# ===============================
-
-> ⚠️ Status: Legacy Product Definition
-> This section documents the existing endpoints as implemented for the original Vibaro MVP.
-> Active product definition is V2 (Stage System). New development should follow V2.
+> Status inside this file: historical baseline with partially current endpoint overlap.
+> Treat these sections as migration context unless the route shape is re-verified against code.
 
 ---
 
@@ -362,29 +392,28 @@ Response (V1 baseline):
 
 ---
 
-# ===============================
+## Stage / Spotlight / Analytics Sections
 
-# V2 – Stage System (Active Additions)
-
-# ===============================
-
-Status: Active for new development
-Product rules: docs/PRODUCT_V2.md
-Data model: docs/DATA_MODEL.md (V2 section)
+> Status inside this file: partially current, but still embedded in a mixed historical document.
+> Product rules: `docs/PRODUCT_V2.md`
+> Data model: `docs/DATA_MODEL.md`
 
 This section extends API v1. All existing v1 endpoints remain valid unless explicitly replaced.
 
-## Implementation Status
+## Implementation Status (Needs Re-Verification)
 
-### ✅ Implemented (Stage MVP)
-- `GET /t/{slug}` - Public tracking redirect
-- `GET /api/v1/analytics/overview` - Performance analytics (7d, 30d)
+### Verified in current route scan
+- `GET /api/v1/analytics/overview`
+- `GET /api/v1/analytics/breakdown`
+- `GET /api/v1/analytics/comparison`
+- `GET /api/v1/studio/home`
+- Spotlight-, Campaign- und Tracking-Link-Endpunkte unter `/api/v1/**`
 
-### 🔄 Planned (Stage Pro)
-- Spotlight CRUD endpoints
-- Campaign CRUD endpoints  
-- Tracking Link CRUD endpoints
-- CSV Export
+### Not verified in `apps/api/routes/api.php` during this review
+- `GET /t/{slug}` / `GET /t/{short_code}` public tracking redirect
+- CSV export endpoint
+
+Diese Punkte sind nicht automatisch falsch, aber aus diesem Review heraus nicht als current source of truth bestätigt.
 
 ---
 

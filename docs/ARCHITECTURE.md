@@ -1,56 +1,68 @@
 # Vibaro Architecture
 
+Status: current
+Last verified: 2026-04-22
+Scope: aktuelle Laufzeit- und Integrationsarchitektur des Monorepos
+
+Diese Datei beschreibt den derzeitigen Systemzuschnitt.
+Produktvisionen oder historische V1/V2-Einordnungen gehören in die Produktdokumente, nicht hierher.
+
 ## Goal
-Vibaro is a B2C SaaS to create and publish musician mini-homepages. MVP focuses on Free + Artist (paid) plans. AI is out of scope for now.
+
+Vibaro ist aktuell ein Monorepo mit Next.js-Webanwendung und Laravel-JSON-API für Public Pages, Studio-Funktionen, Auth sowie die aktuellen Spotlight-/Tracking-/Analytics-Flows.
 
 ## Monorepo Structure
-- apps/web: Next.js (Landing, Dashboard, Public Artist Pages)
-- apps/api: Laravel JSON API (Auth, Artist Pages, Billing later)
-- packages/shared: optional shared constants/types (no cross-app imports)
-- infra/: local docker, scripts
-- docs/: source of truth for conventions and contracts
 
-## Hard Boundaries (Do not break)
-- `apps/web` must NOT import code from `apps/api`.
-- Communication between web and api is HTTP only (JSON API).
-- Shared code (if any) goes into `packages/shared` and must be framework-agnostic.
+- `apps/web`: Next.js App Router, Landing, Auth, Studio, Public Artist Pages, BFF Route Handlers
+- `apps/api`: Laravel JSON API für Auth, Artist Pages, Studio CRUD, Tracking, Analytics und Spotlights
+- `packages/shared`: framework-agnostische gemeinsame Artefakte, ohne Cross-App-Laufzeitkopplung
+- `infra/`: lokale Infrastruktur und Skripte
+- `docs/`: Dokumentation; nur korrekt, wenn mit Code synchron gehalten
 
-## Runtime Topology (Hybrid)
-- Web (Next.js) runs on Vercel.
-- API (Laravel) runs on Hetzner.
-- Media files go to S3-compatible storage (later).
-- DB: PostgreSQL. Cache/Queue: Redis.
+## Hard Boundaries
 
-## Key Flows
+- `apps/web` importiert keinen Code aus `apps/api`.
+- Kommunikation zwischen Web und API erfolgt über HTTP/JSON.
+- Gemeinsamer Code gehört nur nach `packages/shared` und muss framework-agnostisch bleiben.
+
+## Current Runtime Topology
+
+- Browser spricht primär mit Next.js.
+- Laravel ist das Backend-System für Daten, Auth, Policies und Business-Logik.
+- Authentifizierte Browser-Aktionen laufen über Next.js Route Handlers oder server-only Utilities.
+- Öffentliche Server-Fetches dürfen direkt von Next.js zur Laravel-API gehen, wenn kein Browser-Token beteiligt ist.
+
+## Current Auth/Data Flow
+
 ### Authentication
-- Token-based auth via Sanctum. Token is stored as a **httpOnly cookie** (`vibaro_token`), set by the Next.js Route Handler on login/register.
-- **BFF pattern is mandatory**: the browser never holds the raw token. All authenticated API calls flow through Next.js Route Handlers, which read the cookie server-side and add the `Authorization: Bearer` header.
-- Never create a Route Handler whose sole purpose is to expose the token to the browser (e.g. `GET /api/auth/token`).
-- FormData / multipart uploads must also be proxied through Route Handlers using `request.arrayBuffer()` – do not bypass the BFF to avoid encoding issues.
-- Web uses API endpoints only; no direct DB access.
 
-### Public Artist Page Rendering
-- Public pages are served by Next.js route `/p/[handle]`.
-- Data is fetched from API public endpoint with `next: { revalidate: 60 }` (cache-friendly).
-- Owner preview (`is_published=false`) uses a separate authenticated endpoint `GET /api/v1/p/{handle}/preview` with `cache: "no-store"`. The public route and the preview route are intentionally separate so the public path remains uniformly cacheable.
+- Laravel erzeugt Sanctum Personal Access Tokens.
+- Next.js Login-/Register-Route-Handler lesen den Token aus der Laravel-Response und setzen `vibaro_token` als `httpOnly` Cookie.
+- Authentifizierte Requests aus Browser-Clients laufen über Next.js-BFF-Endpunkte.
+- Authentifizierte serverseitige Requests laufen über `backendFetch()`.
+- Der Browser hält keinen lesbaren Bearer-Token.
 
-## Route Handler Categories (When to use a BFF Route Handler)
+### Public Artist Pages
 
-The BFF pattern (Route Handlers in `apps/web/src/app/api/`) is intentional and mandatory for auth security. Not every call needs to go through a Route Handler. Use this classification:
+- Öffentliche Seiten liegen unter `/p/[handle]`.
+- Der veröffentlichte öffentliche Pfad nutzt den Public-Endpoint der API.
+- Die Owner-Preview für unveröffentlichte Seiten nutzt einen separaten authentifizierten Preview-Endpoint.
+- Öffentliche und Preview-Pfade bleiben bewusst getrennt, damit Caching-Regeln nicht vermischt werden.
 
-| Category | Rule | Example |
+## Route Handler Classification
+
+| Category | Current rule | Example |
 |---|---|---|
-| **Auth-sensitive** | Must use Route Handler — token must never reach the browser | All Studio endpoints (`/api/v1/studio/**`) |
-| **Upload proxy** | Must use Route Handler — multipart must be proxied via `request.arrayBuffer()` | `upload-flyer`, `upload-cover`, `upload-avatar` |
-| **Public, directly fetchable** | Server Components may call the Laravel API directly (no Route Handler needed) | `GET /api/v1/p/{handle}` (anonymous, published pages) |
-| **Public but transformed** | Use a Route Handler only if the Server Component needs data from multiple sources merged, or the shape must differ from what Laravel returns | Future: aggregated landing-page data |
+| Auth-sensitive | Muss über BFF oder server-only Helper laufen | Studio-Endpunkte |
+| Upload proxy | Muss über Web-Schicht laufen | Avatar-, Hero-, Cover-, Flyer-Uploads |
+| Public, directly fetchable | Darf server-seitig direkt gegen Laravel gehen | veröffentlichte Public Page |
+| Public but transformed | Route Handler nur bei zusätzlicher Aggregation/Transformation | spezielle zusammengesetzte Web-Responses |
 
-The key invariant: if a call requires the `vibaro_token` cookie, it must go through a Route Handler or a server-only utility (`backendFetch()` in `src/lib/api/backend.ts`). Direct client-side calls to Laravel are only acceptable for truly public, unauthenticated endpoints.
+Die bindende Grenze ist einfach:
+Sobald ein Request den `vibaro_token` braucht, darf die Browser-Schicht den Token nicht selbst halten oder an Laravel senden.
 
-## Non-Goals (MVP)
-- No mobile app, no AI features, no complex analytics platform.
-- Keep the product simple and stable.
+## Non-Goals (Current)
 
-## Decision Notes
-- React/Next.js chosen for fast iteration and public page rendering.
-- Laravel chosen for rapid SaaS backend development (auth, jobs, later billing).
+- kein direkter DB-Zugriff aus `apps/web`
+- keine zweite Auth-Schiene neben dem BFF-/server-only-Muster
+- keine Cross-App-Imports zwischen Web und API
