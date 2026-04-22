@@ -6,6 +6,7 @@ use App\Models\ArtistPage;
 use App\Models\Spotlight;
 use App\Models\TrackingLink;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -36,6 +37,18 @@ class SpotlightLifecycleTest extends TestCase
             'show_on_page' => true,
         ]);
 
+        $currentLink = TrackingLink::create([
+            'artist_page_id' => $page->id,
+            'spotlight_id' => $currentlyActive->id,
+            'platform' => 'instagram',
+            'placement' => 'story',
+            'module' => 'share',
+            'target_url' => 'https://example.com/current-link',
+            'slug' => 'current-story-link',
+            'short_code' => 'current-story-link',
+            'is_active' => true,
+        ]);
+
         Sanctum::actingAs($user);
 
         $response = $this->postJson("/api/v1/spotlights/{$scheduled->id}/activate");
@@ -45,9 +58,62 @@ class SpotlightLifecycleTest extends TestCase
 
         $currentlyActive->refresh();
         $scheduled->refresh();
+        $currentLink->refresh();
 
         $this->assertSame('ended', $currentlyActive->status);
+        $this->assertFalse((bool) $currentlyActive->show_on_page);
+        $this->assertNotNull($currentlyActive->ends_at);
+        $this->assertNotNull($currentLink->archived_at);
         $this->assertSame('active', $scheduled->status);
+    }
+
+    public function test_store_with_activate_true_uses_full_lifecycle_rules(): void
+    {
+        [$user, $page] = $this->createUserWithArtistPage('store-activate-owner');
+
+        $currentlyActive = Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Current Active',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/current-active',
+            'show_on_page' => true,
+        ]);
+
+        $currentLink = TrackingLink::create([
+            'artist_page_id' => $page->id,
+            'spotlight_id' => $currentlyActive->id,
+            'platform' => 'instagram',
+            'placement' => 'bio',
+            'module' => 'share',
+            'target_url' => 'https://example.com/current-bio',
+            'slug' => 'current-bio-link',
+            'short_code' => 'current-bio-link',
+            'is_active' => true,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/spotlights', [
+            'title' => 'Created Active Spotlight',
+            'type' => 'single',
+            'primary_url' => 'https://example.com/created-active',
+            'show_on_page' => true,
+            'activate' => true,
+        ]);
+
+        $response->assertCreated();
+        $newSpotlightId = $response->json('data.id');
+
+        $currentlyActive->refresh();
+        $currentLink->refresh();
+        $newSpotlight = Spotlight::findOrFail($newSpotlightId);
+
+        $this->assertSame('ended', $currentlyActive->status);
+        $this->assertFalse((bool) $currentlyActive->show_on_page);
+        $this->assertNotNull($currentlyActive->ends_at);
+        $this->assertNotNull($currentLink->archived_at);
+        $this->assertSame('active', $newSpotlight->status);
     }
 
     public function test_end_sets_status_and_archives_active_tracking_links(): void
@@ -145,6 +211,52 @@ class SpotlightLifecycleTest extends TestCase
 
         $this->postJson("/api/v1/spotlights/{$foreignSpotlight->id}/activate")
             ->assertStatus(403);
+    }
+
+    public function test_cannot_activate_archived_spotlight(): void
+    {
+        [$user, $page] = $this->createUserWithArtistPage('archived-activate-owner');
+
+        $spotlight = Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Archived Spotlight',
+            'type' => 'single',
+            'status' => 'scheduled',
+            'primary_url' => 'https://example.com/archived',
+            'show_on_page' => true,
+            'archived_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/v1/spotlights/{$spotlight->id}/activate")
+            ->assertStatus(400)
+            ->assertJsonPath('error.code', 'SPOTLIGHT_ARCHIVED');
+    }
+
+    public function test_database_constraint_prevents_two_active_spotlights_per_artist_page(): void
+    {
+        [, $page] = $this->createUserWithArtistPage('db-constraint-owner');
+
+        Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Active One',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/active-one',
+            'show_on_page' => true,
+        ]);
+
+        $this->expectException(QueryException::class);
+
+        Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Active Two',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/active-two',
+            'show_on_page' => true,
+        ]);
     }
 
     private function createUserWithArtistPage(string $handle = 'artist'): array

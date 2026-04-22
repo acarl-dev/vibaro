@@ -128,14 +128,5 @@ class Spotlight extends Model
             }
         });
 
-        static::saving(function ($spotlight) {
-            if ($spotlight->status === 'active') {
-                // Deactivate other active spotlights for this artist page
-                static::where('artist_page_id', $spotlight->artist_page_id)
-                    ->where('id', '!=', $spotlight->id ?? 0)
-                    ->where('status', 'active')
-                    ->update(['status' => 'ended']);
-            }
-        });
     }
 }

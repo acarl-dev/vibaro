@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\Spotlight;
 use App\Services\MetadataService;
+use App\Services\SpotlightLifecycleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -99,7 +100,7 @@ class SpotlightController extends Controller
     /**
      * Create a new spotlight.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, SpotlightLifecycleService $lifecycle): JsonResponse
     {
         $artistPage = $request->user()->artistPage;
 
@@ -123,8 +124,9 @@ class SpotlightController extends Controller
             'activate'           => 'nullable|boolean',
         ]);
 
-        // If activate=true, set to active (boot hook will end any other active spotlight)
-        $status = ($validated['activate'] ?? false) ? 'active' : 'scheduled';
+        // Activation side effects are centralized in SpotlightLifecycleService.
+        $activate = (bool) ($validated['activate'] ?? false);
+        $status = 'scheduled';
 
         $spotlight = Spotlight::create([
             'artist_page_id'     => $artistPage->id,
@@ -146,6 +148,11 @@ class SpotlightController extends Controller
             'meta'               => $validated['meta'] ?? null,
             'show_on_page'       => $validated['show_on_page'] ?? true,
         ]);
+
+        if ($activate) {
+            $lifecycle->activate($spotlight);
+            $spotlight->refresh();
+        }
 
         return $this->success($this->spotlightToArray($spotlight), 201);
     }
@@ -186,14 +193,17 @@ class SpotlightController extends Controller
     /**
      * Activate a spotlight (only one active per artist page).
      */
-    public function activate(Request $request, int $id): JsonResponse
+    public function activate(Request $request, int $id, SpotlightLifecycleService $lifecycle): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
         Gate::authorize('activate', $spotlight);
 
-        // Model boot hook handles deactivating other spotlights
-        $spotlight->update(['status' => 'active']);
+        if ($spotlight->isArchived()) {
+            return $this->error('SPOTLIGHT_ARCHIVED', 'Archived spotlight cannot be activated.', 400);
+        }
+
+        $lifecycle->activate($spotlight);
 
         return $this->success(['active_spotlight_id' => $spotlight->id]);
     }
@@ -201,22 +211,13 @@ class SpotlightController extends Controller
     /**
      * End a spotlight.
      */
-    public function end(Request $request, int $id): JsonResponse
+    public function end(Request $request, int $id, SpotlightLifecycleService $lifecycle): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
         Gate::authorize('end', $spotlight);
 
-        $spotlight->update([
-            'status' => 'ended',
-            'ends_at' => now(),
-            'show_on_page' => false,
-        ]);
-
-        // Archive all active tracking links for this spotlight
-        \App\Models\TrackingLink::where('spotlight_id', $spotlight->id)
-            ->active()
-            ->update(['archived_at' => now()]);
+        $lifecycle->end($spotlight);
 
         return $this->success(['ended_spotlight_id' => $spotlight->id]);
     }
@@ -241,7 +242,7 @@ class SpotlightController extends Controller
     /**
      * Archive a spotlight (soft delete).
      */
-    public function archive(Request $request, int $id): JsonResponse
+    public function archive(Request $request, int $id, SpotlightLifecycleService $lifecycle): JsonResponse
     {
         $spotlight = Spotlight::findOrFail($id);
 
@@ -251,7 +252,7 @@ class SpotlightController extends Controller
             return $this->error('ALREADY_ARCHIVED', 'This spotlight is already archived.', 400);
         }
 
-        $spotlight->archive();
+        $lifecycle->archive($spotlight);
 
         return $this->success(['ok' => true]);
     }
@@ -277,7 +278,7 @@ class SpotlightController extends Controller
     /**
      * Restore an archived spotlight.
      */
-    public function restore(Request $request, int $id): JsonResponse
+    public function restore(Request $request, int $id, SpotlightLifecycleService $lifecycle): JsonResponse
     {
         $spotlight = Spotlight::withoutGlobalScopes()->findOrFail($id);
 
@@ -287,7 +288,7 @@ class SpotlightController extends Controller
             return $this->error('NOT_ARCHIVED', 'This spotlight is not archived.', 400);
         }
 
-        $spotlight->restore();
+        $lifecycle->restore($spotlight);
 
         return $this->success($this->spotlightToArray($spotlight->fresh()));
     }

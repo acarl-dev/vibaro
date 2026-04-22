@@ -236,6 +236,7 @@ Leitprinzipien:
 
 **Regeln**
 - Maximal ein `active` Spotlight pro artist_page.
+- DB-Enforcement: Partial Unique Index auf `(artist_page_id)` für Zeilen mit `status = 'active'` und `archived_at IS NULL`.
 - `ends_at` darf nicht kleiner als `starts_at` sein.
 - **slug ist die stabile Campaign-Identität** – Titeländerung beeinflusst Analytics nicht.
 - slug wird bei Erstellung generiert (lowercase, url-safe, unique).

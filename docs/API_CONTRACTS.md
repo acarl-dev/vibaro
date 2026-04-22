@@ -624,13 +624,25 @@ Activates a spotlight (sets `status` to `active`).
 
 **Rules:**
 - Only one active spotlight per artist page
-- If another spotlight is already active, it is automatically set to `ended`
-- Model boot hook enforces one-active-per-page rule
+- If another spotlight is already active, it is automatically ended with full lifecycle side effects (`ends_at`, `show_on_page=false`, active tracking links archived)
+- Archived spotlights cannot be activated
+- Domain lifecycle service + DB partial unique index enforce one-active-per-page rule
 
 **Response:**
 
 ```json
 { "data": { "active_spotlight_id": 13 } }
+```
+
+**Error (400 Bad Request):**
+
+```json
+{
+  "error": {
+    "code": "SPOTLIGHT_ARCHIVED",
+    "message": "Archived spotlight cannot be activated."
+  }
+}
 ```
 
 ---
