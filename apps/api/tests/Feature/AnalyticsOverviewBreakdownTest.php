@@ -93,6 +93,8 @@ class AnalyticsOverviewBreakdownTest extends TestCase
         $this->createClick($page, $spotlight, $bio, false, 'instagram', 'bio');
         $this->createClick($page, $spotlight, $bio, false, 'instagram', 'bio');
         $this->createClick($page, $spotlight, $story, false, 'instagram', 'story');
+        // Preview click must be excluded from breakdown counts.
+        $this->createClick($page, $spotlight, $story, true, 'instagram', 'story');
 
         Sanctum::actingAs($user);
 

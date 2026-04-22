@@ -106,18 +106,21 @@ class AnalyticsService
         $linkIds = $links->pluck('id');
 
         // Total clicks (current period)
-        $totalCurrent = ClickEvent::whereIn('tracking_link_id', $linkIds)
+        $totalCurrent = ClickEvent::realClicks()
+            ->whereIn('tracking_link_id', $linkIds)
             ->where('occurred_at', '>=', now()->subDays($days))
             ->count();
 
         // Total clicks (previous period for trend)
-        $totalPrevious = ClickEvent::whereIn('tracking_link_id', $linkIds)
+        $totalPrevious = ClickEvent::realClicks()
+            ->whereIn('tracking_link_id', $linkIds)
             ->where('occurred_at', '>=', now()->subDays($days * 2))
             ->where('occurred_at', '<', now()->subDays($days))
             ->count();
 
         // Get clicks by link
-        $clicksByLink = ClickEvent::whereIn('tracking_link_id', $linkIds)
+        $clicksByLink = ClickEvent::realClicks()
+            ->whereIn('tracking_link_id', $linkIds)
             ->where('occurred_at', '>=', now()->subDays($days))
             ->selectRaw('tracking_link_id, COUNT(*) as clicks')
             ->groupBy('tracking_link_id')
