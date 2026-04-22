@@ -84,7 +84,7 @@ class StudioHomeService
     protected function getPreviousSpotlight(ArtistPage $artistPage): ?array
     {
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
-            ->where('status', 'ended')
+            ->ended()
             ->latest('ends_at')
             ->first();
 
@@ -160,7 +160,7 @@ class StudioHomeService
     {
         // Prefer active spotlight; fall back to the most recent scheduled one
         $spotlight = Spotlight::where('artist_page_id', $artistPage->id)
-            ->whereNull('archived_at')
+            ->notArchived()
             ->whereIn('status', ['active', 'scheduled'])
             ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
             ->orderByDesc('created_at')

@@ -61,7 +61,7 @@ class PublicArtistPageController extends Controller
         // Load active spotlight that should be shown on page (Hero Banner)
         $activeSpotlight = $page->spotlights()
             ->currentlyActive()
-            ->where('show_on_page', true)
+            ->visibleOnPage()
             ->first();
 
         // Prepare rich spotlight data for PhaseHero

@@ -66,13 +66,37 @@ class Spotlight extends Model
     }
 
     /**
-     * Scope to only include spotlights that are currently active.
+     * Scope: status = 'active' and not archived. Use for the single running spotlight.
      */
     public function scopeCurrentlyActive(Builder $query): Builder
     {
         return $query
             ->where('status', 'active')
             ->whereNull('archived_at');
+    }
+
+    /**
+     * Scope: not archived (archived_at IS NULL).
+     */
+    public function scopeNotArchived(Builder $query): Builder
+    {
+        return $query->whereNull('archived_at');
+    }
+
+    /**
+     * Scope: status = 'ended'.
+     */
+    public function scopeEnded(Builder $query): Builder
+    {
+        return $query->where('status', 'ended');
+    }
+
+    /**
+     * Scope: visible on the public artist page (show_on_page = true).
+     */
+    public function scopeVisibleOnPage(Builder $query): Builder
+    {
+        return $query->where('show_on_page', true);
     }
 
     /**
