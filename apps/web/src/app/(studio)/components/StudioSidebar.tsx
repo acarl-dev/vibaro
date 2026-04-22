@@ -25,15 +25,15 @@ const NAV_ITEMS = [
 
 const PAGE_SUB_NAV = [
   { label: "Übersicht", href: "/studio/page" },
-  { label: "Themes",    href: "/studio/appearance" },
-  { label: "Profil",    href: "/studio/profile" },
-  { label: "Links",     href: "/studio/links" },
-  { label: "Music",     href: "/studio/music" },
-  { label: "Shows",     href: "/studio/shows" },
-  { label: "Releases",  href: "/studio/releases" },
-  { label: "Videos",    href: "/studio/videos" },
-  { label: "Gallery",   href: "/studio/gallery" },
-  { label: "Kontakt",   href: "/studio/contact" },
+  { label: "Themes",    href: "/studio/page/appearance" },
+  { label: "Profil",    href: "/studio/page/profile" },
+  { label: "Links",     href: "/studio/page/links" },
+  { label: "Music",     href: "/studio/page/music" },
+  { label: "Shows",     href: "/studio/page/shows" },
+  { label: "Releases",  href: "/studio/page/releases" },
+  { label: "Videos",    href: "/studio/page/videos" },
+  { label: "Gallery",   href: "/studio/page/gallery" },
+  { label: "Kontakt",   href: "/studio/page/contact" },
 ] as const;
 
 const PAGE_SUB_HREFS = PAGE_SUB_NAV.map((s) => s.href);

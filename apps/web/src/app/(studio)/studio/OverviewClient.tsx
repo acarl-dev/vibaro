@@ -14,13 +14,6 @@ type ArtistPage = {
   hero_image_url: string | null;
 };
 
-type LinkType = {
-  id: number;
-  title: string;
-  url: string;
-  position: number;
-};
-
 type ContentCounts = {
   releases: number;
   shows: number;
@@ -31,11 +24,10 @@ type ContentCounts = {
 
 type OverviewClientProps = {
   initialPage: ArtistPage;
-  initialLinks: LinkType[];
   contentCounts: ContentCounts;
 };
 
-export default function OverviewClient({ initialPage, initialLinks, contentCounts }: OverviewClientProps) {
+export default function OverviewClient({ initialPage, contentCounts }: OverviewClientProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -80,12 +72,12 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
   };
 
   const completionItems = [
-    { label: "Profil ausgefüllt", completed: isProfileComplete, link: "/studio/profile" },
-    { label: "Releases hochgeladen", completed: hasContent.releases, link: "/studio/releases" },
-    { label: "Shows hinzugefügt", completed: hasContent.shows, link: "/studio/shows" },
-    { label: "Links verknüpft", completed: hasContent.links, link: "/studio/links" },
-    { label: "Videos hochgeladen", completed: hasContent.videos, link: "/studio/videos" },
-    { label: "Galerie befüllt", completed: hasContent.gallery, link: "/studio/gallery" },
+    { label: "Profil ausgefüllt", completed: isProfileComplete, link: "/studio/page/profile" },
+    { label: "Releases hochgeladen", completed: hasContent.releases, link: "/studio/page/releases" },
+    { label: "Shows hinzugefügt", completed: hasContent.shows, link: "/studio/page/shows" },
+    { label: "Links verknüpft", completed: hasContent.links, link: "/studio/page/links" },
+    { label: "Videos hochgeladen", completed: hasContent.videos, link: "/studio/page/videos" },
+    { label: "Galerie befüllt", completed: hasContent.gallery, link: "/studio/page/gallery" },
   ];
 
   const publicUrl = initialPage.handle ? `/p/${initialPage.handle}` : null;
@@ -282,7 +274,7 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
             <h2 className="text-sm font-medium text-zinc-300 mb-4">Schnellaktionen</h2>
             <div className="space-y-2">
               <QuickActionButton 
-                href="/studio/releases"
+                href="/studio/page/releases"
                 label="Release hinzufügen"
                 icon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,7 +283,7 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
                 }
               />
               <QuickActionButton 
-                href="/studio/shows"
+                href="/studio/page/shows"
                 label="Show eintragen"
                 icon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +292,7 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
                 }
               />
               <QuickActionButton 
-                href="/studio/videos"
+                href="/studio/page/videos"
                 label="Video hochladen"
                 icon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,7 +301,7 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
                 }
               />
               <QuickActionButton 
-                href="/studio/gallery"
+                href="/studio/page/gallery"
                 label="Galerie-Bild"
                 icon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +310,7 @@ export default function OverviewClient({ initialPage, initialLinks, contentCount
                 }
               />
               <QuickActionButton 
-                href="/studio/links"
+                href="/studio/page/links"
                 label="Link hinzufügen"
                 icon={
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

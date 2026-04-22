@@ -18,6 +18,19 @@ This document defines the binding product rules for the Studio Redesign (V3).
   - Meine Seite (My Page)
   - Ergebnisse (Results, analytics)
 - Content editors (Profile, Links, Music, Shows, Releases, Videos, Gallery, Contact, Themes) are sub-pages within "Meine Seite", not top-level navigation items
+- The canonical editor routes live under `/studio/page/**`
+  - `/studio/page`
+  - `/studio/page/profile`
+  - `/studio/page/links`
+  - `/studio/page/music`
+  - `/studio/page/shows`
+  - `/studio/page/releases`
+  - `/studio/page/videos`
+  - `/studio/page/gallery`
+  - `/studio/page/contact`
+  - `/studio/page/appearance`
+- Internal navigation, breadcrumbs, CTAs and menus must link only to the canonical `/studio/page/**` structure
+- Legacy editor routes under `/studio/**` exist only as transitional redirects and are not active IA
 
 ### Tracking Links
 

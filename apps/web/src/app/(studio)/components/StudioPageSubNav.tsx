@@ -5,15 +5,6 @@ import { usePathname } from "next/navigation";
 
 const PAGE_SECTION_PREFIXES = [
   "/studio/page",
-  "/studio/appearance",
-  "/studio/profile",
-  "/studio/links",
-  "/studio/music",
-  "/studio/shows",
-  "/studio/releases",
-  "/studio/videos",
-  "/studio/gallery",
-  "/studio/contact",
   "/studio/stage",
 ];
 
