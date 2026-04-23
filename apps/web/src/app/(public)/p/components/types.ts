@@ -106,5 +106,6 @@ export type PublicArtistPageData = {
   theme?: {
     key: string | null;
     variant: string | null;
+    accent_color?: string | null;
   };
 };

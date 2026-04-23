@@ -213,11 +213,13 @@ class StudioHomeService
 
         return $links->map(function ($link) {
             return [
-                'id' => $link->id,
-                'platform' => $link->platform,
-                'placement' => $link->placement,
-                'tracking_url' => $link->tracking_url,
-                'click_count' => $link->click_count,
+                'id'         => $link->id,
+                'label'      => $link->label,
+                'short_code' => $link->short_code,
+                'url'        => $link->tracking_url,
+                'clicks'     => $link->click_count,
+                'platform'   => $link->platform,
+                'placement'  => $link->placement,
             ];
         })->toArray();
     }

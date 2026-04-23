@@ -17,6 +17,7 @@ class ReleaseResource extends JsonResource
             'cover_url'    => $this->cover_path ? $appUrl . Storage::url($this->cover_path) : null,
             'url'          => $this->url,
             'release_date' => $this->release_date?->toDateString(),
+            'release_type' => $this->release_type,
             'is_featured'  => $this->is_featured,
         ];
     }

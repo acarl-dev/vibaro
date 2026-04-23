@@ -95,6 +95,7 @@ class ArtistPageController extends Controller
                 'management_email' => ['sometimes', 'nullable', 'email', 'max:255'],
                 'press_email' => ['sometimes', 'nullable', 'email', 'max:255'],
                 'whatsapp_number' => ['sometimes', 'nullable', 'string', 'max:50'],
+                'contact_message' => ['sometimes', 'nullable', 'string', 'max:500'],
                 'is_published' => ['sometimes', 'boolean'],
             ]);
         } catch (ValidationException $e) {
@@ -216,6 +217,7 @@ class ArtistPageController extends Controller
             'management_email' => $page->management_email,
             'press_email' => $page->press_email,
             'whatsapp_number' => $page->whatsapp_number,
+            'contact_message' => $page->contact_message,
             'is_published' => $page->is_published,
             'published_at' => $page->published_at?->toIso8601String(),
         ];

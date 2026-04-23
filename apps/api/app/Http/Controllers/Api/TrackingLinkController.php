@@ -111,6 +111,7 @@ class TrackingLinkController extends Controller
         return $this->success([
             'id' => $trackingLink->id,
             'short_code' => $trackingLink->short_code,
+            'spotlight_id' => $trackingLink->spotlight_id,
             'tracking_url' => $trackingLink->tracking_url,
             'target_url' => $trackingLink->target_url,
             'platform' => $trackingLink->platform,
@@ -120,6 +121,7 @@ class TrackingLinkController extends Controller
             'utm_source' => $trackingLink->utm_source,
             'utm_medium' => $trackingLink->utm_medium,
             'utm_campaign' => $trackingLink->utm_campaign,
+            'is_active' => $trackingLink->is_active,
             'created_at' => $trackingLink->created_at->toISOString(),
         ], 201);
     }

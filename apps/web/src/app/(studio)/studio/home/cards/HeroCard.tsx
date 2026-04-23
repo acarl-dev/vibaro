@@ -9,7 +9,7 @@ function fmt(n: number): string {
 
 function typeBadge(type: string | null): string {
   if (!type) return "";
-  const map: Record<string, string> = { release: "Release", live: "Live", merch: "Merch", studio: "Studio", presave: "Pre-Save", tour: "Tour" };
+  const map: Record<string, string> = { single: "Single", album: "Album", tour: "Tour", event: "Event", video: "Video", merch: "Merch", livestream: "Livestream", collab: "Collab" };
   return map[type.toLowerCase()] ?? type;
 }
 
