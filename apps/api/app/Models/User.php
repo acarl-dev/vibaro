@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'trial_ends_at',
     ];
 
     /**
@@ -47,7 +48,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'trial_ends_at' => 'datetime',
         ];
+    }
+
+    public function isTrialActive(): bool
+    {
+        return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
+    }
+
+    public function trialDaysRemaining(): int
+    {
+        if (!$this->isTrialActive()) {
+            return 0;
+        }
+
+        return (int) now()->diffInDays($this->trial_ends_at, false);
     }
 
     public function artistPage(): HasOne

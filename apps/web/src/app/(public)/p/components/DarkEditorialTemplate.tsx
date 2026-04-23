@@ -19,7 +19,7 @@ export default function DarkEditorialTemplate({
 }: {
   page: PublicArtistPageData;
 }) {
-  // Setup focus (MVP: Free plan = links focus by default)
+  // Setup focus configuration with defaults
   const focus = setupFocus(page);
 
   // Get optional sections (max 2, excluding focus type, only if has items)

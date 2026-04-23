@@ -4,11 +4,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trial Period
+    |--------------------------------------------------------------------------
+    |
+    | Duration in days for the trial period granted to every new user on
+    | registration. After the trial expires, a paid plan is required.
+    |
+    */
+    'trial_duration_days' => (int) env('VIBARO_TRIAL_DURATION_DAYS', 60),
+
+    /*
+    |--------------------------------------------------------------------------
     | Resource Limits
     |--------------------------------------------------------------------------
     |
-    | Per-artist-page resource limits. These can later be differentiated
-    | by plan (Free / Artist / Pro) once billing is wired up.
+    | Per-artist-page resource limits. Can later be differentiated by plan
+    | once billing is wired up.
     |
     */
     'limits' => [

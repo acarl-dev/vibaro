@@ -62,7 +62,6 @@ export function getOptionalSections(
 
 /**
  * Setup focus configuration with defaults
- * MVP: Free plan = links focus by default (limit: 3)
  */
 export function setupFocus(page: PublicArtistPageData) {
   const focus = page.focus ?? { type: "links" as const, limit: 3 };

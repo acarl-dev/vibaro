@@ -89,9 +89,17 @@ No architectural rewrite is required.
 
 ---
 
-## 5. Plans (Paid Only)
+## 5. Plans
 
-There is no Free plan in V2.
+### Probezeit (Trial)
+
+Jeder neue User erhält bei Registrierung eine **60-tägige Probezeit** mit vollem Stage-Zugang.
+
+- Kein Free Plan. Es gibt keinen dauerhaft kostenfreien Account.
+- Kein Kreditkarte erforderlich zum Starten.
+- Nach Ablauf der Probezeit ist ein bezahlter Plan erforderlich.
+- Die Dauer ist konfigurierbar (`VIBARO_TRIAL_DURATION_DAYS`, default 60).
+- `users.trial_ends_at` ist die Source of Truth für den Probezeit-Status.
 
 ### 5.1 Vibaro Stage
 

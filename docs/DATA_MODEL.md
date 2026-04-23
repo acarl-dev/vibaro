@@ -29,6 +29,7 @@ Authentifizierte Benutzer.
 | email | string | unique |
 | password | string | hashed |
 | is_admin | boolean | default false |
+| trial_ends_at | timestamp | nullable. Gesetzt bei Registrierung. Null = Probezeit abgelaufen oder nie gestartet. |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 

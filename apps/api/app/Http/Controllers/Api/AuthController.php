@@ -30,10 +30,13 @@ class AuthController extends Controller
             return $this->validationError($e->errors());
         }
 
+        $trialDays = config('vibaro.trial_duration_days', 60);
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'trial_ends_at' => now()->addDays($trialDays),
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
