@@ -68,6 +68,22 @@ class TrackingController extends Controller
         // Optional: hash user agent for abuse detection (privacy-aware)
         $userAgentHash = $this->hashUserAgent($userAgent);
 
+        // Deduplicate prefetch/double-request: same UA + same link within 30 seconds.
+        // Some browsers (WhatsApp Web, Chrome speculative loading) issue a prefetch
+        // GET immediately before or alongside the real navigation request. Both carry
+        // a real browser UA so bot detection does not filter them. We skip the second
+        // event to avoid inflating counts by 2x on a single intentional click.
+        if ($userAgentHash) {
+            $recentDuplicate = ClickEvent::where('tracking_link_id', $trackingLink->id)
+                ->where('user_agent_hash', $userAgentHash)
+                ->where('occurred_at', '>=', now()->subSeconds(30))
+                ->exists();
+
+            if ($recentDuplicate) {
+                return;
+            }
+        }
+
         ClickEvent::create([
             'tracking_link_id' => $trackingLink->id,
             'artist_page_id' => $trackingLink->artist_page_id,
