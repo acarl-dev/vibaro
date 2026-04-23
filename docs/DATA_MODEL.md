@@ -47,6 +47,9 @@ Zentrale Entität für Musiker-Seiten.
 | bio | text | nullable |
 | avatar_path | string | nullable |
 | header_path | string | nullable |
+| logo_path | string | nullable |
+| hero_focal_x | integer | nullable, 0–100, default 50. Horizontaler Fokuspunkt des Hero-Bilds. |
+| hero_focal_y | integer | nullable, 0–100, default 35. Vertikaler Fokuspunkt des Hero-Bilds. |
 | theme_key | string | aktuell nur `modern` |
 | theme_variant | string | aktuell nur `auto` |
 | accent_mode | string | `auto` \| `manual` |
@@ -160,6 +163,7 @@ Zentrale Entität für Musiker-Seiten.
 | url | string |
 | description | text |
 | thumbnail_url | string |
+| is_featured | boolean | default false |
 | position | int |
 | created_at | timestamp |
 | updated_at | timestamp |

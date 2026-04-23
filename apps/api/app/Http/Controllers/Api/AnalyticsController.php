@@ -25,13 +25,17 @@ class AnalyticsController extends Controller
     public function overview(Request $request): JsonResponse
     {
         $request->validate([
-            'range' => 'in:7d,30d',
+            'range' => 'in:7d,30d,90d',
             'spotlight_id' => 'nullable|exists:spotlights,id',
             'campaign_id' => 'nullable|exists:campaigns,id',
         ]);
 
         $range = $request->input('range', '7d');
-        $days = $range === '7d' ? 7 : 30;
+        $days = match ($range) {
+            '30d' => 30,
+            '90d' => 90,
+            default => 7,
+        };
         $spotlightId = $request->input('spotlight_id');
         $campaignId = $request->input('campaign_id');
 

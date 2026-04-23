@@ -13,6 +13,7 @@ export type SpotlightSummary = {
   show_on_page: boolean;
   starts_at: string | null;
   ends_at: string | null;
+  days_active: number;
   cover_image_url: string | null;
   artist_name: string | null;
   platform_name: string | null;
@@ -57,7 +58,6 @@ export type CompletenessItem = {
 
 export type PageStatusData = {
   handle: string | null;
-  url: string | null;
   is_published: boolean;
   display_name?: string | null;
   completeness?: {

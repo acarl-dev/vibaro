@@ -26,7 +26,7 @@ export default async function ResultsPage({
     : undefined;
 
   const [analytics, spotlights] = await Promise.all([
-    fetchAnalytics({ range: range as "7d" | "30d", spotlight_id: spotlightId }),
+    fetchAnalytics({ range, spotlight_id: spotlightId }),
     getSpotlights(),
   ]);
 

@@ -4,7 +4,7 @@
  * Client-side functions used in "use client" components (via proxy routes)
  */
 
-export type AnalyticsRange = "7d" | "30d";
+export type AnalyticsRange = "7d" | "30d" | "90d";
 
 export type PlatformStats = {
   platform: string;
@@ -27,15 +27,24 @@ export type TrendDataPoint = {
   clicks: number;
 };
 
+export type PageviewTrendDataPoint = {
+  date: string;
+  views: number;
+};
+
 export type AnalyticsData = {
   range: AnalyticsRange;
   spotlight_id: number | null;
   campaign_id: number | null;
   total_clicks: number;
+  total_pageviews: number;
+  unique_pageviews: number;
+  conversion_rate: number | null;
   by_platform: PlatformStats[];
   by_placement: PlacementStats[];
   by_referrer: ReferrerStats[];
   trend: TrendDataPoint[];
+  pv_trend: PageviewTrendDataPoint[];
 };
 
 export type AnalyticsParams = {

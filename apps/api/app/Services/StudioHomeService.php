@@ -311,9 +311,15 @@ class StudioHomeService
             ->where('occurred_at', '<', now()->subDays(7))
             ->count();
 
+        // trend_pct: percentage change vs previous 7 days.
+        // Returns 0 when no previous data (undefined % change is shown as neutral).
+        $trendPct = $prev7 > 0
+            ? (int) round((($last7 - $prev7) / $prev7) * 100)
+            : 0;
+
         return [
             'total_clicks_7d' => $last7,
-            'trend' => $last7 - $prev7,
+            'trend' => $trendPct,
         ];
     }
 
