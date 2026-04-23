@@ -22,7 +22,7 @@ class TrackingController extends Controller
     public function redirect(Request $request, string $slug)
     {
         // Support both legacy slug and new short_code (8 chars)
-        $trackingLink = TrackingLink::active()
+        $trackingLink = TrackingLink::notArchived()
             ->where(function ($query) use ($slug) {
                 $query->where('short_code', $slug)
                       ->orWhere('slug', $slug);
