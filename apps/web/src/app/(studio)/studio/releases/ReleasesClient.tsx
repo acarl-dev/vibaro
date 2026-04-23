@@ -6,6 +6,7 @@ import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
 import ReleaseForm, { type ReleaseFormData } from "./ReleaseForm";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type Release = {
   id: number;
@@ -96,7 +97,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
     const data = new FormData();
     data.append("cover", file);
     try {
-      const res = await fetch(`/api/studio/releases/${releaseId}/upload-cover`, {
+      const res = await studioFetch(`/api/studio/releases/${releaseId}/upload-cover`, {
         method: "POST",
         body: data,
       });
@@ -114,7 +115,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
 
   const handleCoverDelete = async (releaseId: number) => {
     try {
-      const res = await fetch(`/api/studio/releases/${releaseId}/cover`, { method: "DELETE" });
+      const res = await studioFetch(`/api/studio/releases/${releaseId}/cover`, { method: "DELETE" });
       if (res.ok || res.status === 204) {
         setReleases((prev) => prev.map((r) => (r.id === releaseId ? { ...r, cover_path: null } : r)));
       }
@@ -127,7 +128,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
       return;
     }
     try {
-      const res = await fetch("/api/studio/releases", {
+      const res = await studioFetch("/api/studio/releases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload(formData)),
@@ -137,7 +138,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
       let newRelease: Release = json.data;
       if (coverFile) {
         await handleCoverUpload(newRelease.id, coverFile);
-        const refreshRes = await fetch("/api/studio/releases");
+        const refreshRes = await studioFetch("/api/studio/releases");
         if (refreshRes.ok) {
           const refreshJson = await refreshRes.json();
           const updated = refreshJson.data.find((r: Release) => r.id === newRelease.id);
@@ -156,7 +157,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
       return;
     }
     try {
-      const res = await fetch(`/api/studio/releases/${releaseId}`, {
+      const res = await studioFetch(`/api/studio/releases/${releaseId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload(formData)),
@@ -166,7 +167,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
       let updatedRelease: Release = json.data;
       if (coverFile) {
         await handleCoverUpload(releaseId, coverFile);
-        const refreshRes = await fetch("/api/studio/releases");
+        const refreshRes = await studioFetch("/api/studio/releases");
         if (refreshRes.ok) {
           const refreshJson = await refreshRes.json();
           const refreshed = refreshJson.data.find((r: Release) => r.id === releaseId);
@@ -182,7 +183,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   const handleDelete = async (releaseId: number) => {
     if (!confirm("Dieses Release wirklich l\u00f6schen?")) return;
     try {
-      const res = await fetch(`/api/studio/releases/${releaseId}`, { method: "DELETE" });
+      const res = await studioFetch(`/api/studio/releases/${releaseId}`, { method: "DELETE" });
       if (res.ok) setReleases((prev) => prev.filter((r) => r.id !== releaseId));
     } catch { /* silent */ }
   };

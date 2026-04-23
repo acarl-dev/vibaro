@@ -7,6 +7,7 @@ import IdentityStep from "./steps/IdentityStep";
 import ProfileStep from "./steps/ProfileStep";
 import ContactStep from "./steps/ContactStep";
 import PublishStep from "./steps/PublishStep";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type Step = "intro" | "identity" | "profile" | "contact" | "publish";
 type HandleStatus = "idle" | "checking" | "available" | "unavailable";
@@ -140,7 +141,7 @@ export function OnboardingClient() {
     setProfileSaveStatus("saving");
     setProfileError(null);
     try {
-      const response = await fetch(`/api/studio/artist-pages/${artistPageId}`, {
+      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bio: nextBio.trim() || null }),
@@ -176,7 +177,7 @@ export function OnboardingClient() {
     const formData = new FormData();
     formData.append("hero_image", file);
     try {
-      const res = await fetch("/api/studio/upload-hero", { method: "POST", body: formData });
+      const res = await studioFetch("/api/studio/upload-hero", { method: "POST", body: formData });
       if (!res.ok) {
         const json: unknown = await res.json().catch(() => null);
         setHeroUploadError((json as { error?: string } | null)?.error ?? "Upload fehlgeschlagen.");
@@ -202,7 +203,7 @@ export function OnboardingClient() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) { setContactError("Bitte gib eine g\u00fcltige E-Mail-Adresse ein."); return; }
     if (!artistPageId) { setStep("publish"); return; }
     try {
-      const response = await fetch(`/api/studio/artist-pages/${artistPageId}`, {
+      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contact_email: contactEmail.trim(), contact_url: contactUrl.trim() || null }),
@@ -224,7 +225,7 @@ export function OnboardingClient() {
     setPublishError(null);
     setPublishing(true);
     try {
-      const response = await fetch(`/api/studio/artist-pages/${artistPageId}/publish`, { method: "POST" });
+      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}/publish`, { method: "POST" });
       const json: unknown = await response.json().catch(() => null);
       if (!response.ok) {
         setPublishError((json as { error?: { message?: string } } | null)?.error?.message ?? "Fehler beim Ver\u00f6ffentlichen.");

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import StudioButton from "../../components/StudioButton";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 // -----------------------------------------------------------------------------
 // Template Data (Canonical Copy from Instructions)
@@ -76,7 +77,7 @@ export default function AppearanceClient({
     setPendingSwitch(null);
 
     try {
-      const response = await fetch(`/api/studio/artist-pages/${artistPageId}`, {
+      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

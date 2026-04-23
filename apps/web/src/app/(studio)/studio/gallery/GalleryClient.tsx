@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type GalleryImage = {
   id: number;
@@ -162,7 +163,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
 
   const handleUpdateTitle = async (imageId: number, newTitle: string) => {
     try {
-      const res = await fetch(`/api/studio/gallery/${imageId}`, {
+      const res = await studioFetch(`/api/studio/gallery/${imageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newTitle || null }),
@@ -187,7 +188,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
     if (!confirm("Dieses Bild wirklich löschen?")) return;
 
     try {
-      const res = await fetch(`/api/studio/gallery/${imageId}`, {
+      const res = await studioFetch(`/api/studio/gallery/${imageId}`, {
         method: "DELETE",
       });
 
@@ -261,7 +262,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
     // Save new order to backend
     try {
       const imageIds = updatedImages.map(img => img.id);
-      await fetch('/api/studio/gallery/reorder', {
+      await studioFetch('/api/studio/gallery/reorder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_ids: imageIds }),

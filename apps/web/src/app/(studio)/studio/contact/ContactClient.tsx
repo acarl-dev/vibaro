@@ -3,6 +3,7 @@
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type ContactData = {
   booking_email: string | null;
@@ -29,7 +30,7 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
     setError("");
 
     try {
-      const res = await fetch(`/api/studio/artist-pages/${artistPageId}`, {
+      const res = await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

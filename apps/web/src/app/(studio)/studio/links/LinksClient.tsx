@@ -5,6 +5,7 @@ import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
 import { Plus, Trash } from "../../components/StudioIcons";
 import { getSocialIcon, getPlatformName, type SocialPlatform } from "@/lib/social-icons";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type Link = {
   id: number;
@@ -43,7 +44,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
   const [isCreating, setIsCreating] = useState(false);
 
   const handleUpdateLink = async (linkId: number, url: string) => {
-    const res = await fetch(`/api/studio/links/${linkId}`, {
+    const res = await studioFetch(`/api/studio/links/${linkId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: url || null }),
@@ -63,7 +64,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
     setIsCreating(true);
     setError("");
     try {
-      const res = await fetch("/api/studio/links", {
+      const res = await studioFetch("/api/studio/links", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -92,7 +93,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
 
   const handleDeleteLink = async (linkId: number) => {
     try {
-      const res = await fetch(`/api/studio/links/${linkId}`, { method: "DELETE" });
+      const res = await studioFetch(`/api/studio/links/${linkId}`, { method: "DELETE" });
       if (res.ok) {
         setLinks(links.filter((l) => l.id !== linkId));
         setError("");
@@ -106,7 +107,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
 
   const handleUpdateCustomLink = async (linkId: number, title: string, url: string) => {
     try {
-      const res = await fetch(`/api/studio/links/${linkId}`, {
+      const res = await studioFetch(`/api/studio/links/${linkId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: title || null, url: url || null }),

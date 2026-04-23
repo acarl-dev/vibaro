@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type FeaturedTrack = {
   id: number;
@@ -71,7 +72,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     const resolvedTitle = formData.title?.trim() || buildDefaultTitle(formData.platform);
 
     try {
-      const res = await fetch(`/api/studio/featured-tracks`, {
+      const res = await studioFetch(`/api/studio/featured-tracks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -111,7 +112,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     const resolvedTitle = formData.title?.trim() || buildDefaultTitle(formData.platform);
 
     try {
-      const res = await fetch(`/api/studio/featured-tracks/${trackId}`, {
+      const res = await studioFetch(`/api/studio/featured-tracks/${trackId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -144,7 +145,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     if (!confirm("Track wirklich löschen?")) return;
 
     try {
-      const res = await fetch(`/api/studio/featured-tracks/${trackId}`, {
+      const res = await studioFetch(`/api/studio/featured-tracks/${trackId}`, {
         method: "DELETE",
       });
 

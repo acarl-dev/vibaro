@@ -4,6 +4,7 @@ import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
 import { Plus, Pencil, X } from "../../components/StudioIcons";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type Video = {
   id: number;
@@ -42,7 +43,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
     }
 
     try {
-      const res = await fetch(`/api/studio/videos`, {
+      const res = await studioFetch(`/api/studio/videos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,7 +76,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
     }
 
     try {
-      const res = await fetch(`/api/studio/videos/${videoId}`, {
+      const res = await studioFetch(`/api/studio/videos/${videoId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,7 +106,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
     if (!confirm("Dieses Video wirklich löschen?")) return;
 
     try {
-      const res = await fetch(`/api/studio/videos/${videoId}`, {
+      const res = await studioFetch(`/api/studio/videos/${videoId}`, {
         method: "DELETE",
       });
 
@@ -138,7 +139,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
 
   const handleToggleFeatured = async (videoId: number) => {
     try {
-      const res = await fetch(`/api/studio/videos/${videoId}/featured`, {
+      const res = await studioFetch(`/api/studio/videos/${videoId}/featured`, {
         method: "POST",
       });
 
@@ -199,7 +200,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
     // Save new order to backend
     try {
       const videoIds = updatedVideos.map(v => v.id);
-      await fetch('/api/studio/videos/reorder', {
+      await studioFetch('/api/studio/videos/reorder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ video_ids: videoIds }),

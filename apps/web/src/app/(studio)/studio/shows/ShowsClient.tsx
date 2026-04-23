@@ -6,6 +6,7 @@ import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
 import ShowForm, { type ShowFormData } from "./ShowForm";
+import { studioFetch } from "@/lib/api/client-fetch";
 
 type Show = {
   id: number;
@@ -82,7 +83,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
     const data = new FormData();
     data.append("flyer", file);
     try {
-      const res = await fetch(`/api/studio/shows/${showId}/upload-flyer`, {
+      const res = await studioFetch(`/api/studio/shows/${showId}/upload-flyer`, {
         method: "POST",
         body: data,
       });
@@ -109,7 +110,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
 
   const handleFlyerDelete = async (showId: number) => {
     try {
-      const res = await fetch(`/api/studio/shows/${showId}/flyer`, { method: "DELETE" });
+      const res = await studioFetch(`/api/studio/shows/${showId}/flyer`, { method: "DELETE" });
       if (res.ok) {
         setShows((prev) => prev.map((s) => (s.id === showId ? { ...s, flyer_path: null } : s)));
       }
@@ -131,7 +132,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       return;
     }
     try {
-      const res = await fetch("/api/studio/shows", {
+      const res = await studioFetch("/api/studio/shows", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload(formData)),
@@ -141,7 +142,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       let newShow: Show = json.data;
       if (flyerFile) {
         await handleFlyerUpload(newShow.id, flyerFile);
-        const refreshRes = await fetch("/api/studio/shows");
+        const refreshRes = await studioFetch("/api/studio/shows");
         if (refreshRes.ok) {
           const refreshJson = await refreshRes.json();
           const updated = refreshJson.data.find((s: Show) => s.id === newShow.id);
@@ -162,7 +163,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       return;
     }
     try {
-      const res = await fetch(`/api/studio/shows/${showId}`, {
+      const res = await studioFetch(`/api/studio/shows/${showId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload(formData)),
@@ -172,7 +173,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
       let updatedShow: Show = json.data;
       if (flyerFile) {
         await handleFlyerUpload(showId, flyerFile);
-        const refreshRes = await fetch("/api/studio/shows");
+        const refreshRes = await studioFetch("/api/studio/shows");
         if (refreshRes.ok) {
           const refreshJson = await refreshRes.json();
           const refreshed = refreshJson.data.find((s: Show) => s.id === showId);
@@ -190,7 +191,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
   const handleDelete = async (showId: number) => {
     if (!confirm("Diese Show wirklich l\u00f6schen?")) return;
     try {
-      const res = await fetch(`/api/studio/shows/${showId}`, { method: "DELETE" });
+      const res = await studioFetch(`/api/studio/shows/${showId}`, { method: "DELETE" });
       if (res.ok) setShows((prev) => prev.filter((s) => s.id !== showId));
     } catch {
       // silent
