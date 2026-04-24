@@ -36,7 +36,6 @@ export default function BandNameStep({
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md space-y-10">
         <StepHeader
-          currentStep="band-name"
           title="Wie heißt eure Band?"
           description="Gebt euren Bandnamen ein – eure Webadresse wird automatisch erstellt."
         />

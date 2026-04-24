@@ -12,11 +12,16 @@ function normalizePublicPageData(data: PublicPageApiData): PublicArtistPageData 
   const raw = data as Record<string, unknown>;
   const videos = raw.videos ?? raw.videoItems ?? raw.video_items ?? undefined;
   const gallery_images = raw.gallery_images ?? raw.galleryImages ?? raw.gallery_items ?? undefined;
+  const normalized = data as PublicArtistPageData;
 
   return {
-    ...(data as PublicArtistPageData),
+    ...normalized,
     videos: videos as PublicArtistPageData["videos"],
     gallery_images: gallery_images as PublicArtistPageData["gallery_images"],
+    images: {
+      ...normalized.images,
+      hero_image_url: normalized.images?.hero_image_url ?? "/images/preview/preview_defauld.jpg",
+    },
   };
 }
 

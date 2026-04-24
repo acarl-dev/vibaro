@@ -22,9 +22,8 @@ export default function PhaseStep({ onSelect, generating, generateError, onBack 
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md space-y-8">
         <StepHeader
-          currentStep="phase"
-          title="Was l\u00e4uft gerade bei euch?"
-          description="W\u00e4hlt, was eure Band aktuell bewegt. Das erscheint direkt auf eurer Seite."
+          title="Was passiert gerade bei euch?"
+          description="W\u00e4hlt, was gerade bei euch los ist. Es erscheint sofort auf eurer Seite."
         />
 
         <div className="grid grid-cols-2 gap-3">

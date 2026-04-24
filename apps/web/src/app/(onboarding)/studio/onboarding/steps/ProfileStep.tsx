@@ -34,12 +34,12 @@ export default function PhaseContextStep({
   generating,
   generateError,
 }: PhaseContextStepProps) {
-  const title = phaseType === "release" ? "Was kommt raus?" : "Welche Art von Show?";
+  const title = phaseType === "release" ? "Was ver\u00f6ffentlicht ihr gerade?" : "Was steht an?";
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md space-y-8">
-        <StepHeader currentStep="phase-context" title={title} />
+        <StepHeader title={title} />
 
         <div className="space-y-6">
           {phaseType === "release" && (
@@ -64,11 +64,8 @@ export default function PhaseContextStep({
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <FieldLabel>Titel</FieldLabel>
-                  <span className="text-xs text-zinc-700">Optional</span>
-                </div>
+              <div className="space-y-1.5">
+                <p className="text-xs text-zinc-600">Wie hei\u00dft der Track / das Album? <span className="text-zinc-700">(optional)</span></p>
                 <input
                   type="text"
                   value={phaseTitle}
@@ -109,11 +106,8 @@ export default function PhaseContextStep({
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <FieldLabel>{liveKind === "concert" ? "Stadt" : "Tour-Name"}</FieldLabel>
-                  <span className="text-xs text-zinc-700">Optional</span>
-                </div>
+              <div className="space-y-1.5">
+                <p className="text-xs text-zinc-600">{liveKind === "concert" ? "In welcher Stadt?" : "Wie hei\u00dft die Tour?"} <span className="text-zinc-700">(optional)</span></p>
                 <input
                   type="text"
                   value={phaseLabel}

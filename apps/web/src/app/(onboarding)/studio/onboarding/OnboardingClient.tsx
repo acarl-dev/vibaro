@@ -49,6 +49,7 @@ export function OnboardingClient() {
 
   const [step, setStep] = useState<Step>("band-name");
   const [artistPageId, setArtistPageId] = useState<number | null>(null);
+  const artistPageIdRef = useRef<number | null>(null);
 
   // BandName step
   const [displayName, setDisplayName] = useState("");
@@ -160,7 +161,10 @@ export function OnboardingClient() {
         setHandleStatus("unavailable");
         return;
       }
-      if (typeof data?.id === "number") setArtistPageId(data.id);
+      if (typeof data?.id === "number") {
+        setArtistPageId(data.id);
+        artistPageIdRef.current = data.id;
+      }
       if (typeof data?.handle === "string") setHandle(data.handle);
       setHandleStatus("available");
       setStep("phase");
@@ -180,7 +184,11 @@ export function OnboardingClient() {
     pt: string,
     pl: string,
   ) {
-    if (!artistPageId) return;
+    const pageId = artistPageIdRef.current ?? artistPageId;
+    if (!pageId) {
+      setGenerateError("Seite konnte nicht gefunden werden. Bitte lade die Seite neu.");
+      return;
+    }
     setGenerating(true);
     setGenerateError(null);
 
@@ -188,7 +196,7 @@ export function OnboardingClient() {
     const params = deriveSpotlightParams(phase, rk, lk, pt, pl);
 
     try {
-      await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
+      await studioFetch(`/api/studio/artist-pages/${pageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bio }),
@@ -207,7 +215,7 @@ export function OnboardingClient() {
         }),
       });
 
-      await studioFetch(`/api/studio/artist-pages/${artistPageId}/publish`, { method: "POST" });
+      await studioFetch(`/api/studio/artist-pages/${pageId}/publish`, { method: "POST" });
     } catch {
       setGenerateError("Fehler beim Erstellen der Seite. Bitte versuche es erneut.");
       setGenerating(false);
@@ -293,6 +301,7 @@ export function OnboardingClient() {
 
   return (
     <PreviewStep
+      artistPageId={artistPageId}
       displayName={displayName}
       handle={handle}
       onFinish={handleFinish}

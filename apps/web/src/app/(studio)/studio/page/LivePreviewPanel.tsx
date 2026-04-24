@@ -17,9 +17,11 @@ type Props = {
   externalUrl: string;
   /** Increment to force an iframe reload from outside */
   reloadKey?: number;
+  /** Hide the external "Öffnen" link (e.g. in onboarding where a separate CTA exists) */
+  hideExternalLink?: boolean;
 };
 
-export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey = 0 }: Props) {
+export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey = 0, hideExternalLink = false }: Props) {
   const [device, setDevice] = useState<Device>("desktop");
   const [scale, setScale] = useState(1);
   const [localKey, setLocalKey] = useState(0); // forces iframe reload via button
@@ -120,20 +122,22 @@ export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey =
         </div>
 
         <div className="flex items-center gap-2">
-          <a
-            href={externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[11px] transition-colors"
-            style={{ color: "var(--studio-text-secondary)" }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-            Öffnen
-          </a>
+          {!hideExternalLink && (
+            <a
+              href={externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[11px] transition-colors"
+              style={{ color: "var(--studio-text-secondary)" }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              Öffnen
+            </a>
+          )}
           <button
             onClick={() => setLocalKey((k) => k + 1)}
             className="p-1 rounded transition-colors"
