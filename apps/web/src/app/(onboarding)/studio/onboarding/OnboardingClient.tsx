@@ -8,6 +8,7 @@ import PhaseContextStep from "./steps/ProfileStep";
 import PreviewStep from "./steps/ContactStep";
 import { studioFetch } from "@/lib/api/client-fetch";
 import type { PhaseType, ReleaseKind, LiveKind } from "./steps/onboarding-shared";
+import type { SpotlightItem } from "@/app/(public)/p/components/types";
 
 type Step = "band-name" | "phase" | "phase-context" | "preview";
 type HandleStatus = "idle" | "checking" | "available" | "unavailable";
@@ -66,12 +67,15 @@ export function OnboardingClient() {
   const [liveKind, setLiveKind] = useState<LiveKind>("concert");
   const [phaseTitle, setPhaseTitle] = useState("");
   const [phaseLabel, setPhaseLabel] = useState("");
+  const [phaseUrl, setPhaseUrl] = useState("");
 
   // Generation / preview
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
+  const [previewSpotlight, setPreviewSpotlight] = useState<SpotlightItem | null>(null);
+  const [previewBio, setPreviewBio] = useState("");
 
   const handleCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -183,6 +187,7 @@ export function OnboardingClient() {
     lk: LiveKind,
     pt: string,
     pl: string,
+    url: string,
   ) {
     const pageId = artistPageIdRef.current ?? artistPageId;
     if (!pageId) {
@@ -192,8 +197,19 @@ export function OnboardingClient() {
     setGenerating(true);
     setGenerateError(null);
 
-    const bio = `${displayName.trim()} ist eine Band aus der modernen Musikszene.`;
+    const bio = `${displayName.trim()} verbindet rohe Energie mit klaren Hooks.
+Entstanden aus der Szene, geprägt von Live-Momenten und neuen Ideen, entwickelt sich ihr Sound stetig weiter.`;
     const params = deriveSpotlightParams(phase, rk, lk, pt, pl);
+    const primaryUrl = url.trim() || "https://vibaro.app";
+
+    // Pre-populate preview state so it's available immediately when step changes
+    setPreviewBio(bio);
+    setPreviewSpotlight({
+      title: params.title,
+      type: params.type,
+      primary_url: primaryUrl,
+      cta_label: params.ctaLabel,
+    });
 
     try {
       await studioFetch(`/api/studio/artist-pages/${pageId}`, {
@@ -208,7 +224,7 @@ export function OnboardingClient() {
         body: JSON.stringify({
           title: params.title,
           type: params.type,
-          primary_url: "https://vibaro.app",
+          primary_url: primaryUrl,
           cta_label: params.ctaLabel,
           show_on_page: true,
           activate: true,
@@ -230,18 +246,14 @@ export function OnboardingClient() {
 
   function handlePhaseSelect(phase: PhaseType) {
     setPhaseType(phase);
-    if (phase === "merch" || phase === "studio") {
-      void generatePage(phase, releaseKind, liveKind, "", "");
-    } else {
-      setStep("phase-context");
-    }
+    setStep("phase-context");
   }
 
   // ── Step 3: Phase context ────────────────────────────────────────────
 
   function handlePhaseContextContinue() {
     if (!phaseType) return;
-    void generatePage(phaseType, releaseKind, liveKind, phaseTitle, phaseLabel);
+    void generatePage(phaseType, releaseKind, liveKind, phaseTitle, phaseLabel, phaseUrl);
   }
 
   // ── Step 4: Finish ───────────────────────────────────────────────────
@@ -291,6 +303,8 @@ export function OnboardingClient() {
         setPhaseTitle={setPhaseTitle}
         phaseLabel={phaseLabel}
         setPhaseLabel={setPhaseLabel}
+        phaseUrl={phaseUrl}
+        setPhaseUrl={setPhaseUrl}
         onContinue={handlePhaseContextContinue}
         onBack={() => setStep("phase")}
         generating={generating}
@@ -304,6 +318,8 @@ export function OnboardingClient() {
       artistPageId={artistPageId}
       displayName={displayName}
       handle={handle}
+      initialBio={previewBio}
+      activeSpotlight={previewSpotlight}
       onFinish={handleFinish}
       onBack={() => setStep(phaseType === "release" || phaseType === "live" ? "phase-context" : "phase")}
       finishing={finishing}

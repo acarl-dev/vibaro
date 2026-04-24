@@ -13,6 +13,8 @@ type PhaseContextStepProps = {
   setPhaseTitle: (v: string) => void;
   phaseLabel: string;
   setPhaseLabel: (v: string) => void;
+  phaseUrl: string;
+  setPhaseUrl: (v: string) => void;
   onContinue: () => void;
   onBack: () => void;
   generating: boolean;
@@ -29,12 +31,18 @@ export default function PhaseContextStep({
   setPhaseTitle,
   phaseLabel,
   setPhaseLabel,
+  phaseUrl,
+  setPhaseUrl,
   onContinue,
   onBack,
   generating,
   generateError,
 }: PhaseContextStepProps) {
-  const title = phaseType === "release" ? "Was ver\u00f6ffentlicht ihr gerade?" : "Was steht an?";
+  const title =
+    phaseType === "release" ? "Was ver\u00f6ffentlicht ihr gerade?" :
+    phaseType === "live"    ? "Was steht an?" :
+    phaseType === "merch"   ? "Wohin soll der Link f\u00fchren?" :
+                              "Wohin soll der Link f\u00fchren?";
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
@@ -121,6 +129,25 @@ export default function PhaseContextStep({
           )}
 
           {generateError && <p className="text-xs text-red-400">{generateError}</p>}
+
+          {/* URL field — shown for all phase types */}
+          <div className="space-y-1.5">
+            <p className="text-xs text-zinc-500">
+              {phaseType === "release" && "Link zur Single / zum Album"}
+              {phaseType === "live" && "Link zu Tickets oder Tour-Info"}
+              {phaseType === "merch" && "Link zu eurem Merch-Shop"}
+              {phaseType === "studio" && "Link zu eurer Website"}
+              {" "}<span className="text-zinc-700">(optional)</span>
+            </p>
+            <input
+              type="url"
+              value={phaseUrl}
+              onChange={(e) => setPhaseUrl(e.target.value)}
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-sm text-zinc-100 outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-700"
+              placeholder="https://"
+              autoFocus={phaseType === "merch" || phaseType === "studio"}
+            />
+          </div>
 
           <ActionRow onBack={onBack}>
             <button

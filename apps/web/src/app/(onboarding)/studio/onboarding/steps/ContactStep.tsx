@@ -3,11 +3,15 @@
 import { useState, useRef } from "react";
 import { studioFetch } from "@/lib/api/client-fetch";
 import { getInitials } from "@/app/(public)/p/components/helpers";
+import PhaseHero from "@/components/public-page/PhaseHero";
+import type { SpotlightItem } from "@/app/(public)/p/components/types";
 
 type PreviewStepProps = {
   artistPageId: number | null;
   displayName: string;
   handle: string;
+  initialBio?: string;
+  activeSpotlight?: SpotlightItem | null;
   onFinish: () => void;
   onBack: () => void;
   finishing: boolean;
@@ -18,6 +22,8 @@ export default function PreviewStep({
   artistPageId,
   displayName,
   handle,
+  initialBio,
+  activeSpotlight,
   onFinish,
   onBack,
   finishing,
@@ -28,7 +34,7 @@ export default function PreviewStep({
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [localDisplayName, setLocalDisplayName] = useState(displayName);
-  const [localBio, setLocalBio] = useState("");
+  const [localBio, setLocalBio] = useState(initialBio ?? "");
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const [heroUploading, setHeroUploading] = useState(false);
   const [heroError, setHeroError] = useState<string | null>(null);
@@ -132,9 +138,7 @@ export default function PreviewStep({
         </button>
         <div className="text-center px-4">
           <p className="text-base font-semibold text-zinc-50 tracking-tight">Das ist eure Seite.</p>
-          <p className="text-xs text-zinc-500 mt-0.5 max-w-xs leading-relaxed">
-            Klickt auf Bild, Name oder Bio um sie direkt zu bearbeiten
-          </p>
+          <p className="text-xs text-zinc-500 mt-0.5">Mach sie zu eurer.</p>
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           <button
@@ -357,10 +361,25 @@ export default function PreviewStep({
                   </div>
                 ) : (
                   <button type="button" onClick={() => openEdit("bio")} className="group w-full" title="Bio bearbeiten" style={{ marginTop: "clamp(32px, 4vw, 56px)" }}>
-                    <p className="stage-hero__subtitle" style={{ display: "inline-flex", alignItems: "flex-start", gap: "0.4em" }}>
-                      <span>{localBio || <em style={{ opacity: 0.4, fontStyle: "normal" }}>Bio hinzufügen…</em>}</span>
-                      <svg className="shrink-0 opacity-0 group-hover:opacity-60 transition-opacity mt-0.5" style={{ width: "10px", height: "10px" }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
-                    </p>
+                    {localBio ? (
+                      <p className="stage-hero__subtitle" style={{ display: "inline-flex", alignItems: "flex-start", gap: "0.4em" }}>
+                        <span>{localBio}</span>
+                        <svg className="shrink-0 opacity-0 group-hover:opacity-60 transition-opacity mt-0.5" style={{ width: "10px", height: "10px" }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
+                      </p>
+                    ) : (
+                      <span
+                        className="inline-flex items-center gap-2 text-xs font-medium transition-colors"
+                        style={{
+                          color: "rgba(255,255,255,0.50)",
+                          border: "1px dashed rgba(255,255,255,0.22)",
+                          borderRadius: "6px",
+                          padding: "6px 14px",
+                        }}
+                      >
+                        <svg style={{ width: "12px", height: "12px", flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+                        Bio hinzufügen
+                      </span>
+                    )}
                   </button>
                 )}
 
@@ -369,6 +388,11 @@ export default function PreviewStep({
 
           </div>
         </header>
+
+        {/* Phase / Spotlight preview */}
+        {activeSpotlight && (
+          <PhaseHero spotlight={activeSpotlight} />
+        )}
 
         {/* Studio CTA */}
         <div className="px-6 py-6 flex items-start gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
