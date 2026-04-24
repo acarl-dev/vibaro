@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SpotlightData, fetchArchivedSpotlights, restoreSpotlight, deleteSpotlight } from "@/lib/api/spotlights";
-import CreateSpotlightForm from "./CreateSpotlightForm";
+import CreatePhaseWizard from "./CreatePhaseWizard";
 import SpotlightList from "./SpotlightList";
 import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
@@ -22,6 +22,8 @@ const TYPE_LABELS: Record<string, string> = {
   merch: "Merch",
   livestream: "Livestream",
   collab: "Kollaboration",
+  studio: "Studio",
+  focus: "Fokus",
 };
 
 export default function ProjectClient({ spotlights: initialSpotlights }: ProjectClientProps) {
@@ -130,10 +132,10 @@ export default function ProjectClient({ spotlights: initialSpotlights }: Project
         }
       />
 
-      {/* Create Form */}
+      {/* Create Phase Wizard */}
       {showCreateForm && (
         <div className="mb-6">
-          <CreateSpotlightForm
+          <CreatePhaseWizard
             onSuccess={handleSpotlightCreated}
             onCancel={() => setShowCreateForm(false)}
           />

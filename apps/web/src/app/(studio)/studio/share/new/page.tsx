@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { SpotlightData } from "@/lib/api/spotlights";
-import CreateSpotlightForm from "../../project/CreateSpotlightForm";
+import CreatePhaseWizard from "../../project/CreatePhaseWizard";
 import StudioPageHeader from "../../../components/StudioPageHeader";
 
 export default function NewPhasePage() {
@@ -24,7 +24,7 @@ export default function NewPhasePage() {
         title="NEUE PHASE"
         subtitle="Starte eine zeitlich gezielte Kampagne für deine Seite."
       />
-      <CreateSpotlightForm onSuccess={handleSuccess} onCancel={handleCancel} />
+      <CreatePhaseWizard onSuccess={handleSuccess} onCancel={handleCancel} />
     </div>
   );
 }

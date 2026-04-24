@@ -47,6 +47,11 @@ const META_FIELDS: Record<
   merch: [{ key: "is_limited", label: "Limitiert", type: "boolean" }],
   livestream: [{ key: "countdown_until", label: "Countdown bis (ISO Datum)", type: "text" }],
   collab: [{ key: "partner_name", label: "Partner-Name", type: "text" }],
+  studio: [
+    { key: "status_text", label: "Status (z.B. Aufnahmen laufen)", type: "text" },
+    { key: "expected_release", label: "Voraussichtlicher Release", type: "text" },
+  ],
+  focus: [],
 };
 
 export function PhaseDisplayFields({

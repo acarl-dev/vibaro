@@ -15,7 +15,9 @@ type PhaseType =
   | "event"
   | "merch"
   | "livestream"
-  | "collab";
+  | "collab"
+  | "studio"
+  | "focus";
 
 type PhaseConfig = {
   badge: string;
@@ -23,7 +25,7 @@ type PhaseConfig = {
   /** Radial glow color injected behind content (RGB triplet for rgba()) */
   glowRgb: string;
   /** The mode controls layout & sizing decisions */
-  mode: "single" | "album" | "video" | "tour" | "event" | "merch" | "livestream" | "collab";
+  mode: "single" | "album" | "video" | "tour" | "event" | "merch" | "livestream" | "collab" | "studio" | "focus";
 };
 
 // ---------------------------------------------------------------------------
@@ -39,6 +41,8 @@ const TYPE_CONFIG: Record<PhaseType, PhaseConfig> = {
   merch:      { badge: "LIMITED DROP",  cta: "Jetzt sichern",   glowRgb: "180, 160, 60",  mode: "merch"      },
   livestream: { badge: "LIVE STREAM",   cta: "Jetzt beitreten", glowRgb: "220, 38, 38",   mode: "livestream" },
   collab:     { badge: "COLLABORATION", cta: "Jetzt entdecken", glowRgb: "60, 160, 200",  mode: "collab"     },
+  studio:     { badge: "IM STUDIO",     cta: "Mehr erfahren",   glowRgb: "80, 80, 100",   mode: "studio"     },
+  focus:      { badge: "AKTUELL",       cta: "Mehr erfahren",   glowRgb: "100, 100, 120",  mode: "focus"      },
 };
 
 const DEFAULT_CONFIG: PhaseConfig = {
