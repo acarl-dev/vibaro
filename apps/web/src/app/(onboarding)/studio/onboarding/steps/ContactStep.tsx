@@ -1,81 +1,67 @@
 "use client";
 
-import { StepHeader, FieldLabel, ActionRow } from "./onboarding-shared";
+import LivePreviewPanel from "@/app/(studio)/studio/page/LivePreviewPanel";
 
-type ContactStepProps = {
-  contactEmail: string;
-  setContactEmail: (v: string) => void;
-  contactUrl: string;
-  setContactUrl: (v: string) => void;
-  contactError: string | null;
-  setContactError: (e: string | null) => void;
-  onContinue: () => void;
+type PreviewStepProps = {
+  displayName: string;
+  handle: string;
+  onFinish: () => void;
   onBack: () => void;
+  finishing: boolean;
+  finishError: string | null;
 };
 
-export default function ContactStep({
-  contactEmail,
-  setContactEmail,
-  contactUrl,
-  setContactUrl,
-  contactError,
-  setContactError,
-  onContinue,
+export default function PreviewStep({
+  displayName,
+  handle,
+  onFinish,
   onBack,
-}: ContactStepProps) {
-  const canContinue = contactEmail.trim().length > 0;
+  finishing,
+  finishError,
+}: PreviewStepProps) {
+  const externalUrl = `https://vibaro.app/p/${handle}`;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md space-y-8">
-        <StepHeader
-          currentStep="contact"
-          title="Wie kann man dich erreichen?"
-          description="Diese Infos erscheinen auf deiner \u00f6ffentlichen Seite und helfen Fans und Buchern, dich zu kontaktieren."
-        />
+    <div className="min-h-screen flex flex-col">
+      {/* Top bar */}
+      <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-zinc-800/60">
+        <button
+          type="button"
+          onClick={onBack}
+          disabled={finishing}
+          className="text-sm text-zinc-600 hover:text-zinc-300 transition-colors disabled:opacity-40"
+        >
+          ← Zurück
+        </button>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <FieldLabel>Kontakt-E-Mail</FieldLabel>
-            <input
-              type="email"
-              value={contactEmail}
-              onChange={(e) => { setContactEmail(e.target.value); setContactError(null); }}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-sm text-zinc-100 outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-700"
-              placeholder="booking@deinemail.com"
-              autoFocus
-            />
-            <p className="text-xs text-zinc-700">F\u00fcr Booking-Anfragen oder allgemeine Kontaktaufnahme.</p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <FieldLabel>Website oder Booking-Link</FieldLabel>
-              <span className="text-xs text-zinc-700">Optional</span>
-            </div>
-            <input
-              type="url"
-              value={contactUrl}
-              onChange={(e) => setContactUrl(e.target.value)}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-sm text-zinc-100 outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-700"
-              placeholder="https://"
-            />
-          </div>
-
-          {contactError && <p className="text-xs text-red-400">{contactError}</p>}
-
-          <ActionRow onBack={onBack} backLabel="Profil">
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={!canContinue}
-              className="rounded-full bg-zinc-50 px-7 py-2.5 text-sm font-medium text-zinc-900 hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Weiter \u2192
-            </button>
-          </ActionRow>
+        <div className="text-center">
+          <p className="text-sm font-semibold text-zinc-100">Eure Seite ist bereit.</p>
+          <p className="text-xs text-zinc-600">
+            {displayName} · vibaro.app/p/{handle}
+          </p>
         </div>
+
+        <div className="flex flex-col items-end gap-1">
+          <button
+            type="button"
+            onClick={onFinish}
+            disabled={finishing}
+            className="rounded-full bg-zinc-50 px-5 py-2 text-sm font-medium text-zinc-900 hover:bg-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            {finishing ? "Wird gestartet…" : "Weiter → Studio"}
+          </button>
+          {finishError && <p className="text-xs text-red-400">{finishError}</p>}
+        </div>
+      </div>
+
+      {/* Live preview */}
+      <div className="flex-1 min-h-0">
+        <LivePreviewPanel
+          previewPath={`/p/${handle}`}
+          externalUrl={externalUrl}
+        />
       </div>
     </div>
   );
 }
+

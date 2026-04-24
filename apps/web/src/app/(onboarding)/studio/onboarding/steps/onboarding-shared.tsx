@@ -2,14 +2,21 @@
 
 import type React from "react";
 
-export type Step = "intro" | "identity" | "profile" | "contact" | "publish";
+export type Step = "band-name" | "phase" | "phase-context" | "preview";
+export type PhaseType = "release" | "live" | "merch" | "studio";
+export type ReleaseKind = "single" | "album" | "video";
+export type LiveKind = "concert" | "tour";
 
-export const STEPS: { key: Step; label: string }[] = [
-  { key: "identity", label: "Identit\u00e4t" },
-  { key: "profile", label: "Profil" },
-  { key: "contact", label: "Kontakt" },
-  { key: "publish", label: "Fertig" },
+// Three visual steps; "phase-context" maps to "phase" in the indicator
+const VISUAL_STEPS: { key: Step; label: string }[] = [
+  { key: "band-name", label: "Bandname" },
+  { key: "phase", label: "Aktuell" },
+  { key: "preview", label: "Deine Seite" },
 ];
+
+function getVisualStep(step: Step): Step {
+  return step === "phase-context" ? "phase" : step;
+}
 
 export function StepHeader({
   title,
@@ -17,16 +24,17 @@ export function StepHeader({
   currentStep,
 }: {
   title: string;
-  description: string;
+  description?: string;
   currentStep: Step;
 }) {
-  const currentIndex = STEPS.findIndex((s) => s.key === currentStep);
+  const visualStep = getVisualStep(currentStep);
+  const currentIndex = VISUAL_STEPS.findIndex((s) => s.key === visualStep);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <span className="text-xs uppercase tracking-[0.2em] text-zinc-600">Vibaro</span>
         <div className="flex items-center gap-2">
-          {STEPS.map((s, i) => {
+          {VISUAL_STEPS.map((s, i) => {
             const done = i < currentIndex;
             const active = i === currentIndex;
             return (
@@ -49,7 +57,7 @@ export function StepHeader({
                     i + 1
                   )}
                 </div>
-                {i < STEPS.length - 1 && (
+                {i < VISUAL_STEPS.length - 1 && (
                   <div className={["h-px w-5 transition-colors", done ? "bg-zinc-600" : "bg-zinc-800"].join(" ")} />
                 )}
               </div>
@@ -59,7 +67,7 @@ export function StepHeader({
       </div>
       <div className="space-y-1.5">
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-        <p className="text-sm text-zinc-500">{description}</p>
+        {description && <p className="text-sm text-zinc-500">{description}</p>}
       </div>
     </div>
   );

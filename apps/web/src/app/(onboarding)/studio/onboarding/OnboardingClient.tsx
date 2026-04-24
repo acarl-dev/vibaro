@@ -1,57 +1,86 @@
 "use client";
 
-import { DragEvent, FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import IntroStep from "./steps/IntroStep";
-import IdentityStep from "./steps/IdentityStep";
-import ProfileStep from "./steps/ProfileStep";
-import ContactStep from "./steps/ContactStep";
-import PublishStep from "./steps/PublishStep";
+import BandNameStep from "./steps/IntroStep";
+import PhaseStep from "./steps/IdentityStep";
+import PhaseContextStep from "./steps/ProfileStep";
+import PreviewStep from "./steps/ContactStep";
 import { studioFetch } from "@/lib/api/client-fetch";
+import type { PhaseType, ReleaseKind, LiveKind } from "./steps/onboarding-shared";
 
-type Step = "intro" | "identity" | "profile" | "contact" | "publish";
+type Step = "band-name" | "phase" | "phase-context" | "preview";
 type HandleStatus = "idle" | "checking" | "available" | "unavailable";
-type SaveStatus = "idle" | "saving" | "saved" | "error";
+
+function deriveSpotlightParams(
+  phaseType: PhaseType,
+  releaseKind: ReleaseKind,
+  liveKind: LiveKind,
+  phaseTitle: string,
+  phaseLabel: string,
+): { type: string; title: string; ctaLabel: string } {
+  if (phaseType === "release") {
+    const kindLabel = { single: "Single", album: "Album", video: "Video" }[releaseKind];
+    return {
+      type: releaseKind,
+      title: phaseTitle.trim() || `Neue ${kindLabel}`,
+      ctaLabel: "Jetzt anh\u00f6ren",
+    };
+  }
+  if (phaseType === "live") {
+    if (liveKind === "concert") {
+      const place = phaseLabel.trim();
+      return {
+        type: "event",
+        title: place ? `Live in ${place}` : "Live-Konzert",
+        ctaLabel: "Shows ansehen",
+      };
+    }
+    return { type: "tour", title: phaseLabel.trim() || "Auf Tour", ctaLabel: "Shows ansehen" };
+  }
+  if (phaseType === "merch") {
+    return { type: "merch", title: "Neues Merch", ctaLabel: "Jetzt shoppen" };
+  }
+  return { type: "album", title: "Neues Album in Arbeit", ctaLabel: "Mehr erfahren" };
+}
 
 export function OnboardingClient() {
   const router = useRouter();
 
-  const [step, setStep] = useState<Step>("intro");
+  const [step, setStep] = useState<Step>("band-name");
   const [artistPageId, setArtistPageId] = useState<number | null>(null);
 
-  // Identity
-  const [handle, setHandle] = useState("");
+  // BandName step
   const [displayName, setDisplayName] = useState("");
+  const [handle, setHandle] = useState("");
   const [handleStatus, setHandleStatus] = useState<HandleStatus>("idle");
   const [handleError, setHandleError] = useState<string | null>(null);
+  const [bandNameSaving, setBandNameSaving] = useState(false);
 
-  // Profile
-  const [bio, setBio] = useState("");
-  const [genre, setGenre] = useState("");
-  const [profileSaveStatus, setProfileSaveStatus] = useState<SaveStatus>("idle");
-  const [profileError, setProfileError] = useState<string | null>(null);
-  const [heroPreviewUrl, setHeroPreviewUrl] = useState<string | null>(null);
-  const [heroUploading, setHeroUploading] = useState(false);
-  const [heroUploadError, setHeroUploadError] = useState<string | null>(null);
+  // Phase step
+  const [phaseType, setPhaseType] = useState<PhaseType | null>(null);
 
-  // Contact
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactUrl, setContactUrl] = useState("");
-  const [contactError, setContactError] = useState<string | null>(null);
+  // PhaseContext step
+  const [releaseKind, setReleaseKind] = useState<ReleaseKind>("single");
+  const [liveKind, setLiveKind] = useState<LiveKind>("concert");
+  const [phaseTitle, setPhaseTitle] = useState("");
+  const [phaseLabel, setPhaseLabel] = useState("");
 
-  // Publish
-  const [publishing, setPublishing] = useState(false);
-  const [publishError, setPublishError] = useState<string | null>(null);
+  // Generation / preview
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [finishing, setFinishing] = useState(false);
+  const [finishError, setFinishError] = useState<string | null>(null);
 
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       if (handleCheckTimeoutRef.current) clearTimeout(handleCheckTimeoutRef.current);
     };
   }, []);
+
+  // ── Handle helpers ──────────────────────────────────────────────────
 
   function generateHandleFromName(name: string): string {
     return name
@@ -106,12 +135,17 @@ export function OnboardingClient() {
     handleCheckTimeoutRef.current = setTimeout(() => { void findAvailableHandle(base); }, 500);
   }
 
-  async function handleIdentitySubmit(event: FormEvent) {
+  // ── Step 1: Band name ────────────────────────────────────────────────
+
+  async function handleBandNameSubmit(event: FormEvent) {
     event.preventDefault();
     setHandleError(null);
-    if (!displayName.trim()) { setHandleError("K\u00fcnstlername ist erforderlich."); return; }
-    if (!handle || handle.length < 3) { setHandleError("Handle konnte nicht generiert werden. Bitte \u00e4ndere deinen K\u00fcnstlernamen leicht ab."); return; }
-    setHandleStatus("checking");
+    if (!displayName.trim()) { setHandleError("Bandname ist erforderlich."); return; }
+    if (!handle || handle.length < 3) {
+      setHandleError("Handle konnte nicht generiert werden. Bitte \u00e4ndere den Bandnamen leicht ab.");
+      return;
+    }
+    setBandNameSaving(true);
     try {
       const response = await fetch("/api/studio/artist-pages", {
         method: "POST",
@@ -129,180 +163,143 @@ export function OnboardingClient() {
       if (typeof data?.id === "number") setArtistPageId(data.id);
       if (typeof data?.handle === "string") setHandle(data.handle);
       setHandleStatus("available");
-      setStep("profile");
+      setStep("phase");
     } catch {
       setHandleError("Netzwerkfehler. Bitte pr\u00fcfe deine Verbindung.");
-      setHandleStatus("unavailable");
-    }
-  }
-
-  async function saveProfile(nextBio: string) {
-    if (!artistPageId) return;
-    setProfileSaveStatus("saving");
-    setProfileError(null);
-    try {
-      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bio: nextBio.trim() || null }),
-      });
-      if (!response.ok) {
-        const json: unknown = await response.json().catch(() => null);
-        setProfileSaveStatus("error");
-        setProfileError((json as { error?: { message?: string } } | null)?.error?.message ?? "Fehler beim Speichern.");
-        return;
-      }
-      setProfileSaveStatus("saved");
-      setTimeout(() => setProfileSaveStatus("idle"), 2000);
-    } catch {
-      setProfileSaveStatus("error");
-      setProfileError("Netzwerkfehler beim Speichern.");
-    }
-  }
-
-  function scheduleProfileSave(nextBio: string) {
-    if (!artistPageId) return;
-    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => { void saveProfile(nextBio); }, 800);
-  }
-
-  const handleHeroFile = useCallback(async (file: File) => {
-    setHeroUploadError(null);
-    if (!file.type.startsWith("image/")) { setHeroUploadError("Nur Bilddateien erlaubt (JPG, PNG, WebP)."); return; }
-    if (file.size > 10 * 1024 * 1024) { setHeroUploadError("Maximale Dateigröße: 10 MB."); return; }
-    const reader = new FileReader();
-    reader.onload = (e) => setHeroPreviewUrl(e.target?.result as string);
-    reader.readAsDataURL(file);
-    setHeroUploading(true);
-    const formData = new FormData();
-    formData.append("hero_image", file);
-    try {
-      const res = await studioFetch("/api/studio/upload-hero", { method: "POST", body: formData });
-      if (!res.ok) {
-        const json: unknown = await res.json().catch(() => null);
-        setHeroUploadError((json as { error?: string } | null)?.error ?? "Upload fehlgeschlagen.");
-        setHeroPreviewUrl(null);
-      }
-    } catch {
-      setHeroUploadError("Netzwerkfehler beim Upload.");
-      setHeroPreviewUrl(null);
     } finally {
-      setHeroUploading(false);
+      setBandNameSaving(false);
     }
-  }, []);
-
-  function handleProfileContinue() {
-    if (!bio.trim()) { setProfileError("Bio ist erforderlich."); return; }
-    if (!heroPreviewUrl) { setHeroUploadError("Bitte lade ein Headerbild hoch."); return; }
-    setStep("contact");
   }
 
-  async function handleContactContinue() {
-    setContactError(null);
-    if (!contactEmail.trim()) { setContactError("Kontakt-E-Mail ist erforderlich."); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())) { setContactError("Bitte gib eine g\u00fcltige E-Mail-Adresse ein."); return; }
-    if (!artistPageId) { setStep("publish"); return; }
+  // ── Step 3/4: Generate page ──────────────────────────────────────────
+
+  async function generatePage(
+    phase: PhaseType,
+    rk: ReleaseKind,
+    lk: LiveKind,
+    pt: string,
+    pl: string,
+  ) {
+    if (!artistPageId) return;
+    setGenerating(true);
+    setGenerateError(null);
+
+    const bio = `${displayName.trim()} ist eine Band aus der modernen Musikszene.`;
+    const params = deriveSpotlightParams(phase, rk, lk, pt, pl);
+
     try {
-      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
+      await studioFetch(`/api/studio/artist-pages/${artistPageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contact_email: contactEmail.trim(), contact_url: contactUrl.trim() || null }),
+        body: JSON.stringify({ bio }),
       });
-      if (!response.ok) {
-        const json: unknown = await response.json().catch(() => null);
-        setContactError((json as { error?: { message?: string } } | null)?.error?.message ?? "Fehler beim Speichern der Kontaktdaten.");
-        return;
-      }
+
+      await fetch("/api/studio/spotlights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: params.title,
+          type: params.type,
+          primary_url: "https://vibaro.app",
+          cta_label: params.ctaLabel,
+          show_on_page: true,
+          activate: true,
+        }),
+      });
+
+      await studioFetch(`/api/studio/artist-pages/${artistPageId}/publish`, { method: "POST" });
     } catch {
-      setContactError("Netzwerkfehler beim Speichern.");
+      setGenerateError("Fehler beim Erstellen der Seite. Bitte versuche es erneut.");
+      setGenerating(false);
       return;
     }
-    setStep("publish");
+
+    setGenerating(false);
+    setStep("preview");
   }
 
-  async function handlePublish() {
-    if (!artistPageId) return;
-    setPublishError(null);
-    setPublishing(true);
-    try {
-      const response = await studioFetch(`/api/studio/artist-pages/${artistPageId}/publish`, { method: "POST" });
-      const json: unknown = await response.json().catch(() => null);
-      if (!response.ok) {
-        setPublishError((json as { error?: { message?: string } } | null)?.error?.message ?? "Fehler beim Ver\u00f6ffentlichen.");
-        setPublishing(false);
-        return;
-      }
-      router.push("/studio");
-    } catch {
-      setPublishError("Netzwerkfehler beim Ver\u00f6ffentlichen.");
-      setPublishing(false);
+  // ── Step 2: Phase selection ──────────────────────────────────────────
+
+  function handlePhaseSelect(phase: PhaseType) {
+    setPhaseType(phase);
+    if (phase === "merch" || phase === "studio") {
+      void generatePage(phase, releaseKind, liveKind, "", "");
+    } else {
+      setStep("phase-context");
     }
   }
 
-  if (step === "intro") return <IntroStep onNext={() => setStep("identity")} />;
+  // ── Step 3: Phase context ────────────────────────────────────────────
 
-  if (step === "identity") {
+  function handlePhaseContextContinue() {
+    if (!phaseType) return;
+    void generatePage(phaseType, releaseKind, liveKind, phaseTitle, phaseLabel);
+  }
+
+  // ── Step 4: Finish ───────────────────────────────────────────────────
+
+  function handleFinish() {
+    setFinishing(true);
+    router.push("/studio");
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────
+
+  if (step === "band-name") {
     return (
-      <IdentityStep
+      <BandNameStep
         displayName={displayName}
         setDisplayName={setDisplayName}
         handle={handle}
         handleStatus={handleStatus}
         handleError={handleError}
         onDisplayNameChange={scheduleHandleGenerate}
-        onSubmit={handleIdentitySubmit}
-        onBack={() => setStep("intro")}
+        onSubmit={handleBandNameSubmit}
+        saving={bandNameSaving}
       />
     );
   }
 
-  if (step === "profile") {
+  if (step === "phase") {
     return (
-      <ProfileStep
-        bio={bio}
-        setBio={setBio}
-        genre={genre}
-        setGenre={setGenre}
-        profileSaveStatus={profileSaveStatus}
-        profileError={profileError}
-        heroPreviewUrl={heroPreviewUrl}
-        setHeroPreviewUrl={setHeroPreviewUrl}
-        heroUploading={heroUploading}
-        heroUploadError={heroUploadError}
-        setHeroUploadError={setHeroUploadError}
-        onBioChange={scheduleProfileSave}
-        onHeroFile={handleHeroFile}
-        onContinue={handleProfileContinue}
-        onBack={() => setStep("identity")}
+      <PhaseStep
+        onSelect={handlePhaseSelect}
+        generating={generating}
+        generateError={generateError}
+        onBack={() => setStep("band-name")}
       />
     );
   }
 
-  if (step === "contact") {
+  if (step === "phase-context") {
     return (
-      <ContactStep
-        contactEmail={contactEmail}
-        setContactEmail={setContactEmail}
-        contactUrl={contactUrl}
-        setContactUrl={setContactUrl}
-        contactError={contactError}
-        setContactError={setContactError}
-        onContinue={() => { void handleContactContinue(); }}
-        onBack={() => setStep("profile")}
+      <PhaseContextStep
+        phaseType={phaseType!}
+        releaseKind={releaseKind}
+        setReleaseKind={setReleaseKind}
+        liveKind={liveKind}
+        setLiveKind={setLiveKind}
+        phaseTitle={phaseTitle}
+        setPhaseTitle={setPhaseTitle}
+        phaseLabel={phaseLabel}
+        setPhaseLabel={setPhaseLabel}
+        onContinue={handlePhaseContextContinue}
+        onBack={() => setStep("phase")}
+        generating={generating}
+        generateError={generateError}
       />
     );
   }
 
   return (
-    <PublishStep
-      handle={handle}
+    <PreviewStep
       displayName={displayName}
-      bio={bio}
-      publishing={publishing}
-      publishError={publishError}
-      onPublish={() => { void handlePublish(); }}
-      onSkip={() => router.push("/studio")}
-      onBack={() => setStep("contact")}
+      handle={handle}
+      onFinish={handleFinish}
+      onBack={() => setStep(phaseType === "release" || phaseType === "live" ? "phase-context" : "phase")}
+      finishing={finishing}
+      finishError={finishError}
     />
   );
 }
+
