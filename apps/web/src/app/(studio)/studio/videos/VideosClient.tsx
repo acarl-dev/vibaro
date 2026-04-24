@@ -3,6 +3,9 @@
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioEmptyState from "../../components/StudioEmptyState";
+import StudioNotice from "../../components/StudioNotice";
 import { Plus, Pencil, X } from "../../components/StudioIcons";
 import { studioFetch } from "@/lib/api/client-fetch";
 
@@ -220,46 +223,37 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
     <StudioTabPage
       title="Videos"
       description="Verwalte deine Musikvideos und anderen Video-Content (max. 8 Videos)."
+      action={
+        !isCreating && !editingId && videos.length < 8 ? (
+          <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+            <Plus size={14} />
+            + Neues Video
+          </StudioButton>
+        ) : undefined
+      }
     >
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-sm font-medium text-zinc-300">Deine Videos ({videos.length}/8)</h2>
-            {videos.length > 1 && (
-              <p className="text-xs text-zinc-500 mt-1">
-                💡 Ziehe Videos, um die Reihenfolge zu ändern
-              </p>
-            )}
-          </div>
-          {!isCreating && !editingId && videos.length < 8 && (
-            <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-              <Plus size={14} />
-              + Neues Video
-            </StudioButton>
-          )}
-        </div>
-
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
-            {error}
-          </div>
-        )}
-
+      {error && <StudioNotice type="error" className="mb-4">{error}</StudioNotice>}
+      {videos.length > 1 && !isCreating && !editingId && (
+        <p className="text-xs mb-4" style={{ color: "var(--studio-text-secondary)" }}>
+          💡 Ziehe Videos, um die Reihenfolge zu ändern
+        </p>
+      )}
+      <StudioCard>
         <div className="space-y-3">
           {/* Create Form */}
           {isCreating && (
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+            <div className="rounded-lg border p-4 space-y-3" style={{ background: "var(--studio-surface)", borderColor: "var(--studio-border)" }}>
               <input
                 type="text"
                 placeholder="Video-Titel"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
               <select
                 value={formData.platform}
                 onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="studio-input w-full px-3 py-2 text-sm"
               >
                 <option value="youtube">YouTube</option>
                 <option value="vimeo">Vimeo</option>
@@ -269,14 +263,14 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                 placeholder="Video-URL (z.B. https://www.youtube.com/watch?v=...)"
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
               <textarea
                 placeholder="Beschreibung (optional)"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
 
               <div className="flex gap-2">
@@ -292,12 +286,15 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
 
           {/* Videos List */}
           {videos.length === 0 && !isCreating ? (
-            <div className="rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
-              <p className="text-xs text-zinc-600 mb-2">Noch keine Videos hinzugefügt</p>
-              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-                Erstes Video hinzufügen
-              </StudioButton>
-            </div>
+            <StudioEmptyState
+              title="Noch keine Videos"
+              description="Füge deine Musikvideos hinzu."
+              action={
+                <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+                  Erstes Video hinzufügen
+                </StudioButton>
+              }
+            />
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               {videos.map((video, index) => (
@@ -318,17 +315,17 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                   }`}
                 >
                   {editingId === video.id ? (
-                    <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+                    <div className="rounded-lg border p-4 space-y-3" style={{ background: "var(--studio-surface)", borderColor: "var(--studio-border)" }}>
                       <input
                         type="text"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                        className="studio-input w-full px-3 py-2 text-sm"
                       />
                       <select
                         value={formData.platform}
                         onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                        className="studio-input w-full px-3 py-2 text-sm"
                       >
                         <option value="youtube">YouTube</option>
                         <option value="vimeo">Vimeo</option>
@@ -337,13 +334,13 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                         type="url"
                         value={formData.url}
                         onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                        className="studio-input w-full px-3 py-2 text-sm"
                       />
                       <textarea
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         rows={3}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                        className="studio-input w-full px-3 py-2 text-sm"
                       />
 
                       <div className="flex gap-2">
@@ -356,7 +353,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                       </div>
                     </div>
                   ) : (
-                    <div className="rounded-lg border border-zinc-800 bg-zinc-900 overflow-hidden group cursor-move relative">
+                    <div className="rounded-lg border overflow-hidden group cursor-move relative" style={{ background: "var(--studio-surface)", borderColor: "var(--studio-border)" }}>
                       {/* Drag handle indicator */}
                       <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
@@ -367,7 +364,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                       </div>
 
                       {/* Thumbnail */}
-                      <div className="relative aspect-video bg-zinc-950 pointer-events-none">
+                      <div className="relative aspect-video pointer-events-none" style={{ background: "var(--studio-bg)" }}>
                         {video.thumbnail_url ? (
                           <img
                             src={video.thumbnail_url}
@@ -376,7 +373,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <svg className="w-12 h-12 text-zinc-700" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20" style={{ color: "var(--studio-border)" }}>
                               <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                             </svg>
                           </div>
@@ -396,7 +393,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                         )}
                         
                         {/* Platform Badge */}
-                        <div className="absolute top-2 right-2 px-2 py-1 rounded bg-zinc-950/80 text-xs text-zinc-300">
+                        <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs" style={{ background: "rgba(10,10,15,0.8)", color: "var(--studio-text-secondary)" }}>
                           {video.platform}
                         </div>
                       </div>
@@ -405,19 +402,16 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                       <div className="p-3 pointer-events-auto">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm text-zinc-100 truncate">{video.title}</p>
+                            <p className="font-semibold text-sm truncate" style={{ color: "var(--studio-text-primary)" }}>{video.title}</p>
                             {video.description && (
-                              <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{video.description}</p>
+                              <p className="text-xs mt-1 line-clamp-2" style={{ color: "var(--studio-text-secondary)" }}>{video.description}</p>
                             )}
                           </div>
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleToggleFeatured(video.id)}
-                              className={`text-xs p-1 transition-colors ${
-                                video.is_featured 
-                                  ? 'text-emerald-400 hover:text-emerald-300' 
-                                  : 'text-zinc-600 hover:text-emerald-400'
-                              }`}
+                              className="text-xs p-1 transition-colors"
+                              style={{ color: video.is_featured ? "var(--studio-success)" : "var(--studio-border)" }}
                               title={video.is_featured ? "Als Hero entfernen" : "Als Hero markieren"}
                             >
                               ★
@@ -438,7 +432,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
             </div>
           )}
         </div>
-      </div>
+      </StudioCard>
     </StudioTabPage>
   );
 }

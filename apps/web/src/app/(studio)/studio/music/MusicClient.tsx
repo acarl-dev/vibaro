@@ -184,18 +184,6 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     setError("");
   };
 
-  const startCreatingFor = (platform: FeaturedTrack["platform"]) => {
-    if (editingId) return;
-    setIsCreating(true);
-    setFormData({
-      title: buildDefaultTitle(platform),
-      artist_name: "",
-      platform,
-      platform_url: "",
-    });
-    setError("");
-  };
-
   return (
     <StudioTabPage
       title="Musik"
@@ -274,42 +262,17 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
         )}
 
         {/* Add platform buttons when idle */}
-        {!isCreating && !editingId && tracks.length === 0 ? (
+        {!isCreating && !editingId && tracks.length === 0 && (
           <StudioEmptyState
             title="Noch keine Tracks"
             description="Füge Tracks von Spotify, YouTube Music oder SoundCloud hinzu."
             action={
-              <div className="flex flex-wrap gap-2 justify-center">
-                <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("spotify")}>
-                  Spotify
-                </StudioButton>
-                <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("youtubemusic")}>
-                  YouTube Music
-                </StudioButton>
-                <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("soundcloud")}>
-                  SoundCloud
-                </StudioButton>
-              </div>
+              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+                + Track hinzufügen
+              </StudioButton>
             }
           />
-        ) : !isCreating && !editingId ? (
-          <div className="mb-6">
-            <p className="mb-3 text-sm" style={{ color: "var(--studio-text-secondary)" }}>
-              Wähle die Plattform, für die du einen Player hinzufügen möchtest.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("spotify")}>
-                Spotify
-              </StudioButton>
-              <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("youtubemusic")}>
-                YouTube Music
-              </StudioButton>
-              <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("soundcloud")}>
-                SoundCloud
-              </StudioButton>
-            </div>
-          </div>
-        ) : null}
+        )}
 
         {/* Tracks List */}
         {tracks.length > 0 && (

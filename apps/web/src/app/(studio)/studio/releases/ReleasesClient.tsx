@@ -225,21 +225,22 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
   };
 
   return (
-    <StudioTabPage title="Releases" description="Pr\u00e4sentiere deine Alben, EPs und Singles.">
+    <StudioTabPage
+      title="Releases"
+      description="Präsentiere deine Alben, EPs und Singles."
+      action={
+        !isCreating && !editingId ? (
+          <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+            + Neues Release
+          </StudioButton>
+        ) : undefined
+      }
+    >
       <StudioNotice type="info" className="mb-4">
-        Markierte Releases erscheinen als \u201eNew Release\u201c ganz oben auf deiner K\u00fcnstlerseite.
+        Markierte Releases erscheinen als „New Release“ ganz oben auf deiner Künstlerseite.
       </StudioNotice>
 
       <StudioCard>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>Deine Releases</h2>
-          {!isCreating && !editingId && (
-            <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-              + Neues Release
-            </StudioButton>
-          )}
-        </div>
-
         {error && (
           <StudioNotice type="error" className="mb-4">{error}</StudioNotice>
         )}
@@ -261,11 +262,16 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
           )}
 
           {releases.length === 0 && !isCreating ? (
-            <div className="col-span-full rounded-lg border-2 border-dashed p-8 text-center" style={{ borderColor: "var(--studio-border)" }}>
-              <p className="text-xs mb-2" style={{ color: "var(--studio-text-secondary)" }}>Noch keine Releases hinzugef\u00fcgt</p>
-              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-                Erstes Release hinzuf\u00fcgen
-              </StudioButton>
+            <div className="col-span-full">
+              <StudioEmptyState
+                title="Noch keine Releases"
+                description="Füge deine Alben, EPs und Singles hinzu."
+                action={
+                  <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+                    Erstes Release hinzufügen
+                  </StudioButton>
+                }
+              />
             </div>
           ) : (
             releases.map((release) => {
