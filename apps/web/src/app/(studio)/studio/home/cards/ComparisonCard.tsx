@@ -13,7 +13,7 @@ function ComparisonRow({ label, title, visitors, clicks, conversion, isCurrent =
       <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--studio-text-secondary)", opacity: 0.6, minWidth: "52px", flexShrink: 0 }}>{label}</span>
       <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--studio-text-primary)" }}>{title}</span>
       <span style={{ fontSize: "13px", color: "var(--studio-text-secondary)" }}>
-        {fmt(visitors)} Besucher \u00b7 {fmt(clicks)} Klicks{conversion !== null && ` \u00b7 ${conversion}%`}
+        {fmt(visitors)} Besucher · {fmt(clicks)} Klicks{conversion !== null && ` · ${conversion}%`}
       </span>
     </div>
   );
@@ -39,7 +39,7 @@ export default function ComparisonCard({ current, previous }: { current: StudioH
         <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)", marginBottom: "4px" }}>Vergleich</p>
         <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.6, marginBottom: "12px" }}>Aktuell vs letzte Phase</p>
         <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.5 }}>
-          Noch kein Vergleich m\u00f6glich \u2014 beende eine Phase, um sie mit der n\u00e4chsten zu vergleichen.
+          Noch kein Vergleich möglich — beende eine Phase, um sie mit der nächsten zu vergleichen.
         </p>
       </div>
     );
@@ -63,7 +63,7 @@ export default function ComparisonCard({ current, previous }: { current: StudioH
         {ps && <ComparisonRow label="Vorher" title={previous.title} visitors={ps.visitors} clicks={ps.clicks} conversion={ps.conversion} />}
       </div>
       <div style={{ marginTop: "16px" }}>
-        <Link href="/studio/share/performance" style={{ fontSize: "13px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}>Vergleich in Performance ansehen</Link>
+        <Link href="/studio/results" style={{ fontSize: "13px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}>Vergleich in der Analyse ansehen</Link>
       </div>
     </div>
   );

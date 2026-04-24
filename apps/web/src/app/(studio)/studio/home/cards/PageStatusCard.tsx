@@ -36,7 +36,7 @@ export default function PageStatusCard({ page }: { page: StudioHomeData["page"] 
         </button>
       </div>
       <a href={pageUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}>
-        Vorschau \u00f6ffnen \u2192
+        Vorschau öffnen →
       </a>
     </div>
   );
