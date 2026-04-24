@@ -3,6 +3,9 @@
 import { useState, useRef } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioEmptyState from "../../components/StudioEmptyState";
+import StudioNotice from "../../components/StudioNotice";
 import { studioFetch } from "@/lib/api/client-fetch";
 
 type GalleryImage = {
@@ -283,16 +286,13 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
       title="Galerie"
       description="Verwalte deine Fotos und Press Shots (max. 16 Bilder)."
     >
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-sm font-medium text-zinc-300">Deine Bilder ({images.length}/16)</h2>
-            {images.length > 1 && (
-              <p className="text-xs text-zinc-500 mt-1">
-                💡 Ziehe Bilder, um die Reihenfolge zu ändern
-              </p>
-            )}
-          </div>
+      <StudioCard>
+        {images.length > 1 && (
+          <p className="text-xs mb-4" style={{ color: "var(--studio-text-secondary)" }}>
+            💡 Ziehe Bilder, um die Reihenfolge zu ändern
+          </p>
+        )}
+        <div className="flex items-center justify-end mb-4">
           {images.length < 16 && (
             <div>
               <input
@@ -355,11 +355,7 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
               />
               <label
                 htmlFor="gallery-upload"
-                className={`inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg border border-zinc-800 transition-colors cursor-pointer ${
-                  uploading
-                    ? "text-zinc-600 cursor-not-allowed"
-                    : "text-zinc-400 hover:text-zinc-100 hover:border-zinc-600"
-                }`}
+                className="studio-btn studio-btn-secondary studio-btn-sm cursor-pointer"
               >
                 {uploading && uploadProgress
                   ? `⏳ ${uploadProgress.current}/${uploadProgress.total}`
@@ -372,9 +368,9 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400 whitespace-pre-line">
+          <StudioNotice type="error" className="mb-4">
             {error}
-          </div>
+          </StudioNotice>
         )}
 
         {images.length === 0 ? (
@@ -382,25 +378,22 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`rounded-lg border-2 border-dashed bg-zinc-900/50 p-12 text-center transition-colors ${
-              isDragging
-                ? "border-zinc-600 bg-zinc-800/50"
-                : "border-zinc-800"
-            }`}
+            className="rounded-lg border-2 border-dashed p-12 text-center transition-colors"
+            style={{ background: isDragging ? "var(--studio-surface-elevated)" : "transparent", borderColor: isDragging ? "var(--studio-text-secondary)" : "var(--studio-border)" }}
           >
             <div className="flex flex-col items-center gap-3">
-              <svg className="w-12 h-12 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: "var(--studio-border)" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-xs text-zinc-600 mb-1">
+              <p className="text-xs mb-1" style={{ color: "var(--studio-text-secondary)" }}>
                 {isDragging ? "Dateien hier ablegen..." : "Noch keine Bilder hinzugefügt"}
               </p>
-              <p className="text-xs text-zinc-700 mb-3">
+              <p className="text-xs mb-3" style={{ color: "var(--studio-text-secondary)" }}>
                 Bilder hierher ziehen oder
               </p>
               <label
                 htmlFor="gallery-upload"
-                className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors cursor-pointer"
+                className="studio-btn studio-btn-secondary studio-btn-sm cursor-pointer"
               >
                 Datei auswählen
               </label>
@@ -411,17 +404,16 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`rounded-lg transition-colors ${
-              isDragging ? "ring-2 ring-zinc-600 ring-inset bg-zinc-800/30" : ""
-            }`}
+            className="rounded-lg transition-colors"
+            style={isDragging ? { outline: "2px solid var(--studio-text-secondary)", background: "var(--studio-surface-elevated)" } : undefined}
           >
             {isDragging && (
-              <div className="absolute inset-0 rounded-lg bg-zinc-900/80 backdrop-blur-sm flex items-center justify-center z-10 pointer-events-none">
+              <div className="absolute inset-0 rounded-lg backdrop-blur-sm flex items-center justify-center z-10 pointer-events-none" style={{ background: "rgba(10,10,15,0.8)" }}>
                 <div className="text-center">
-                  <svg className="w-16 h-16 text-zinc-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-16 h-16 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: "var(--studio-text-secondary)" }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-sm text-zinc-400">Dateien hier ablegen</p>
+                  <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>Dateien hier ablegen</p>
                 </div>
               </div>
             )}
@@ -435,13 +427,14 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
                   onDragLeave={handleDragLeaveItem}
                   onDrop={(e) => handleDropItem(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`group relative aspect-square rounded-lg overflow-hidden bg-zinc-900 border transition-all cursor-move ${
-                    draggedIndex === index
-                      ? "opacity-50 scale-95"
-                      : dragOverIndex === index
-                      ? "border-emerald-500 ring-2 ring-emerald-500/50"
-                      : "border-zinc-800"
+                  className={`group relative aspect-square rounded-lg overflow-hidden border transition-all cursor-move ${
+                    draggedIndex === index ? "opacity-50 scale-95" : ""
                   }`}
+                  style={{
+                    background: "var(--studio-surface)",
+                    borderColor: dragOverIndex === index ? "var(--studio-success)" : "var(--studio-border)",
+                    boxShadow: dragOverIndex === index ? "0 0 0 2px var(--studio-success)" : undefined,
+                  }}
                 >
                   {/* Drag handle indicator */}
                   <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -462,14 +455,18 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                     <button
                       onClick={() => startEdit(image)}
-                      className="w-8 h-8 rounded-full bg-zinc-800/90 text-zinc-300 hover:bg-zinc-700 transition-colors flex items-center justify-center"
+                      className="w-8 h-8 rounded-full transition-colors flex items-center justify-center"
+                      style={{ background: "rgba(28,28,40,0.9)", color: "var(--studio-text-primary)" }}
                       title="Titel bearbeiten"
                     >
                       ✎
                     </button>
                     <button
                       onClick={() => handleDelete(image.id)}
-                      className="w-8 h-8 rounded-full bg-zinc-800/90 text-zinc-300 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center"
+                      className="w-8 h-8 rounded-full transition-colors flex items-center justify-center"
+                      style={{ background: "rgba(28,28,40,0.9)", color: "var(--studio-text-primary)" }}
+                      onMouseOver={e => (e.currentTarget.style.background = "var(--studio-accent)")}
+                      onMouseOut={e => (e.currentTarget.style.background = "rgba(28,28,40,0.9)")}
                       title="Löschen"
                     >
                       ✕
@@ -487,19 +484,19 @@ export default function GalleryClient({ initialImages }: GalleryClientProps) {
             </div>
           </div>
         )}
-      </div>
+      </StudioCard>
 
       {/* Edit Title Modal */}
       {editingId !== null && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 max-w-md w-full">
+          <div className="rounded-xl p-6 max-w-md w-full" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
             <h3 className="text-lg font-semibold mb-4">Bildtitel bearbeiten</h3>
             <input
               type="text"
               placeholder="Titel (optional)"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 mb-4"
+              className="studio-input w-full px-3 py-2 text-sm mb-4"
               autoFocus
             />
             <div className="flex gap-2 justify-end">

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioNotice from "../../components/StudioNotice";
 import { Plus, Trash } from "../../components/StudioIcons";
 import { getSocialIcon, getPlatformName, type SocialPlatform } from "@/lib/social-icons";
 import { studioFetch } from "@/lib/api/client-fetch";
@@ -136,35 +138,34 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
     >
       <div className="space-y-6">
         {/* Social Media Section */}
-        <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+        <StudioCard>
           <div className="mb-4">
-            <h2 className="text-sm font-medium text-zinc-300">Social Media & Musik</h2>
-            <p className="text-xs text-zinc-600 mt-1">
+            <h2 className="text-sm font-medium mb-1" style={{ color: "var(--studio-text-primary)" }}>Social Media &amp; Musik</h2>
+            <p className="text-xs" style={{ color: "var(--studio-text-secondary)" }}>
               Trage einfach deine URLs ein. Leere Felder werden nicht angezeigt.
             </p>
           </div>
 
           {error && (
-            <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
-              {error}
-            </div>
+            <StudioNotice type="error" className="mb-4">{error}</StudioNotice>
           )}
 
           <div className="space-y-3">
             {socialLinks.map((link) => (
               <div
                 key={link.id}
-                className="flex flex-col gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:flex-row sm:items-center"
+                className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center"
+                style={{ background: "var(--studio-surface)", borderColor: "var(--studio-border)" }}
               >
                 {/* Icon */}
                 <div className="flex items-center gap-3 sm:gap-2">
-                  <div className="flex-shrink-0 text-zinc-400">
+                  <div className="flex-shrink-0" style={{ color: "var(--studio-text-secondary)" }}>
                     {getSocialIcon(link.type as SocialPlatform, "w-5 h-5")}
                   </div>
 
                   {/* Platform Name */}
                   <div className="min-w-0 sm:w-32 sm:flex-shrink-0">
-                    <p className="text-sm font-medium text-zinc-300">
+                    <p className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>
                       {link.title || getPlatformName(link.type as SocialPlatform)}
                     </p>
                   </div>
@@ -179,14 +180,14 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
               </div>
             ))}
           </div>
-        </div>
+        </StudioCard>
 
         {/* Custom Links Section */}
-        <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+        <StudioCard>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-medium text-zinc-300">Eigene Links</h2>
-              <p className="text-xs text-zinc-600 mt-1">
+              <h2 className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>Eigene Links</h2>
+              <p className="text-xs mt-1" style={{ color: "var(--studio-text-secondary)" }}>
                 Füge beliebige Links mit eigenem Titel hinzu.
               </p>
             </div>
@@ -209,21 +210,21 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
             ))}
 
             {customLinks.length === 0 && !showAddForm && (
-              <p className="text-xs text-zinc-600 py-2">Noch keine eigenen Links vorhanden.</p>
+              <p className="text-xs py-2" style={{ color: "var(--studio-text-secondary)" }}>Noch keine eigenen Links vorhanden.</p>
             )}
           </div>
 
           {/* Add Form */}
           {showAddForm && (
-            <div className="mt-4 rounded-lg border border-zinc-700 bg-zinc-900 p-4 space-y-3">
-              <p className="text-xs font-medium text-zinc-400">Neuer Link</p>
+            <div className="mt-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--studio-border)", background: "var(--studio-surface)" }}>
+              <p className="text-xs font-medium" style={{ color: "var(--studio-text-secondary)" }}>Neuer Link</p>
               <input
                 type="text"
                 placeholder="Titel (z.B. Meine Website)"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 autoFocus
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
               <input
                 type="url"
@@ -238,7 +239,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
                     setNewUrl("");
                   }
                 }}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="studio-input w-full px-3 py-2 text-sm"
               />
               <div className="flex gap-2 justify-end">
                 <StudioButton
@@ -264,7 +265,7 @@ export default function LinksClient({ initialLinks }: LinksClientProps) {
               </div>
             </div>
           )}
-        </div>
+        </StudioCard>
       </div>
     </StudioTabPage>
   );
@@ -304,10 +305,10 @@ function SocialLinkInput({
         value={value}
         onChange={(e) => { setValue(e.target.value); setValidationError(false); }}
         onBlur={handleBlur}
-        className={`w-full rounded-lg border bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:ring-1 ${
+        className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 studio-input ${
           validationError
             ? "border-red-800 focus:border-red-600 focus:ring-red-600"
-            : "border-zinc-800 focus:border-zinc-600 focus:ring-zinc-600"
+            : "border-transparent"
         }`}
       />
       {validationError && (
@@ -340,7 +341,7 @@ function CustomLinkRow({
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center" style={{ background: "var(--studio-surface)", borderColor: "var(--studio-border)" }}>
       <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
         <input
           type="text"
@@ -348,7 +349,7 @@ function CustomLinkRow({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={handleBlur}
-          className="w-full sm:w-40 sm:flex-shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+          className="studio-input w-full sm:w-40 sm:flex-shrink-0 px-3 py-2 text-sm"
         />
         <input
           type="url"
@@ -356,7 +357,7 @@ function CustomLinkRow({
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           onBlur={handleBlur}
-          className="w-full flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+          className="studio-input w-full flex-1 px-3 py-2 text-sm"
         />
       </div>
       <StudioButton

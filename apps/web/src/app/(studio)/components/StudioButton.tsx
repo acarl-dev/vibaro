@@ -1,6 +1,6 @@
 import { ReactNode, ButtonHTMLAttributes } from "react";
 
-type StudioButtonVariant = "primary" | "secondary" | "danger";
+type StudioButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type StudioButtonSize = "md" | "sm" | "icon";
 
 type StudioButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -12,6 +12,7 @@ type StudioButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const VARIANT_CLASS: Record<StudioButtonVariant, string> = {
   primary: "studio-btn studio-btn-primary",
   secondary: "studio-btn studio-btn-secondary",
+  ghost: "studio-btn studio-btn-ghost",
   danger: "studio-btn studio-btn-danger",
 };
 

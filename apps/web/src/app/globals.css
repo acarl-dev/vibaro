@@ -248,6 +248,17 @@ a:focus-visible,
     background-color: rgba(230, 57, 70, 0.1);
   }
 
+  .studio-btn-ghost {
+    background-color: transparent;
+    border: none;
+    color: var(--studio-text-secondary);
+  }
+
+  .studio-btn-ghost:hover {
+    background-color: var(--studio-surface-elevated);
+    color: var(--studio-text-primary);
+  }
+
   /* Size modifiers (combined with variant class) */
   .studio-btn-sm {
     font-size: 12px;

@@ -5,6 +5,9 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioEmptyState from "../../components/StudioEmptyState";
+import StudioNotice from "../../components/StudioNotice";
 import ReleaseForm, { type ReleaseFormData } from "./ReleaseForm";
 import { studioFetch } from "@/lib/api/client-fetch";
 
@@ -223,13 +226,13 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
 
   return (
     <StudioTabPage title="Releases" description="Pr\u00e4sentiere deine Alben, EPs und Singles.">
-      <div className="mb-4 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
-        💡 <span className="font-medium">Info:</span> Markierte Releases erscheinen als \u201eNew Release\u201c ganz oben auf deiner K\u00fcnstlerseite.
-      </div>
+      <StudioNotice type="info" className="mb-4">
+        Markierte Releases erscheinen als \u201eNew Release\u201c ganz oben auf deiner K\u00fcnstlerseite.
+      </StudioNotice>
 
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
+      <StudioCard>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium text-zinc-300">Deine Releases</h2>
+          <h2 className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>Deine Releases</h2>
           {!isCreating && !editingId && (
             <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
               + Neues Release
@@ -238,9 +241,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
-            {error}
-          </div>
+          <StudioNotice type="error" className="mb-4">{error}</StudioNotice>
         )}
 
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -260,8 +261,8 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
           )}
 
           {releases.length === 0 && !isCreating ? (
-            <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
-              <p className="text-xs text-zinc-600 mb-2">Noch keine Releases hinzugef\u00fcgt</p>
+            <div className="col-span-full rounded-lg border-2 border-dashed p-8 text-center" style={{ borderColor: "var(--studio-border)" }}>
+              <p className="text-xs mb-2" style={{ color: "var(--studio-text-secondary)" }}>Noch keine Releases hinzugef\u00fcgt</p>
               <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
                 Erstes Release hinzuf\u00fcgen
               </StudioButton>
@@ -286,17 +287,17 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                     />
                   ) : (
                     /* Release Card */
-                    <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col">
-                      <div className="relative mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
+                    <div className="rounded-lg border p-5 flex h-full flex-col" style={{ background: "var(--studio-surface)", borderColor: "var(--studio-border)" }}>
+                      <div className="relative mb-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--studio-border)", background: "var(--studio-bg)" }}>
                         <div className="relative w-full pb-[100%]">
                           {coverSrc ? (
                             <img src={coverSrc} alt="Release cover" className="absolute inset-0 h-full w-full object-cover" />
                           ) : (
-                            <div className="absolute inset-0 bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">\u266a</div>
+                            <div className="absolute inset-0 flex items-center justify-center text-2xl" style={{ background: "var(--studio-surface)", color: "var(--studio-border)" }}>\u266a</div>
                           )}
                         </div>
                         {release.release_type && (
-                          <div className="absolute top-2 left-2 rounded bg-zinc-900/80 px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-200">
+                          <div className="absolute top-2 left-2 rounded px-2 py-1 text-[10px] uppercase tracking-wider" style={{ background: "rgba(10,10,15,0.8)", color: "var(--studio-text-primary)" }}>
                             {release.release_type}
                           </div>
                         )}
@@ -306,9 +307,9 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-zinc-100 truncate">{release.title}</p>
+                        <p className="text-sm font-medium truncate" style={{ color: "var(--studio-text-primary)" }}>{release.title}</p>
                         {formatReleaseDate(release.release_date ?? "") && (
-                          <p className="text-xs text-zinc-500 mt-1">{formatReleaseDate(release.release_date ?? "")}</p>
+                          <p className="text-xs mt-1" style={{ color: "var(--studio-text-secondary)" }}>{formatReleaseDate(release.release_date ?? "")}</p>
                         )}
                       </div>
 
@@ -328,7 +329,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
                             />
                             <label
                               htmlFor={`cover-upload-${release.id}`}
-                              className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block"
+                              className="studio-btn studio-btn-secondary studio-btn-sm cursor-pointer"
                             >
                               {uploadingCover === release.id ? "\u23f3 Hochladen..." : "🎨 Cover hinzuf\u00fcgen"}
                             </label>
@@ -350,7 +351,7 @@ export default function ReleasesClient({ initialReleases }: ReleasesClientProps)
             })
           )}
         </div>
-      </div>
+      </StudioCard>
     </StudioTabPage>
   );
 }

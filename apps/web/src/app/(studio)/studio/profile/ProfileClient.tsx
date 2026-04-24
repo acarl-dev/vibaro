@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioNotice from "../../components/StudioNotice";
 
 type ArtistPage = {
   id: number;
@@ -275,11 +278,11 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
       ) : undefined}
     >
       {/* Live Preview with Inline Editing */}
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 overflow-hidden">
+      <div className="overflow-hidden rounded-lg" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
         {/* Hero Image Section with Name & Bio */}
         <div className="relative group">
           {initialPage.hero_image_url ? (
-            <div className="relative aspect-[21/9] bg-zinc-900">
+            <div className="relative aspect-[21/9]" style={{ background: "var(--studio-bg)" }}>
               <img
                 src={initialPage.hero_image_url}
                 alt="Hero"
@@ -298,7 +301,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
               {/* Focal Mode Overlay – captures click position */}
               {focalMode && (
                 <div
-                  className="absolute inset-0 bg-blue-500/10 border-2 border-blue-400/60 cursor-crosshair z-30"
+                  className="absolute inset-0 cursor-crosshair z-30"
+                  style={{ background: "var(--studio-accent-muted)", border: "2px solid var(--studio-accent)" }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
@@ -319,11 +323,11 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 <button
                   onClick={() => setFocalMode(!focalMode)}
                   disabled={heroUploading || focalSaving}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg backdrop-blur-sm border text-xs text-white transition-colors disabled:opacity-50 ${
-                    focalMode
-                      ? "bg-blue-600/90 border-blue-400/40 hover:bg-blue-600"
-                      : "bg-black/60 border-white/10 hover:bg-black/80"
-                  }`}
+                  className="studio-btn studio-btn-sm backdrop-blur-sm disabled:opacity-50"
+                  style={focalMode
+                    ? { background: "var(--studio-accent)", border: "1px solid var(--studio-accent)", color: "#fff" }
+                    : { background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }
+                  }
                 >
                   {focalSaving ? (
                     <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
@@ -349,7 +353,10 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                       if (file) handleHeroUpload(file);
                     }}
                   />
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 text-xs text-white hover:bg-black/80 transition-colors">
+                  <div
+                    className="studio-btn studio-btn-sm backdrop-blur-sm cursor-pointer"
+                    style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+                  >
                     {heroUploading ? (
                       <>
                         <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
@@ -372,7 +379,8 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                 <button
                   onClick={handleHeroDelete}
                   disabled={heroUploading}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/80 backdrop-blur-sm border border-red-500/20 text-xs text-white hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="studio-btn studio-btn-sm backdrop-blur-sm disabled:opacity-50"
+                  style={{ background: "var(--studio-accent-muted)", border: "1px solid rgba(230,57,70,0.3)", color: "var(--studio-accent)" }}
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -384,9 +392,9 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
 
             </div>
           ) : (
-            <div className="relative aspect-[21/9] bg-zinc-900">
+            <div className="relative aspect-[21/9]" style={{ background: "var(--studio-surface-elevated)" }}>
               {/* Upload Area */}
-              <label className="absolute inset-0 cursor-pointer hover:bg-zinc-800/50 transition-colors flex flex-col items-center justify-center text-zinc-500">
+              <label className="absolute inset-0 cursor-pointer transition-colors flex flex-col items-center justify-center" style={{ color: "var(--studio-text-secondary)" }}>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -420,20 +428,20 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
         </div>
 
         {/* Logo Upload Section */}
-        <div className="p-6 border-b border-zinc-800">
+        <div className="p-6" style={{ borderBottom: "1px solid var(--studio-border)" }}>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-sm font-medium text-white">Logo</p>
-              <p className="text-xs text-zinc-500 mt-0.5">Wird im Header-Badge angezeigt. Ersetzt Avatar als Logo-Quelle.</p>
+              <p className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>Logo</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--studio-text-secondary)" }}>Wird im Header-Badge angezeigt. Ersetzt Avatar als Logo-Quelle.</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             {/* Preview */}
-            <div className="relative flex-shrink-0 w-16 h-16 rounded-full bg-black border border-zinc-700 overflow-hidden flex items-center justify-center">
+            <div className="relative flex-shrink-0 w-16 h-16 rounded-full overflow-hidden flex items-center justify-center" style={{ background: "var(--studio-bg)", border: "1px solid var(--studio-border)" }}>
               {initialPage.logo_url ? (
                 <img src={initialPage.logo_url} alt="Logo" className="w-full h-full object-cover" />
               ) : (
-                <svg className="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--studio-text-secondary)" }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               )}
@@ -451,7 +459,7 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                     if (file) handleLogoUpload(file);
                   }}
                 />
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-xs text-white hover:bg-zinc-700 transition-colors cursor-pointer">
+                <span className="studio-btn studio-btn-secondary studio-btn-sm cursor-pointer">
                   {logoUploading ? (
                     <>
                       <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
@@ -468,19 +476,20 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
                       {initialPage.logo_url ? "Austauschen" : "Logo hochladen"}
                     </>
                   )}
-                </div>
+                </span>
               </label>
               {initialPage.logo_url && (
-                <button
+                <StudioButton
+                  variant="danger"
+                  size="sm"
                   onClick={handleLogoDelete}
                   disabled={logoUploading}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/20 border border-red-500/30 text-xs text-red-400 hover:bg-red-600/30 transition-colors disabled:opacity-50"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   Entfernen
-                </button>
+                </StudioButton>
               )}
             </div>
           </div>
@@ -588,42 +597,42 @@ export default function ProfileClient({ initialPage }: ProfileClientProps) {
         </div>
 
         {/* Info Box */}
-        <div className="p-8">
-          <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-4">
+        <div className="p-6">
+          <StudioNotice type="info">
             <div className="flex gap-3">
-              <svg className="w-5 h-5 text-zinc-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--studio-text-secondary)" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-sm text-zinc-300 font-medium mb-1">Fokuspunkt setzen</p>
-                <p className="text-xs text-zinc-500">
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--studio-text-primary)" }}>Fokuspunkt setzen</p>
+                <p className="text-xs" style={{ color: "var(--studio-text-secondary)" }}>
                   Klicke auf „Fokuspunkt“, um festzulegen, welcher Bereich des Bilds immer sichtbar bleibt – unabhängig von der Bildschirmgröße.
                 </p>
               </div>
             </div>
-          </div>
+          </StudioNotice>
         </div>
       </div>
 
       {/* Tips Section */}
-      <div className="mt-6 rounded-xl border border-zinc-900 bg-zinc-900/20 p-6">
-        <h3 className="text-sm font-medium text-zinc-300 mb-3">Tipps für ein starkes Profil</h3>
-        <ul className="space-y-2 text-xs text-zinc-500">
+      <StudioCard className="mt-6">
+        <h3 className="text-sm font-medium mb-3" style={{ color: "var(--studio-text-primary)" }}>Tipps für ein starkes Profil</h3>
+        <ul className="space-y-2 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
           <li className="flex gap-2">
-            <span className="text-emerald-400">✓</span>
+            <span style={{ color: "var(--studio-success)" }}>✓</span>
             <span>Verwende ein professionelles Header-Bild (empfohlen: 2100x900px)</span>
           </li>
 
           <li className="flex gap-2">
-            <span className="text-emerald-400">✓</span>
+            <span style={{ color: "var(--studio-success)" }}>✓</span>
             <span>Schreibe eine prägnante Bio, die deine Musik und Persönlichkeit beschreibt</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-emerald-400">✓</span>
+            <span style={{ color: "var(--studio-success)" }}>✓</span>
             <span>Nutze deinen echten Künstlernamen oder Bandnamen als Display Name</span>
           </li>
         </ul>
-      </div>
+      </StudioCard>
     </StudioTabPage>
   );
 }

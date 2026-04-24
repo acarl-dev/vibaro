@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
+import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioEmptyState from "../../components/StudioEmptyState";
+import StudioNotice from "../../components/StudioNotice";
 import { studioFetch } from "@/lib/api/client-fetch";
 
 type FeaturedTrack = {
@@ -196,50 +200,28 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
     <StudioTabPage
       title="Musik"
       description="Wähle bis zu 5-7 Tracks aus, die auf deiner Seite abgespielt werden können."
+      action={
+        !isCreating && !editingId ? (
+          <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+            + Track hinzufügen
+          </StudioButton>
+        ) : undefined
+      }
     >
       {/* Error */}
         {error && (
-          <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <StudioNotice type="error" className="mb-6">
             {error}
-          </div>
-        )}
-
-        {/* Create Buttons */}
-        {!isCreating && !editingId && (
-          <div className="mb-6">
-            <p className="studio-subtitle mb-3 text-sm">
-              Wähle die Plattform, für die du einen Player hinzufügen möchtest.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => startCreatingFor("spotify")}
-                className="studio-btn studio-btn-secondary rounded-full text-xs"
-              >
-                Spotify
-              </button>
-              <button
-                onClick={() => startCreatingFor("youtubemusic")}
-                className="studio-btn studio-btn-secondary rounded-full text-xs"
-              >
-                YouTube Music
-              </button>
-              <button
-                onClick={() => startCreatingFor("soundcloud")}
-                className="studio-btn studio-btn-secondary rounded-full text-xs"
-              >
-                SoundCloud
-              </button>
-            </div>
-          </div>
+          </StudioNotice>
         )}
 
         {/* Create Form */}
         {isCreating && (
-          <div className="studio-card mb-6">
-            <h3 className="studio-h2 mb-4 text-base">Neuer Track</h3>
+          <StudioCard className="mb-6">
+            <h3 className="mb-4 text-base font-semibold" style={{ color: "var(--studio-text-primary)" }}>Neuer Track</h3>
             <div className="space-y-4">
               <div>
-                <label className="studio-subtitle mb-2 block text-sm">Plattform *</label>
+                <label className="mb-2 block text-sm" style={{ color: "var(--studio-text-secondary)" }}>Plattform *</label>
                 <select
                   value={formData.platform}
                   onChange={(e) =>
@@ -266,7 +248,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
               </div>
 
               <div>
-                <label className="studio-subtitle mb-2 block text-sm">URL *</label>
+                <label className="mb-2 block text-sm" style={{ color: "var(--studio-text-secondary)" }}>URL *</label>
                 <input
                   type="url"
                   value={formData.platform_url}
@@ -274,46 +256,75 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                   className="studio-input w-full px-3 py-2 text-sm"
                   placeholder="https://open.spotify.com/track/..."
                 />
-                <p className="studio-subtitle mt-2 text-xs">
+                <p className="mt-2 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
                   Wir erzeugen den Player automatisch aus der URL.
                 </p>
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleCreate}
-                  className="studio-btn studio-btn-primary"
-                >
+                <StudioButton variant="primary" size="sm" onClick={handleCreate}>
                   Erstellen
-                </button>
-                <button
-                  onClick={cancelCreating}
-                  className="studio-btn studio-btn-secondary"
-                >
+                </StudioButton>
+                <StudioButton variant="secondary" size="sm" onClick={cancelCreating}>
                   Abbrechen
-                </button>
+                </StudioButton>
               </div>
             </div>
-          </div>
+          </StudioCard>
         )}
 
-        {/* Tracks List */}
-        {tracks.length === 0 && !isCreating ? (
-          <div className="studio-card px-6 py-12 text-center">
-            <p className="studio-subtitle text-sm">Noch keine Tracks hinzugefügt.</p>
+        {/* Add platform buttons when idle */}
+        {!isCreating && !editingId && tracks.length === 0 ? (
+          <StudioEmptyState
+            title="Noch keine Tracks"
+            description="Füge Tracks von Spotify, YouTube Music oder SoundCloud hinzu."
+            action={
+              <div className="flex flex-wrap gap-2 justify-center">
+                <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("spotify")}>
+                  Spotify
+                </StudioButton>
+                <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("youtubemusic")}>
+                  YouTube Music
+                </StudioButton>
+                <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("soundcloud")}>
+                  SoundCloud
+                </StudioButton>
+              </div>
+            }
+          />
+        ) : !isCreating && !editingId ? (
+          <div className="mb-6">
+            <p className="mb-3 text-sm" style={{ color: "var(--studio-text-secondary)" }}>
+              Wähle die Plattform, für die du einen Player hinzufügen möchtest.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("spotify")}>
+                Spotify
+              </StudioButton>
+              <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("youtubemusic")}>
+                YouTube Music
+              </StudioButton>
+              <StudioButton variant="secondary" size="sm" onClick={() => startCreatingFor("soundcloud")}>
+                SoundCloud
+              </StudioButton>
+            </div>
           </div>
-        ) : (
+        ) : null}
+
+        {/* Tracks List */}
+        {tracks.length > 0 && (
           <div className="grid gap-4 md:grid-cols-2">
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="studio-card p-4"
+                className="rounded-lg p-4"
+                style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}
               >
                 {editingId === track.id ? (
                   <div className="space-y-4">
-                    <h3 className="studio-h2 text-base">Track bearbeiten</h3>
+                    <h3 className="text-base font-semibold" style={{ color: "var(--studio-text-primary)" }}>Track bearbeiten</h3>
                     <div>
-                      <label className="studio-subtitle mb-2 block text-sm">Plattform *</label>
+                      <label className="mb-2 block text-sm" style={{ color: "var(--studio-text-secondary)" }}>Plattform *</label>
                       <select
                         value={formData.platform}
                         onChange={(e) =>
@@ -340,7 +351,7 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                     </div>
 
                     <div>
-                      <label className="studio-subtitle mb-2 block text-sm">URL *</label>
+                      <label className="mb-2 block text-sm" style={{ color: "var(--studio-text-secondary)" }}>URL *</label>
                       <input
                         type="url"
                         value={formData.platform_url}
@@ -349,24 +360,18 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                         }
                         className="studio-input w-full px-3 py-2 text-sm"
                       />
-                      <p className="studio-subtitle mt-2 text-xs">
+                      <p className="mt-2 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
                         Wir erzeugen den Player automatisch aus der URL.
                       </p>
                     </div>
 
                     <div className="flex gap-3 pt-2">
-                      <button
-                        onClick={() => handleUpdate(track.id)}
-                        className="studio-btn studio-btn-primary"
-                      >
+                      <StudioButton variant="primary" size="sm" onClick={() => handleUpdate(track.id)}>
                         Speichern
-                      </button>
-                      <button
-                        onClick={cancelEditing}
-                        className="studio-btn studio-btn-secondary"
-                      >
+                      </StudioButton>
+                      <StudioButton variant="secondary" size="sm" onClick={cancelEditing}>
                         Abbrechen
-                      </button>
+                      </StudioButton>
                     </div>
                   </div>
                 ) : (
@@ -426,18 +431,12 @@ export default function MusicClient({ initialTracks }: MusicClientProps) {
                     </div>
 
                     <div className="flex gap-3">
-                      <button
-                        onClick={() => startEditing(track)}
-                        className="studio-btn studio-btn-secondary"
-                      >
+                      <StudioButton variant="secondary" size="sm" onClick={() => startEditing(track)}>
                         Bearbeiten
-                      </button>
-                      <button
-                        onClick={() => handleDelete(track.id)}
-                        className="studio-btn studio-btn-danger"
-                      >
+                      </StudioButton>
+                      <StudioButton variant="danger" size="sm" onClick={() => handleDelete(track.id)}>
                         Löschen
-                      </button>
+                      </StudioButton>
                     </div>
                   </div>
                 )}

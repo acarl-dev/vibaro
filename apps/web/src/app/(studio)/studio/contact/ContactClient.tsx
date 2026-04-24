@@ -3,6 +3,8 @@
 import { useState } from "react";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioNotice from "../../components/StudioNotice";
 import { studioFetch } from "@/lib/api/client-fetch";
 
 type ContactData = {
@@ -60,23 +62,24 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
     <StudioTabPage
       title="Kontakt"
       description="Verwalte deine Kontaktdaten für Booking, Management und Press."
+      action={
+        <StudioButton variant="primary" size="md" onClick={handleSave} disabled={saving}>
+          {saving ? "Speichern..." : "Speichern"}
+        </StudioButton>
+      }
     >
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6 space-y-6">
+      <StudioCard className="space-y-6">
         {error && (
-          <div className="rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
-            {error}
-          </div>
+          <StudioNotice type="error">{error}</StudioNotice>
         )}
 
         {success && (
-          <div className="rounded-lg border border-green-900/50 bg-green-900/10 px-3 py-2 text-xs text-green-400">
-            Kontaktdaten erfolgreich gespeichert
-          </div>
+          <StudioNotice type="info">Kontaktdaten erfolgreich gespeichert</StudioNotice>
         )}
 
         {/* Booking Email */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: "var(--studio-text-primary)" }}>
             Booking E-Mail
           </label>
           <input
@@ -84,16 +87,16 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
             placeholder="booking@example.com"
             value={formData.booking_email || ""}
             onChange={(e) => setFormData({ ...formData, booking_email: e.target.value })}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            className="studio-input w-full px-3 py-2 text-sm"
           />
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
             Wird öffentlich für Booking-Anfragen angezeigt
           </p>
         </div>
 
         {/* Management Email */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: "var(--studio-text-primary)" }}>
             Management E-Mail
           </label>
           <input
@@ -101,16 +104,16 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
             placeholder="management@example.com"
             value={formData.management_email || ""}
             onChange={(e) => setFormData({ ...formData, management_email: e.target.value })}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            className="studio-input w-full px-3 py-2 text-sm"
           />
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
             Wird öffentlich für Management-Anfragen angezeigt
           </p>
         </div>
 
         {/* Press Email */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: "var(--studio-text-primary)" }}>
             Press E-Mail
           </label>
           <input
@@ -118,16 +121,16 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
             placeholder="press@example.com"
             value={formData.press_email || ""}
             onChange={(e) => setFormData({ ...formData, press_email: e.target.value })}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            className="studio-input w-full px-3 py-2 text-sm"
           />
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
             Wird öffentlich für Press-Anfragen angezeigt
           </p>
         </div>
 
         {/* WhatsApp Business */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: "var(--studio-text-primary)" }}>
             WhatsApp Business
           </label>
           <input
@@ -135,16 +138,16 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
             placeholder="+49 123 456789"
             value={formData.whatsapp_number || ""}
             onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+            className="studio-input w-full px-3 py-2 text-sm"
           />
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
             Optional: WhatsApp Business Nummer (mit Ländervorwahl, z.B. +49)
           </p>
         </div>
 
         {/* Contact Message */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: "var(--studio-text-primary)" }}>
             Kontakt-Nachricht
           </label>
           <textarea
@@ -153,32 +156,22 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
             onChange={(e) => setFormData({ ...formData, contact_message: e.target.value })}
             rows={3}
             maxLength={500}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 resize-none"
+            className="studio-input w-full px-3 py-2 text-sm resize-none"
           />
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
             Persönliche Nachricht im Kontakt-Modal (max. 500 Zeichen). Standard: "Ich melde mich so schnell wie möglich bei dir."
           </p>
         </div>
 
-        {/* Save Button */}
-        <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
-          <p className="text-xs text-zinc-600">
-            Diese Informationen werden öffentlich auf deiner Artist-Seite angezeigt
-          </p>
-          <StudioButton variant="primary" size="md" onClick={handleSave} disabled={saving}>
-            {saving ? "Speichern..." : "Speichern"}
-          </StudioButton>
-        </div>
-      </div>
-
-      {/* Info Box */}
-      <div className="mt-6 rounded-lg border border-blue-900/50 bg-blue-900/10 p-4">
-        <h3 className="text-sm font-semibold text-blue-400 mb-2">💡 Hinweis</h3>
-        <p className="text-xs text-blue-300/80 leading-relaxed">
-          Alle Kontaktdaten sind optional. Du kannst entscheiden, welche Informationen du öffentlich teilen möchtest.
-          Lasse Felder leer, die nicht angezeigt werden sollen.
+        {/* Info */}
+        <p className="text-xs pt-4" style={{ color: "var(--studio-text-secondary)", borderTop: "1px solid var(--studio-border)" }}>
+          Diese Informationen werden öffentlich auf deiner Artist-Seite angezeigt
         </p>
-      </div>
+      </StudioCard>
+
+      <StudioNotice type="info" className="mt-6">
+        <strong>Hinweis:</strong> Alle Kontaktdaten sind optional. Du kannst entscheiden, welche Informationen du öffentlich teilen möchtest. Lasse Felder leer, die nicht angezeigt werden sollen.
+      </StudioNotice>
     </StudioTabPage>
   );
 }

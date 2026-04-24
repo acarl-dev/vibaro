@@ -5,6 +5,9 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import StudioTabPage from "../../components/StudioTabPage";
 import StudioButton from "../../components/StudioButton";
+import StudioCard from "../../components/StudioCard";
+import StudioEmptyState from "../../components/StudioEmptyState";
+import StudioNotice from "../../components/StudioNotice";
 import ShowForm, { type ShowFormData } from "./ShowForm";
 import { studioFetch } from "@/lib/api/client-fetch";
 
@@ -237,26 +240,27 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
     format(new Date(dateString), "EEE, d. MMM yyyy \u2022 HH:mm", { locale: de });
 
   return (
-    <StudioTabPage title="Shows" description="Verwalte deine kommenden Konzerte und Auftritte.">
-      <div className="mb-4 rounded-lg bg-blue-900/20 border border-blue-800/50 p-3 text-xs text-blue-300">
-        💡 <span className="font-medium">Info:</span> Shows werden auf deiner \u00f6ffentlichen Seite
+    <StudioTabPage
+      title="Shows"
+      description="Verwalte deine kommenden Konzerte und Auftritte."
+      action={
+        !isCreating && !editingId ? (
+          <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+            + Neue Show
+          </StudioButton>
+        ) : undefined
+      }
+    >
+      <StudioNotice type="info" className="mb-6">
+        💡 <span className="font-medium">Info:</span> Shows werden auf deiner öffentlichen Seite
         nicht mehr angezeigt, sobald das Veranstaltungsdatum vorbei ist.
-      </div>
+      </StudioNotice>
 
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900/30 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium text-zinc-300">Deine Shows</h2>
-          {!isCreating && !editingId && (
-            <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-              + Neue Show
-            </StudioButton>
-          )}
-        </div>
-
+      <StudioCard>
         {error && (
-          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-900/10 px-3 py-2 text-xs text-red-400">
+          <StudioNotice type="error" className="mb-4">
             {error}
-          </div>
+          </StudioNotice>
         )}
 
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -276,11 +280,16 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
           )}
 
           {shows.length === 0 && !isCreating ? (
-            <div className="col-span-full rounded-lg border border-dashed border-zinc-800 bg-zinc-900/50 p-8 text-center">
-              <p className="text-xs text-zinc-600 mb-2">Noch keine Shows hinzugef\u00fcgt</p>
-              <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
-                Erste Show hinzuf\u00fcgen
-              </StudioButton>
+            <div className="col-span-full">
+              <StudioEmptyState
+                title="Noch keine Shows"
+                description="Füge deine kommenden Konzerte und Auftritte hinzu."
+                action={
+                  <StudioButton variant="secondary" size="sm" onClick={() => setIsCreating(true)}>
+                    Erste Show hinzufügen
+                  </StudioButton>
+                }
+              />
             </div>
           ) : (
             shows.map((show) => (
@@ -299,23 +308,23 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                     submitLabel="Speichern"
                   />
                 ) : (
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5 flex h-full flex-col">
-                    <div className="mb-4 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-950">
+                  <div className="rounded-lg p-5 flex h-full flex-col" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
+                    <div className="mb-4 overflow-hidden rounded-lg" style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)" }}>
                       {getFlyerSrc(show) ? (
                         <img src={getFlyerSrc(show)!} alt="Show flyer" className="h-56 w-full object-contain" />
                       ) : (
-                        <div className="h-56 w-full bg-zinc-900/40 flex items-center justify-center text-zinc-600 text-2xl">\u266a</div>
+                        <div className="h-56 w-full flex items-center justify-center text-2xl" style={{ background: "var(--studio-surface-elevated)", color: "var(--studio-text-secondary)" }}>♪</div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-zinc-500 mb-1">{formatShowDate(show.starts_at)}</p>
-                      <p className="text-sm font-medium text-zinc-100 truncate">{show.venue}</p>
-                      <p className="text-xs text-zinc-500 truncate">{show.city}</p>
+                      <p className="text-xs mb-1" style={{ color: "var(--studio-text-secondary)" }}>{formatShowDate(show.starts_at)}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: "var(--studio-text-primary)" }}>{show.venue}</p>
+                      <p className="text-xs truncate" style={{ color: "var(--studio-text-secondary)" }}>{show.city}</p>
                       {show.price !== null || show.is_free ? (
-                        <p className="text-xs text-zinc-500 mt-1">{show.is_free ? "Freier Eintritt" : `${show.price} \u20ac`}</p>
+                        <p className="text-xs mt-1" style={{ color: "var(--studio-text-secondary)" }}>{show.is_free ? "Freier Eintritt" : `${show.price} €`}</p>
                       ) : null}
                       {show.support_acts && show.support_acts.length > 0 && (
-                        <p className="text-xs text-zinc-500 mt-1 line-clamp-2">Support: {show.support_acts.join(", ")}</p>
+                        <p className="text-xs mt-1 line-clamp-2" style={{ color: "var(--studio-text-secondary)" }}>Support: {show.support_acts.join(", ")}</p>
                       )}
                     </div>
                     <div className="mt-3 flex items-center justify-between gap-2">
@@ -324,7 +333,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
                           <input ref={fileInputRef} type="file" accept="image/*"
                             onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleFlyerUpload(show.id, file); }}
                             className="hidden" id={`flyer-upload-${show.id}`} />
-                          <label htmlFor={`flyer-upload-${show.id}`} className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer inline-block">
+                          <label htmlFor={`flyer-upload-${show.id}`} className="text-xs cursor-pointer inline-block" style={{ color: "var(--studio-text-secondary)" }}>
                             {uploadingFlyer === show.id ? "\u23f3 Hochladen..." : "📎 Flyer hinzuf\u00fcgen"}
                           </label>
                         </div>
@@ -342,7 +351,7 @@ export default function ShowsClient({ initialShows }: ShowsClientProps) {
             ))
           )}
         </div>
-      </div>
+      </StudioCard>
     </StudioTabPage>
   );
 }

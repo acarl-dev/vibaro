@@ -313,7 +313,7 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                     draggedIndex === index
                       ? "opacity-50 scale-95"
                       : dragOverIndex === index
-                      ? "ring-2 ring-emerald-500/50"
+                      ? "ring-2 ring-accent"
                       : ""
                   }`}
                 >
@@ -384,12 +384,12 @@ export default function VideosClient({ initialVideos }: VideosClientProps) {
                         
                         {/* Featured Badge */}
                         {video.is_featured && (
-                          <div className="absolute top-3 left-12 flex items-center gap-2 bg-black/70 backdrop-blur-md rounded-full px-3 py-1.5 border border-emerald-500/30">
+                          <div className="absolute top-3 left-12 flex items-center gap-2 bg-black/70 backdrop-blur-md rounded-full px-3 py-1.5" style={{ border: "1px solid var(--studio-success)" }}>
                             <div className="relative">
-                              <div className="absolute inset-0 rounded-full bg-emerald-400/30 blur-md animate-pulse" />
-                              <div className="relative w-2 h-2 rounded-full bg-emerald-400" />
+                              <div className="absolute inset-0 rounded-full blur-md animate-pulse" style={{ background: "rgba(34,197,94,0.3)" }} />
+                              <div className="relative w-2 h-2 rounded-full" style={{ background: "var(--studio-success)" }} />
                             </div>
-                            <span className="text-[10px] font-medium tracking-wider uppercase text-emerald-400/90">
+                            <span className="text-[10px] font-medium tracking-wider uppercase" style={{ color: "var(--studio-success)" }}>
                               Hero
                             </span>
                           </div>
