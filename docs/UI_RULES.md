@@ -13,6 +13,70 @@ Wenn STYLEGUIDE.md und UI_RULES.md kollidieren, gilt:
 
 ---
 
+## Adoption Status
+
+Diese Regeln gelten verbindlich für neue UI und bewusst angefasste UI-Slices.
+
+Bestehender Legacy-Code muss nicht sofort vollständig angepasst werden.
+Wenn ein bestehender Screen bearbeitet wird, soll nur der betroffene Bereich schrittweise an diese Regeln angenähert werden.
+
+Keine großflächigen UI-Refactors ohne eigenen Plan.
+
+---
+
+## Official UI Components
+
+Diese Komponenten sind verbindlich zu verwenden. Neue Alternativen duerfen nicht ohne dokumentierte Begruendung eingefuehrt werden.
+
+| Komponente | Pfad | Einsatzgebiet |
+|---|---|---|
+| `StudioButton` | `apps/web/src/app/(studio)/components/StudioButton.tsx` | Alle Aktions-Buttons im Studio |
+| `StudioCard` | `apps/web/src/app/(studio)/components/StudioCard.tsx` | Alle Cards und Container-Panels im Studio |
+| `StudioEmptyState` | `apps/web/src/app/(studio)/components/StudioEmptyState.tsx` | Alle Empty States im Studio |
+| `StudioTabPage` | `apps/web/src/app/(studio)/components/StudioTabPage.tsx` | Sub-Pages unter "Meine Seite" |
+| `StudioPageHeader` | `apps/web/src/app/(studio)/components/StudioPageHeader.tsx` | Top-Level Studio-Produktbereiche (Phase, Share, QR, Performance, Settings) |
+| `StudioPageSubNav` | `apps/web/src/app/(studio)/components/StudioPageSubNav.tsx` | Einzig erlaubtes Studio-Subnav-Pattern |
+| `StudioTopNav` | `apps/web/src/app/(studio)/components/StudioTopNav.tsx` | Primaere Studio-Navigation (Desktop) |
+| `StudioBottomNav` | `apps/web/src/app/(studio)/components/StudioBottomNav.tsx` | Primaere Studio-Navigation (Mobile) |
+| `StudioStatCard` | `apps/web/src/app/(studio)/components/StudioStatCard.tsx` | Metriken und KPI-Kacheln |
+| `StudioStatusBadge` | `apps/web/src/app/(studio)/components/StudioStatusBadge.tsx` | Phase-/Seiten-Status-Badges |
+| `StudioNotice` | `apps/web/src/app/(studio)/components/StudioNotice.tsx` | Inline-Hinweise (info, warning, error) |
+| `ExplainPanel` | `apps/web/src/app/(studio)/components/ExplainPanel.tsx` | Kontextuelle Hilfe im Help-Mode |
+| `WhyButton` | `apps/web/src/app/(studio)/components/WhyButton.tsx` | Optionale Vertiefungs-Erklaerungen |
+| `HelpHub` | `apps/web/src/app/(studio)/components/HelpHub.tsx` | Zentraler Hilfe-Einstiegspunkt im Studio |
+
+---
+
+## Page Header Rules
+
+- `StudioTabPage` fuer Sub-Pages unter **Meine Seite**:
+  Profile, Appearance, Links, Music, Shows, Releases, Videos, Gallery, Contact.
+- `StudioPageHeader` fuer Top-Level Studio-Produktbereiche:
+  Dashboard/Home, Phase, Links verteilen/Share, QR, Performance/Analyse, Settings.
+- Kein neues Page-Header-Pattern ohne explizite Entscheidung.
+
+---
+
+## Navigation Rules
+
+- `StudioPageSubNav` ist das einzig erlaubte Subnav-Pattern im Studio.
+- `StudioTopNav` (Desktop) und `StudioBottomNav` (Mobile) sind die primaeren Navigationspatterns.
+- `StudioSidebar` existiert als Teil der aktuellen Shell. Neue Navigationskonzepte duerfen nicht ohne explizite Entscheidung eingefuehrt werden.
+
+---
+
+## Known Legacy Areas
+
+### Settings
+
+`SettingsClient` nutzt aktuell lokale Button-, Card- und Badge-Stile (kein `StudioButton`, kein `StudioCard`, kein `StudioStatusBadge`).
+
+Regel:
+- Keine neuen lokalen UI-Stile in Settings.
+- Beim naechsten Anfassen von Settings muss der betroffene Bereich schrittweise auf `StudioButton`, `StudioCard` und `StudioStatusBadge` (oder eine dokumentierte zentrale Settings-Variante) migriert werden.
+
+---
+
 ## 1. Visual Modes
 
 Vibaro hat vier Visual Modes. Sie teilen ein gemeinsames System, duerfen sich aber bewusst in Gewichtung und Stimmung unterscheiden.
@@ -83,45 +147,55 @@ Nicht erlaubt:
 
 ### 2.1 Buttons
 
+Zentrale Komponente: `StudioButton` (`apps/web/src/app/(studio)/components/StudioButton.tsx`)
+
 Verpflichtend:
 - Genau ein dominanter primaerer Button pro Screen-Zustand.
-- Alle Buttons muessen zentrale Button-Komponente und Tokens nutzen.
+- Alle Buttons im Studio muessen `StudioButton` nutzen.
 - Button-Hoehe und Radius duerfen nicht komponentenlokal frei gewaehlt werden.
 
 Verwendung:
-- primary: Hauptaktion im aktuellen Schritt
-- secondary: naechstwichtige Alternative
-- ghost: sekundare Inline-Aktion in ruhigen Flaechen
-- danger: irreversible/risikobehaftete Aktion
-- link: textnahe Navigation ohne Button-Gewicht
+- `primary`: Hauptaktion im aktuellen Schritt
+- `secondary`: naechstwichtige Alternative
+- `ghost`: sekundare Inline-Aktion in ruhigen Flaechen
+- `danger`: irreversible/risikobehaftete Aktion
+- `link`: textnahe Navigation ohne Button-Gewicht
+
+Groessen: `md` (Standard), `sm`, `icon`
 
 Nicht erlaubt:
 - mehrere primary-Buttons in derselben Aktionsgruppe
 - eigene Button-Stile in Feature-Komponenten
+- raw `<button>` mit freien Tailwind-Klassen im Studio
 
 ### 2.2 Cards
 
+Zentrale Komponente: `StudioCard` (`apps/web/src/app/(studio)/components/StudioCard.tsx`)
+
 Verpflichtend:
-- Card-Komposition ueber zentrale Card-Komponente.
-- Radius, Border, Shadow nur ueber zentrale Varianten.
+- Card-Komposition ueber `StudioCard`.
+- Radius, Border, Shadow nur ueber Props/Varianten von `StudioCard`.
 
 Verwendung:
-- default: Standard-Container
-- emphasis: hervorgehobene, aber nicht kritische Information
-- muted: Hintergrund-/Kontextinformation
-- danger: Warnung oder irreversible Konsequenz
+- default: Standard-Container (kein `accentBorder`)
+- emphasis: `accentBorder={true}` fuer hervorgehobene Informationen
+- clickable: `clickable={true}` fuer navigierbare Kacheln
 
 Nicht erlaubt:
 - neue Shadow/Radius/Borders direkt in Feature-Code
-- parallele Card-Systeme je Bereich
+- parallele Card-Systeme je Bereich (z. B. lokale `rounded-xl`-Divs statt `StudioCard`)
 
 ### 2.3 Empty States
 
+Zentrale Komponente: `StudioEmptyState` (`apps/web/src/app/(studio)/components/StudioEmptyState.tsx`)
+
+Props: `icon` (optional), `title`, `description`, `action` (ReactNode, optional)
+
 Verpflichtend:
 Jeder Empty State muss beantworten:
-1. Was ist leer?
-2. Warum ist es relevant?
-3. Was ist der naechste Schritt?
+1. Was ist leer? → `title`
+2. Warum ist es relevant? → `description`
+3. Was ist der naechste Schritt? → `action` (CTA via `StudioButton`)
 
 Zusatzregeln:
 - genau ein klarer CTA
@@ -130,8 +204,10 @@ Zusatzregeln:
 
 ### 2.4 Tabs / Subnav
 
+Zentrale Komponente: `StudioPageSubNav` (`apps/web/src/app/(studio)/components/StudioPageSubNav.tsx`)
+
 Verpflichtend:
-- Ein einheitliches Subnav-Muster fuer gleiche IA-Ebene.
+- Nur `StudioPageSubNav` als Subnav-Pattern im Studio.
 - Aktiver Zustand muss klar und barrierearm erkennbar sein.
 - Labels folgen den Produktbegriffen aus STYLEGUIDE.md.
 
@@ -141,9 +217,16 @@ Nicht erlaubt:
 
 ### 2.5 Info- / Help-Panels
 
+Zentrale Komponenten:
+- `ExplainPanel` (`apps/web/src/app/(studio)/components/ExplainPanel.tsx`) – kontextuelle Hilfe, nur sichtbar wenn `helpMode` aktiv
+- `WhyButton` (`apps/web/src/app/(studio)/components/WhyButton.tsx`) – optionale Vertiefung via Drawer
+- `StudioNotice` (`apps/web/src/app/(studio)/components/StudioNotice.tsx`) – Inline-Hinweis (type: `info`, `warning`, `error`)
+- `HelpHub` (`apps/web/src/app/(studio)/components/HelpHub.tsx`) – zentraler Hilfe-Einstiegspunkt
+
 Verpflichtend:
-- ExplainPanel fuer kurze, kontextuelle Hilfe.
-- WhyButton fuer optionale Vertiefung.
+- `ExplainPanel` fuer kurze, kontextuelle Hilfe im Help-Mode.
+- `WhyButton` fuer optionale Vertiefung.
+- `StudioNotice` fuer persistente Inline-Hinweise ausserhalb des Help-Mode.
 - Hilfe unterstuetzt Aktion, ersetzt sie nicht.
 
 Nicht erlaubt:
@@ -152,10 +235,14 @@ Nicht erlaubt:
 
 ### 2.6 Stat Cards
 
+Zentrale Komponente: `StudioStatCard` (`apps/web/src/app/(studio)/components/StudioStatCard.tsx`)
+
+Props: `value`, `label`, `trend` (optional: `{ value: string; positive: boolean }`)
+
 Verpflichtend:
-- Kennzahl + Kontext + Zeitraum/Bezug muessen zusammen lesbar sein.
+- Kennzahl + `label` + optional Trend muessen zusammen lesbar sein.
 - Stat Cards duerfen die Hauptaktion nicht visuell uebertrumpfen.
-- Bei leeren Daten: auf Phase/naechste Aktion verweisen.
+- Bei leeren Daten (`value === ""`) zeigt die Komponente `—`; zusaetzlich auf Phase/naechste Aktion verweisen.
 
 Nicht erlaubt:
 - isolierte Zahlen ohne Erklaerung
@@ -163,38 +250,50 @@ Nicht erlaubt:
 
 ### 2.7 Forms
 
-Verpflichtend:
-- Labels immer sichtbar (kein label-only Placeholder).
-- Fehlertexte konkret und loesungsorientiert.
+Status: **Keine zentrale Form-Komponente vorhanden.**
+
+Geplante zukuenftige Komponenten: `StudioField`, `StudioInput`, `StudioTextarea`, `StudioSelect`, `StudioFormSection`
+
+Bis eine zentrale Formular-Komponente existiert:
+- Dominantes bestehendes Studio-Input-Pattern wiederverwenden (keine neuen Inline-Input-Stile).
+- Labels immer sichtbar – kein label-only Placeholder.
+- Fehlertexte konkret und loesungsorientiert auf Feldebene.
 - Kritische Felder (z. B. Sichtbarkeit, URL-nahe Felder) brauchen klare Folgenbeschreibung.
-- Primaraktion am Formularende eindeutig priorisiert.
+- Primaraktion am Formularende eindeutig priorisiert via `StudioButton variant="primary"`.
 
 Nicht erlaubt:
-- uneinheitliche Feldabstaende pro Form
+- neue Input-Stile (neue `rounded-*`, neue Border-Farben) in Feature-Komponenten
 - CTA-Hierarchiebruch in Formular-Footern
 
 ### 2.8 Badges
 
+Zentrale Komponente: `StudioStatusBadge` (`apps/web/src/app/(studio)/components/StudioStatusBadge.tsx`)
+
+Erlaubte Status-Werte: `live`, `draft`, `ended`
+
 Verpflichtend:
-- Badge-Farben und Bedeutung sind zentral definiert.
+- `StudioStatusBadge` fuer Phase-/Seiten-Status.
 - Badge-Text ist kurz, statusorientiert und eindeutig.
 
 Nicht erlaubt:
-- freie neue Badge-Farben in Feature-Komponenten
+- freie neue Badge-Farben in Feature-Komponenten (kein lokales `bg-emerald-*` etc.)
 - Badge als Ersatz fuer fehlende Erklaerung
 
 ### 2.9 Icons
 
+Zentrale Icon-Quelle: `StudioIcons` (`apps/web/src/app/(studio)/components/StudioIcons.tsx`)
+
 Verpflichtend:
-- Ein konsistentes Icon-Set fuer funktionale UI-Elemente.
+- Funktionale Studio-UI-Elemente verwenden `StudioIcons` oder eine einzige explizit freigegebene Icon-Bibliothek (kein Mix).
 - Einheitliche Groessenstufen und Ausrichtung.
 
 Nicht erlaubt:
-- Mix aus StudioIcons, Inline-SVGs und Emojis fuer dieselbe Funktionsebene
+- Mix aus `StudioIcons`, separaten Inline-SVGs und Emojis fuer dieselbe Funktionsebene
 - Emoji-Icons fuer funktionale Aktionen
+- Neue Inline-SVG-Definitionen ausserhalb von `StudioIcons` ohne Erweiterung der zentralen Datei
 
 Hinweis:
-- Emojis sind nur in seltenen, rein illustrativen Hilfekontexten erlaubt, nie fuer primaere Funktionselemente.
+- Emojis sind nur in seltenen, rein illustrativen Hilfekontexten erlaubt (z. B. ExplainPanel-Beispiele), nie fuer primaere Funktionselemente.
 
 ---
 
