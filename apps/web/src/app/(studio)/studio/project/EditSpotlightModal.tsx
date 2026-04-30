@@ -306,7 +306,7 @@ export default function EditSpotlightModal({
                       }`,
                     }}
                   >
-                    {formData.meta?.is_limited && (
+                    {Boolean(formData.meta?.is_limited) && (
                       <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>

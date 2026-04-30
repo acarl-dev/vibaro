@@ -27,7 +27,6 @@ export default function PublishStep({
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md space-y-8">
         <StepHeader
-          currentStep="publish"
           title="Fast fertig."
           description="So sieht deine Seite aus. Du kannst jetzt ver\u00f6ffentlichen oder das Studio erst erkunden."
         />

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
       },
     ],
   },
-                    "Phase-Management",
+  twitter: {
     card: "summary_large_image",
     title: "Vibaro – Die digitale Bühne für Musiker",
     description:
