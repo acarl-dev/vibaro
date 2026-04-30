@@ -11,11 +11,11 @@ function ActionCard({ label, sub, href, external = false }: ActionItem) {
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-end",
-    minHeight: "100px",
+    minHeight: "88px",
     background: hovered ? "var(--studio-surface-elevated)" : "var(--studio-surface)",
     border: `1px solid ${hovered ? "var(--studio-accent-muted)" : "var(--studio-border)"}`,
-    borderRadius: "16px",
-    padding: "18px 20px",
+    borderRadius: "8px",
+    padding: "14px 16px",
     textDecoration: "none",
     cursor: "pointer",
     transition: "background 150ms ease, border-color 150ms ease",
@@ -63,10 +63,15 @@ export default function QuickActions({ hasActivePhase, pageHandle }: QuickAction
       ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: "12px" }}>
+    <section className="space-y-3" aria-label="Weitere Aktionen">
+      <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--studio-text-secondary)", opacity: 0.7 }}>
+        Weitere Aktionen
+      </p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {actions.map((a) => (
         <ActionCard key={a.label} {...a} />
       ))}
-    </div>
+      </div>
+    </section>
   );
 }

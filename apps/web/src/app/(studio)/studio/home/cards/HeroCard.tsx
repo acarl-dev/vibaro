@@ -23,7 +23,7 @@ function phaseSubline(type: string | null): string {
 
 function HeroStatCell({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ background: "var(--studio-bg)", border: "1px solid var(--studio-border)", borderRadius: "12px", padding: "14px 16px" }}>
+    <div className="rounded-lg px-4 py-3.5" style={{ background: "var(--studio-bg)", border: "1px solid var(--studio-border)" }}>
       <div style={{ fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--studio-text-secondary)", opacity: 0.7, marginBottom: "6px" }}>
         {label}
       </div>
@@ -34,7 +34,7 @@ function HeroStatCell({ label, value }: { label: string; value: string }) {
 
 export function HeroEmpty() {
   return (
-    <div style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)", borderRadius: "20px", padding: "40px 32px", position: "relative", overflow: "hidden" }}>
+    <div className="relative overflow-hidden rounded-lg p-6 sm:p-8" style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)" }}>
       <div
         style={{ position: "absolute", right: "-16px", top: "50%", transform: "translateY(-50%)", opacity: 0.06, pointerEvents: "none", userSelect: "none" }}
         aria-hidden
@@ -57,16 +57,16 @@ export function HeroEmpty() {
             1. Fokus festlegen · 2. Links und QR teilen · 3. Performance prüfen
           </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "20px" }}>
+        <div className="mb-5 flex flex-wrap items-center gap-3">
           <Link
             href="/studio/share/new"
-            style={{ background: "var(--studio-accent)", color: "#fff", padding: "11px 20px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
+            className="studio-btn studio-btn-primary"
           >
             Neue Phase starten
           </Link>
           <Link
             href="/studio/page"
-            style={{ background: "transparent", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)", padding: "11px 18px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
+            className="studio-btn studio-btn-secondary"
           >
             Seite weiter ausbauen
           </Link>
@@ -79,12 +79,18 @@ export function HeroEmpty() {
   );
 }
 
-export function HeroActive({ spotlight }: { spotlight: NonNullable<StudioHomeData["spotlight"]> }) {
+export function HeroActive({
+  spotlight,
+  pagePublished,
+}: {
+  spotlight: NonNullable<StudioHomeData["spotlight"]>;
+  pagePublished: boolean;
+}) {
   const stats = spotlight.phase_stats;
   const hasData = stats && (stats.visitors > 0 || stats.clicks > 0);
 
   return (
-    <div style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)", borderTop: "3px solid var(--studio-accent)", borderRadius: "20px", padding: "32px" }}>
+    <div className="rounded-lg border-t-[3px] p-6 sm:p-8" style={{ background: "var(--studio-surface-elevated)", borderColor: "var(--studio-border)", borderTopColor: "var(--studio-accent)", borderLeftWidth: "1px", borderRightWidth: "1px", borderBottomWidth: "1px" }}>
       <div style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
           <span style={{ background: "var(--studio-accent-muted)", color: "var(--studio-accent)", padding: "4px 10px", borderRadius: "999px", fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 600 }}>
@@ -117,22 +123,48 @@ export function HeroActive({ spotlight }: { spotlight: NonNullable<StudioHomeDat
           Sobald du deine Links teilst, siehst du hier erste Daten.
         </p>
       )}
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+      <div className="flex flex-wrap items-center gap-2.5">
+        {pagePublished ? (
+          <>
+            <Link
+              href={hasData ? "/studio/results" : "/studio/share/distribution"}
+              className="studio-btn studio-btn-primary"
+            >
+              {hasData ? "Performance prüfen" : "Links verteilen"}
+            </Link>
+            <Link
+              href={hasData ? "/studio/share/distribution" : "/studio/share/qr"}
+              className="studio-btn studio-btn-secondary"
+            >
+              {hasData ? "Mehr Links verteilen" : "QR-Code nutzen"}
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/studio/settings"
+              className="studio-btn studio-btn-primary"
+            >
+              Seite veröffentlichen
+            </Link>
+            <Link
+              href="/studio/share/distribution"
+              className="studio-btn studio-btn-secondary"
+            >
+              Danach Links verteilen
+            </Link>
+          </>
+        )}
         <Link
           href="/studio/share"
-          style={{ background: "var(--studio-accent)", color: "#fff", padding: "10px 18px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
+          className="studio-btn studio-btn-ghost"
         >
           Phase verwalten
         </Link>
         <Link
-          href="/studio/share/distribution"
-          style={{ background: "transparent", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)", padding: "10px 18px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
-        >
-          Links verteilen
-        </Link>
-        <Link
           href="/studio/page"
-          style={{ marginLeft: "auto", fontSize: "13px", fontWeight: 500, color: "var(--studio-text-secondary)", textDecoration: "none", opacity: 0.75 }}
+          className="ml-auto text-xs font-medium"
+          style={{ color: "var(--studio-text-secondary)", opacity: 0.75 }}
         >
           Seite bearbeiten →
         </Link>

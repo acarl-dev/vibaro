@@ -392,7 +392,73 @@ Ergaenzende Regel:
 
 ---
 
-## 8. Token- Und Stil-Disziplin
+## 8. Layout & Spacing Standards
+
+Diese Werte sind verbindlich fuer neue UI-Arbeit. Bestehender Legacy-Code muss beim naechsten Anfassen schrittweise angeglichen werden.
+
+### 8.1 Studio
+
+| Bereich | Standard | Technisch |
+|---|---|---|
+| Content max-width | 1200px | `style={{ maxWidth: "1200px" }}` (CSS-Token geplant) |
+| Page padding | px-4 sm:px-6, py-8 | vom Studio-Layout vorgegeben — nicht wiederholen |
+| Main section gap | 32px | `space-y-8` |
+| Card padding | 24px | `p-6` via `StudioCard` |
+| Card radius | 8px | `rounded-lg` via `StudioCard` |
+| Grid gap | 20px | `gap-5` |
+| Button | `StudioButton` only | Keine freien `<button>` mit Tailwind-Klassen |
+| Input | `studio-input` + `px-3 py-2` | Klasse aus `globals.css` |
+| Mobile bottom safe area | `pb-20 md:pb-0` | Nur wo `StudioBottomNav` aktiv ist |
+
+Verboten:
+- Abweichende Card-Paddings oder Radien direkt in Feature-Komponenten.
+- Neue `gap-*`-Werte ohne Begruendung.
+- `StudioStatCard` darf nicht mit anderem Padding als `StudioCard` erscheinen (Angleichung ausstehend, aber kein neuer Wildwuchs).
+
+### 8.2 Landingpage
+
+- Kann bewusst groessere Abstaende und `rounded-full`-CTAs verwenden — dies ist ein dokumentierter Mode-Unterschied zum Studio.
+- Standard Section-Breiten:
+  - Textsektionen: `max-w-4xl`
+  - Feature-/Grid-Sektionen: `max-w-7xl`
+- Keine weiteren `max-w-*`-Werte ohne Begruendung.
+
+### 8.3 Public Page
+
+- Darf editorial spacing und template-spezifische Breiten verwenden.
+- Muss pro Template intern konsistent sein.
+- Mobile-first fuer Fans.
+- Keine Studio-Komponenten auf der Public Page.
+
+### 8.4 Settings
+
+- Bekanntes Legacy-Gebiet mit lokalen Card-/Button-/Badge-Stilen.
+- Beim naechsten Anfassen: betroffenen Bereich schrittweise auf Studio-Spacing und offizielle Komponenten migrieren.
+- Keine neuen lokalen Stile in Settings.
+
+---
+
+## 8.5 Inline-Style-Regeln
+
+`style={{ ... }}` ist **nur** fuer echte dynamische Werte erlaubt.
+
+Erlaubt:
+- `width`/`height` aus Runtime-Daten (z. B. Chart-Balken, Fortschrittsbalken)
+- `transform` (z. B. Positionierung, Animation)
+- CSS-Variablen (`var(--studio-accent)` etc.)
+- Bedingte Layout-Werte aus Props/State (z. B. `maxWidth: isVideo ? "960px" : "680px"`)
+- `focal point` fuer Bild-Positionierung
+
+Nicht erlaubt:
+- Radius (`borderRadius: "..."`)
+- Shadow (`boxShadow: "..."`)
+- Farben (`color: "#..."`, `background: "#..."`) — CSS-Variablen sind ok
+- Statische Padding/Margin-Werte, die auch als Tailwind-Klasse ausgedrueckt werden koennten
+- Statische Schriftgroessen (`fontSize: "14px"` etc.)
+
+---
+
+## 9. Token- Und Stil-Disziplin
 
 - Farben nur ueber Theme-Variablen und bestehende Tokens.
 - Spacing nur ueber definierte Abstands-Skalen.
@@ -401,7 +467,7 @@ Ergaenzende Regel:
 
 ---
 
-## 9. Produktloop-Check In Der UI
+## 10. Produktloop-Check In Der UI
 
 Jeder neue oder geaenderte Screen muss mindestens einen dieser Punkte klar unterstuetzen:
 
@@ -413,7 +479,7 @@ Wenn ein Screen keinen Bezug zum Produktloop zeigt, muss sein Nutzen fuer den Lo
 
 ---
 
-## 10. Geltung
+## 11. Geltung
 
 Diese Regeln sind fuer MVP-Slices verbindlich.
 Abweichungen sind nur erlaubt, wenn sie:

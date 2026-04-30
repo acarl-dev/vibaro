@@ -15,7 +15,7 @@ function plat(id: string | null): string {
 
 function SnapStatCell({ label, value, trend }: { label: string; value: string; trend?: { pct: number } | null }) {
   return (
-    <div style={{ background: "var(--studio-bg)", border: "1px solid var(--studio-border)", borderRadius: "12px", padding: "14px 16px" }}>
+    <div className="rounded-lg px-4 py-3.5" style={{ background: "var(--studio-bg)", border: "1px solid var(--studio-border)" }}>
       <div style={{ fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--studio-text-secondary)", opacity: 0.6, marginBottom: "6px" }}>{label}</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
         <span style={{ fontSize: "22px", fontWeight: 600, lineHeight: 1, color: "var(--studio-text-primary)" }}>{value}</span>
@@ -45,27 +45,39 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
 
   if (!hasData) {
     return (
-      <div style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", borderRadius: "16px", padding: "20px" }}>
+      <div className="rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
         <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--studio-text-primary)", marginBottom: "6px" }}>
           Noch keine Daten
         </p>
         <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.65, marginBottom: "16px" }}>
           Lege zuerst einen Fokus fest und verteile dann deine Links oder QR-Codes, damit du siehst, was funktioniert.
         </p>
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          {hasActivePhase ? (
+        <div className="flex flex-wrap gap-2.5">
+          {hasActivePhase && !page?.is_published ? (
+            <Link
+              href="/studio/settings"
+              className="studio-btn studio-btn-primary"
+            >
+              Seite veröffentlichen
+            </Link>
+          ) : hasActivePhase ? (
             <Link
               href="/studio/share/distribution"
-              style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)", padding: "8px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, textDecoration: "none", display: "inline-block" }}
+              className="studio-btn studio-btn-primary"
             >
-              Links teilen
+              Links verteilen
             </Link>
           ) : (
             <Link
               href="/studio/share/new"
-              style={{ background: "var(--studio-surface-elevated)", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)", padding: "8px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, textDecoration: "none", display: "inline-block" }}
+              className="studio-btn studio-btn-primary"
             >
               Phase starten
+            </Link>
+          )}
+          {hasActivePhase && page?.is_published && (
+            <Link href="/studio/share/qr" className="studio-btn studio-btn-secondary">
+              QR-Code nutzen
             </Link>
           )}
         </div>
@@ -76,7 +88,7 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
   const conversion = visitors > 0 && clicks > 0 ? parseFloat((clicks / visitors * 100).toFixed(1)) : null;
 
   return (
-    <div style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", borderRadius: "16px", padding: "20px" }}>
+    <div className="rounded-lg p-6" style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", gap: "12px", flexWrap: "wrap" }}>
         <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)" }}>
           {hasActivePhase ? "Performance dieser Phase" : "Überblick"}

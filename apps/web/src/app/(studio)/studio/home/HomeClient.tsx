@@ -14,10 +14,13 @@ export default function HomeClient({ data }: HomeClientProps) {
   const isActive = data.spotlight?.status === "active";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div className="space-y-5">
       {/* 1. Primary Hero Card */}
       {isActive && data.spotlight ? (
-        <HeroActive spotlight={data.spotlight} />
+        <HeroActive
+          spotlight={data.spotlight}
+          pagePublished={Boolean(data.page?.is_published)}
+        />
       ) : (
         <HeroEmpty />
       )}
