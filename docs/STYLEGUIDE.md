@@ -1,228 +1,295 @@
-# Vibaro Styleguide
+# Vibaro Styleguide (Binding, MVP)
 
-This styleguide defines the visual and communicative appearance of Vibaro.
-It is binding for all UI decisions (web, public pages, dashboard).
+Status: Active  
+Scope: Studio, Public Page, Landingpage  
+Related: ARCHITECTURE.md, PRODUCT_RULES.md, PRODUCT_V2.md, THEMES.md
 
-Goal: calm, high-quality, timeless – the musician is the focus, not the tool.
+Dieser Styleguide definiert verbindlich die visuelle und sprachliche Ausrichtung von Vibaro.
+Er gilt fuer alle Design- und UX-Entscheidungen im MVP.
 
----
-
-## 1. Design Philosophy
-
-- calm instead of loud
-- clear instead of playful
-- reduced instead of overloaded
-- professional, not “startup buzz”
-
-Vibaro should feel like:
-- a high-quality music magazine
-- a minimalist artist website
-- not a marketing tool
+Leitsatz: ruhig, hochwertig, zeitlos. Die Band steht im Mittelpunkt, das Tool bleibt im Hintergrund.
 
 ---
 
-## 2. Colors
+## 1. Produkt-DNA
 
-- Colors must come **exclusively** from the theme system (`docs/THEMES.md`)
-- No free color choices per component
-- Accent colors should be used sparingly (buttons, links, highlights)
-- Accent colors must never be used as full background surfaces
+### Was Vibaro ist
 
-❌ Forbidden:
-- random HEX colors
-- colorful gradients
-- color wheels / color pickers in the MVP
+- Eine Bandseite auf Vibaro mit klarem aktuellem Fokus.
+- Ein Workflow-System fuer konkrete Promotion-Phasen.
+- Ein Tool, das Sichtbarkeit und Wirkung pro Phase messbar macht.
 
----
+### Was Vibaro nicht ist
 
-## 3. Typography
+- Keine generische "Baukasten-Homepage" ohne Handlungsfokus.
+- Kein lautes Marketing-Dashboard.
+- Kein Feature-Katalog ohne klaren naechsten Schritt.
 
+### Zentraler Produktloop (visuell zu stuetzen)
 
-Avoid:
-- playful fonts
+1. Aktuellen Fokus festlegen.
+2. Links und QR-Code teilen.
+3. Sehen, was funktioniert.
 
-### Typo-Rollen (Landing Page)
-
-🅰️ Headline (Hero & Section Titles)
-- Inter, weight 600–700
-- leicht negatives Letter-spacing (~-0.01em)
-- kompakte Line-height
-- Farbe: Primary Text Color (Theme)
-- Einsatz: Hero-Headline, Haupt-Section-Titel („So sieht deine Seite aus“, „Bereit für deine eigene Seite?“)
-
-🅱️ Subheadlines / erklärende Titel
-- Inter Medium (500)
-- etwas kleiner als A
-- mehr Zeilenabstand, ruhiger
-- etwas weniger Kontrast als A
-- Einsatz: erklärende Überschriften, Übergänge zwischen Sections
-
-🅲 Main Copy (Absätze)
-- Inter Regular (400)
-- großzügige Line-height (z.B. `leading-relaxed`)
-- ruhige Textfarbe (nicht reinweiß, z.B. leicht abgedunkeltes Foreground)
-- max. Textbreite begrenzen (z.B. `max-w-xl` / `max-w-2xl`)
-- Einsatz: Produktbeschreibung, Erklärtexte, Benefits (keine Bullet-Wüsten)
-
-🅳 Meta / Secondary Text
-- Inter Regular oder Medium
-- kleiner als Main Copy
-- weniger Kontrast, aber nie „grau auf grau“
-- Einsatz: Hinweise, kleine Erklärungen, Footer, rechtliches
-
-🅴 Buttons & CTAs
-- Inter Medium oder Semibold
-- klar, keine verspielten Caps
-- kein extra Letterspacing
-- CTA soll wirken wie eine Entscheidung, nicht wie Werbung
-### Hero Typografie (Landing Page)
-
-- Font: Inter (self-hosted, sans-serif)
-- Headline: weight 600–700, slightly negative letter-spacing (~0.01em), rather tight line height for an editorial feel
-- Subline: Inter Regular/Medium, more relaxed line height, clearly calmer than the headline
+Regel fuer alle Screens: Der aktuelle Schritt im Loop muss klar erkennbar sein, und der naechste Schritt muss sichtbar vorbereitet werden.
 
 ---
 
-## 4. Layout & Spacing
+## 2. Zielgruppe Und Tonalitaet
 
-- generous spacing
-- fewer elements per screen
-- mobile-first thinking
-- clear separation of content
+### Primare MVP-Zielgruppe
 
-Principle:
-> If something feels cramped, it is wrong.
+- Ambitionierte Metal-, Metalcore- und Alternative-Bands.
+
+### Tonalitaet
+
+- Ernsthaft.
+- Hochwertig.
+- Ruhig.
+- Kontrolliert.
+- Direkt und klar.
+
+### Nicht erlaubt
+
+- Verspielte oder ironische Produktsprache.
+- Generische SaaS-Floskeln.
+- Startup-Buzzwords.
+
+Referenzgefuehl: moderne Editorial-Aesthetik aus Musik-/Kulturkontext, nicht "Growth-Tool"-Optik.
 
 ---
 
-## 5. UI Components
+## 3. Sprache Und Begriffe
 
-### Buttons
-- clear
-- calm
-- no “shiny” look
-- accent color only for primary actions
+### Verbindliche Produktbegriffe (UI-nah)
+
+- Meine Seite = dauerhafte Bandseite.
+- Phase = aktueller Fokus (z. B. Release, Tour, Merch, Studio).
+- Links verteilen = Tracking-Links und QR-Code je Kanal.
+- Performance dieser Phase = Auswertung einer konkreten Phase.
+- Analyse = uebergreifende Auswertung ueber mehrere Phasen.
+
+### Bevorzugte sichtbare Begriffe in der Primar-UI
+
+- Fokus
+- Phase
+- Links verteilen
+- QR-Code
+- Performance dieser Phase
+- Analyse
+- Veroeffentlichen
+- Sichtbar / Nicht sichtbar
+
+### Zu vermeidende technische Begriffe in der Primar-UI
+
+- Distribution (als Hauptbegriff)
+- Tracking (als dominante Nutzerbezeichnung)
+- Conversion
+- Handle
+- Hero
+- Template
+- UTM
+- Attribution
+
+Technische Begriffe duerfen in Entwicklerdoku, optionalen Hilfetexten oder API-Kontexten vorkommen, aber nicht als dominante Nutzerfuehrung im Studio.
+
+### Begriffsumgang (verbindlich)
+
+- Distribution: intern okay, extern in der UI durch "Links verteilen" ersetzen.
+- Tracking: intern/fachlich okay, in der UI bevorzugt "Performance" oder "Wirkung".
+- Conversion: nur in Analyse-Kontexten, nicht als Einstiegssprache.
+- Handle: in UI als "Band-Adresse" oder "Seiten-Adresse" erklaeren.
+- Hero: nur als interner Designbegriff.
+- Template: in UI durch "Design" oder "Look" ersetzen.
+
+### Deutsch/Englisch-Regel
+
+- Studio: Deutsch als Standardsprache fuer Navigation, Aktionen, Hilfetexte und Status.
+- Public Page: Sprache der Bandinhalte frei waehlbar; Produkt-/Tool-Sprache bleibt im Hintergrund.
+- Technische englische Fachbegriffe nur dann, wenn es keine klare deutsche Alternative im jeweiligen Kontext gibt.
+
+---
+
+## 4. Informationsarchitektur
+
+### Trennung der Kernbereiche
+
+- Meine Seite: dauerhafte Identitaet und Grundauftritt.
+- Phase: aktueller Promotion-Fokus.
+- Links verteilen: operative Ausspielung pro Kanal inklusive QR.
+- Performance dieser Phase: Wirkung einer konkreten Phase.
+- Analyse: uebergreifende Sicht auf Entwicklung und Muster.
+
+### Navigationsprinzip
+
+- Jeder Screen braucht einen klaren naechsten Schritt.
+- Jeder Screen-Zustand hat genau einen dominanten CTA.
+- Sekundaeraktionen bleiben visuell nachgeordnet.
+
+### Priorisierung
+
+- Aktionen sind wichtiger als Datenmasse.
+- Daten werden kontextuell gezeigt, nicht als permanente Dashboard-Wand.
+
+---
+
+## 5. Visuelles System
+
+### Farben
+
+- Farben kommen ausschliesslich aus dem Theme-System gemaess THEMES.md.
+- Keine freien HEX-Farben in Komponenten.
+- Keine grellen Flaechen als Standard.
+- Kontraste muessen klar lesbar, aber nicht aggressiv sein.
+
+### Typografie
+
+- Ruhige, moderne Sans-Serif-Systematik.
+- Keine verspielten oder dekorativen Schriftstile.
+- Klare Hierarchie: Headline, Subheadline, Body, Meta.
+- Textbreiten begrenzen, damit Inhalte editorial und lesbar bleiben.
+
+### Spacing
+
+- Grosszuegige Abstaende statt kompakter Verdichtung.
+- Weniger Elemente pro Viewport.
+- Mobile-first mit sauberer vertikaler Rhythmik.
 
 ### Cards
-- subtly separated
-- no harsh shadows
-- no strong contrasts
 
-### Inputs
-- simple
-- easy to read
-- clear but unobtrusive focus states
+- Klare Gruppierung, dezente Trennung.
+- Keine starken Schatten, keine lauten Effekte.
+- Karten duerfen nicht wie austauschbare SaaS-Featureboxen wirken.
 
----
+### Buttons
 
-## 6. Interaction & Animation
+- Primaerer Button pro Screen-Zustand.
+- Klares visuelles Gefaelle zwischen primaer und sekundaer.
+- Keine "shiny"- oder spielerischen Stilmittel.
 
-- smooth transitions
-- short, subtle animations
-- no continuous motion
-- animation supports function, not attention-seeking
+### Icons
 
----
+- Funktional, sparsam, konsistent.
+- Keine Deko-Icons ohne Informationswert.
 
-## 7. Text & Language (UI)
+### Empty States
 
-- clear
-- friendly
-- factual
-- no marketing speak
-- no buzzwords
+- Immer mit klarer naechster Aktion.
+- Kurz erklaeren, warum etwas leer ist.
+- Keine toten Enden.
 
-Example:
-❌ “Boost your artist presence now!”  
-✅ “Publish your artist page”
+### Hilfe-Elemente
+
+- Hilfe ist sichtbar, aber nicht dominant.
+- Hilfetexte unterstuetzen Entscheidungen statt sie zu ersetzen.
 
 ---
 
-## 8. Public Artist Pages
+## 6. Studio Design
 
-- the artist is always the focus
-- Vibaro stays visually in the background
-- branding is subtle
-- content > UI
+### Grundprinzip
 
-Public pages should feel like:
-> “The artist’s page – not the tool’s page”
+- Ruhig, kontrolliert, workflow-orientiert.
 
----
+### Verbindliche Regeln
 
-## 9. Forbidden (important)
+- Keine Dashboard-Ueberladung mit gleichgewichtigen Widgets.
+- Aktionen vor Kennzahlen.
+- Die aktuelle Phase muss visuell eindeutig sein.
+- Hilfesystem ist immer erreichbar, aber draengt Aktionen nicht weg.
 
-- ❌ flashy colors
-- ❌ visual chaos
-- ❌ continuous animations
-- ❌ playful UI experiments
-- ❌ technical language in the UI
+### Interaktion
 
----
-
-## 10. Landing Page & Hero Layout (binding)
-
-The Vibaro landing page follows an editorial, calm design.
-It must not feel like a classic SaaS landing page.
-
-### Core Principles
-- one dominant visual focus (artist image or scene)
-- very little text
-- lots of white space
-- clear hierarchy
+- Kurze, subtile Motion nur zur Orientierung.
+- Keine Daueranimationen.
+- Keine Effekte, die Aufmerksamkeit unnoetig binden.
 
 ---
 
-### Hero Section
+## 7. Public Page Design
 
-The hero is image-driven, not feature-driven.
+### Zielbild
 
-**Structure:**
-- large-scale image (at least 50% of the area)
-- text block clearly separated
-- no text-heavy overlays
-- no patterned backgrounds
+- Band im Mittelpunkt.
+- Hochwertig, dunkel, stage-/editorial-artig.
+- Mobile-first fuer Fans.
 
-**Hero text:**
-- one clear headline
-- one short explanatory sentence
-- one primary action (CTA)
+### Branding-Regel (verbindlich)
 
-❌ Forbidden in the hero:
-- feature lists
-- bullet points
-- icons
-- sliders
-- marketing phrases
+- Vibaro-Branding darf sichtbar sein, aber nur dezent im Footer.
+- Kein Vibaro-Branding im Hero.
+- Keine dominante Vibaro-CTA im Content.
+- Die Bandidentitaet hat immer Prioritaet.
+
+### Sprachregel Public Page
+
+- Keine generische Template-Sprache.
+- Inhalte sollen nach echter Bandkommunikation klingen, nicht nach Tool-Text.
 
 ---
 
-### Imagery
+## 8. Landingpage Design
 
-- editorial photography
-- authentic musician scenes
-- no stock-photo startup look
-- no abstract graphics
+### Positionierung
 
-Images should feel like:
-> album covers, magazine photography, artist portraits
+- Die Landingpage verkauft nicht nur "eine Homepage".
+- Sie erklaert den Produktloop: Fokus festlegen, Links/QR teilen, Performance sehen.
 
----
+### Struktur-Regel
 
-### Branding in the Hero
+- Hero und erste Sections muessen den Produktloop sichtbar machen.
+- Keine Feature-Wueste.
+- Keine austauschbare SaaS-Optik.
 
-- Vibaro logo small and calm
-- no dominant branding
-- no “look at our product” feeling
+### Gestaltungsprinzip
 
-Goal:
-> Visitors remember the artist, not the tool.
+- Reduziert, editorial, klar priorisiert.
+- Eine dominante Botschaft pro Abschnitt.
+- Bildsprache: authentisch, musiknah, nicht stockhaft-startup.
 
 ---
 
-### Layout Feel
+## 9. Hilfe-System
 
-- desktop: calm and spacious
-- mobile: image first, text second
-- no visual crowding
-- no effects used to force attention
+### ExplainPanels
+
+- Kurz.
+- Kontextbezogen.
+- Handlungsorientiert.
+
+### WhyButtons
+
+- Optional fuer mehr Tiefe.
+- Kein Pflichtschritt fuer den Hauptworkflow.
+
+### HelpHub
+
+- Einstieg ueber den Produktloop.
+- Hilfe entlang der drei Kernschritte strukturieren.
+
+### Konsistenz-Regel
+
+- Keine Wiederholungen gleicher Hilfetexte in mehreren Komponenten.
+- Hilfe darf nie die primaere Aktion auf dem Screen verdraengen.
+
+---
+
+## 10. Forbidden / Anti-Patterns
+
+- Zu viele gleich starke CTAs auf einem Screen.
+- Technische Begriffe als primaere Nutzerfuehrung.
+- "Distribution" als dominanter sichtbarer Begriff.
+- Vibaro-zentrierte Public Page statt bandzentrierter Darstellung.
+- Generische SaaS-Cards ohne produktive Handlung.
+- Zu viele "Coming Soon"-Bloecke in produktiven Flows.
+- Hilfe-Elemente, die die eigentliche Aktion ueberlagern.
+- Grelle Farben, visuelles Chaos oder dauerhafte Animationen.
+- Beliebige Startup-Buzzword-Texte statt klarer, musiknaher Sprache.
+
+---
+
+## Umsetzungshinweis
+
+Bei Konflikten zwischen Design-Wuenschen und Produktlogik gilt der Produktloop:
+Fokus setzen -> Links/QR teilen -> Performance sehen.
+Alle neuen UX-/UI-Slices muessen diesen Ablauf sicht- und nutzbar staerken.
