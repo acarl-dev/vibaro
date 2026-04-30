@@ -13,11 +13,10 @@ import {
 } from "@/lib/api/tracking-links";
 import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
-import StudioEmptyState from "../../components/StudioEmptyState";
-import { Megaphone } from "../../components/StudioIcons";
 import ExplainPanel from "../../components/ExplainPanel";
 import WhyButton from "../../components/WhyButton";
 import ShareDistributionQRHint from "./ShareDistributionQRHint";
+import ShareDistributionEmptyState from "./ShareDistributionEmptyState";
 
 type ShareClientProps = {
   activeSpotlight: {
@@ -128,24 +127,7 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
   };
 
   if (!activeSpotlight) {
-    return (
-      <div>
-        <StudioPageHeader title="DISTRIBUTION" subtitle="Erstelle Tracking-Links für deine Kanäle." />
-        <StudioEmptyState
-          icon={Megaphone}
-          title="Keine aktive Phase"
-          description="Starte zuerst eine Phase, um Tracking-Links zu generieren."
-          action={
-            <button
-              onClick={() => router.push("/studio/share")}
-              className="studio-btn studio-btn-primary"
-            >
-              Zur Phase-Übersicht
-            </button>
-          }
-        />
-      </div>
-    );
+    return <ShareDistributionEmptyState onBackToPhaseOverview={() => router.push("/studio/share")} />;
   }
 
   return (
