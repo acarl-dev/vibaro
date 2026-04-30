@@ -130,6 +130,8 @@ export async function fetchArchivedSpotlights(): Promise<SpotlightData[]> {
 /**
  * Fetch active spotlight
  */
+// NOTE: This client/BFF helper intentionally uses /api/studio/spotlights/active.
+// Do not merge with studio-phase.server.ts without aligning endpoint semantics and error handling.
 export async function fetchActiveSpotlight(): Promise<SpotlightData | null> {
   try {
     const res = await fetch("/api/studio/spotlights/active", {
