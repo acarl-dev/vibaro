@@ -68,6 +68,7 @@ type ShareDistributionSpotlightListItem = {
 };
 
 async function fetchActiveSpotlight(): Promise<ShareOverviewSpotlight | null> {
+  // TODO (P2+): belongs to Phase/Links/Analytics layer
   try {
     const res = await backendFetch("/api/v1/spotlights/active", { cache: "no-store" });
     if (!res.ok) return null;
@@ -88,6 +89,7 @@ async function fetchActiveSpotlight(): Promise<ShareOverviewSpotlight | null> {
 }
 
 async function fetchScheduledCount(): Promise<number> {
+  // TODO (P2+): belongs to Phase/Links/Analytics layer
   try {
     const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
     if (!res.ok) return 0;
@@ -100,6 +102,7 @@ async function fetchScheduledCount(): Promise<number> {
 }
 
 async function fetchPhaseAnalytics(spotlightId: number): Promise<ShareOverviewAnalytics | null> {
+  // TODO (P2+): belongs to Phase/Links/Analytics layer
   try {
     const res = await backendFetch(
       `/api/v1/analytics/overview?range=7d&spotlight_id=${spotlightId}`,
@@ -140,6 +143,7 @@ export async function fetchShareOverviewServerData() {
 }
 
 async function fetchShareDistributionBestSpotlight(): Promise<ShareDistributionSpotlight | null> {
+  // TODO (P2+): belongs to Phase/Links/Analytics layer
   try {
     const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
     if (!res.ok) return null;
