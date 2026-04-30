@@ -27,16 +27,20 @@ export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey =
   const [localKey, setLocalKey] = useState(0); // forces iframe reload via button
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Defer iframe rendering until after first client paint
   useEffect(() => {
-    setIsMounted(true);
+    const id = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   // Whenever the iframe key changes, show the loading overlay again
   useEffect(() => {
-    if (isMounted) setIsLoading(true);
+    if (!isMounted) return;
+    const id = setTimeout(() => setIsLoading(true), 0);
+    return () => clearTimeout(id);
   }, [reloadKey, localKey, isMounted]);
 
   const activeDevice = DEVICES.find((d) => d.key === device)!;
@@ -44,11 +48,12 @@ export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey =
   // Recalculate scale whenever device or container size changes
   const recalculate = useCallback(() => {
     if (!containerRef.current) return;
-    const containerWidth = containerRef.current.clientWidth;
+    const cw = containerRef.current.clientWidth;
+    setContainerWidth(cw);
     if (device === "desktop") {
       setScale(1); // no scaling for desktop, just fill width
     } else {
-      setScale(Math.min(1, containerWidth / activeDevice.width));
+      setScale(Math.min(1, cw / activeDevice.width));
     }
   }, [device, activeDevice.width]);
 
@@ -167,7 +172,7 @@ export default function LivePreviewPanel({ previewPath, externalUrl, reloadKey =
             // Center non-desktop previews
             ...(device !== "desktop" && scale < 1
               ? {
-                  marginLeft: `${(containerRef.current?.clientWidth ?? 0) / 2 - (activeDevice.width * scale) / 2}px`,
+                  marginLeft: `${containerWidth / 2 - (activeDevice.width * scale) / 2}px`,
                 }
               : {}),
           }}
