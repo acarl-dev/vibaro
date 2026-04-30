@@ -609,7 +609,8 @@ export default function HelpHub() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   if (!mounted || !helpHubOpen) return null;

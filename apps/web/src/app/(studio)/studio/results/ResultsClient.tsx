@@ -36,18 +36,26 @@ export default function ResultsClient({
 
   // Load breakdown data when spotlight is selected
   useEffect(() => {
-    if (spotlightFilter) {
+    if (!spotlightFilter) {
+      setBreakdownData(null);
+      return;
+    }
+    let cancelled = false;
+    const id = setTimeout(() => {
+      if (cancelled) return;
       setLoadingBreakdown(true);
       fetchAnalyticsBreakdown(spotlightFilter, range)
-        .then(setBreakdownData)
+        .then((data) => { if (!cancelled) setBreakdownData(data); })
         .catch((error) => {
           console.error("Failed to load breakdown:", error);
-          setBreakdownData(null);
+          if (!cancelled) setBreakdownData(null);
         })
-        .finally(() => setLoadingBreakdown(false));
-    } else {
-      setBreakdownData(null);
-    }
+        .finally(() => { if (!cancelled) setLoadingBreakdown(false); });
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
   }, [spotlightFilter, range]);
 
   const handleRangeChange = (newRange: "7d" | "30d" | "90d") => {

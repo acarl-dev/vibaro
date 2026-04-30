@@ -284,7 +284,8 @@ export default function WhyButton({ content, label = "Warum?", className }: WhyB
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   // Hidden in clean mode — only appears when user has activated help mode

@@ -24,12 +24,15 @@ export function HelpModeProvider({ children }: { children: ReactNode }) {
 
   // Persist via localStorage so it survives browser restarts
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("vibaro_help_mode");
-      if (stored === "1") setHelpMode(true);
-    } catch {
-      // localStorage unavailable (e.g. private mode restrictions) — ignore
-    }
+    const id = setTimeout(() => {
+      try {
+        const stored = localStorage.getItem("vibaro_help_mode");
+        if (stored === "1") setHelpMode(true);
+      } catch {
+        // localStorage unavailable (e.g. private mode restrictions) — ignore
+      }
+    }, 0);
+    return () => clearTimeout(id);
   }, []);
 
   const toggleHelpMode = () => {
