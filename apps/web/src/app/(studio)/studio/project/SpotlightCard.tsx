@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   SpotlightData,
   activateSpotlight,
@@ -62,6 +63,7 @@ export default function SpotlightCard({
   onRemove,
   onActivate,
 }: SpotlightCardProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const { showToast } = useToast();
@@ -83,6 +85,7 @@ export default function SpotlightCard({
     if (result.success) {
       showToast("Phase aktiviert", "success");
       onActivate(spotlight.id);
+      router.refresh();
     } else {
       showToast(result.error || "Fehler beim Aktivieren", "error");
     }

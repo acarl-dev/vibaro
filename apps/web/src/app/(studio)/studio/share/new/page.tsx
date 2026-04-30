@@ -9,9 +9,13 @@ export default function NewPhasePage() {
   const router = useRouter();
 
   const handleSuccess = (spotlight: SpotlightData) => {
-    // After creating, go to phases list so user can see & activate
-    void spotlight;
-    router.push("/studio/share/phases");
+    const target =
+      spotlight.status === "active"
+        ? "/studio/share/distribution"
+        : "/studio/share/phases";
+
+    router.push(target);
+    router.refresh();
   };
 
   const handleCancel = () => {

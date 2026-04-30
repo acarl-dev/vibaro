@@ -126,8 +126,12 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
     return <ShareDistributionEmptyState onBackToPhaseOverview={() => router.push("/studio/share")} />;
   }
 
+  const phaseLinks = allLinks.filter(
+    (link) => link.spotlight_id === activeSpotlight.id
+  );
+
   const groupedLinks = Object.entries(
-    allLinks.reduce((acc, link) => {
+    phaseLinks.reduce((acc, link) => {
       if (!acc[link.platform]) {
         acc[link.platform] = [];
       }
@@ -196,9 +200,9 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
           />
         )}
 
-        {allLinks.length > 0 && (
+        {phaseLinks.length > 0 && (
           <ShareDistributionLinksList
-            totalLinks={allLinks.length}
+            totalLinks={phaseLinks.length}
             groupedLinks={groupedLinks}
             onCopy={handleCopy}
           />

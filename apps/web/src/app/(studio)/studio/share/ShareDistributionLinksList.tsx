@@ -14,7 +14,7 @@ export default function ShareDistributionLinksList({
 }: ShareDistributionLinksListProps) {
   return (
     <div className="pt-8" style={{ borderTop: "1px solid var(--studio-border)" }}>
-      <h2 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "var(--studio-text-secondary)" }}>Alle Links ({totalLinks})</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "var(--studio-text-secondary)" }}>Links dieser Phase ({totalLinks})</h2>
       <div className="space-y-6">
         {groupedLinks.map(([platform, links]) => {
           const platformInfo = getPlatformById(platform);

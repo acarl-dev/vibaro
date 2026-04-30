@@ -516,7 +516,12 @@ export default function CreatePhaseWizard({ onSuccess, onCancel }: WizardProps) 
     setLoading(false);
 
     if (result.success && result.data) {
-      showToast("Phase erstellt", "success");
+      showToast(
+        result.data.status === "active"
+          ? "Phase aktiviert – du kannst jetzt Links und QR-Code verteilen."
+          : "Phase geplant – aktiviere sie, wenn du sie teilen möchtest.",
+        "success"
+      );
       onSuccess(result.data);
     } else {
       showToast(result.error || "Fehler beim Erstellen", "error");
