@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 /* ─────────────────────────────────────────────────────────
    SEO METADATA
@@ -68,9 +69,9 @@ export default function Home() {
       {/* ════════════════ NAVIGATION ════════════════ */}
       <header className="fixed top-0 z-50 w-full border-b border-zinc-800/40 bg-zinc-950/60 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8" aria-label="Hauptnavigation">
-          <a href="/" className="text-xl font-semibold tracking-tight" aria-label="Vibaro Startseite">
+          <Link href="/" className="text-xl font-semibold tracking-tight" aria-label="Vibaro Startseite">
             vibaro
-          </a>
+          </Link>
           <div className="flex items-center gap-6">
             <a href="#features" className="hidden text-sm text-zinc-400 transition-colors hover:text-white sm:inline">
               Features

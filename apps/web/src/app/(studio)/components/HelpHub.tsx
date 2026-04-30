@@ -443,7 +443,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
 
           {/* ── Worum geht's? ── */}
           <section style={{ marginBottom: "0" }}>
-            <SectionLabel>Worum geht's in Vibaro?</SectionLabel>
+            <SectionLabel>Worum geht&apos;s in Vibaro?</SectionLabel>
             <BodyText>
               Vibaro ist deine zentrale Seite als Musiker. Alles an einem Ort: deine Links, deine
               Releases, deine Socials.
