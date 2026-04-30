@@ -39,13 +39,13 @@ Zulaessige Kernel:
 ### Bewusst offene Punkte
 
 - `apps/web/src/lib/api/studio-share.server.ts` enthaelt weiter Composition und markierte Domain-Leaks
-- serverseitig werden `pageUrl` und `totalPageviews` teils noch berechnet, obwohl aktuelle Clients sie nicht mehr nutzen
 - `Spotlight` bleibt technischer Backend-Begriff
 - `Campaign` bleibt internes Modell im Links-Kern
 
 ### Nicht mehr Teil von P2
 
 - Header-KPI-Block in `PerformanceClient` wird nicht weiter extrahiert
+- keine weiteren Frontend-Komponenten-Slices in Share/Performance im Rahmen von P2
 - keine DB-Migrationen im Rahmen von P2
 - keine API-Endpunkt-Aenderungen im Rahmen von P2
 - keine Model-Umbenennungen oder Model-Refactors im Rahmen von P2
@@ -228,7 +228,7 @@ Zulaessige Kernel:
 | apps/web/src/app/(studio)/studio/project/ModulesClient.tsx | Phase | Phase | Nein | Phase-Module und Fokus | Behalten |
 | apps/web/src/app/(studio)/studio/project/spotlights/page.tsx | Phase | Phase | Ja: falscher Begriff | Spotlight-Begriff als UI-Routenpfad | Umbenennung UI-Text |
 | apps/web/src/app/(studio)/studio/share/page.tsx | Phase | Phase | Ja: Mischverantwortung | Uebersicht kombiniert Phase, Links und teils Analytics-Kontext | Spaeter extrahieren |
-| apps/web/src/app/(studio)/studio/share/PhaseOverviewClient.tsx | Phase | Phase | Ja: Mischverantwortung | Phase-UI mit Analytics-Signalen in einem Client | Spaeter extrahieren |
+| apps/web/src/app/(studio)/studio/share/PhaseOverviewClient.tsx | Phase | Phase | Nein | P2-konsolidierter UI-Orchestrator nach Extraktionen praesentationaler Teilkomponenten | Behalten |
 | apps/web/src/app/(studio)/studio/share/ShareClient.tsx | Links | Links | Nein | Distribution und Tracking-Link-Erzeugung | Behalten |
 | apps/web/src/app/(studio)/studio/share/PlatformSelector.tsx | Links | Links | Nein | Plattformzuordnung fuer Distribution | Behalten |
 | apps/web/src/app/(studio)/studio/share/PlacementSelector.tsx | Links | Links | Nein | Placementzuordnung fuer Distribution | Behalten |
@@ -237,7 +237,7 @@ Zulaessige Kernel:
 | apps/web/src/app/(studio)/studio/share/qr/page.tsx | Links | Links | Nein | QR-Link-Flow | Behalten |
 | apps/web/src/app/(studio)/studio/share/phases/page.tsx | Phase | Phase | Nein | Phase-bezogene Share-Ansicht | Behalten |
 | apps/web/src/app/(studio)/studio/share/performance/page.tsx | Analytics | Analytics | Ja: Mischverantwortung | Performance in Share-Baum kann Phase-Filter enthalten | Spaeter extrahieren |
-| apps/web/src/app/(studio)/studio/share/performance/PerformanceClient.tsx | Analytics | Analytics | Ja: Mischverantwortung | Performance-UI mit Share-Kontext gekoppelt | Spaeter extrahieren |
+| apps/web/src/app/(studio)/studio/share/performance/PerformanceClient.tsx | Analytics | Analytics | Nein | P2-konsolidierter Analytics-Orchestrator nach Extraktionen; Header-KPI-Block bewusst inline belassen | Behalten |
 | apps/web/src/app/(studio)/studio/results/page.tsx | Analytics | Analytics | Nein | Kanonische Analytics-Route (results) | Behalten |
 | apps/web/src/app/(studio)/studio/results/ResultsClient.tsx | Analytics | Analytics | Nein | Analytics Breakdown/Filter Darstellung | Behalten |
 | apps/web/src/app/(studio)/studio/ergebnisse/page.tsx | Analytics | Analytics | Ja: doppelte Logik | Legacy-Alias zur kanonischen results-Route | Spaeter loeschen/redirecten |
@@ -395,9 +395,7 @@ Zulaessige Kernel:
 - apps/web/src/app/(studio)/studio/links/page.tsx
 - apps/web/src/app/(studio)/studio/links/LinksClient.tsx
 - apps/web/src/app/(studio)/studio/share/page.tsx
-- apps/web/src/app/(studio)/studio/share/PhaseOverviewClient.tsx
 - apps/web/src/app/(studio)/studio/share/performance/page.tsx
-- apps/web/src/app/(studio)/studio/share/performance/PerformanceClient.tsx
 - apps/web/src/app/(studio)/studio/ergebnisse/page.tsx
 - apps/web/src/app/(studio)/studio/settings/page.tsx
 - apps/web/src/app/(studio)/studio/settings/SettingsClient.tsx
@@ -416,6 +414,7 @@ Zulaessige Kernel:
 
 ## 3) P2 mittlere Refactors
 
+- Share-Frontend-Komponenten-Slices fuer `PhaseOverviewClient`, `ShareClient` und `PerformanceClient` sind abgeschlossen; keine weiteren P2-Slices geplant.
 - Doppelte Website-Publishing-Handler (/studio/publish, /studio/unpublish, artist-pages/[id]/publish) spaeter zentralisieren.
 - StudioHomeService auf reine Composition reduzieren und domainnahe Business-Logik auslagern.
 - Share-Baum in klare Unterbereiche trennen: Phase Overview, Links Distribution, Analytics Performance.

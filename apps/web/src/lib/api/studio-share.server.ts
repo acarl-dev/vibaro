@@ -48,7 +48,6 @@ export type SharePerformanceComparisonPhase = {
 
 export type SharePerformanceServerData = {
   totalClicks: number;
-  totalPageviews: number;
   uniquePageviews: number;
   conversionRate: number | null;
   byPlatform: { platform: string; clicks: number }[];
@@ -179,24 +178,14 @@ export async function fetchShareDistributionServerData() {
     return {
       shouldRedirect: true,
       activeSpotlight: null,
-      pageUrl: null,
     };
   }
 
-  const [activeSpotlight, homeData] = await Promise.all([
-    fetchShareDistributionBestSpotlight(),
-    fetchStudioHome(),
-  ]);
-
-  const handle = homeData?.page?.handle;
-  const pageUrl = handle
-    ? `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/p/${handle}`
-    : null;
+  const activeSpotlight = await fetchShareDistributionBestSpotlight();
 
   return {
     shouldRedirect: false,
     activeSpotlight,
-    pageUrl,
   };
 }
 
@@ -275,7 +264,6 @@ export async function fetchSharePerformanceServerData(): Promise<SharePerformanc
     if (!analyticsRes.ok) {
       return {
         totalClicks: 0,
-        totalPageviews: 0,
         uniquePageviews: 0,
         conversionRate: null,
         byPlatform: [],
@@ -291,7 +279,6 @@ export async function fetchSharePerformanceServerData(): Promise<SharePerformanc
 
     return {
       totalClicks: d?.total_clicks ?? 0,
-      totalPageviews: d?.total_pageviews ?? 0,
       uniquePageviews: d?.unique_pageviews ?? 0,
       conversionRate: d?.conversion_rate ?? null,
       byPlatform: d?.by_platform ?? [],
