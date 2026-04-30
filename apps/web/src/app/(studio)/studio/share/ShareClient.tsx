@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PlatformSelector from "./PlatformSelector";
 import PlacementSelector from "./PlacementSelector";
-import { type Platform, type Placement, getPlatformById, getCopyHint } from "@/lib/platforms";
+import { type Platform, type Placement, getCopyHint } from "@/lib/platforms";
 import {
   fetchTrackingLinks,
   checkTrackingLinkExists,
@@ -17,6 +17,7 @@ import ExplainPanel from "../../components/ExplainPanel";
 import WhyButton from "../../components/WhyButton";
 import ShareDistributionQRHint from "./ShareDistributionQRHint";
 import ShareDistributionEmptyState from "./ShareDistributionEmptyState";
+import ShareDistributionLinksList from "./ShareDistributionLinksList";
 
 type ShareClientProps = {
   activeSpotlight: {
@@ -129,6 +130,16 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
   if (!activeSpotlight) {
     return <ShareDistributionEmptyState onBackToPhaseOverview={() => router.push("/studio/share")} />;
   }
+
+  const groupedLinks = Object.entries(
+    allLinks.reduce((acc, link) => {
+      if (!acc[link.platform]) {
+        acc[link.platform] = [];
+      }
+      acc[link.platform].push(link);
+      return acc;
+    }, {} as Record<string, TrackingLinkData[]>)
+  );
 
   return (
     <div>
@@ -290,66 +301,12 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
           </div>
         )}
 
-        {/* All Links Overview - Grouped by Platform */}
         {allLinks.length > 0 && (
-          <div className="pt-8" style={{ borderTop: "1px solid var(--studio-border)" }}>
-            <h2 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "var(--studio-text-secondary)" }}>Alle Links ({allLinks.length})</h2>
-            <div className="space-y-6">
-              {Object.entries(
-                allLinks.reduce((acc, link) => {
-                  if (!acc[link.platform]) {
-                    acc[link.platform] = [];
-                  }
-                  acc[link.platform].push(link);
-                  return acc;
-                }, {} as Record<string, TrackingLinkData[]>)
-              ).map(([platform, links]) => {
-                const platformInfo = getPlatformById(platform);
-                const totalClicks = links.reduce((sum, link) => sum + link.click_count, 0);
-                
-                return (
-                  <div key={platform}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xl">{platformInfo?.icon || '🔗'}</span>
-                      <h3 className="text-sm font-semibold" style={{ color: "var(--studio-text-primary)" }}>
-                        {platformInfo?.label || platform}
-                      </h3>
-                      <span className="text-xs" style={{ color: "var(--studio-text-secondary)" }}>
-                        {links.length} {links.length === 1 ? 'Link' : 'Links'} · {totalClicks} Klicks
-                      </span>
-                    </div>
-                    <div className="grid gap-2">
-                      {links.map((link) => (
-                        <div
-                          key={link.id}
-                          className="flex items-center justify-between rounded p-3 transition-colors"
-                          style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface-elevated)" }}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium" style={{ color: "var(--studio-text-primary)" }}>{link.label}</p>
-                            <p className="text-xs mt-0.5" style={{ color: "var(--studio-text-secondary)", fontFamily: "var(--font-geist-mono, ui-monospace, monospace)" }}>{link.short_code}</p>
-                          </div>
-                          <div className="flex items-center gap-3 ml-4">
-                            <span className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>{link.click_count} Klicks</span>
-                            <button
-                              onClick={() => handleCopy(link.tracking_url)}
-                              className="rounded p-1.5 transition-colors"
-                              style={{ color: "var(--studio-text-secondary)" }}
-                              title="Link kopieren"
-                            >
-                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <ShareDistributionLinksList
+            totalLinks={allLinks.length}
+            groupedLinks={groupedLinks}
+            onCopy={handleCopy}
+          />
         )}
       </div>
 
