@@ -26,10 +26,9 @@ type ShareClientProps = {
     slug: string;
     primary_url?: string;
   } | null;
-  pageUrl: string | null;
 };
 
-export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientProps) {
+export default function ShareClient({ activeSpotlight }: ShareClientProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
