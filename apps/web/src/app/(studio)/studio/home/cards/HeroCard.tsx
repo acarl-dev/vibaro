@@ -108,7 +108,7 @@ export function HeroActive({ spotlight }: { spotlight: NonNullable<StudioHomeDat
         </div>
       ) : (
         <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.55, marginBottom: "24px" }}>
-          Sobald du deine Links teilst, siehst du hier erste Ergebnisse.
+          Sobald du deine Links teilst, siehst du hier erste Daten.
         </p>
       )}
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>

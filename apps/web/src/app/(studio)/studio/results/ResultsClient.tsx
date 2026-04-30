@@ -83,11 +83,11 @@ export default function ResultsClient({
   if (spotlights.length === 0) {
     return (
       <div>
-        <StudioPageHeader title="ERGEBNISSE" subtitle="Stats & Daten" />
+        <StudioPageHeader title="ANALYSE" subtitle="Stats & Daten" />
         <StudioEmptyState
           icon={TrendingUp}
           title="Noch keine Daten"
-          description="Sobald du Links teilst und deine Seite live ist, siehst du hier die Ergebnisse."
+          description="Sobald du Links teilst und deine Seite live ist, siehst du hier erste Daten."
           action={
             <a href="/studio/share" className="studio-btn studio-btn-primary">
               Phase starten →
@@ -101,7 +101,7 @@ export default function ResultsClient({
   if (!analytics) {
     return (
       <div>
-        <StudioPageHeader title="ERGEBNISSE" subtitle="Stats & Daten" />
+        <StudioPageHeader title="ANALYSE" subtitle="Stats & Daten" />
         <StudioEmptyState
           icon={TrendingUp}
           title="Keine Daten verfügbar"
@@ -113,7 +113,7 @@ export default function ResultsClient({
 
   return (
     <div>
-      <StudioPageHeader title="ERGEBNISSE" subtitle="Click-Analytics für deine Tracking-Links" />
+      <StudioPageHeader title="ANALYSE" subtitle="Click-Analytics für deine Tracking-Links" />
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">

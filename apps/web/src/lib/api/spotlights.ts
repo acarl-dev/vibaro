@@ -169,7 +169,7 @@ export async function createSpotlight(
     if (!res.ok) {
       return {
         success: false,
-        error: json?.error?.message || "Fehler beim Erstellen des Spotlights",
+        error: json?.error?.message || "Fehler beim Erstellen der Phase",
       };
     }
 
@@ -207,7 +207,7 @@ export async function updateSpotlight(
     if (!res.ok) {
       return {
         success: false,
-        error: json?.error?.message || "Fehler beim Aktualisieren des Spotlights",
+        error: json?.error?.message || "Fehler beim Aktualisieren der Phase",
       };
     }
 
@@ -239,7 +239,7 @@ export async function activateSpotlight(
     if (!res.ok) {
       return {
         success: false,
-        error: json?.error?.message || "Fehler beim Aktivieren des Spotlights",
+        error: json?.error?.message || "Fehler beim Aktivieren der Phase",
       };
     }
 
@@ -271,7 +271,7 @@ export async function endSpotlight(
     if (!res.ok) {
       return {
         success: false,
-        error: json?.error?.message || "Fehler beim Beenden des Spotlights",
+        error: json?.error?.message || "Fehler beim Beenden der Phase",
       };
     }
 
@@ -303,7 +303,7 @@ export async function archiveSpotlight(
     if (!res.ok) {
       return {
         success: false,
-        error: json?.error?.message || "Fehler beim Archivieren des Spotlights",
+        error: json?.error?.message || "Fehler beim Archivieren der Phase",
       };
     }
 
@@ -335,7 +335,7 @@ export async function restoreSpotlight(
     if (!res.ok) {
       return {
         success: false,
-        error: json?.error?.message || "Fehler beim Wiederherstellen des Spotlights",
+        error: json?.error?.message || "Fehler beim Wiederherstellen der Phase",
       };
     }
 

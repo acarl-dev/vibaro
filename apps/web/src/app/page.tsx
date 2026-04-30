@@ -25,7 +25,7 @@ export const metadata: Metadata = {
       },
     ],
   },
-  twitter: {
+                    "Phase-Management",
     card: "summary_large_image",
     title: "Vibaro – Die digitale Bühne für Musiker",
     description:
@@ -291,13 +291,13 @@ export default function Home() {
                 Fokus statt Feed.
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-lg text-zinc-400 lg:text-xl">
-                Setze dein wichtigstes Projekt ins Spotlight.
+                Setze dein wichtigstes Projekt in den Fokus.
               </p>
             </div>
 
             <div className="mx-auto mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-zinc-400 lg:text-xl lg:leading-relaxed">
               <p className="text-zinc-300">
-                Single. Album. Tour. Kampagne.
+                Single. Album. Tour. Phase.
               </p>
               <p>
                 Mit Vibaro definierst du eine Phase –
@@ -524,7 +524,7 @@ export default function Home() {
                   {[
                     "Eigene Musiker-Website",
                     "Shows, Releases & Galerie",
-                    "Spotlight-Phasen",
+                    "Phase-Management",
                     "Tracking & Performance",
                     "QR-Codes",
                     "Alle Themes",
