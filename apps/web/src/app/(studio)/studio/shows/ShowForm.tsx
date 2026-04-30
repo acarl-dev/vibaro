@@ -164,7 +164,7 @@ export default function ShowForm({
               className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
             />
             <p className="text-[11px] text-zinc-600">
-              Wird als „Abendkasse" angezeigt, wenn kein Ticket-Link angegeben ist
+              Wird als „Abendkasse&quot; angezeigt, wenn kein Ticket-Link angegeben ist
             </p>
           </div>
         )}

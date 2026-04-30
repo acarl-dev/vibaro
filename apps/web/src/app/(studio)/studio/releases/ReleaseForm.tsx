@@ -68,7 +68,7 @@ export default function ReleaseForm({
             onChange={(e) => set({ is_featured: e.target.checked })}
             className="rounded border-zinc-700 bg-zinc-950 text-zinc-100"
           />
-          Als "New Release" hervorheben
+          Als &quot;New Release&quot; hervorheben
         </label>
         <p className="text-[10px] text-zinc-600 ml-5">
           Wird prominent ganz oben auf deiner K\u00fcnstlerseite angezeigt

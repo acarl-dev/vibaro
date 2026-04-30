@@ -726,6 +726,7 @@ function EditorialFooter({
       if (contact.type === "whatsapp") {
         window.open(url, "_blank", "noopener,noreferrer");
       } else {
+        // eslint-disable-next-line react-hooks/immutability
         window.location.href = url;
       }
     } catch {

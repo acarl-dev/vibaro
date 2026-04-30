@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     body: JSON.stringify(body),
   });
 
-  let json: any;
+  let json: unknown;
   try {
     json = await apiResponse.json();
   } catch {
@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(json, { status: apiResponse.status });
   }
 
-  const token = json?.data?.token as string | undefined;
-  const user = json?.data?.user;
+  const token = (json as { data?: { token?: string; user?: unknown } } | null)?.data?.token;
+  const user = (json as { data?: { token?: string; user?: unknown } } | null)?.data?.user;
 
   // After registration, users should normally go into onboarding
   const nextPath = "/studio/onboarding";

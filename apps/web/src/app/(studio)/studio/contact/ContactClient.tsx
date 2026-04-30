@@ -159,7 +159,7 @@ export default function ContactClient({ initialData, artistPageId }: ContactClie
             className="studio-input w-full px-3 py-2 text-sm resize-none"
           />
           <p className="mt-1 text-xs" style={{ color: "var(--studio-text-secondary)" }}>
-            Persönliche Nachricht im Kontakt-Modal (max. 500 Zeichen). Standard: "Ich melde mich so schnell wie möglich bei dir."
+            Persönliche Nachricht im Kontakt-Modal (max. 500 Zeichen). Standard: &quot;Ich melde mich so schnell wie möglich bei dir.&quot;
           </p>
         </div>
 

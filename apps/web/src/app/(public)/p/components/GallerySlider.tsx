@@ -72,6 +72,7 @@ export default function GallerySlider({ items }: { items: GalleryImageItem[] }) 
 
   const smoothScrollBy = (el: HTMLElement, distance: number, duration = 450) => {
     if (animatingRef.current) return; // ignore clicks mid-animation
+    // eslint-disable-next-line react-hooks/immutability
     animatingRef.current = true;
 
     // Disable snap during animation so it doesn't fight our rAF
