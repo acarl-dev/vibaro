@@ -21,7 +21,6 @@ export type ComparisonPhase = {
 
 type Props = {
   totalClicks: number;
-  totalPageviews: number;
   uniquePageviews: number;
   conversionRate: number | null;
   byPlatform: PlatformStat[];
@@ -158,7 +157,6 @@ function TrendBar({ data, label }: {
 
 export default function PerformanceClient({
   totalClicks,
-  totalPageviews,
   uniquePageviews,
   conversionRate,
   byPlatform,

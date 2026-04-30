@@ -11,7 +11,6 @@ export default async function PerformancePage() {
   return (
     <PerformanceClient
       totalClicks={d.totalClicks}
-      totalPageviews={d.totalPageviews}
       uniquePageviews={d.uniquePageviews}
       conversionRate={d.conversionRate}
       byPlatform={d.byPlatform}
