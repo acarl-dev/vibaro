@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { endSpotlight } from "@/lib/api/spotlights";
 import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
-import StudioEmptyState from "../../components/StudioEmptyState";
 import StudioStatCard from "../../components/StudioStatCard";
-import { Megaphone } from "../../components/StudioIcons";
 import ExplainPanel from "../../components/ExplainPanel";
 import WhyButton from "../../components/WhyButton";
 import PhaseQuickActions from "./PhaseQuickActions";
+import PhaseEmptyStateCard from "./PhaseEmptyStateCard";
 
 export type PhaseSpotlight = {
   id: number;
@@ -154,29 +153,10 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics, schedu
           ]}
           tip={{ text: "Starte immer eine neue Phase für jedes neue Ziel – so bleiben deine Daten sauber und vergleichbar." }}
         />
-        <StudioEmptyState
-          icon={Megaphone}
-          title="Keine aktive Phase"
-          description="Starte eine neue Phase, um deine Seite gezielt zu pushen."
-          action={
-            <div className="flex flex-col items-center gap-3">
-              <button
-                onClick={() => router.push("/studio/share/new")}
-                className="studio-btn studio-btn-primary"
-              >
-                Neue Phase starten
-              </button>
-              {scheduledCount > 0 && (
-                <button
-                  onClick={() => router.push("/studio/share/phases")}
-                  className="text-xs underline"
-                  style={{ color: "var(--studio-accent)", background: "none", border: "none", cursor: "pointer" }}
-                >
-                  {scheduledCount} geplante {scheduledCount === 1 ? "Phase" : "Phasen"} anzeigen
-                </button>
-              )}
-            </div>
-          }
+        <PhaseEmptyStateCard
+          scheduledCount={scheduledCount}
+          onCreatePhase={() => router.push("/studio/share/new")}
+          onOpenPhases={() => router.push("/studio/share/phases")}
         />
       </div>
     );
