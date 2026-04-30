@@ -66,6 +66,9 @@ This document defines the binding product rules for the Studio Redesign (V3).
 - Handle must be lowercase, URL-safe, unique
 - **Publishing rule**: Public page is visible only when `is_published = true`
 - Public page respects `visible_sections` configuration
+- Public page may include **subtle Vibaro branding in the footer**
+- In MVP, public pages run on Vibaro (`/p/[handle]`) and **do not use custom domains**
+- Vibaro branding must stay in the background and must not overshadow the artist identity
 - Private fields (booking_email, management_email, press_email, whatsapp_number, etc.) are **never** exposed on public pages or public API responses
 
 ### Content Management

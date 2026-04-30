@@ -129,7 +129,7 @@ type PublicArtistPageData = {
 ### 1. **Künstler im Fokus**
 - Keine aufdringlichen CTAs
 - Keine Marketing-Sprache
-- Kein Tool-Branding außer im Footer
+- Vibaro-Branding bleibt dezent im Footer und überlagert nicht die Band
 - Die Seite repräsentiert den Künstler, nicht das Tool
 
 ### 2. **Ruhe und Klarheit**

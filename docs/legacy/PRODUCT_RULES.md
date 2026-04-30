@@ -36,7 +36,7 @@ Leitidee:
 ### Artist (paid, später)
 - Shows + Releases
 - Fokus-Sektion frei wählbar (Links / Shows / Releases)
-- Branding entfernt
+- Vibaro Branding sichtbar (dezent, Footer)
 - Mehr Varianten / Themes
 - Basic Stats (nach MVP)
 
