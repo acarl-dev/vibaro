@@ -36,13 +36,13 @@ export default function ResultsClient({
 
   // Load breakdown data when spotlight is selected
   useEffect(() => {
-    if (!spotlightFilter) {
-      setBreakdownData(null);
-      return;
-    }
     let cancelled = false;
     const id = setTimeout(() => {
       if (cancelled) return;
+      if (!spotlightFilter) {
+        setBreakdownData(null);
+        return;
+      }
       setLoadingBreakdown(true);
       fetchAnalyticsBreakdown(spotlightFilter, range)
         .then((data) => { if (!cancelled) setBreakdownData(data); })
