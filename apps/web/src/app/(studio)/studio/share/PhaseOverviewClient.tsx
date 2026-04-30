@@ -57,41 +57,6 @@ function computeTrend(trend: { date: string; clicks: number }[]): { value: strin
   return { value: `${pct > 0 ? "+" : ""}${pct}% Trend`, positive: pct >= 0 };
 }
 
-function NavKachel({ label, desc, href }: { label: string; desc: string; href: string }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <a
-      href={href}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="flex items-center justify-between gap-3 rounded-lg p-4 transition-all no-underline"
-      style={{
-        background: "var(--studio-surface-elevated)",
-        border: hovered ? "1px solid var(--studio-accent-muted)" : "1px solid var(--studio-border)",
-        textDecoration: "none",
-      }}
-    >
-      <div className="flex flex-col gap-0.5">
-        <span
-          className="text-xs font-bold uppercase tracking-widest"
-          style={{ color: "var(--studio-text-primary)" }}
-        >
-          {label}
-        </span>
-        <span
-          className="text-xs"
-          style={{ color: "var(--studio-text-secondary)", opacity: 0.75 }}
-        >
-          {desc}
-        </span>
-      </div>
-      <span style={{ color: "var(--studio-text-secondary)", opacity: 0.45, fontSize: "18px", lineHeight: 1, flexShrink: 0 }}>
-        &#8250;
-      </span>
-    </a>
-  );
-}
-
 export default function PhaseOverviewClient({ activeSpotlight, analytics, scheduledCount = 0 }: Props) {
   const router = useRouter();
   const { showToast } = useToast();

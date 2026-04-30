@@ -1,3 +1,5 @@
+import "server-only";
+
 import { backendFetch } from "@/lib/api/backend";
 import type { SpotlightData as Spotlight } from "@/lib/api/spotlights";
 

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { backendFetch } from "@/lib/api/backend";
 import { fetchActiveSpotlight } from "@/lib/api/studio-phase.server";
 

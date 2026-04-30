@@ -1,3 +1,5 @@
+import "server-only";
+
 import { backendFetch } from "@/lib/api/backend";
 import { fetchStudioHome } from "@/lib/api/studio";
 
