@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { backendFetch } from "@/lib/api/backend";
-import { fetchStudioHome } from "@/lib/api/studio";
+import { fetchShareQRServerData } from "@/lib/api/studio-share.server";
 import StudioPageHeader from "../../../components/StudioPageHeader";
 import StudioQRCode from "../../../components/StudioQRCode";
 import StudioEmptyState from "../../../components/StudioEmptyState";
@@ -8,50 +7,11 @@ import { Megaphone } from "../../../components/StudioIcons";
 import ExplainPanel from "../../../components/ExplainPanel";
 import WhyButton from "../../../components/WhyButton";
 
-async function fetchActiveHandle(): Promise<{ handle: string | null; phaseTitle: string | null; totalClicks: number }> {
-  try {
-    const [homeData, spotlightRes] = await Promise.all([
-      fetchStudioHome(),
-      backendFetch("/api/v1/spotlights/active", { cache: "no-store" }),
-    ]);
-
-    const handle = homeData?.page?.handle ?? null;
-    let phaseTitle: string | null = null;
-    let totalClicks = 0;
-
-    if (spotlightRes.ok) {
-      const json = await spotlightRes.json();
-      phaseTitle = json?.data?.title ?? null;
-
-      if (json?.data?.id) {
-        try {
-          const analyticsRes = await backendFetch(
-            `/api/v1/analytics/overview?range=7d&spotlight_id=${json.data.id}`,
-            { cache: "no-store" }
-          );
-          if (analyticsRes.ok) {
-            const aJson = await analyticsRes.json();
-            totalClicks = aJson?.data?.total_clicks ?? 0;
-          }
-        } catch {
-          // ignore
-        }
-      }
-    }
-
-    return { handle, phaseTitle, totalClicks };
-  } catch {
-    return { handle: null, phaseTitle: null, totalClicks: 0 };
-  }
-}
-
 export default async function QRPage() {
-  const { handle, phaseTitle, totalClicks } = await fetchActiveHandle();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const pageUrl = handle ? `${appUrl}/p/${handle}` : null;
+  const { handle, phaseTitle, totalClicks, pageUrl, shouldRedirect } = await fetchShareQRServerData();
 
   // Guard: requires active phase
-  if (!phaseTitle) redirect("/studio/share");
+  if (shouldRedirect) redirect("/studio/share");
 
   if (!pageUrl) {
     return (

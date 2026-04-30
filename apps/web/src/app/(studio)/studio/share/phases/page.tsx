@@ -1,19 +1,8 @@
-import { backendFetch } from "@/lib/api/backend";
+import { fetchSharePhasesServerData } from "@/lib/api/studio-share.server";
 import ProjectClient from "../../project/ProjectClient";
 import { SpotlightData } from "@/lib/api/spotlights";
 
-async function fetchSpotlights(): Promise<SpotlightData[]> {
-  try {
-    const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json?.data ?? [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function AllPhasesPage() {
-  const spotlights = await fetchSpotlights();
+  const spotlights = (await fetchSharePhasesServerData()) as SpotlightData[];
   return <ProjectClient spotlights={spotlights} />;
 }
