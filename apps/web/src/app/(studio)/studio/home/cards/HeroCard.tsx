@@ -93,7 +93,10 @@ export function HeroActive({
     <div className="rounded-lg border-t-[3px] p-6 sm:p-8" style={{ background: "var(--studio-surface-elevated)", borderColor: "var(--studio-border)", borderTopColor: "var(--studio-accent)", borderLeftWidth: "1px", borderRightWidth: "1px", borderBottomWidth: "1px" }}>
       <div style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
-          <span style={{ background: "var(--studio-accent-muted)", color: "var(--studio-accent)", padding: "4px 10px", borderRadius: "999px", fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 600 }}>
+          <span
+            className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase"
+            style={{ background: "var(--studio-accent-muted)", color: "var(--studio-accent)", letterSpacing: "0.06em" }}
+          >
             Aktive Phase
           </span>
           {spotlight.starts_at && (

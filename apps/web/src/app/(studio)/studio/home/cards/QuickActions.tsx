@@ -1,40 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 type ActionItem = { label: string; sub: string; href: string; external?: boolean };
 
 function ActionCard({ label, sub, href, external = false }: ActionItem) {
-  const [hovered, setHovered] = useState(false);
-  const style: React.CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    minHeight: "88px",
-    background: hovered ? "var(--studio-surface-elevated)" : "var(--studio-surface)",
-    border: `1px solid ${hovered ? "var(--studio-accent-muted)" : "var(--studio-border)"}`,
-    borderRadius: "8px",
-    padding: "14px 16px",
+  const cardClassName = "group flex min-h-[88px] flex-col justify-end rounded-lg px-4 py-3.5 transition-colors";
+  const cardStyle: React.CSSProperties = {
+    background: "var(--studio-surface)",
+    border: "1px solid var(--studio-border)",
     textDecoration: "none",
-    cursor: "pointer",
-    transition: "background 150ms ease, border-color 150ms ease",
   };
-  const labelStyle: React.CSSProperties = { fontSize: "14px", fontWeight: 600, color: "var(--studio-text-primary)", marginBottom: "4px" };
-  const subStyle: React.CSSProperties = { fontSize: "12px", color: "var(--studio-text-secondary)", opacity: 0.7 };
+  const labelClassName = "mb-1 text-sm font-medium";
+  const subClassName = "text-xs";
+  const textStyle: React.CSSProperties = { color: "var(--studio-text-primary)" };
+  const subStyle: React.CSSProperties = { color: "var(--studio-text-secondary)", opacity: 0.65 };
 
   if (external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={style}>
-        <p style={labelStyle}>{label}</p>
-        <p style={subStyle}>{sub}</p>
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cardClassName} style={cardStyle}>
+        <p className={labelClassName} style={textStyle}>{label}</p>
+        <p className={subClassName} style={subStyle}>{sub}</p>
       </a>
     );
   }
   return (
-    <Link href={href} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={style}>
-      <p style={labelStyle}>{label}</p>
-      <p style={subStyle}>{sub}</p>
+    <Link href={href} className={cardClassName} style={cardStyle}>
+      <p className={labelClassName} style={textStyle}>{label}</p>
+      <p className={subClassName} style={subStyle}>{sub}</p>
     </Link>
   );
 }
@@ -52,7 +45,7 @@ export default function QuickActions({ hasActivePhase, pageHandle }: QuickAction
     ? [
         { label: "Links verteilen", sub: "Erzeuge pro Kanal einen eigenen Link für Story, Bio, Ads oder Posts.", href: "/studio/share/distribution" },
         { label: "QR-Code nutzen", sub: "Nutze einen QR-Code für Flyer, Poster oder Merchstand.", href: "/studio/share/qr" },
-        { label: "Analyse ansehen", sub: "Prüfe, welche Kanäle und Links für euren aktuellen Push funktionieren.", href: "/studio/results" },
+        { label: "Analyse ansehen", sub: "Sobald Daten vorliegen, siehst du hier, welche Kanäle funktionieren.", href: "/studio/results" },
       ]
     : [
         { label: "Phase starten", sub: "Setze einen klaren Fokus für Release, Live, Merch oder Studio.", href: "/studio/share/new" },

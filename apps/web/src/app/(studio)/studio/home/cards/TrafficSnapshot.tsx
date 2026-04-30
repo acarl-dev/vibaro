@@ -56,27 +56,27 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
           {hasActivePhase && !page?.is_published ? (
             <Link
               href="/studio/settings"
-              className="studio-btn studio-btn-primary"
+              className="studio-btn studio-btn-secondary"
             >
               Seite veröffentlichen
             </Link>
           ) : hasActivePhase ? (
             <Link
               href="/studio/share/distribution"
-              className="studio-btn studio-btn-primary"
+              className="studio-btn studio-btn-secondary"
             >
               Links verteilen
             </Link>
           ) : (
             <Link
               href="/studio/share/new"
-              className="studio-btn studio-btn-primary"
+              className="studio-btn studio-btn-secondary"
             >
               Phase starten
             </Link>
           )}
           {hasActivePhase && page?.is_published && (
-            <Link href="/studio/share/qr" className="studio-btn studio-btn-secondary">
+            <Link href="/studio/share/qr" className="studio-btn studio-btn-ghost">
               QR-Code nutzen
             </Link>
           )}
@@ -101,7 +101,7 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
           </a>
         )}
       </div>
-      <div className="grid grid-cols-3" style={{ gap: "10px", marginBottom: "16px" }}>
+      <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-3" style={{ gap: "10px", marginBottom: "16px" }}>
         <SnapStatCell label="Besucher" value={fmt(visitors)} trend={snap.trend_pct !== null ? { pct: snap.trend_pct } : null} />
         <SnapStatCell label="Klicks" value={fmt(clicks)} trend={stats.trend !== 0 ? { pct: stats.trend } : null} />
         <SnapStatCell label="Klicks pro Besucher" value={conversion !== null ? `${conversion}%` : "—"} />
