@@ -17,6 +17,7 @@ import StudioEmptyState from "../../components/StudioEmptyState";
 import { Megaphone } from "../../components/StudioIcons";
 import ExplainPanel from "../../components/ExplainPanel";
 import WhyButton from "../../components/WhyButton";
+import ShareDistributionQRHint from "./ShareDistributionQRHint";
 
 type ShareClientProps = {
   activeSpotlight: {
@@ -186,22 +187,7 @@ export default function ShareClient({ activeSpotlight, pageUrl }: ShareClientPro
       />
 
       <div className="space-y-8">
-        {/* QR link — full QR page is at /studio/share/qr */}
-        <div
-          className="rounded-lg p-4 flex items-center justify-between"
-          style={{ border: "1px solid var(--studio-border)", background: "var(--studio-surface)" }}
-        >
-          <div>
-            <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--studio-text-primary)" }}>QR & Offline</p>
-            <p style={{ fontSize: "12px", color: "var(--studio-text-secondary)", marginTop: "2px" }}>QR-Code für diese Phase</p>
-          </div>
-          <a
-            href="/studio/share/qr"
-            style={{ fontSize: "12px", color: "var(--studio-accent)", fontWeight: 500, textDecoration: "none" }}
-          >
-            Zum QR-Code →
-          </a>
-        </div>
+        <ShareDistributionQRHint />
 
         {/* Platform Selector */}
         <div>
