@@ -7,6 +7,11 @@ use App\Models\ArtistPage;
 class LinkService
 {
     /**
+     * Domain note:
+     * This service belongs to the Website core and only manages ArtistPage social links.
+     * It must not be used for TrackingLink / distribution logic.
+     */
+    /**
      * Get default social media platform configurations
      *
      * @return array<array{type: string, title: string, position: int}>

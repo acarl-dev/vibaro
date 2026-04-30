@@ -85,18 +85,18 @@ const MODULES: ModuleDef[] = [
     id: "campaign",
     icon: BarChart2,
     emoji: "📣",
-    label: "CAMPAIGN",
-    tagline: "Werbemaßnahmen strukturieren",
-    description: "Tracke woher dein Traffic kommt und welche Kampagne gewinnt.",
+    label: "PHASE",
+    tagline: "Distribution strukturieren",
+    description: "Tracke, woher dein Traffic kommt und welche Phase am besten performt.",
     features: [
-      "Plattform-Kampagnenlinks (Story, Bio, Ads)",
+      "Plattform-Links je Platzierung (Story, Bio, Ads)",
       "Tracking pro Plattform",
-      "Vergleich Kampagnen A vs B",
+      "Vergleich Phase A vs B",
       "Traffic-Quelle Übersicht",
     ],
-    effect: "Für Bands, die Releases gezielt pushen wollen.",
+    effect: "Für Bands, die ihre Releases strukturiert in Phasen pushen wollen.",
     status: "available",
-    href: "/studio/project/spotlights",
+    href: "/studio/project",
     accentVar: "--mod-campaign",
   },
   {
@@ -157,7 +157,7 @@ export default function ModulesClient() {
         className="mt-8 text-xs leading-relaxed"
         style={{ color: "var(--studio-text-secondary)" }}
       >
-        Immer nur ein Modul aktiv. Das aktive Modul bestimmt den Fokus deiner Seite und deiner Kampagnen-Links.
+        Immer nur ein Modul aktiv. Das aktive Modul bestimmt den Fokus deiner Seite und deiner Phasen-Links.
       </p>
     </div>
   );

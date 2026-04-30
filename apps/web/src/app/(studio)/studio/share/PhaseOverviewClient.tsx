@@ -122,14 +122,14 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics, schedu
       <div>
         <StudioPageHeader
           title="PHASE"
-          subtitle="Zeitlich gezielte Kampagnen für deine Seite."
+          subtitle="Zeitlich gezielte Phasen für deine Seite."
           action={
             <WhyButton
               label="Was ist eine Phase?"
               content={{
                 title: "Was ist eine Phase?",
                 what: "Eine Phase ist ein Zeitraum, in dem du etwas gezielt pushst – zum Beispiel eine neue Single, ein Album oder eine Tour-Ankündigung.",
-                why: "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und analysierst später, was am besten funktioniert hat. Wenn du eine neue Kampagne startest, beginnst du eine neue Phase – so bleiben deine Daten sauber und vergleichbar.",
+                why: "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und analysierst später, was am besten funktioniert hat. Für jedes neue Ziel startest du eine neue Phase – so bleiben deine Daten sauber und vergleichbar.",
                 example: "🎵 Single Release-Phase: Du pushst deinen neuen Song 2 Wochen lang.\n🎭 Tour-Phase: Du kommunizierst deine Tour 4 Wochen lang.\n🛏️ Studio-Phase: Du gibst Einblicke in dein Studio, um die Vorfreude zu steigern.",
                 tip: "Beende die aktuelle Phase, bevor du eine neue startest. So bleiben deine Statistiken klar trennbar.",
               }}
@@ -151,7 +151,7 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics, schedu
             { icon: "🎵", label: "Single Release", description: "Du veröffentlichst einen neuen Song. Starte eine Phase, erstelle Story- und Bio-Links, und beobachte, wo die meisten Klicks herkommen." },
             { icon: "🎭", label: "Tour-Ankündigung", description: "Du kündigst eine Tour an. Erstelle Links für Instagram, YouTube und deinen Newsletter – und vergleiche am Ende, was am besten funktioniert hat." },
           ]}
-          tip={{ text: "Starte immer eine neue Phase für jede neue Kampagne – so bleiben deine Daten sauber und vergleichbar." }}
+          tip={{ text: "Starte immer eine neue Phase für jedes neue Ziel – so bleiben deine Daten sauber und vergleichbar." }}
         />
         <StudioEmptyState
           icon={Megaphone}
@@ -200,7 +200,7 @@ export default function PhaseOverviewClient({ activeSpotlight, analytics, schedu
             content={{
               title: "Was ist eine Phase?",
               what: "Eine Phase ist ein Zeitraum, in dem du etwas gezielt pushst – zum Beispiel eine neue Single, ein Album oder eine Tour-Ankündigung.",
-              why: "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und analysierst später, was am besten funktioniert hat. Wenn du eine neue Kampagne startest, beginnst du eine neue Phase.",
+              why: "Während einer Phase erzeugst du Tracking-Links, verteilst sie auf deinen Kanälen und analysierst später, was am besten funktioniert hat. Für jedes neue Ziel startest du eine neue Phase.",
               example: "🎵 Single Release-Phase: Du pushst deinen neuen Song 2 Wochen lang.\n🎭 Tour-Phase: Du kommunizierst deine Tour 4 Wochen lang.",
               tip: "Beende die aktuelle Phase, bevor du eine neue startest. So bleiben deine Statistiken klar trennbar.",
             }}

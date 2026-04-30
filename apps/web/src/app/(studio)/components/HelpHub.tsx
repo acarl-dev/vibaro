@@ -463,7 +463,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
               <FlowStep
                 number="1"
                 title="Phase starten"
-                description="Eine Phase ist ein Zeitraum mit einem klaren Ziel – z.B. ein neues Release, eine Tour oder ein Festival. Jede Kampagne bekommt ihre eigene Phase."
+                description="Eine Phase ist ein Zeitraum mit einem klaren Ziel – z.B. ein neues Release, eine Tour oder ein Festival. Jedes Ziel bekommt seine eigene Phase."
               />
               <FlowStep
                 number="2"
@@ -540,7 +540,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <GlossaryEntry
                 term="Phase"
-                definition="Ein Zeitraum, in dem du etwas gezielt pushst – z.B. einen neuen Song oder eine Tour. Du loggst Klicks pro Phase, damit Kampagnen vergleichbar bleiben."
+                definition="Ein Zeitraum, in dem du etwas gezielt pushst – z.B. einen neuen Song oder eine Tour. Du loggst Klicks pro Phase, damit Phasen vergleichbar bleiben."
               />
               <GlossaryEntry
                 term="Besucher"

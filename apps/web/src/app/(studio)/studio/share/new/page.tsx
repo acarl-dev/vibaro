@@ -22,7 +22,7 @@ export default function NewPhasePage() {
     <div className="max-w-xl">
       <StudioPageHeader
         title="NEUE PHASE"
-        subtitle="Starte eine zeitlich gezielte Kampagne für deine Seite."
+        subtitle="Starte eine zeitlich gezielte Phase für deine Seite."
       />
       <CreatePhaseWizard onSuccess={handleSuccess} onCancel={handleCancel} />
     </div>
