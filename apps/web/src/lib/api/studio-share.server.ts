@@ -228,7 +228,7 @@ export async function fetchShareQRServerData(): Promise<ShareQRServerData> {
       phaseTitle,
       totalClicks,
       pageUrl,
-      shouldRedirect: !phaseTitle,
+      shouldRedirect: !pageUrl,
     };
   } catch {
     return {

@@ -69,8 +69,13 @@ export default function Home() {
       {/* ════════════════ NAVIGATION ════════════════ */}
       <header className="fixed top-0 z-50 w-full border-b border-zinc-800/40 bg-zinc-950/60 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8" aria-label="Hauptnavigation">
-          <Link href="/" className="text-xl font-semibold tracking-tight" aria-label="Vibaro Startseite">
-            vibaro
+          <Link
+            href="/"
+            className="text-sm font-black uppercase tracking-widest transition-colors"
+            style={{ color: "#E63946" }}
+            aria-label="Vibaro Startseite"
+          >
+            VIBARO
           </Link>
           <div className="flex items-center gap-6">
             <a href="#features" className="hidden text-sm text-zinc-400 transition-colors hover:text-white sm:inline">
@@ -133,18 +138,15 @@ export default function Home() {
           </div>
 
           {/* ── Inhalt ── */}
-          <div
-            className="relative flex px-6 lg:px-16"
-            style={{ minHeight: "100svh", alignItems: "center", paddingLeft: "clamp(1.5rem, 27vw, 38rem)" }}
-          >
-            <div style={{ maxWidth: "640px", paddingBottom: "8vh" }}>
+          <div className="relative mx-auto grid min-h-[100svh] w-full max-w-7xl items-center gap-10 px-6 pt-28 pb-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-14 lg:px-12 lg:pt-24 lg:pb-16">
+            <div className="max-w-2xl">
 
               {/* Kicker */}
               <p
                 className="mb-6 text-xs font-semibold uppercase tracking-[0.26em]"
                 style={{ color: "rgba(255,255,255,0.56)" }}
               >
-                Für Musiker, die es ernst meinen
+                Für Bands mit klarem Fokus
               </p>
 
               {/* Headline */}
@@ -156,9 +158,11 @@ export default function Home() {
                   letterSpacing: "-0.03em",
                 }}
               >
-                Own Your
+                Deine Bandseite.
                 <br />
-                Stage.
+                Dein aktueller Fokus.
+                <br />
+                Deine Zahlen.
               </h1>
 
               {/* Subline */}
@@ -170,9 +174,9 @@ export default function Home() {
                   maxWidth: "480px",
                 }}
               >
-                Die professionelle Homepage für Musiker – mit allem, was du brauchst.
-                <br />
-                In Minuten live. Ohne Baukasten. Ohne Abhängigkeit.
+                Vibaro verbindet eure dauerhafte Bandseite mit Phasen für Release, Tour,
+                Merch oder Studio. Teilt kanalgenaue Links, nutzt euren festen Band-QR
+                und seht, was funktioniert.
               </p>
 
               {/* CTAs */}
@@ -181,17 +185,102 @@ export default function Home() {
                   href="/register"
                   className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-950 transition-all hover:scale-[1.03] hover:bg-zinc-200"
                 >
-                  Deine Bühne starten
+                  Als Testband starten
                 </a>
                 <a
-                  href="#buehne"
+                  href="#steps-heading"
                   className="inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:text-white"
                   style={{ color: "rgba(255,255,255,0.42)" }}
                 >
-                  So sieht&apos;s aus
+                  Produktloop ansehen
                   <ArrowRightIcon />
                 </a>
               </div>
+            </div>
+
+            <div className="relative w-full max-w-[560px] justify-self-start lg:justify-self-end">
+              <div className="relative overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-900/80 shadow-[0_24px_70px_rgba(0,0,0,0.55)]">
+                <div className="relative h-[320px] sm:h-[360px] lg:h-[390px]">
+                  <img
+                    src="/images/landing/erik-mclean-PQqV2XerrhM-unsplash.jpg"
+                    alt="NOVA VEIL auf einer dunklen Bühnenaufnahme"
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: "62% 24%" }}
+                    loading="lazy"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(to top, rgba(5,5,6,0.88) 8%, rgba(8,8,10,0.52) 52%, rgba(8,8,10,0.20) 100%)",
+                    }}
+                  />
+
+                  <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 pt-4 sm:px-5">
+                    <div className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-400/40 bg-zinc-900/60 text-xs font-semibold tracking-[0.14em] text-zinc-100">
+                      NV
+                    </div>
+                    <span className="rounded-full border border-zinc-500/50 bg-zinc-950/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-200">
+                      Public Page
+                    </span>
+                  </div>
+
+                  <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-300/90">NOVA VEIL</p>
+                    <h3 className="mt-2 text-2xl font-semibold tracking-[-0.01em] text-white sm:text-3xl">BLACKOUT SIGNAL</h3>
+                    <p className="mt-1 text-sm text-zinc-300">NEW SINGLE · Out now</p>
+
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {["Spotify", "YouTube", "Shows"].map((label) => (
+                        <span
+                          key={label}
+                          className="rounded-full border border-zinc-400/40 bg-zinc-950/55 px-3 py-1.5 text-xs font-medium text-zinc-100"
+                        >
+                          {label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <aside className="mt-4 w-full rounded-xl border border-zinc-700/80 bg-zinc-950/92 p-4 shadow-[0_14px_40px_rgba(0,0,0,0.5)] sm:max-w-[360px] lg:absolute lg:right-[-34px] lg:bottom-[-28px] lg:mt-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400">Studio</span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/10 px-2 py-1 text-[11px] font-medium text-red-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-400" aria-hidden="true" />
+                    Phase aktiv
+                  </span>
+                </div>
+
+                <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-900/70 p-3">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Phase</p>
+                  <p className="mt-1 text-sm font-semibold text-zinc-100">New Single</p>
+                  <div className="mt-2 h-0.5 w-16 rounded-full bg-red-500/70" aria-hidden="true" />
+                </div>
+
+                <ul className="mt-3 space-y-1.5 text-xs text-zinc-300">
+                  <li>Instagram Story · Link erstellt</li>
+                  <li>Band-QR bereit</li>
+                  <li>Performance wird erfasst</li>
+                </ul>
+
+                <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="rounded-md border border-zinc-800 bg-zinc-900/70 px-2 py-2 text-zinc-200">
+                    <div className="font-semibold text-zinc-100">214</div>
+                    <div className="mt-0.5 text-[11px] text-zinc-500">Besucher</div>
+                  </div>
+                  <div className="rounded-md border border-zinc-800 bg-zinc-900/70 px-2 py-2 text-zinc-200">
+                    <div className="font-semibold text-zinc-100">68</div>
+                    <div className="mt-0.5 text-[11px] text-zinc-500">Link-Klicks</div>
+                  </div>
+                  <div className="rounded-md border border-red-500/35 bg-zinc-900/70 px-2 py-2 text-zinc-200">
+                    <div className="font-semibold text-zinc-100">12</div>
+                    <div className="mt-0.5 text-[11px] text-zinc-500">Bandseiten-Aufrufe</div>
+                  </div>
+                </div>
+              </aside>
             </div>
           </div>
         </section>
@@ -199,6 +288,7 @@ export default function Home() {
         {/* ════════════════ 2 · PROBLEM ════════════════ */}
         <section className="py-24 lg:py-32" aria-labelledby="problem-heading">
           <div className="mx-auto max-w-3xl px-6 lg:px-8">
+            
             <h2
               id="problem-heading"
               className="text-center text-3xl font-semibold leading-[1.1] tracking-[-0.01em] text-zinc-50 sm:text-4xl lg:text-5xl"
@@ -224,7 +314,7 @@ export default function Home() {
               <p>
                 Einen Ort, den du kontrollierst.
                 <br />
-                <span className="text-zinc-300">Nicht eine Plattform.</span>
+                
               </p>
             </div>
           </div>
@@ -330,6 +420,7 @@ export default function Home() {
         <section className="border-t border-zinc-800/50 py-24 lg:py-32" aria-labelledby="performance-heading">
           <div className="mx-auto max-w-4xl px-6 lg:px-8">
             <div className="text-center">
+              
               <h2
                 id="performance-heading"
                 className="text-3xl font-semibold leading-[1.1] tracking-[-0.01em] text-zinc-50 sm:text-4xl lg:text-5xl"
@@ -367,7 +458,7 @@ export default function Home() {
                 "Referrer",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-lg text-zinc-300">
-                  <CheckIcon className="h-5 w-5 shrink-0 text-zinc-600" />
+                  <CheckIcon className="h-5 w-5 shrink-0 text-[#E63946]/80" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -385,6 +476,7 @@ export default function Home() {
         <section id="features" className="border-t border-zinc-800/50 py-24 lg:py-32" aria-labelledby="features-heading">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="text-center">
+              
               <h2
                 id="features-heading"
                 className="text-3xl font-semibold leading-[1.1] tracking-[-0.01em] text-zinc-50 sm:text-4xl lg:text-5xl"
@@ -404,13 +496,15 @@ export default function Home() {
 
             <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
               {/* Card 1 – Deine Bühne */}
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 transition-colors hover:border-zinc-700">
+              <div className="relative rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 transition-colors hover:border-zinc-700">
+                <div className="absolute left-8 top-0 h-0.5 w-12 -translate-y-px rounded-full bg-[#E63946]/55" aria-hidden="true" />
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-zinc-300">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 014 9 15 15 0 01-4 9 15 15 0 01-4-9 15 15 0 014-9z" />
                   </svg>
                 </div>
+                <p className="mt-5 text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">Meine Seite</p>
                 <h3 className="mt-6 text-xl font-semibold text-zinc-50">Deine Bühne</h3>
                 <p className="mt-3 leading-relaxed text-zinc-400">
                   Alle Inhalte an einem Ort – unter deinem eigenen Link.
@@ -418,7 +512,8 @@ export default function Home() {
               </div>
 
               {/* Card 2 – Dein Fokus */}
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 transition-colors hover:border-zinc-700">
+              <div className="relative rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 transition-colors hover:border-zinc-700">
+                <div className="absolute left-8 top-0 h-0.5 w-12 -translate-y-px rounded-full bg-[#E63946]/70" aria-hidden="true" />
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-zinc-300">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" strokeWidth={1.5} />
@@ -426,6 +521,7 @@ export default function Home() {
                     <circle cx="12" cy="12" r="2" strokeWidth={1.5} />
                   </svg>
                 </div>
+                <p className="mt-5 text-xs font-medium uppercase tracking-[0.14em] text-[#E63946]">Phase</p>
                 <h3 className="mt-6 text-xl font-semibold text-zinc-50">Dein Fokus</h3>
                 <p className="mt-3 leading-relaxed text-zinc-400">
                   Ein Projekt im Mittelpunkt. Keine Ablenkung.
@@ -433,13 +529,15 @@ export default function Home() {
               </div>
 
               {/* Card 3 – Deine Kontrolle */}
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 transition-colors hover:border-zinc-700 sm:col-span-2 lg:col-span-1">
+              <div className="relative rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 transition-colors hover:border-zinc-700 sm:col-span-2 lg:col-span-1">
+                <div className="absolute left-8 top-0 h-0.5 w-12 -translate-y-px rounded-full bg-[#E63946]/55" aria-hidden="true" />
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-zinc-300">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3v18h18" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16l4-4 4 2 5-6" />
                   </svg>
                 </div>
+                <p className="mt-5 text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">Analyse</p>
                 <h3 className="mt-6 text-xl font-semibold text-zinc-50">Deine Kontrolle</h3>
                 <p className="mt-3 leading-relaxed text-zinc-400">
                   Verstehe deine Performance – ohne externe Plattformen.
@@ -452,24 +550,42 @@ export default function Home() {
         {/* ════════════════ 7 · SO EINFACH IST ES ════════════════ */}
         <section className="border-t border-zinc-800/50 py-24 lg:py-32" aria-labelledby="steps-heading">
           <div className="mx-auto max-w-5xl px-6 lg:px-8">
+            
             <h2
               id="steps-heading"
               className="text-center text-3xl font-semibold leading-[1.1] tracking-[-0.01em] text-zinc-50 sm:text-4xl lg:text-5xl"
             >
-              In drei Schritten live.
+              Der Produktloop in drei Schritten.
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-zinc-400">
-              Keine Einrichtungszeit. Kein technisches Wissen nötig.
+              Phase festlegen, Links &amp; Band-QR teilen, Performance sehen.
             </p>
 
-            <div className="mt-20 grid gap-12 sm:grid-cols-3">
+            <div className="relative mt-20 grid gap-6 sm:grid-cols-3 sm:gap-8 lg:gap-10">
+              <div className="pointer-events-none absolute left-[16.666%] right-[16.666%] top-6 hidden h-px bg-gradient-to-r from-[#E63946]/0 via-[#E63946]/45 to-[#E63946]/0 sm:block" aria-hidden="true" />
               {[
-                { step: "01", title: "Registrieren", desc: "Erstelle deinen Account – kostenlos und in Sekunden." },
-                { step: "02", title: "Einrichten", desc: "Füge Profil, Shows und Releases hinzu." },
-                { step: "03", title: "Veröffentlichen", desc: "Teile deinen Link. Deine Seite ist sofort online." },
-              ].map(({ step, title, desc }) => (
-                <div key={step} className="text-center sm:text-left">
-                  <div className="text-4xl font-bold text-zinc-800">{step}</div>
+                {
+                  step: "01",
+                  title: "Phase festlegen",
+                  desc: "Wählt, was gerade wichtig ist: Release, Tour, Merch oder Studio. Diese Phase wird zum Fokus eurer Bandseite.",
+                },
+                {
+                  step: "02",
+                  title: "Links & Band-QR teilen",
+                  desc: "Erstellt kanalgenaue Links für eure Phase und nutzt euren festen Band-QR für Flyer, Sticker, Poster oder den Merchstand.",
+                },
+                {
+                  step: "03",
+                  title: "Performance sehen",
+                  desc: "Seht, welche Kanäle funktionieren und wie eure aktuelle Phase ankommt.",
+                },
+              ].map(({ step, title, desc }, index) => (
+                <div key={step} className="relative rounded-xl border border-zinc-800/90 bg-zinc-900/25 p-5 text-center sm:p-6 sm:text-left">
+                  <div className="absolute left-1/2 top-5 h-2 w-2 -translate-x-1/2 rounded-full bg-[#E63946] sm:left-6 sm:translate-x-0" aria-hidden="true" />
+                  <div className={`text-4xl font-bold ${index === 0 ? "text-[#E63946]" : "text-zinc-700"}`}>{step}</div>
+                  <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">
+                    {index === 0 ? "Phase" : index === 1 ? "Links" : "Performance"}
+                  </p>
                   <h3 className="mt-4 text-xl font-semibold text-zinc-50">{title}</h3>
                   <p className="mt-2 leading-relaxed text-zinc-400">{desc}</p>
                 </div>
@@ -502,6 +618,7 @@ export default function Home() {
         <section id="pricing" className="border-t border-zinc-800/50 py-24 lg:py-32" aria-labelledby="pricing-heading">
           <div className="mx-auto max-w-3xl px-6 lg:px-8">
             <div className="text-center">
+              
               <h2
                 id="pricing-heading"
                 className="text-3xl font-semibold leading-[1.1] tracking-[-0.01em] text-zinc-50 sm:text-4xl lg:text-5xl"
@@ -515,7 +632,8 @@ export default function Home() {
 
             {/* Single plan card */}
             <div className="mx-auto mt-16 max-w-lg">
-              <div className="flex flex-col rounded-2xl border-2 border-white bg-white p-8 text-zinc-950 sm:p-10">
+              <div className="relative flex flex-col rounded-2xl border-2 border-white bg-white p-8 text-zinc-950 sm:p-10">
+                <div className="absolute left-8 top-0 h-0.5 w-16 -translate-y-px rounded-full bg-[#E63946]" aria-hidden="true" />
                 <div className="text-sm font-medium text-zinc-800">Vibaro Artist</div>
                 <div className="mt-4 flex items-baseline gap-2">
                   <span className="text-5xl font-semibold tracking-[-0.01em] text-zinc-950">29&thinsp;€</span>
@@ -529,7 +647,7 @@ export default function Home() {
                     "Tracking & Performance",
                     "QR-Codes",
                     "Alle Themes",
-                    "Kein Vibaro-Branding",
+                    "Die Band steht im Mittelpunkt – Vibaro bleibt dezent im Hintergrund",
                     "DSGVO-konform",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
@@ -540,12 +658,12 @@ export default function Home() {
                 </ul>
                 <a
                   href="/register"
-                  className="mt-10 block w-full rounded-full bg-zinc-950 py-3.5 text-center font-semibold text-white transition-colors hover:bg-zinc-800"
+                  className="mt-10 block w-full rounded-full bg-zinc-950 py-3.5 text-center font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E63946]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                 >
                   Jetzt deine Bühne starten
                 </a>
                 <p className="mt-4 text-center text-xs text-zinc-500">
-                  30 Tage kostenlos testen. Jederzeit kündbar.
+                  Als Testband 3 Monate ausprobieren. Jederzeit kündbar.
                 </p>
               </div>
             </div>
@@ -556,6 +674,7 @@ export default function Home() {
         <section className="py-20 lg:py-32" aria-label="Registrierung">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="rounded-3xl border border-zinc-800 bg-zinc-900/30 px-8 py-20 text-center lg:px-16">
+              
               <h2 className="text-3xl font-semibold leading-[1.1] tracking-[-0.01em] text-zinc-50 sm:text-4xl lg:text-5xl">
                 Bereit für deine
                 <br />
