@@ -38,7 +38,6 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
   const [copyHint, setCopyHint] = useState<string>("");
   const [allLinks, setAllLinks] = useState<TrackingLinkData[]>([]);
 
-  // Load all links on mount
   useEffect(() => {
     loadLinks();
   }, []);
@@ -48,7 +47,6 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
     setAllLinks(links);
   };
 
-  // Check for existing link when platform/placement selected
   useEffect(() => {
     if (!activeSpotlight || !selectedPlatform || !selectedPlacement) {
       setExistingLink(null);
@@ -101,18 +99,16 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
         spotlight_id: activeSpotlight.id,
         platform: selectedPlatform.id,
         placement: selectedPlacement.id,
-        target_url: activeSpotlight.primary_url || "https://vibaro.com", // TODO: Get from spotlight
+        target_url: activeSpotlight.primary_url || "https://vibaro.com",
       });
 
       if (result.success && result.data) {
-        // Auto-copy the new link
         await navigator.clipboard.writeText(result.data.tracking_url);
 
         const hint = getCopyHint(selectedPlatform.id, selectedPlacement.id);
         setCopyHint(hint);
         showToast("Link erstellt & kopiert!", "success", hint || undefined);
 
-        // Reload links
         await loadLinks();
         setExistingLink(result.data);
       } else {
@@ -143,39 +139,39 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
   return (
     <div>
       <StudioPageHeader
-        title="DISTRIBUTION"
-        subtitle={`Phase: ${activeSpotlight.title}`}
+        title="LINKS VERTEILEN"
+        subtitle={`Phase: ${activeSpotlight.title} · Erstelle je Kanal einen eigenen Link, damit du spaeter siehst, woher Klicks kamen.`}
         action={
           <WhyButton
             label="Wie funktioniert das?"
             content={{
-              title: "Distribution verstehen",
-              what: "Du erzeugst hier spezielle Links für jede Plattform und Platzierung, die du nutzt.",
-              why: "Jeder Link wird separat gemessen. Wenn du überall denselben Link benutzt, siehst du nur eine Gesamtzahl. Mit getrennten Links siehst du genau: 3 Klicks aus Instagram Story, 1 aus YouTube, 1 aus dem Newsletter.",
-              example: "Song-Link für Instagram Story: 12 Klicks\nSong-Link für Instagram Bio: 4 Klicks\nSong-Link für YouTube-Kommentar: 2 Klicks\n\n→ Du weißt jetzt: Story performt am besten.",
-              tip: "Erstelle für jede Plattform mindestens einen Story- und einen Bio-Link. Das reicht für die meisten Releases.",
+              title: "Links verteilen verstehen",
+              what: "Hier erstellst du pro Kanal und Platzierung einen eigenen Link fuer deinen aktuellen Push.",
+              why: "Nur mit getrennten Links siehst du spaeter messbar, was funktioniert: zum Beispiel Instagram Story, Bio, Newsletter oder YouTube separat.",
+              example: "Instagram Story: 12 Klicks\nInstagram Bio: 4 Klicks\nYouTube: 2 Klicks\n\nDu siehst sofort, welcher Kanal fuer diese Phase am meisten bringt.",
+              tip: "Lege fuer jeden aktiven Kanal mindestens einen eigenen Link an. So bleibt deine Phase sauber messbar.",
             }}
           />
         }
       />
 
       <ExplainPanel
-        heading="Was ist Distribution?"
+        heading="Was ist Links verteilen?"
         body={[
-          "Hier erzeugst du spezielle Tracking-Links – einen pro Plattform und Platzierung.",
-          "Wenn du überall denselben Link benutzt, siehst du nur \"5 Klicks gesamt\". Mit getrennten Links siehst du: 3 aus Instagram Story, 1 aus YouTube, 1 aus dem Newsletter.",
+          "Hier erstellst du je Kanal einen eigenen Link fuer deine aktuelle Phase.",
+          "Wenn du ueberall denselben Link benutzt, siehst du nur Klicks gesamt. Mit getrennten Links erkennst du spaeter, woher die Klicks kamen.",
         ]}
         nextSteps={[
-          "Wähle unten eine Plattform (z. B. Instagram)",
-          "Wähle eine Platzierung (z. B. Story oder Bio)",
-          "Kopiere den generierten Link und poste ihn dort",
+          "Waehle unten eine Plattform (z. B. Instagram)",
+          "Waehle eine Platzierung (z. B. Story oder Bio)",
+          "Kopiere den Link und verteile ihn genau dort",
         ]}
         examples={[
-          { icon: "📱", label: "Du postest heute Abend eine Story: \"Neuer Song draußen!\"", description: "\u2192 Nimm den Instagram Story-Link. Nicht den Bio-Link. Sonst weißt du nicht, woher der Klick kam." },
-          { icon: "🔗", label: "Die Story läuft ab – du packst den Song für 2 Wochen in deine Bio", description: "\u2192 Nimm jetzt den Instagram Bio-Link. So bleiben Story und Bio getrennt messbar." },
-          { icon: "📊", label: "Du schaltest Werbung für deinen Song", description: "\u2192 Nimm den Instagram Ad-Link. Dann siehst du genau, wie viele Klicks deine Ads gebracht haben." },
+          { icon: "📱", label: "Du postest heute Abend eine Story", description: "Nutze den Instagram-Story-Link. Dann bleibt messbar, ob genau diese Story Klicks gebracht hat." },
+          { icon: "🔗", label: "Danach landet der Push in eurer Bio", description: "Nutze dafuer den Bio-Link. So bleiben Story und Bio in dieser Phase getrennt auswertbar." },
+          { icon: "📊", label: "Ihr bewerbt den Release gezielt", description: "Nutze fuer Ads oder Newsletter jeweils den passenden Link. Dann siehst du spaeter, welcher Kanal wirklich funktioniert." },
         ]}
-        tip={{ text: "Erstelle mindestens Story + Bio für jede Plattform, die du aktiv nutzt. Das reicht für einen guten Überblick." }}
+        tip={{ text: "Produktloop: 1. Fokus festlegen · 2. Links und QR teilen · 3. Performance dieser Phase pruefen." }}
       />
 
       <div className="space-y-8">
@@ -208,7 +204,6 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
           />
         )}
       </div>
-
     </div>
   );
 }

@@ -50,9 +50,9 @@ export default function QuickActions({ hasActivePhase, pageHandle }: QuickAction
 
   const actions: ActionItem[] = hasActivePhase
     ? [
-        { label: "Links teilen", sub: "Erzeuge passende Links für Story, Bio, Ads oder Posts.", href: "/studio/share/distribution" },
-        { label: "QR-Code nutzen", sub: "Erstelle einen QR-Code für Flyer, Poster oder Bühne.", href: "/studio/share/qr" },
-        { label: "Performance ansehen", sub: "Sieh, welche Kanäle und Links funktionieren.", href: "/studio/results" },
+        { label: "Links verteilen", sub: "Erzeuge pro Kanal einen eigenen Link für Story, Bio, Ads oder Posts.", href: "/studio/share/distribution" },
+        { label: "QR-Code nutzen", sub: "Nutze einen QR-Code für Flyer, Poster oder Merchstand.", href: "/studio/share/qr" },
+        { label: "Analyse ansehen", sub: "Prüfe, welche Kanäle und Links für euren aktuellen Push funktionieren.", href: "/studio/results" },
       ]
     : [
         { label: "Phase starten", sub: "Setze einen klaren Fokus für Release, Live, Merch oder Studio.", href: "/studio/share/new" },

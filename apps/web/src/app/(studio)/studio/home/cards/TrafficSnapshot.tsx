@@ -50,7 +50,7 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
           Noch keine Daten
         </p>
         <p style={{ fontSize: "13px", color: "var(--studio-text-secondary)", opacity: 0.65, marginBottom: "16px" }}>
-          Teile deine Links oder starte eine Phase, damit du siehst, was funktioniert.
+          Lege zuerst einen Fokus fest und verteile dann deine Links oder QR-Codes, damit du siehst, was funktioniert.
         </p>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           {hasActivePhase ? (
@@ -79,7 +79,7 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
     <div style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)", borderRadius: "16px", padding: "20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", gap: "12px", flexWrap: "wrap" }}>
         <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--studio-text-primary)" }}>
-          Überblick
+          {hasActivePhase ? "Performance dieser Phase" : "Überblick"}
           <span style={{ fontSize: "12px", fontWeight: 400, color: "var(--studio-text-secondary)", opacity: 0.6, marginLeft: "8px" }}>7 Tage</span>
         </p>
         {pageUrl && page && (
@@ -92,7 +92,7 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
       <div className="grid grid-cols-3" style={{ gap: "10px", marginBottom: "16px" }}>
         <SnapStatCell label="Besucher" value={fmt(visitors)} trend={snap.trend_pct !== null ? { pct: snap.trend_pct } : null} />
         <SnapStatCell label="Klicks" value={fmt(clicks)} trend={stats.trend !== 0 ? { pct: stats.trend } : null} />
-        <SnapStatCell label="Conversion" value={conversion !== null ? `${conversion}%` : "—"} />
+        <SnapStatCell label="Klicks pro Besucher" value={conversion !== null ? `${conversion}%` : "—"} />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
         {snap.top_platform && (

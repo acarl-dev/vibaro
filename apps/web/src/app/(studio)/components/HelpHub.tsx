@@ -445,12 +445,10 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
           <section style={{ marginBottom: "0" }}>
             <SectionLabel>Worum geht&apos;s in Vibaro?</SectionLabel>
             <BodyText>
-              Vibaro ist deine zentrale Seite als Musiker. Alles an einem Ort: deine Links, deine
-              Releases, deine Socials.
+              Vibaro ist Bandseite plus Messsystem für aktuelle Aktionen.
             </BodyText>
             <BodyText>
-              Fans landen auf deiner Seite – egal ob über Instagram, YouTube, Flyer oder QR-Code.
-              Du siehst, was funktioniert und was nicht.
+              Du legst zuerst deinen Fokus fest, verteilst dann Links und QR-Codes und siehst danach, was funktioniert.
             </BodyText>
           </section>
 
@@ -463,22 +461,22 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
               <FlowStep
                 number="1"
                 title="Phase starten"
-                description="Eine Phase ist ein Zeitraum mit einem klaren Ziel – z.B. ein neues Release, eine Tour oder ein Festival. Jedes Ziel bekommt seine eigene Phase."
+                description="Eine Phase ist dein aktueller Fokus, zum Beispiel ein Release, eine Tour oder Merch. Jedes Ziel bekommt seine eigene Phase."
               />
               <FlowStep
                 number="2"
-                title="Links erstellen (Distribution)"
-                description="Für jede Plattform und Platzierung erzeugst du einen eigenen Tracking-Link. Story, Bio, Ad – jeder Link wird separat gemessen."
+                title="Links verteilen vorbereiten"
+                description="Für jede Plattform und Platzierung erzeugst du einen eigenen Link. Story, Bio oder Ad bleiben so getrennt messbar."
               />
               <FlowStep
                 number="3"
                 title="Links verteilen"
-                description="Du postest deine Links auf Instagram, YouTube, in deinem Newsletter, auf Flyern (QR-Code) – wo auch immer deine Fans sind."
+                description="Du teilst deine Links auf Instagram, YouTube, im Newsletter oder per QR-Code dort, wo deine Fans gerade sind."
               />
               <FlowStep
                 number="4"
-                title="Performance analysieren"
-                description="Nach ein paar Tagen schaust du in Performance. Welche Plattform hat am meisten gebracht? Das zeigt dir, wo du mehr machen solltest."
+                title="Performance dieser Phase prüfen"
+                description="Nach ein paar Tagen schaust du in Performance. So siehst du, welcher Kanal für diesen Push am meisten gebracht hat."
               />
             </div>
           </section>
@@ -514,7 +512,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
                 <p style={{ fontSize: "13px", color: "var(--studio-text-primary)", margin: 0, lineHeight: "1.55" }}>
                   <strong>Schritt 2:</strong> Erstelle unter{" "}
                   <a href="/studio/share/distribution" style={{ color: "var(--studio-accent)", textDecoration: "none" }}>
-                    Distribution
+                    Links verteilen
                   </a>{" "}
                   mindestens einen Instagram Story-Link und einen Bio-Link.
                 </p>
@@ -526,7 +524,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
                   <a href="/studio/share/performance" style={{ color: "var(--studio-accent)", textDecoration: "none" }}>
                     Performance
                   </a>
-                  , wo deine Klicks herkommen.
+                  , welche Kanäle in dieser Phase funktionieren.
                 </p>
               </div>
             </div>
@@ -540,7 +538,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <GlossaryEntry
                 term="Phase"
-                definition="Ein Zeitraum, in dem du etwas gezielt pushst – z.B. einen neuen Song oder eine Tour. Du loggst Klicks pro Phase, damit Phasen vergleichbar bleiben."
+                definition="Dein aktueller Fokus, zum Beispiel ein neuer Song oder eine Tour. Klicks bleiben pro Phase getrennt, damit Phasen vergleichbar bleiben."
               />
               <GlossaryEntry
                 term="Besucher"
@@ -552,15 +550,15 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
               />
               <GlossaryEntry
                 term="Conversion"
-                definition="Von 100 Besuchern klicken zum Beispiel 30 auf einen deiner Links – das ergibt 30 % Conversion. Je höher, desto überzeugender ist deine Seite."
+                definition="Von 100 Besuchern klicken zum Beispiel 30 auf einen deiner Links. Das sind 30 % Klicks pro Besucher. Je höher, desto überzeugender ist deine Seite."
               />
               <GlossaryEntry
                 term="QR-Scan"
                 definition="Jemand hat deinen QR-Code gescannt (z.B. auf einem Flyer oder Poster). Ein Scan zählt wie ein normaler Seitenbesuch."
               />
               <GlossaryEntry
-                term="Distribution"
-                definition="Hier erzeugst du Tracking-Links je Plattform und Platzierung, damit du siehst, wo deine Klicks herkommen."
+                term="Links verteilen"
+                definition="Hier erzeugst du eigene Links je Plattform und Platzierung, damit du später siehst, woher deine Klicks kamen."
               />
             </div>
           </section>
@@ -579,7 +577,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
               <PracticeTip
                 icon="🎵"
                 title="Release Push"
-                body="Starte die Phase 1–2 Tage vor Veröffentlichung. Erstelle Links für Instagram Story, Bio und YouTube. Poste den Story-Link am Release-Tag mehrmals."
+                body="Starte die Phase 1–2 Tage vor Veröffentlichung. Erstelle Links für Instagram Story, Bio und YouTube. Bewirb den Story-Link am Release-Tag gezielt."
               />
               <PracticeTip
                 icon="🎭"
@@ -588,7 +586,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
               />
               <PracticeTip
                 icon="📊"
-                title="Wenn Conversion unter 10 %"
+                title="Wenn Klicks pro Besucher unter 10 % liegen"
                 body="Deine Seite wird besucht, aber kaum geklickt. Prüfe: Sind deine wichtigsten Links gut sichtbar? Hast du einen klaren Call-to-Action? Ist dein Featured Track aktuell?"
               />
             </div>

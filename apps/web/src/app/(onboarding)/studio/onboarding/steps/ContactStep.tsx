@@ -137,8 +137,8 @@ export default function PreviewStep({
           ← Zurück
         </button>
         <div className="text-center px-4">
-          <p className="text-base font-semibold text-zinc-50 tracking-tight">Das ist eure Seite.</p>
-          <p className="text-xs text-zinc-500 mt-0.5">Mach sie zu eurer.</p>
+          <p className="text-base font-semibold text-zinc-50 tracking-tight">Das ist eure Bandseite mit aktuellem Fokus.</p>
+          <p className="text-xs text-zinc-500 mt-0.5">Im Studio verteilt ihr Links und prüft später, was funktioniert.</p>
         </div>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           <button
@@ -398,7 +398,7 @@ export default function PreviewStep({
         <div className="px-6 py-6 flex items-start gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0 text-zinc-600" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           <p className="text-xs text-zinc-600 leading-relaxed">
-            Eure Band-Website ist startklar. Im <span className="text-zinc-400 font-medium">Vibaro Studio</span> könnt ihr sie weiter ausbauen – Release-Links, Tourdaten, Galerie, eigenes Logo und mehr.
+            Eure Bandseite ist startklar. Im <span className="text-zinc-400 font-medium">Vibaro Studio</span> legt ihr als Nächstes euren Fokus fest, verteilt Links oder QR-Codes und prüft später die Performance dieser Phase.
           </p>
         </div>
       </div>

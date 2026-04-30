@@ -16,7 +16,7 @@ export default function PhaseEmptyStateCard({
     <StudioEmptyState
       icon={Megaphone}
       title="Keine aktive Phase"
-      description="Starte eine neue Phase, um deine Seite gezielt zu pushen."
+      description="Eine Phase hält Release, Tour oder Merch-Push getrennt messbar. Starte eine Phase, bevor du Links verteilst."
       action={
         <div className="flex flex-col items-center gap-3">
           <button

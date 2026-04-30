@@ -103,7 +103,7 @@ function ComparisonTable({
       d: delta(current.qr_scans, previous.qr_scans),
     },
     {
-      label: "Conversion",
+      label: "Klicks pro Besucher",
       cur: current.conversion !== null ? `${current.conversion}%` : "—",
       prev: previous.conversion !== null ? `${previous.conversion}%` : "—",
       d:

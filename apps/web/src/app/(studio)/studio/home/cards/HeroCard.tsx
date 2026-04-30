@@ -51,7 +51,10 @@ export function HeroEmpty() {
             Deine Seite steht. Was willst du jetzt pushen?
           </h2>
           <p style={{ fontSize: "14px", color: "var(--studio-text-secondary)", opacity: 0.8, maxWidth: "520px" }}>
-            Starte eine Phase, um deine Band-Seite gezielt auf einen Release, eine Show, Merch oder Studio-Updates auszurichten.
+            Starte eine Phase, um deine Bandseite auf einen Release, eine Show, Merch oder Studio-Updates auszurichten und später messbar zu sehen, welche Kanäle für diesen Push funktionieren.
+          </p>
+          <p style={{ fontSize: "12px", color: "var(--studio-text-secondary)", opacity: 0.6, maxWidth: "520px", marginTop: "10px" }}>
+            1. Fokus festlegen · 2. Links und QR teilen · 3. Performance prüfen
           </p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "20px" }}>
@@ -99,6 +102,9 @@ export function HeroActive({ spotlight }: { spotlight: NonNullable<StudioHomeDat
         <p style={{ fontSize: "14px", color: "var(--studio-text-secondary)", opacity: 0.75 }}>
           {phaseSubline(spotlight.type)}
         </p>
+        <p style={{ fontSize: "12px", color: "var(--studio-text-secondary)", opacity: 0.6, marginTop: "10px" }}>
+          1. Fokus festlegen · 2. Links und QR teilen · 3. Performance dieser Phase prüfen
+        </p>
       </div>
       {hasData && stats ? (
         <div className="grid grid-cols-2 sm:grid-cols-3" style={{ gap: "12px", marginBottom: "24px" }}>
@@ -122,7 +128,7 @@ export function HeroActive({ spotlight }: { spotlight: NonNullable<StudioHomeDat
           href="/studio/share/distribution"
           style={{ background: "transparent", border: "1px solid var(--studio-border)", color: "var(--studio-text-primary)", padding: "10px 18px", borderRadius: "10px", fontWeight: 500, fontSize: "14px", textDecoration: "none", display: "inline-block" }}
         >
-          Links teilen
+          Links verteilen
         </Link>
         <Link
           href="/studio/page"

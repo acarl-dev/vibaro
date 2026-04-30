@@ -16,7 +16,7 @@ export default async function QRPage() {
   if (!pageUrl) {
     return (
       <div>
-        <StudioPageHeader title="QR & OFFLINE" subtitle="QR-Code für diese Phase." />
+        <StudioPageHeader title="QR & OFFLINE" subtitle="Nutze diesen QR-Code während der ganzen Phase." />
         <StudioEmptyState
           icon={Megaphone}
           title="Keine Seite gefunden"
@@ -30,16 +30,16 @@ export default async function QRPage() {
     <div className="space-y-8">
       <StudioPageHeader
         title="QR & OFFLINE"
-        subtitle={phaseTitle ? `Phase: ${phaseTitle}` : "QR-Code für deine Seite."}
+        subtitle={phaseTitle ? `Phase: ${phaseTitle} · Nutze diesen QR-Code während der ganzen Phase.` : "Nutze diesen QR-Code während der ganzen Phase."}
         action={
           <WhyButton
             label="Wozu ein QR-Code?"
             content={{
               title: "QR & Offline",
-              what: "Ein QR-Code ist der Brücke zwischen deiner Offline-Welt und deiner digitalen Präsenz.",
-              why: "Wenn du Flyer, Poster oder Merch hast, können Fans direkt zu deiner Seite gelangen – und du siehst genau, wie viele das gemacht haben. QR-Scans werden in deinen Phase-Stats separat ausgewiesen.",
-              example: "Du druckst 200 Flyer für ein Konzert. Nach dem Konzert siehst du: 47 QR-Scans. Das bedeutet: 23 % deiner Flüger haben den Code genutzt.",
-              tip: "Drucke immer denselben QR-Code für eine Phase aus. Dann kannst du Offline-Performance mit Online-Performance vergleichen.",
+              what: "Ein QR-Code bringt Fans von Flyern, Postern oder dem Merchstand direkt auf deine Bandseite.",
+              why: "Wenn du während der ganzen Phase denselben QR-Code nutzt, bleibt messbar, wie gut dein Offline-Push im Vergleich zu deinen Links funktioniert.",
+              example: "Du druckst 200 Flyer für ein Konzert. Nach dem Konzert siehst du: 47 QR-Scans. So erkennst du, ob dein Offline-Push funktioniert hat.",
+              tip: "Nutze diesen QR-Code während der ganzen Phase, zum Beispiel auf Flyern, Plakaten oder am Merchstand.",
             }}
           />
         }
@@ -48,19 +48,19 @@ export default async function QRPage() {
       <ExplainPanel
         heading="Was ist QR & Offline?"
         body={[
-          "QR-Codes bringen Fans von Flyern, Postern oder Merch direkt auf deine Seite – ganz ohne Social Media.",
-          "Jeder Scan wird gezählt. So kannst du sehen, ob dein Offline-Push genauso gut funktioniert wie dein Online-Push.",
+          "QR-Codes bringen Fans von Flyern, Postern oder Merch direkt auf deine Seite.",
+          "Nutze diesen QR-Code während der ganzen Phase, damit du später sauber siehst, wie stark dein Offline-Push war.",
         ]}
         nextSteps={[
           "Lade den QR-Code unten herunter",
-          "Drucke ihn auf Flyer, Poster oder Merch",
-          "Schau nach dem Konzert/Event in Performance, wie viele Scans es gab",
+          "Nutze ihn auf Flyern, Plakaten oder am Merchstand",
+          "Schau danach in Performance dieser Phase, wie viele QR-Scans es gab",
         ]}
         examples={[
-          { icon: "🎭", label: "Konzert-Poster mit QR-Code", description: "200 Flyer gedruckt, 47 Scans → 23 % deiner Flüger haben den Code genutzt. Du siehst, ob Offline-Werbung für dich funktioniert." },
+          { icon: "🎭", label: "Konzert-Poster mit QR-Code", description: "200 Flyer gedruckt, 47 Scans. Du siehst, ob Offline-Werbung für diese Phase funktioniert hat." },
           { icon: "👕", label: "QR-Code auf Merch", description: "Fans, die dein Merch tragen, können direkt deine Seite aufrufen. Der Scan wird getrennt von deinen Social-Media-Klicks gemessen." },
         ]}
-        tip={{ text: "Drucke immer denselben QR-Code für eine Phase. Wenn du ihn während der Phase wechselst, verlierst du die Vergleichbarkeit." }}
+        tip={{ text: "Nutze denselben QR-Code während der ganzen Phase. Wenn du ihn zwischendurch wechselst, wird dein Offline-Ergebnis schwerer vergleichbar." }}
       />
 
       {/* QR Card */}
@@ -105,13 +105,13 @@ export default async function QRPage() {
             {totalClicks}
           </p>
           <p className="text-sm mt-1" style={{ color: "var(--studio-text-secondary)" }}>
-            Klicks gesamt (7 Tage)
+            Alle Klicks dieser Phase (7 Tage)
           </p>
         </div>
         <div className="sm:col-span-2 flex items-center">
           <div>
             <p className="text-sm font-medium" style={{ color: "var(--studio-text-secondary)" }}>
-              QR-Scans werden automatisch in den Phase-Stats erfasst.
+              QR-Scans werden in Performance dieser Phase separat ausgewiesen und nicht mit Link-Klicks verwechselt.
             </p>
             <p className="text-xs mt-1" style={{ color: "var(--studio-text-secondary)", opacity: 0.5 }}>
               Standort-Insights folgen sp\u00e4ter.

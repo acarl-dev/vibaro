@@ -13,7 +13,7 @@ function ComparisonRow({ label, title, visitors, clicks, conversion, isCurrent =
       <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--studio-text-secondary)", opacity: 0.6, minWidth: "52px", flexShrink: 0 }}>{label}</span>
       <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--studio-text-primary)" }}>{title}</span>
       <span style={{ fontSize: "13px", color: "var(--studio-text-secondary)" }}>
-        {fmt(visitors)} Besucher · {fmt(clicks)} Klicks{conversion !== null && ` · ${conversion}%`}
+        {fmt(visitors)} Besucher · {fmt(clicks)} Klicks{conversion !== null && ` · ${conversion}% Klicks pro Besucher`}
       </span>
     </div>
   );
@@ -30,7 +30,7 @@ export default function ComparisonCard({ current, previous }: { current: StudioH
   }
   if (!highlightBadge && cs?.conversion != null && ps?.conversion != null) {
     const pp = parseFloat((cs.conversion - ps.conversion).toFixed(1));
-    if (pp !== 0) highlightBadge = { label: `${pp > 0 ? "+" : ""}${pp} pp Conversion`, positive: pp > 0 };
+    if (pp !== 0) highlightBadge = { label: `${pp > 0 ? "+" : ""}${pp} pp Klicks pro Besucher`, positive: pp > 0 };
   }
 
   if (!previous) {

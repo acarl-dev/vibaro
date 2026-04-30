@@ -11,11 +11,11 @@ export default function ShareDistributionEmptyState({
 }: ShareDistributionEmptyStateProps) {
   return (
     <div>
-      <StudioPageHeader title="DISTRIBUTION" subtitle="Erstelle Tracking-Links für deine Kanäle." />
+      <StudioPageHeader title="LINKS VERTEILEN" subtitle="Erstelle je Kanal einen eigenen Link, damit du später siehst, woher Klicks kamen." />
       <StudioEmptyState
         icon={Megaphone}
         title="Keine aktive Phase"
-        description="Starte zuerst eine Phase, um Tracking-Links zu generieren."
+        description="Eine Phase hält Release, Tour oder Merch-Push getrennt messbar. Starte zuerst eine Phase, bevor du Links verteilst."
         action={
           <button
             onClick={onBackToPhaseOverview}

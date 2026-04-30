@@ -5,9 +5,9 @@ export default function PhaseQuickActions() {
       style={{ background: "var(--studio-surface)", border: "1px solid var(--studio-border)" }}
     >
       {[
-        { label: "Distribution", desc: "Plattformen & Links", href: "/studio/share/distribution" },
-        { label: "QR & Offline", desc: "QR-Code für diese Phase", href: "/studio/share/qr" },
-        { label: "Performance", desc: "Klicks & Plattform-Verteilung", href: "/studio/share/performance" },
+        { label: "Links verteilen", desc: "Eigene Links je Kanal erstellen", href: "/studio/share/distribution" },
+        { label: "QR & Offline", desc: "Denselben QR-Code in der ganzen Phase nutzen", href: "/studio/share/qr" },
+        { label: "Performance", desc: "Performance dieser Phase prüfen", href: "/studio/share/performance" },
       ].map((item) => (
         <a
           key={item.href}

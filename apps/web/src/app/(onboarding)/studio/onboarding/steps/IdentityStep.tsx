@@ -22,8 +22,8 @@ export default function PhaseStep({ onSelect, generating, generateError, onBack 
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md space-y-8">
         <StepHeader
-          title="Was passiert gerade bei euch?"
-          description="W\u00e4hlt, was gerade bei euch los ist. Es erscheint sofort auf eurer Seite."
+          title="Was ist euer aktueller Fokus?"
+          description="Eine Phase ist euer aktueller Fokus, zum Beispiel Release, Tour, Merch oder Studio. Sie erscheint auf eurer Bandseite und bleibt später getrennt messbar."
         />
 
         <div className="grid grid-cols-2 gap-3">
@@ -60,7 +60,7 @@ export default function PhaseStep({ onSelect, generating, generateError, onBack 
         <div className="fixed inset-0 bg-zinc-950/80 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="text-center space-y-3">
             <div className="h-7 w-7 border-2 border-zinc-700 border-t-zinc-200 rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-zinc-400">Erstelle eure Seite\u2026</p>
+            <p className="text-sm text-zinc-400">Erstelle eure Bandseite und euren ersten Fokus\u2026</p>
           </div>
         </div>
       )}

@@ -31,7 +31,7 @@ export default function PerformanceTrend({
             Noch keine Daten. Teile zuerst einen Tracking-Link.
           </p>
           <a href="/studio/share/distribution" className="studio-btn studio-btn-primary inline-flex">
-            Zu Distribution →
+            Zu Links verteilen →
           </a>
         </div>
       )}

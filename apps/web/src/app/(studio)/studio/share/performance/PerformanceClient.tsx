@@ -45,7 +45,7 @@ export default function PerformanceClient({
           <h1
             className="text-lg font-bold uppercase tracking-[0.08em]"
           >
-            PERFORMANCE
+            PERFORMANCE DIESER PHASE
           </h1>
           {phaseTitle && (
             <p className="text-sm mt-1" style={{ color: "var(--studio-text-secondary)" }}>
@@ -56,11 +56,11 @@ export default function PerformanceClient({
             <WhyButton
               label="Was bedeuten die Zahlen?"
               content={{
-                title: "Performance verstehen",
-                what: "Hier siehst du, wie gut deine Seite und deine Links in dieser Phase performen.",
-                why: "Besucher = wie viele Menschen deine Seite geöffnet haben. Klicks = wie viele davon auf einen Link gedrückt haben. Von 100 Besuchern klicken z.\u202fB. 30 auf einen Link – das sind 30 % Conversion.",
-                example: "100 Besucher, 30 Klicks → 30 % Conversion ✔️ Gut!\n100 Besucher, 5 Klicks → 5 % Conversion → Deine wichtigsten Links vielleicht weiter oben platzieren.",
-                tip: "Wenn deine Conversion unter 10 % liegt, überprüfe, ob deine wichtigsten Links gut sichtbar angezeigt werden.",
+                title: "Performance dieser Phase verstehen",
+                what: "Hier siehst du, wie gut deine Seite, deine Links und dein QR-Code in dieser Phase funktionieren.",
+                why: "Besucher = wie viele Menschen deine Seite geöffnet haben. Link-Klicks = wie viele davon auf einen Link gedrückt haben. Conversion bedeutet hier kurz: Klicks pro Besucher.",
+                example: "100 Besucher, 30 Klicks → 30 % Klicks pro Besucher.\n100 Besucher, 5 Klicks → 5 % Klicks pro Besucher. Dann sollten die wichtigsten Links klarer sichtbar sein.",
+                tip: "Wenn deine Klicks pro Besucher unter 10 % liegen, prüfe, ob deine wichtigsten Links gut sichtbar angezeigt werden.",
               }}
             />
           </div>
@@ -81,7 +81,7 @@ export default function PerformanceClient({
               {totalClicks - qrClicks}
             </p>
             <p className="text-xs mt-1" style={{ color: "var(--studio-text-secondary)" }}>
-              Klicks
+              Link-Klicks
             </p>
           </div>
           {qrClicks > 0 && (
@@ -110,7 +110,7 @@ export default function PerformanceClient({
                   {pct}&thinsp;%
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: activeStyle.color, opacity: 0.7 }}>
-                  Conversion
+                  Klicks pro Besucher
                 </p>
               </div>
             );
@@ -120,8 +120,8 @@ export default function PerformanceClient({
 
       <ExplainPanel
         body={[
-          "Hier siehst du, wie viele Menschen deine Seite besucht und auf deine Links geklickt haben.",
-          "Schau vor allem auf die Plattform-Verteilung: Wenn Instagram 70 % deiner Klicks bringt, solltest du dort mehr posten. Wenn YouTube kaum Klicks bringt, ist der Aufwand dort vielleicht nicht wert.",
+          "Hier siehst du, wie viele Menschen deine Seite in dieser Phase besucht und auf deine Links geklickt haben.",
+          "Schau vor allem auf die Plattform-Verteilung: So erkennst du, welcher Kanal für deinen aktuellen Push wirklich funktioniert.",
         ]}
         nextSteps={[
           "Warte 3–7 Tage, damit ausreichend Daten da sind",
@@ -132,7 +132,7 @@ export default function PerformanceClient({
           { icon: "📊", label: "Instagram 70 %, YouTube 20 %, Newsletter 10 %", description: "Instagram ist dein Top-Kanal. Mehr Story- und Bio-Posts, weniger Energie in andere Kanäle stecken." },
           { icon: "⚠️", label: "Ein Kanal liegt dauerhaft unter 5 %", description: "Du kannst ihn ruhig deprioritisieren – oder ausprobieren, ob mehr Posting dort was ändert." },
         ]}
-        tip={{ text: "Niedrige Conversion (unter 10 %)? Dann überprüfe: Sind deine wichtigsten Links gut sichtbar? Hast du einen klaren Aufruf zum Klicken?" }}
+        tip={{ text: "Niedrige Klicks pro Besucher (unter 10 %)? Dann prüfe: Sind deine wichtigsten Links gut sichtbar? Hast du einen klaren Aufruf zum Klicken?" }}
       />
 
       <PerformanceTrend

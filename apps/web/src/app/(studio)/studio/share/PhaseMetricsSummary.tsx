@@ -28,15 +28,15 @@ export default function PhaseMetricsSummary({
           className="text-[11px] font-semibold uppercase tracking-widest"
           style={{ color: "var(--studio-text-secondary)" }}
         >
-          Schnellübersicht
+          Performance dieser Phase
         </p>
         <WhyButton
           content={{
             title: "Statistiken verstehen",
             what: "Diese Zahlen zeigen dir, wie gut deine aktuelle Phase läuft.",
-            why: "Besucher sagt dir, wie viele Menschen deine Seite geöffnet haben. Klicks zeigen, wie viele davon auch auf einen deiner Links gedrückt haben. Conversion zeigt das Verhältnis: Wenn 100 Leute deine Seite besuchen und 30 klicken, ist deine Conversion 30 %.",
-            example: "100 Besucher, 30 Klicks = 30 % Conversion\n\nHohe Conversion = deine Seite überzeugt.\nNiedrige Conversion = vielleicht fehlt ein klarer Aufruf zum Handeln.",
-            tip: "Wenn deine Conversion unter 10 % liegt, überprüfe, ob deine wichtigsten Links gut sichtbar sind.",
+            why: "Besucher zeigt dir, wie viele Menschen deine Seite geöffnet haben. Link-Klicks zeigen, wie viele davon auf einen deiner Links gedrückt haben. Conversion bedeutet hier kurz: Klicks pro Besucher.",
+            example: "100 Besucher, 30 Klicks = 30 % Klicks pro Besucher.\n\nHoher Wert = deine Seite überzeugt.\nNiedriger Wert = vielleicht fehlt ein klarer nächster Schritt.",
+            tip: "Wenn deine Klicks pro Besucher unter 10 % liegen, prüfe, ob deine wichtigsten Links gut sichtbar sind.",
           }}
         />
       </div>
@@ -47,7 +47,7 @@ export default function PhaseMetricsSummary({
         />
         <StudioStatCard
           value={regularClicks}
-          label="Klicks"
+          label="Link-Klicks"
           trend={trendStat}
         />
         <StudioStatCard
@@ -60,7 +60,7 @@ export default function PhaseMetricsSummary({
               ? `${Math.round(conversionRate * 100)} %`
               : "—"
           }
-          label="Conversion"
+          label="Klicks pro Besucher"
         />
       </div>
     </div>

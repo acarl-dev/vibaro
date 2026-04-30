@@ -47,7 +47,10 @@ export default function PhaseContextStep({
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md space-y-8">
-        <StepHeader title={title} />
+        <StepHeader
+          title={title}
+          description="Lege jetzt den Link für diese Phase fest. So ist euer aktueller Push von Anfang an klar und später messbar."
+        />
 
         <div className="space-y-6">
           {phaseType === "release" && (

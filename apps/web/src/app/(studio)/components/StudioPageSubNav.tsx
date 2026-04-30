@@ -25,7 +25,7 @@ const PAGE_SUB_NAV_ITEMS = [
 const PHASE_SUB_NAV_ITEMS = [
   { label: "Übersicht",    href: "/studio/share",              exact: true,  requiresPhase: false },
   { label: "Alle Phasen",  href: "/studio/share/phases",                    requiresPhase: false },
-  { label: "Distribution", href: "/studio/share/distribution",               requiresPhase: true  },
+  { label: "Links verteilen", href: "/studio/share/distribution",             requiresPhase: true  },
   { label: "QR & Offline", href: "/studio/share/qr",                         requiresPhase: true  },
   { label: "Performance",  href: "/studio/share/performance",                requiresPhase: true  },
 ] as const;

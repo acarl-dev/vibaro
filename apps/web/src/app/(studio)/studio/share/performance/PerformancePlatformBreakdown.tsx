@@ -35,7 +35,7 @@ export default function PerformancePlatformBreakdown({
           content={{
             title: "Plattform-Verteilung",
             what: "Hier siehst du, welche Plattform wie viele Klicks auf deine Seite gebracht hat.",
-            why: "Das zeigt dir, wo deine Fans wirklich aktiv sind. Wenn Instagram 70 % deiner Klicks bringt, solltest du dort aktiver posten. Wenn eine Plattform kaum Klicks bringt, lohnt sich der Aufwand dort vielleicht nicht.",
+            why: "Das zeigt dir, wo deine Fans für diese Phase wirklich aktiv sind. Wenn Instagram 70 % deiner Klicks bringt, solltest du dort gezielter bewerben. Wenn eine Plattform kaum Klicks bringt, lohnt sich der Aufwand dort vielleicht nicht.",
             example: "Instagram Story: 45 Klicks (70 %)\nYouTube: 12 Klicks (19 %)\nNewsletter: 7 Klicks (11 %)\n\n→ Du weißt jetzt: Instagram ist dein wichtigster Kanal.",
             tip: "Vergleiche die Plattform-Verteilung über mehrere Phasen. So siehst du, ob sich deine Strategie verändert.",
           }}
@@ -97,7 +97,7 @@ export default function PerformancePlatformBreakdown({
         href="/studio/share/distribution"
         className="studio-btn studio-btn-primary mt-4 inline-flex"
       >
-        Links erstellen →
+        Links verteilen →
       </a>
     </div>
   );

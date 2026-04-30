@@ -37,7 +37,7 @@ export default function BandNameStep({
       <div className="w-full max-w-md space-y-10">
         <StepHeader
           title="Wie heißt eure Band?"
-          description="Gebt euren Bandnamen ein – eure Webadresse wird automatisch erstellt."
+          description="Vibaro erstellt eure Bandseite. Danach legt ihr euren aktuellen Fokus fest und seht später, welche Kanäle für euren Push funktionieren."
         />
 
         <form onSubmit={onSubmit} className="space-y-6">
