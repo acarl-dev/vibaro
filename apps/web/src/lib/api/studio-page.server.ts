@@ -1,5 +1,5 @@
 import { backendFetch } from "@/lib/api/backend";
-import type { SpotlightData as Spotlight } from "@/lib/api/spotlights";
+import { fetchActiveSpotlight } from "@/lib/api/studio-phase.server";
 
 export type ArtistPage = {
   id: number;
@@ -231,24 +231,7 @@ export async function fetchStudioGalleryImages(): Promise<GalleryImage[]> {
     return [];
   }
 }
-
-// TODO (P2+): belongs to Phase/Links/Analytics layer
-export async function fetchActiveSpotlight(): Promise<Spotlight | null> {
-  try {
-    const res = await backendFetch("/api/v1/spotlights", { cache: "no-store" });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const spotlights = json?.data ?? [];
-    const active = Array.isArray(spotlights)
-      ? spotlights.find((s: { status: string }) => s.status === "active")
-      : null;
-    return active ?? null;
-  } catch {
-    return null;
-  }
-}
-
-// TODO (P2+): belongs to Phase/Links/Analytics layer
+// Composition: orchestrates Website and Phase server data for the studio page entry.
 export async function fetchStudioPageServerData() {
   const [page, activeSpotlight] = await Promise.all([
     fetchArtistPage(),
