@@ -19,6 +19,37 @@ Zulaessige Kernel:
 - Analytics
 - Shared/Foundation
 
+## Konsolidierungsstand 2026-04-30
+
+### P1 abgeschlossen
+
+- Legacy Redirects abgeschlossen
+- UI-Terminologie auf Phase ausgerichtet
+- `results` als kanonische Route/Begriff abgeschlossen
+
+### P2 abgeschlossen
+
+- `apps/web/src/lib/api/studio-page.server.ts` konsolidiert
+- `apps/web/src/lib/api/studio-phase.server.ts` konsolidiert
+- `apps/web/src/lib/api/studio-share.server.ts` konsolidiert
+- `PhaseOverviewClient` in praesentationale Teilkomponenten zerlegt
+- `ShareClient` in praesentationale Teilkomponenten zerlegt
+- `PerformanceClient` in praesentationale Teilkomponenten zerlegt
+
+### Bewusst offene Punkte
+
+- `apps/web/src/lib/api/studio-share.server.ts` enthaelt weiter Composition und markierte Domain-Leaks
+- serverseitig werden `pageUrl` und `totalPageviews` teils noch berechnet, obwohl aktuelle Clients sie nicht mehr nutzen
+- `Spotlight` bleibt technischer Backend-Begriff
+- `Campaign` bleibt internes Modell im Links-Kern
+
+### Nicht mehr Teil von P2
+
+- Header-KPI-Block in `PerformanceClient` wird nicht weiter extrahiert
+- keine DB-Migrationen im Rahmen von P2
+- keine API-Endpunkt-Aenderungen im Rahmen von P2
+- keine Model-Umbenennungen oder Model-Refactors im Rahmen von P2
+
 ## Backend
 
 ### Models
