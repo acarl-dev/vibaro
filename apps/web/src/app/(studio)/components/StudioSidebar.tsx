@@ -20,19 +20,19 @@ const NAV_ITEMS = [
   { label: "DASHBOARD",   sublabel: "Übersicht",        href: "/studio",          icon: LayoutGrid, exact: true  },
   { label: "MEINE SEITE", sublabel: "Seite bearbeiten", href: "/studio/page",     icon: FilePen,    exact: false },
   { label: "PHASE",       sublabel: "Phasen & Links", href: "/studio/share",    icon: Megaphone,  exact: false },
-  { label: "ANALYSE",     sublabel: "Stats & Auswertung", href: "/studio/results", icon: TrendingUp, exact: false },
+  { label: "ANALYSE",     sublabel: "Performance & Trends", href: "/studio/results", icon: TrendingUp, exact: false },
 ] as const;
 
 const PAGE_SUB_NAV = [
   { label: "Übersicht", href: "/studio/page" },
-  { label: "Themes",    href: "/studio/page/appearance" },
+  { label: "Design",    href: "/studio/page/appearance" },
   { label: "Profil",    href: "/studio/page/profile" },
   { label: "Links",     href: "/studio/page/links" },
-  { label: "Music",     href: "/studio/page/music" },
-  { label: "Shows",     href: "/studio/page/shows" },
-  { label: "Releases",  href: "/studio/page/releases" },
+  { label: "Musik",     href: "/studio/page/music" },
+  { label: "Konzerte",  href: "/studio/page/shows" },
+  { label: "Veröffentlichungen", href: "/studio/page/releases" },
   { label: "Videos",    href: "/studio/page/videos" },
-  { label: "Gallery",   href: "/studio/page/gallery" },
+  { label: "Galerie",   href: "/studio/page/gallery" },
   { label: "Kontakt",   href: "/studio/page/contact" },
 ] as const;
 

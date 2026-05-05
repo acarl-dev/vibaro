@@ -49,7 +49,7 @@ export default function QuickActions({ hasActivePhase, pageHandle }: QuickAction
       ]
     : [
         { label: "Phase starten", sub: "Setze einen klaren Fokus für Release, Live, Merch oder Studio.", href: "/studio/share/new" },
-        { label: "Seite ausbauen", sub: "Füge Musik, Videos, Fotos, Shows oder Kontaktmöglichkeiten hinzu.", href: "/studio/page" },
+      { label: "Seite ausbauen", sub: "Füge Musik, Videos, Fotos, Konzerte oder Kontaktmöglichkeiten hinzu.", href: "/studio/page" },
         previewUrl
           ? { label: "Vorschau prüfen", sub: "Sieh deine öffentliche Band-Seite so, wie Besucher sie sehen.", href: previewUrl, external: true }
           : { label: "Seite bearbeiten", sub: "Passe Inhalte, Layout und Links deiner Band-Seite an.", href: "/studio/page" },

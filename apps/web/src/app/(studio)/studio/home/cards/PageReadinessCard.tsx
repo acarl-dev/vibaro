@@ -17,7 +17,7 @@ const SECTION_CARDS = [
   { icon: "🎥", label: "Videos", desc: "Clips, Musikvideos oder Studio-Material", href: "/studio/page/videos" },
   { icon: "💿", label: "Diskografie", desc: "Releases, EPs oder Alben", href: "/studio/page/releases" },
   { icon: "📷", label: "Fotos", desc: "Visueller Eindruck deiner Band", href: "/studio/page/gallery" },
-  { icon: "🎤", label: "Shows", desc: "Kommende Termine oder Tourdaten", href: "/studio/page/shows" },
+  { icon: "🎤", label: "Konzerte", desc: "Kommende Termine oder Tourdaten", href: "/studio/page/shows" },
   { icon: "📩", label: "Kontakt", desc: "Booking, Presse oder direkte Anfragen", href: "/studio/page/contact" },
 ];
 
