@@ -7,6 +7,8 @@ type ShareDistributionLinkActionProps = {
   existingLink: TrackingLinkData | null;
   isCreating: boolean;
   copyHint: string;
+  createDisabled?: boolean;
+  createDisabledReason?: string;
   onCopy: (url: string) => void;
   onCreate: () => void;
 };
@@ -17,6 +19,8 @@ export default function ShareDistributionLinkAction({
   existingLink,
   isCreating,
   copyHint,
+  createDisabled = false,
+  createDisabledReason,
   onCopy,
   onCreate,
 }: ShareDistributionLinkActionProps) {
@@ -91,9 +95,14 @@ export default function ShareDistributionLinkAction({
           <p className="text-sm" style={{ color: "var(--studio-text-secondary)" }}>
             Dieser Link existiert noch nicht. Erstelle ihn jetzt.
           </p>
+          {createDisabledReason && (
+            <p className="text-xs" style={{ color: "var(--studio-text-secondary)" }}>
+              {createDisabledReason}
+            </p>
+          )}
           <button
             onClick={onCreate}
-            disabled={isCreating}
+            disabled={isCreating || createDisabled}
             className="studio-btn studio-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreating ? (

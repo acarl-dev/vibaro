@@ -156,8 +156,16 @@ export default function EditSpotlightModal({
       return;
     }
 
+    const normalizedPrimaryUrl = formData.primary_url?.trim()
+      ? formData.primary_url.trim()
+      : null;
+    const payload: UpdateSpotlightRequest = {
+      ...formData,
+      primary_url: normalizedPrimaryUrl,
+    };
+
     setLoading(true);
-    const result = await updateSpotlight(spotlight.id, formData);
+    const result = await updateSpotlight(spotlight.id, payload);
 
     if (result.success) {
       const spotlights = await fetchSpotlights();
@@ -264,9 +272,9 @@ export default function EditSpotlightModal({
                 </Question>
                 <input
                   type="url"
-                  value={formData.primary_url === "https://vibaro.app" ? "" : (formData.primary_url || "")}
+                  value={formData.primary_url || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, primary_url: e.target.value || "https://vibaro.app" })
+                    setFormData({ ...formData, primary_url: e.target.value === "" ? null : e.target.value })
                   }
                   placeholder={linkPlaceholder(currentType)}
                   className="studio-input w-full px-3 py-2.5 text-sm"

@@ -33,6 +33,7 @@ export type ShareQRServerData = {
   phaseTitle: string | null;
   totalClicks: number;
   pageUrl: string | null;
+  isPagePublished: boolean;
   shouldRedirect: boolean;
 };
 
@@ -197,6 +198,7 @@ export async function fetchShareQRServerData(): Promise<ShareQRServerData> {
     ]);
 
     const handle = homeData?.page?.handle ?? null;
+    const isPagePublished = Boolean(homeData?.page?.is_published);
     let phaseTitle: string | null = null;
     let totalClicks = 0;
 
@@ -221,14 +223,15 @@ export async function fetchShareQRServerData(): Promise<ShareQRServerData> {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const pageUrl = handle ? `${appUrl}/p/${handle}` : null;
+    const pageUrl = handle && isPagePublished ? `${appUrl}/p/${handle}` : null;
 
     return {
       handle,
       phaseTitle,
       totalClicks,
       pageUrl,
-      shouldRedirect: !pageUrl,
+      isPagePublished,
+      shouldRedirect: !handle,
     };
   } catch {
     return {
@@ -236,6 +239,7 @@ export async function fetchShareQRServerData(): Promise<ShareQRServerData> {
       phaseTitle: null,
       totalClicks: 0,
       pageUrl: null,
+      isPagePublished: false,
       shouldRedirect: true,
     };
   }

@@ -1,5 +1,5 @@
-import ModulesClient from "./ModulesClient";
+import { redirect } from "next/navigation";
 
 export default function ProjectPage() {
-  return <ModulesClient />;
+  redirect("/studio/share/phases");
 }

@@ -200,7 +200,8 @@ export function OnboardingClient() {
     const bio = `${displayName.trim()} verbindet rohe Energie mit klaren Hooks.
 Entstanden aus der Szene, geprägt von Live-Momenten und neuen Ideen, entwickelt sich ihr Sound stetig weiter.`;
     const params = deriveSpotlightParams(phase, rk, lk, pt, pl);
-    const primaryUrl = url.trim() || "https://vibaro.app";
+    const trimmedUrl = url.trim();
+    const primaryUrl = trimmedUrl.length > 0 ? trimmedUrl : null;
 
     // Pre-populate preview state so it's available immediately when step changes
     setPreviewBio(bio);

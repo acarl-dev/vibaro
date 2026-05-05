@@ -13,6 +13,7 @@ import { useToast } from "@/context/ToastContext";
 import StudioPageHeader from "../../components/StudioPageHeader";
 import ExplainPanel from "../../components/ExplainPanel";
 import WhyButton from "../../components/WhyButton";
+import StudioNotice from "../../components/StudioNotice";
 import ShareDistributionQRHint from "./ShareDistributionQRHint";
 import ShareDistributionEmptyState from "./ShareDistributionEmptyState";
 import ShareDistributionLinksList from "./ShareDistributionLinksList";
@@ -37,6 +38,7 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [copyHint, setCopyHint] = useState<string>("");
   const [allLinks, setAllLinks] = useState<TrackingLinkData[]>([]);
+  const hasPrimaryUrl = Boolean(activeSpotlight?.primary_url?.trim());
 
   useEffect(() => {
     loadLinks();
@@ -92,6 +94,10 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
 
   const handleCreate = async () => {
     if (!activeSpotlight || !selectedPlatform || !selectedPlacement) return;
+    if (!hasPrimaryUrl) {
+      showToast("Diese Phase hat noch keinen Ziel-Link. Füge einen Link hinzu, bevor du Tracking-Links erstellst.", "error");
+      return;
+    }
 
     setIsCreating(true);
     try {
@@ -99,7 +105,7 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
         spotlight_id: activeSpotlight.id,
         platform: selectedPlatform.id,
         placement: selectedPlacement.id,
-        target_url: activeSpotlight.primary_url || "https://vibaro.com",
+        target_url: activeSpotlight.primary_url!,
       });
 
       if (result.success && result.data) {
@@ -181,6 +187,12 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
       <div className="space-y-8">
         <ShareDistributionQRHint />
 
+        {!hasPrimaryUrl && (
+          <StudioNotice type="warning">
+            Diese Phase hat noch keinen Ziel-Link. Füge einen Link hinzu, bevor du Tracking-Links erstellst.
+          </StudioNotice>
+        )}
+
         <ShareDistributionSelection
           selectedPlatform={selectedPlatform}
           selectedPlacement={selectedPlacement}
@@ -195,6 +207,8 @@ export default function ShareClient({ activeSpotlight }: ShareClientProps) {
             existingLink={existingLink}
             isCreating={isCreating}
             copyHint={copyHint}
+            createDisabled={!hasPrimaryUrl}
+            createDisabledReason={!hasPrimaryUrl ? "Lege zuerst einen Ziel-Link in deiner Phase fest." : undefined}
             onCopy={handleCopy}
             onCreate={handleCreate}
           />

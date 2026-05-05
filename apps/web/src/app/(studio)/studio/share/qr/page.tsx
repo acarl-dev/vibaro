@@ -1,14 +1,16 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { fetchShareQRServerData } from "@/lib/api/studio-share.server";
 import StudioPageHeader from "../../../components/StudioPageHeader";
 import StudioQRCode from "../../../components/StudioQRCode";
 import StudioEmptyState from "../../../components/StudioEmptyState";
+import StudioButton from "../../../components/StudioButton";
 import { Megaphone } from "../../../components/StudioIcons";
 import ExplainPanel from "../../../components/ExplainPanel";
 import WhyButton from "../../../components/WhyButton";
 
 export default async function QRPage() {
-  const { handle, phaseTitle, totalClicks, pageUrl, shouldRedirect } = await fetchShareQRServerData();
+  const { handle, phaseTitle, totalClicks, pageUrl, isPagePublished, shouldRedirect } = await fetchShareQRServerData();
 
   // Guard: requires a published band page URL for QR generation
   if (shouldRedirect) redirect("/studio/share");
@@ -19,8 +21,19 @@ export default async function QRPage() {
         <StudioPageHeader title="QR & OFFLINE" subtitle="Dieser QR-Code führt dauerhaft zu deiner öffentlichen Bandseite." />
         <StudioEmptyState
           icon={Megaphone}
-          title="Keine Seite gefunden"
-          description="Deine Seite muss veröffentlicht sein, um einen QR-Code zu generieren."
+          title={isPagePublished ? "Keine Seite gefunden" : "Bandseite nicht veröffentlicht"}
+          description={
+            isPagePublished
+              ? "Deine Seite muss veröffentlicht sein, um einen QR-Code zu generieren."
+              : "Veröffentliche deine Bandseite, bevor du den QR-Code teilst."
+          }
+          action={
+            !isPagePublished ? (
+              <Link href="/studio/page">
+                <StudioButton>Zur Seite</StudioButton>
+              </Link>
+            ) : undefined
+          }
         />
       </div>
     );

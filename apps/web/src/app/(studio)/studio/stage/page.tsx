@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
 export default function StagePage() {
-  // Legacy route: old stage naming now routes to the phase management entry.
-  redirect("/studio/project");
+  // Legacy route: route to canonical phase overview.
+  redirect("/studio/share/phases");
 }

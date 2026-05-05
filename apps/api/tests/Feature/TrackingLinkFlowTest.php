@@ -155,6 +155,23 @@ class TrackingLinkFlowTest extends TestCase
         }
     }
 
+    public function test_store_rejects_missing_target_url(): void
+    {
+        [$user, $page] = $this->createUserWithArtistPage('missing-url-owner');
+        $spotlight = $this->createSpotlight($page, 'Missing URL Spotlight');
+
+        Sanctum::actingAs($user);
+
+        foreach ([null, '', '   '] as $targetUrl) {
+            $this->postJson('/api/v1/tracking-links', [
+                'spotlight_id' => $spotlight->id,
+                'platform' => 'instagram',
+                'placement' => 'story',
+                'target_url' => $targetUrl,
+            ])->assertStatus(422);
+        }
+    }
+
     private function createUserWithArtistPage(string $handle): array
     {
         $user = User::factory()->create();
