@@ -188,7 +188,6 @@ Zulaessige Kernel:
 | Datei | Aktueller Kernel | Ziel-Kernel | Konflikt | Begruendung | Massnahme |
 |---|---|---|---|---|---|
 | apps/web/src/app/(studio)/studio/page.tsx | Shared/Foundation | Shared/Foundation | Ja: doppelte Logik | Parallelstruktur zu studio/home und studio/page/* | Pruefen |
-| apps/web/src/app/(studio)/studio/OverviewClient.tsx | Shared/Foundation | Shared/Foundation | Ja: doppelte Logik | Ueberblickslogik ueberschneidet Home und andere Dashboards | Pruefen |
 | apps/web/src/app/(studio)/studio/home/HomeClient.tsx | Shared/Foundation | Shared/Foundation | Nein | Dashboard-Composition im Shared/Foundation Layer (UI-Aggregation) | Behalten |
 | apps/web/src/app/(studio)/studio/home/cards/QuickActions.tsx | Shared/Foundation | Shared/Foundation | Nein | Navigation/Action Shell | Behalten |
 | apps/web/src/app/(studio)/studio/home/cards/TrafficSnapshot.tsx | Analytics | Analytics | Nein | Analytics-KPI Card | Behalten |
@@ -391,7 +390,6 @@ Zulaessige Kernel:
 - apps/api/app/Services/StudioHomeService.php
 - apps/api/app/Services/LinkService.php
 - apps/web/src/app/(studio)/studio/page.tsx
-- apps/web/src/app/(studio)/studio/OverviewClient.tsx
 - apps/web/src/app/(studio)/studio/links/page.tsx
 - apps/web/src/app/(studio)/studio/links/LinksClient.tsx
 - apps/web/src/app/(studio)/studio/share/page.tsx
