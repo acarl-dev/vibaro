@@ -6,7 +6,6 @@ import {
   Mic,
   Disc,
   ShoppingBag,
-  BarChart2,
   Headphones,
   ChevronRight,
 } from "../../components/StudioIcons";
@@ -82,24 +81,6 @@ const MODULES: ModuleDef[] = [
     accentVar: "--mod-merch",
   },
   {
-    id: "campaign",
-    icon: BarChart2,
-    emoji: "📣",
-    label: "PHASE",
-    tagline: "Distribution strukturieren",
-    description: "Tracke, woher dein Traffic kommt und welche Phase am besten performt.",
-    features: [
-      "Plattform-Links je Platzierung (Story, Bio, Ads)",
-      "Tracking pro Plattform",
-      "Vergleich Phase A vs B",
-      "Traffic-Quelle Übersicht",
-    ],
-    effect: "Für Bands, die ihre Releases strukturiert in Phasen pushen wollen.",
-    status: "available",
-    href: "/studio/project",
-    accentVar: "--mod-campaign",
-  },
-  {
     id: "studio",
     icon: Headphones,
     emoji: "🎧",
@@ -123,7 +104,6 @@ const MODULE_HUES: Record<string, string> = {
   "--mod-live":     "142",  // green
   "--mod-release":  "265",  // purple
   "--mod-merch":    "28",   // orange
-  "--mod-campaign": "210",  // blue  (matches existing studio accent family)
   "--mod-studio":   "240",  // indigo
 };
 

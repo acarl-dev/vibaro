@@ -778,7 +778,12 @@ Response:
 
 ---
 
-## Campaigns (Stage Pro)
+## Campaigns
+
+> **Status:** Technisch vorhanden (Backend, Routen, Modell, `campaign_id`-FK in `tracking_links` und Analytics).
+> Wird in der UI nicht exponiert — kein Campaign-Einstiegspunkt im Studio.
+> Das frühere „Stage Pro"-Tier-Konzept existiert nicht mehr; Vibaro hat ein einheitliches Preismodell.
+> Campaign-Endpunkte sind für eine spätere Aktivierung vorbereitet, aber derzeit ohne Produkt-Kontext.
 
 ### GET /campaigns
 
@@ -862,7 +867,7 @@ Response:
 
 ---
 
-## Tracking Links (Stage + Pro)
+## Tracking Links
 
 ### GET /tracking-links
 
@@ -1059,7 +1064,7 @@ Response:
 
 ---
 
-## Public Tracking Redirect (Stage + Pro)
+## Public Tracking Redirect
 
 ### GET /t/{short_code}
 
@@ -1094,7 +1099,7 @@ Public endpoint. Server-side tracking + 302 redirect to target_url.
 
 ---
 
-## Analytics (Stage + Pro)
+## Analytics
 
 ### GET /analytics/overview
 
@@ -1342,7 +1347,9 @@ Rules:
 
 ---
 
-## Export (Stage Pro)
+## Export
+
+> **Status:** Noch nicht implementiert. Abhängig von Campaign-Aktivierung (siehe Campaigns-Abschnitt).
 
 ### GET /exports/campaigns/{id}.csv
 
