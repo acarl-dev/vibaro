@@ -1,9 +1,30 @@
 import type { NextConfig } from "next";
 
+function getApiStorageRemotePattern() {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!apiBaseUrl) {
+    return null;
+  }
+
+  try {
+    const patternUrl = new URL(apiBaseUrl);
+    patternUrl.pathname = "/storage/**";
+    patternUrl.search = "";
+    patternUrl.hash = "";
+
+    return patternUrl;
+  } catch {
+    return null;
+  }
+}
+
+const apiStorageRemotePattern = getApiStorageRemotePattern();
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
+      ...(apiStorageRemotePattern ? [apiStorageRemotePattern] : []),
       {
         protocol: "http",
         hostname: "127.0.0.1",

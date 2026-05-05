@@ -68,8 +68,8 @@ export default function PageOverviewClient({ page, activeSpotlight }: Props) {
 
   // Relative path so the iframe works in any environment (local, staging, prod)
   const previewPath = `/p/${page.handle}`;
-  // Full URL for the external "Öffnen" link
-  const externalUrl = `${process.env.NEXT_PUBLIC_WEB_URL || "https://vibaro.app"}/p/${page.handle}`;
+  // Full URL for the external "Öffnen" link (canonical APP_URL, legacy WEB_URL fallback)
+  const externalUrl = `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_WEB_URL || "https://vibaro.app"}/p/${page.handle}`;
 
   const handlePublish = async () => {
     setIsPublishing(true);

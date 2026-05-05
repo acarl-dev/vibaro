@@ -1,4 +1,3 @@
-cat << 'EOF' > .gitignore
 # OS
 .DS_Store
 
@@ -12,6 +11,8 @@ dist/
 # Env
 .env
 .env.*
+!.env.example
+!**/.env.example
 
 # Laravel
 /apps/api/vendor/
@@ -30,4 +31,3 @@ dist/
  
 # Windows alternate data stream metadata (Explorer)
 *Zone.Identifier*
-EOF
