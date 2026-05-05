@@ -343,16 +343,16 @@ class StudioHomeService
             ];
         }
 
-        // Priority 2: No project
+        // Priority 2: No phase
         if (!$spotlight) {
             return [
                 'type' => 'spotlight',
-                'message' => 'Starte ein Projekt, um Links zu erstellen und zu sehen wie es läuft.',
-                'action' => '/studio/project',
+                'message' => 'Starte eine Phase, um Links zu erstellen und zu sehen wie es läuft.',
+                'action' => '/studio/share/new',
             ];
         }
 
-        // Priority 3: Project, but no links
+        // Priority 3: Phase active, but no links
         if (empty($topLinks)) {
             return [
                 'type' => 'links',
