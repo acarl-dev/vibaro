@@ -562,10 +562,10 @@ Creates a new spotlight.
 
 **Field validation:**
 - `title`: required, string, max 255 chars
-- `type`: required, one of: `single`, `album`, `tour`, `event`, `video`, `merch`, `livestream`, `collab`
+- `type`: required, one of: `single`, `album`, `tour`, `event`, `video`, `merch`, `livestream`, `collab`, `studio`, `focus`
 - `starts_at`: optional, date
 - `ends_at`: optional, date (must be after `starts_at`)
-- `primary_url`: required, URL, max 1000 chars
+- `primary_url`: optional, URL or null, max 1000 chars — not required for focus/studio phases; CTA and distribution links are omitted when absent
 - `description`: optional, string, max 1000 chars
 - `show_on_page`: optional, boolean (default: true)
 - `subtitle`: optional, string, max 500 chars

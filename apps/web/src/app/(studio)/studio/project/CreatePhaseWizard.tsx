@@ -58,7 +58,7 @@ function buildRequest(
   isLimited: boolean,
   activate: boolean,
 ): CreateSpotlightRequest {
-  const url = link.trim() || "https://vibaro.app";
+  const url = link.trim() || null;
 
   if (category === "release") {
     const kindMap: Record<ReleaseKind, SpotlightType> = { single: "single", album: "album", video: "video" };

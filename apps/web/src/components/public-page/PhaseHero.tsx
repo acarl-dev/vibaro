@@ -242,7 +242,7 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
         </div>
 
         {/* ── VIDEO: massive play icon (the primary CTA, no button) ── */}
-        {isVideo && (
+        {isVideo && spotlight.primary_url && (
           <a
             href={spotlight.primary_url}
             target="_blank"
@@ -308,7 +308,7 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
         <PhaseMetaInfo type={phaseType} meta={meta} />
 
         {/* ── Primary CTA — Video skips this (hero = CTA) ── */}
-        {!isVideo && (
+        {!isVideo && spotlight.primary_url && (
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-3">
             <a
               href={spotlight.primary_url}
@@ -354,7 +354,7 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
         )}
 
         {/* Video: subtle text-link CTA below icon */}
-        {isVideo && (
+        {isVideo && spotlight.primary_url && (
           <a
             href={spotlight.primary_url}
             target="_blank"

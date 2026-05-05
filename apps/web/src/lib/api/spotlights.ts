@@ -14,7 +14,7 @@ export type SpotlightData = {
   status: SpotlightStatus;
   starts_at: string | null;
   ends_at: string | null;
-  primary_url: string;
+  primary_url: string | null;
   cover_image_url: string | null;
   artist_name: string | null;
   platform_name: string | null;
@@ -44,7 +44,7 @@ export type CreateSpotlightRequest = {
   type: SpotlightType;
   starts_at?: string | null;
   ends_at?: string | null;
-  primary_url: string;
+  primary_url?: string | null;
   cover_image_url?: string | null;
   artist_name?: string | null;
   platform_name?: string | null;

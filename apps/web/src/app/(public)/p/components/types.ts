@@ -60,7 +60,7 @@ export type GalleryImageItem = {
 export type SpotlightItem = {
   title: string;
   type: string;
-  primary_url: string;
+  primary_url?: string | null;
   cover_image_url?: string | null;
   subtitle?: string | null;
   description?: string | null;

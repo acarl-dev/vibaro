@@ -75,7 +75,7 @@ export default function CreateSpotlightForm({
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    const url = formData.primary_url.trim();
+    const url = (formData.primary_url ?? "").trim();
     if (!url || !url.startsWith("http")) {
       setMetadata(null);
       return;
@@ -112,8 +112,8 @@ export default function CreateSpotlightForm({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.primary_url.trim()) {
-      showToast("Bitte Titel und Link ausfüllen", "error");
+    if (!formData.title.trim()) {
+      showToast("Bitte einen Titel eingeben", "error");
       return;
     }
 
@@ -138,18 +138,17 @@ export default function CreateSpotlightForm({
         {/* Primary URL — first so metadata loads before user fills title */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Link <span className="text-red-500">*</span>
+            Link <span className="text-xs font-normal" style={{ color: "var(--studio-text-secondary)" }}>(optional)</span>
           </label>
           <div className="relative">
             <input
               type="url"
-              value={formData.primary_url}
+              value={formData.primary_url ?? ""}
               onChange={(e) =>
-                setFormData({ ...formData, primary_url: e.target.value })
+                setFormData({ ...formData, primary_url: e.target.value || null })
               }
               placeholder="https://open.spotify.com/track/... oder YouTube-Link"
               className="studio-input w-full px-3 py-2 text-sm pr-9"
-              required
             />
             {metaLoading && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2">
