@@ -149,9 +149,13 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
   // Background: explicit bg overrides > blurred cover > solid dark
   const bgImage = spotlight.background_image_url || spotlight.cover_image_url;
   const useCoverBlur = !spotlight.background_image_url && !!spotlight.cover_image_url;
+  const hasImageBackdrop = !!bgImage;
 
   return (
-    <section className="relative w-full overflow-hidden" aria-label={`Phase: ${spotlight.title}`}>
+    <section
+      className="relative w-full overflow-hidden bg-page"
+      aria-label={`Phase: ${spotlight.title}`}
+    >
 
       {/* ══════════════════════
           LAYER 1 · Background
@@ -173,10 +177,15 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
             }}
           />
         ) : (
-          <div className="absolute inset-0" style={{ background: "rgb(8, 8, 10)" }} />
+          <div className="absolute inset-0" style={{ background: "rgb(var(--bg-page))" }} />
         )}
         {/* Hard dark wash so background never competes */}
-        <div className="absolute inset-0" style={{ background: isVideo ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.72)" }} />
+        {hasImageBackdrop && (
+          <div
+            className="absolute inset-0"
+            style={{ background: isVideo ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.72)" }}
+          />
+        )}
       </div>
 
       {/* ══════════════════════════════════
@@ -191,10 +200,12 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
       />
 
       {/* Top-to-bottom vignette — directs eye to content */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 25%, transparent 72%, rgba(0,0,0,0.55) 100%)" }}
-      />
+      {hasImageBackdrop && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 25%, transparent 72%, rgba(0,0,0,0.55) 100%)" }}
+        />
+      )}
 
       {/* Accent hairline top */}
       <div
@@ -208,7 +219,7 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
       />
 
       {/* Video-only: edge vignette for cinematic crop */}
-      {isVideo && (
+      {isVideo && hasImageBackdrop && (
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: "radial-gradient(ellipse 90% 80% at 50% 50%, transparent 35%, rgba(0,0,0,0.65) 100%)" }}
