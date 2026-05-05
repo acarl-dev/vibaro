@@ -501,7 +501,7 @@ function HelpHubDrawer({ onClose }: { onClose: () => void }) {
                 <span style={{ fontSize: "16px", flexShrink: 0 }}>🎯</span>
                 <p style={{ fontSize: "13px", color: "var(--studio-text-primary)", margin: 0, lineHeight: "1.55" }}>
                   <strong>Schritt 1:</strong> Geh zu{" "}
-                  <a href="/studio/share" style={{ color: "var(--studio-accent)", textDecoration: "none" }}>
+                  <a href="/studio/share/new" style={{ color: "var(--studio-accent)", textDecoration: "none" }}>
                     Phase
                   </a>{" "}
                   und starte eine neue Phase für deinen aktuellen Release.

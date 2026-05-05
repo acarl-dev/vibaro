@@ -97,7 +97,7 @@ export default function ResultsClient({
           title="Noch keine Daten"
           description="Sobald du Links teilst und deine Seite live ist, siehst du hier erste Daten."
           action={
-            <a href="/studio/share" className="studio-btn studio-btn-primary">
+            <a href="/studio/share/new" className="studio-btn studio-btn-primary">
               Phase starten →
             </a>
           }
