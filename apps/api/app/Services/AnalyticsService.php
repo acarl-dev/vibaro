@@ -19,19 +19,25 @@ class AnalyticsService
      *
      * Used by AnalyticsController::comparison and StudioHomeService::getPhaseStats.
      */
-    public function getPhaseStats(int $spotlightId): array
+    public function getPhaseStats(int $spotlightId, ?int $artistPageId = null): array
     {
-        $totalClicks = ClickEvent::where('spotlight_id', $spotlightId)
+        $clickQuery = ClickEvent::where('spotlight_id', $spotlightId)
+            ->when($artistPageId, fn ($query) => $query->where('artist_page_id', $artistPageId));
+
+        $pageviewQuery = PageViewEvent::where('spotlight_id', $spotlightId)
+            ->when($artistPageId, fn ($query) => $query->where('artist_page_id', $artistPageId));
+
+        $totalClicks = (clone $clickQuery)
             ->where('is_preview', false)
             ->count();
 
-        $qrClicks = ClickEvent::where('spotlight_id', $spotlightId)
+        $qrClicks = (clone $clickQuery)
             ->where('platform', 'qr')
             ->where('is_preview', false)
             ->count();
 
         $uniqueVisitors = PageViewEvent::countDistinctVisitors(
-            PageViewEvent::where('spotlight_id', $spotlightId)->realViews()
+            (clone $pageviewQuery)->realViews()
         );
 
         $conversion = $uniqueVisitors > 0
@@ -41,7 +47,7 @@ class AnalyticsService
             ? min(100.0, round($totalClicks / $uniqueVisitors * 100, 1))
             : null;
 
-        $topPlatform = ClickEvent::where('spotlight_id', $spotlightId)
+        $topPlatform = (clone $clickQuery)
             ->where('is_preview', false)
             ->where('platform', '!=', 'qr')
             ->whereNotNull('platform')

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\Video;
+use App\Rules\SafeExternalUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 class VideoController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
     /**
      * List all videos for authenticated user's artist page
      */
@@ -42,6 +45,8 @@ class VideoController extends Controller
         $page = $request->user()->artistPage;
         $this->authorize('update', $page);
 
+        $this->normalizeUrlInput($request, ['url']);
+
         // Check limit
         $maxVideos = config('vibaro.limits.max_videos', 8);
         if ($page->videos()->count() >= $maxVideos) {
@@ -51,7 +56,7 @@ class VideoController extends Controller
         try {
             $validated = $request->validate([
                 'title' => ['required', 'string', 'max:255'],
-                'url' => ['required', 'url', 'max:500'],
+                'url' => ['required', 'string', 'max:500', new SafeExternalUrl()],
                 'platform' => ['required', 'in:youtube,vimeo'],
                 'description' => ['nullable', 'string', 'max:1000'],
             ]);
@@ -111,10 +116,12 @@ class VideoController extends Controller
 
         $this->authorize('update', $page);
 
+        $this->normalizeUrlInput($request, ['url']);
+
         try {
             $validated = $request->validate([
                 'title' => ['sometimes', 'string', 'max:255'],
-                'url' => ['sometimes', 'url', 'max:500'],
+                'url' => ['sometimes', 'string', 'max:500', new SafeExternalUrl()],
                 'platform' => ['sometimes', 'in:youtube,vimeo'],
                 'description' => ['nullable', 'string', 'max:1000'],
                 'position' => ['sometimes', 'integer', 'min:0'],

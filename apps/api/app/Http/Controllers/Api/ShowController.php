@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
-use App\Models\Show;
+use App\Rules\SafeExternalUrl;
 use App\Services\ImageProcessingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ use RuntimeException;
 class ShowController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
 
     public function __construct(private readonly ImageProcessingService $imageProcessor) {}
 
@@ -55,12 +57,14 @@ class ShowController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['ticket_url']);
+
         $validated = $request->validate([
             'starts_at' => 'required|date',
             'venue' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
-            'ticket_url' => 'nullable|url|max:2048',
+            'ticket_url' => ['nullable', 'string', 'max:2048', new SafeExternalUrl()],
             'price' => 'nullable|numeric|min:0|max:99999.99',
             'is_free' => 'nullable|boolean',
             'support_acts' => 'nullable|array',
@@ -109,6 +113,8 @@ class ShowController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['ticket_url']);
+
         $show = $artistPage->shows()->findOrFail($showId);
 
         $validated = $request->validate([
@@ -116,7 +122,7 @@ class ShowController extends Controller
             'venue' => 'sometimes|required|string|max:255',
             'city' => 'sometimes|required|string|max:255',
             'address' => 'nullable|string|max:500',
-            'ticket_url' => 'nullable|url|max:2048',
+            'ticket_url' => ['nullable', 'string', 'max:2048', new SafeExternalUrl()],
             'price' => 'nullable|numeric|min:0|max:99999.99',
             'is_free' => 'nullable|boolean',
             'support_acts' => 'nullable|array',

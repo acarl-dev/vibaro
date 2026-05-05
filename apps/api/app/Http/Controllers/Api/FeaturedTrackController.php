@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Models\FeaturedTrack;
+use App\Rules\SafeExternalUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Gate;
 class FeaturedTrackController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
 
     /**
      * GET /artist-pages/{id}/featured-tracks
@@ -43,11 +46,13 @@ class FeaturedTrackController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['platform_url']);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'artist_name' => 'nullable|string|max:255',
             'platform' => 'required|string|in:spotify,youtubemusic,soundcloud',
-            'platform_url' => 'required|url|max:500',
+            'platform_url' => ['required', 'string', 'max:500', new SafeExternalUrl()],
             'embed_id' => 'nullable|string|max:255',
         ]);
 
@@ -84,13 +89,15 @@ class FeaturedTrackController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['platform_url']);
+
         $track = $artistPage->featuredTracks()->findOrFail($trackId);
 
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'artist_name' => 'nullable|string|max:255',
             'platform' => 'sometimes|string|in:spotify,youtubemusic,soundcloud',
-            'platform_url' => 'sometimes|url|max:500',
+            'platform_url' => ['sometimes', 'string', 'max:500', new SafeExternalUrl()],
             'embed_id' => 'nullable|string|max:255',
             'position' => 'sometimes|integer|min:0',
         ]);

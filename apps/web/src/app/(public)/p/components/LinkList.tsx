@@ -1,6 +1,7 @@
 "use client";
 
 import type { LinkItem } from "./types";
+import { safeHref } from "@/lib/safe-href";
 import {
   EmptyLinksState,
 } from "./EmptyStates";
@@ -92,25 +93,49 @@ export function LinkList({ items }: { items: LinkItem[] }) {
   return (
     <div className="flex flex-wrap justify-center" style={{ gap: "clamp(20px, 3vw, 36px)" }}>
       {items.map((link, index) => (
-        <a
-          key={index}
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={link.title}
-          aria-label={link.title}
-          style={{
-            color: "rgba(255,255,255,0.35)",
-            transition: "color 0.2s",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
-        >
-          {getSocialIcon(link.type)}
-        </a>
+        (() => {
+          const href = safeHref(link.url);
+
+          if (!href) {
+            return (
+              <span
+                key={index}
+                title={link.title}
+                aria-label={link.title}
+                style={{
+                  color: "rgba(255,255,255,0.35)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {getSocialIcon(link.type)}
+              </span>
+            );
+          }
+
+          return (
+            <a
+              key={index}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={link.title}
+              aria-label={link.title}
+              style={{
+                color: "rgba(255,255,255,0.35)",
+                transition: "color 0.2s",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
+            >
+              {getSocialIcon(link.type)}
+            </a>
+          );
+        })()
       ))}
     </div>
   );

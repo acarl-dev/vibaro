@@ -1,6 +1,7 @@
 "use client";
 
 import { useLazyLoad } from "../hooks/useLazyLoad";
+import { safeHref } from "@/lib/safe-href";
 
 type FeaturedTrack = {
   title: string;
@@ -134,7 +135,7 @@ export default function MusicPlayer({ tracks }: MusicPlayerProps) {
                   </p>
                 )}
                 <a
-                  href={track.platform_url}
+                  href={safeHref(track.platform_url) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 transition-colors"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SpotlightItem } from "@/app/(public)/p/components/shared";
+import { safeHref } from "@/lib/safe-href";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -139,6 +140,8 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
 
   const { mode, badge, glowRgb } = config;
   const ctaLabel = spotlight.cta_label || config.cta;
+  const primaryHref = safeHref(spotlight.primary_url);
+  const secondaryHref = safeHref(spotlight.secondary_cta_url);
   const isLive = mode === "livestream";
   const isVideo = mode === "video";
   const isAlbum = mode === "album";
@@ -242,9 +245,9 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
         </div>
 
         {/* ── VIDEO: massive play icon (the primary CTA, no button) ── */}
-        {isVideo && spotlight.primary_url && (
+        {isVideo && primaryHref && (
           <a
-            href={spotlight.primary_url}
+            href={primaryHref}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center justify-center mb-8 transition-transform duration-300 hover:scale-105"
@@ -308,10 +311,10 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
         <PhaseMetaInfo type={phaseType} meta={meta} />
 
         {/* ── Primary CTA — Video skips this (hero = CTA) ── */}
-        {!isVideo && spotlight.primary_url && (
+        {!isVideo && primaryHref && (
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-3">
             <a
-              href={spotlight.primary_url}
+              href={primaryHref}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0"
@@ -331,9 +334,9 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
             >
               {ctaLabel}
             </a>
-            {spotlight.secondary_cta_url && spotlight.secondary_cta_label && (
+            {secondaryHref && spotlight.secondary_cta_label && (
               <a
-                href={spotlight.secondary_cta_url}
+                href={secondaryHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 transition-all duration-200 hover:opacity-70"
@@ -354,9 +357,9 @@ export default function PhaseHero({ spotlight }: PhaseHeroProps) {
         )}
 
         {/* Video: subtle text-link CTA below icon */}
-        {isVideo && spotlight.primary_url && (
+        {isVideo && primaryHref && (
           <a
-            href={spotlight.primary_url}
+            href={primaryHref}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 text-xs font-medium uppercase tracking-[0.1em] transition-opacity hover:opacity-60"

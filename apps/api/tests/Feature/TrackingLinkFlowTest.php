@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\ArtistPage;
 use App\Models\Spotlight;
-use App\Models\TrackingLink;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -133,6 +132,27 @@ class TrackingLinkFlowTest extends TestCase
 
         $this->deleteJson("/api/v1/tracking-links/{$linkId}")
             ->assertStatus(403);
+    }
+
+    public function test_store_rejects_unsafe_target_urls(): void
+    {
+        [$user, $page] = $this->createUserWithArtistPage('unsafe-url-owner');
+        $spotlight = $this->createSpotlight($page, 'Unsafe URL Spotlight');
+
+        Sanctum::actingAs($user);
+
+        foreach ([
+            'javascript:alert(1)',
+            'data:text/html,<svg/onload=alert(1)>',
+            '//evil.example.com/path',
+        ] as $unsafeUrl) {
+            $this->postJson('/api/v1/tracking-links', [
+                'spotlight_id' => $spotlight->id,
+                'platform' => 'instagram',
+                'placement' => 'story',
+                'target_url' => $unsafeUrl,
+            ])->assertStatus(422);
+        }
     }
 
     private function createUserWithArtistPage(string $handle): array

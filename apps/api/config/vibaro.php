@@ -27,4 +27,9 @@ return [
         'max_gallery_images' => (int) env('VIBARO_MAX_GALLERY_IMAGES', 16),
     ],
 
+    'security' => [
+        // Keep HTTP disabled in production-like environments unless explicitly enabled.
+        'allow_http_external_urls' => (bool) env('VIBARO_ALLOW_HTTP_EXTERNAL_URLS', false),
+    ],
+
 ];

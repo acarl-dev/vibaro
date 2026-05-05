@@ -1,5 +1,6 @@
 import type { ShowItem } from "./types";
 import { EmptyShowsState } from "./EmptyStates";
+import { safeHref } from "@/lib/safe-href";
 
 // -----------------------------------------------------------------------------
 // ShowList Component
@@ -15,7 +16,10 @@ export function ShowList({ items }: { items: ShowItem[] }) {
 
   return (
     <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-      {items.map((show, index) => (
+      {items.map((show, index) => {
+        const ticketHref = safeHref(show.url);
+
+        return (
         <li
           key={index}
           style={{
@@ -141,9 +145,9 @@ export function ShowList({ items }: { items: ShowItem[] }) {
           )}
 
           {/* Ticket CTA */}
-          {show.url && (
+          {ticketHref && (
             <a
-              href={show.url}
+              href={ticketHref}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -165,7 +169,8 @@ export function ShowList({ items }: { items: ShowItem[] }) {
             </a>
           )}
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }

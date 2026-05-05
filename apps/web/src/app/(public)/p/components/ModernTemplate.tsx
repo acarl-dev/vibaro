@@ -15,6 +15,7 @@ import MusicPlayer from "./MusicPlayer";
 import GallerySlider from "./GallerySlider";
 import { PreviewBanner } from "./PreviewBanner";
 import PhaseHero from "@/components/public-page/PhaseHero";
+import { safeHref } from "@/lib/safe-href";
 
 /**
  * ModernTemplate - Block-based artist page with hierarchical structure
@@ -266,7 +267,7 @@ function FeaturedReleaseHero({ release }: { release: ReleaseItem }) {
       </p>
 
       <a
-        href={release.url ?? "#"}
+        href={safeHref(release.url) ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className="group flex flex-col sm:flex-row gap-8 sm:gap-12 items-center sm:items-start"

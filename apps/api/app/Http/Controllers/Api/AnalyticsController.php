@@ -273,9 +273,20 @@ class AnalyticsController extends Controller
             $country = null;
         }
 
-        // Spotlight: use provided id or resolve active spotlight for this page
-        $spotlightId = $request->input('spotlight_id');
-        if (!$spotlightId) {
+        // Spotlight binding: only keep provided spotlight_id when it belongs
+        // to the resolved artist page. Otherwise force null to prevent cross-page
+        // analytics pollution.
+        $providedSpotlightId = $request->input('spotlight_id');
+        $spotlightId = null;
+
+        if ($providedSpotlightId) {
+            $belongsToPage = Spotlight::query()
+                ->where('id', $providedSpotlightId)
+                ->where('artist_page_id', $artistPage->id)
+                ->exists();
+
+            $spotlightId = $belongsToPage ? (int) $providedSpotlightId : null;
+        } else {
             $active      = $artistPage->spotlights()
                 ->currentlyActive()
                 ->first();
@@ -359,7 +370,7 @@ class AnalyticsController extends Controller
 
         $formatPhase = fn (Spotlight $s) => array_merge(
             ['id' => $s->id, 'title' => $s->title],
-            $service->getPhaseStats($s->id),
+            $service->getPhaseStats($s->id, $artistPage->id),
         );
 
         return $this->success([

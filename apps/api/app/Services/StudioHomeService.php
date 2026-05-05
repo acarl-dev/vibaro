@@ -50,7 +50,7 @@ class StudioHomeService
 
         // 6. Phase stats (all-time for active spotlight)
         if ($spotlight) {
-            $spotlight['phase_stats'] = $this->getPhaseStats($spotlight['id']);
+            $spotlight['phase_stats'] = $this->getPhaseStats($spotlight['id'], $artistPage->id);
         }
 
         // 7. Previous (last ended) spotlight + its metrics
@@ -73,9 +73,9 @@ class StudioHomeService
     /**
      * Get all-time metrics for a spotlight (delegates to shared AnalyticsService).
      */
-    protected function getPhaseStats(int $spotlightId): array
+    protected function getPhaseStats(int $spotlightId, ?int $artistPageId = null): array
     {
-        return $this->analyticsService->getPhaseStats($spotlightId);
+        return $this->analyticsService->getPhaseStats($spotlightId, $artistPageId);
     }
 
     /**
@@ -95,7 +95,7 @@ class StudioHomeService
         return [
             'id'         => $spotlight->id,
             'title'      => $spotlight->title,
-            'phase_stats' => $this->getPhaseStats($spotlight->id),
+            'phase_stats' => $this->getPhaseStats($spotlight->id, $artistPage->id),
         ];
     }
 

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
-use App\Models\Release;
+use App\Rules\SafeExternalUrl;
 use App\Services\ImageProcessingService;
 use App\Services\ReleaseMetadataService;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,7 @@ use RuntimeException;
 class ReleaseController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
 
     public function __construct(
         protected ReleaseMetadataService $metadata,
@@ -54,10 +56,12 @@ class ReleaseController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['url']);
+
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
             'release_date' => 'nullable|date',
-            'url' => 'nullable|url|max:2048',
+            'url' => ['nullable', 'string', 'max:2048', new SafeExternalUrl()],
             'is_featured' => 'nullable|boolean',
         ]);
 
@@ -110,12 +114,14 @@ class ReleaseController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['url']);
+
         $release = $artistPage->releases()->findOrFail($releaseId);
 
         $validated = $request->validate([
             'title' => 'sometimes|nullable|string|max:255',
             'release_date' => 'sometimes|nullable|date',
-            'url' => 'nullable|url|max:2048',
+            'url' => ['nullable', 'string', 'max:2048', new SafeExternalUrl()],
             'is_featured' => 'nullable|boolean',
         ]);
 

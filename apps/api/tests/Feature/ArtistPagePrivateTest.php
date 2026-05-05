@@ -3,8 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\ArtistPage;
+use App\Services\ImageProcessingService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Tests\TestCase;
 
 class ArtistPagePrivateTest extends TestCase
@@ -267,5 +271,119 @@ class ArtistPagePrivateTest extends TestCase
         // Controller returns 404 (not 403) to avoid revealing that the resource
         // exists for another user — intentional enumeration protection (see SECURITY.md).
         $response->assertStatus(404);
+    }
+
+    public function test_generic_update_ignores_avatar_path_changes(): void
+    {
+        $user = User::factory()->create();
+
+        $page = ArtistPage::create([
+            'user_id' => $user->id,
+            'handle' => 'asset-owner',
+            'display_name' => 'Asset Owner',
+            'bio' => null,
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'accent_color' => null,
+            'is_published' => false,
+        ]);
+        $page->avatar_path = 'avatars/' . $user->id . '/old.webp';
+        $page->save();
+
+        $this->actingAs($user, 'sanctum');
+
+        $this->patchJson("/api/v1/artist-pages/{$page->id}", [
+            'display_name' => 'Renamed',
+            'avatar_path' => 'avatars/999/foreign.webp',
+        ])->assertOk();
+
+        $page->refresh();
+
+        $this->assertSame('Renamed', $page->display_name);
+        $this->assertSame('avatars/' . $user->id . '/old.webp', $page->avatar_path);
+    }
+
+    public function test_upload_avatar_does_not_delete_foreign_prefixed_path(): void
+    {
+        Storage::fake('public');
+
+        $owner = User::factory()->create();
+        $victim = User::factory()->create();
+
+        ArtistPage::create([
+            'user_id' => $victim->id,
+            'handle' => 'victim-page',
+            'display_name' => 'Victim',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'is_published' => true,
+        ]);
+
+        $page = ArtistPage::create([
+            'user_id' => $owner->id,
+            'handle' => 'owner-page',
+            'display_name' => 'Owner',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'is_published' => true,
+        ]);
+        $page->avatar_path = 'avatars/999/foreign.webp';
+        $page->save();
+
+        Storage::disk('public')->put('avatars/999/foreign.webp', 'victim-content');
+
+        $mock = Mockery::mock(ImageProcessingService::class);
+        $mock->shouldReceive('process')
+            ->once()
+            ->andReturn([
+                'path' => 'avatars/' . $page->id . '/new-avatar.webp',
+                'contents' => 'new-avatar-content',
+            ]);
+        $this->app->instance(ImageProcessingService::class, $mock);
+
+        $this->actingAs($owner, 'sanctum');
+
+        $this->postJson('/api/v1/artist-pages/upload-avatar', [
+            'avatar' => UploadedFile::fake()->image('avatar.jpg'),
+        ])->assertOk();
+
+        $this->assertTrue(Storage::disk('public')->exists('avatars/999/foreign.webp'));
+        $this->assertTrue(Storage::disk('public')->exists('avatars/' . $page->id . '/new-avatar.webp'));
+
+        $page->refresh();
+        $this->assertSame('avatars/' . $page->id . '/new-avatar.webp', $page->avatar_path);
+    }
+
+    public function test_delete_avatar_does_not_delete_foreign_prefixed_path(): void
+    {
+        Storage::fake('public');
+
+        $owner = User::factory()->create();
+
+        $page = ArtistPage::create([
+            'user_id' => $owner->id,
+            'handle' => 'delete-owner',
+            'display_name' => 'Delete Owner',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'is_published' => true,
+        ]);
+        $page->avatar_path = 'avatars/999/foreign.webp';
+        $page->save();
+
+        Storage::disk('public')->put('avatars/999/foreign.webp', 'victim-content');
+
+        $this->actingAs($owner, 'sanctum');
+
+        $this->deleteJson('/api/v1/artist-pages/delete-avatar')
+            ->assertOk();
+
+        $this->assertTrue(Storage::disk('public')->exists('avatars/999/foreign.webp'));
+        $page->refresh();
+        $this->assertNull($page->avatar_path);
     }
 }

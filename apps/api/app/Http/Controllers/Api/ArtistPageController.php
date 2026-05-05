@@ -86,7 +86,6 @@ class ArtistPageController extends Controller
             $validated = $request->validate([
                 'display_name' => ['sometimes', 'string', 'max:255'],
                 'bio' => ['sometimes', 'nullable', 'string'],
-                'avatar_path' => ['sometimes', 'nullable', 'string'],
                 'theme_key' => ['sometimes', 'string', 'in:modern'],
                 'theme_variant' => ['sometimes', 'string', 'in:auto'],
                 'accent_mode' => ['sometimes', 'string', 'in:auto,manual'],
@@ -237,13 +236,13 @@ class ArtistPageController extends Controller
         }
 
         try {
-            $result = $this->imageProcessor->process($request->file('avatar'), 'avatar', 'avatars');
+            $result = $this->imageProcessor->process($request->file('avatar'), 'avatar', 'avatars/' . $page->id);
         } catch (RuntimeException $e) {
             return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
         }
 
         if ($page->avatar_path) {
-            Storage::disk('public')->delete($page->avatar_path);
+            $this->deletePublicAssetIfOwned($page->avatar_path, 'avatars/' . $page->id . '/');
         }
 
         Storage::disk('public')->put($result['path'], $result['contents']);
@@ -267,13 +266,13 @@ class ArtistPageController extends Controller
         }
 
         try {
-            $result = $this->imageProcessor->process($request->file('hero_image'), 'hero', 'hero-images');
+            $result = $this->imageProcessor->process($request->file('hero_image'), 'hero', 'hero-images/' . $page->id);
         } catch (RuntimeException $e) {
             return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
         }
 
         if ($page->header_path) {
-            Storage::disk('public')->delete($page->header_path);
+            $this->deletePublicAssetIfOwned($page->header_path, 'hero-images/' . $page->id . '/');
         }
 
         Storage::disk('public')->put($result['path'], $result['contents']);
@@ -297,13 +296,13 @@ class ArtistPageController extends Controller
         }
 
         try {
-            $result = $this->imageProcessor->process($request->file('logo'), 'logo', 'logos');
+            $result = $this->imageProcessor->process($request->file('logo'), 'logo', 'logos/' . $page->id);
         } catch (RuntimeException $e) {
             return $this->error('IMAGE_PROCESSING_FAILED', 'Image could not be processed.', 422);
         }
 
         if ($page->logo_path) {
-            Storage::disk('public')->delete($page->logo_path);
+            $this->deletePublicAssetIfOwned($page->logo_path, 'logos/' . $page->id . '/');
         }
 
         Storage::disk('public')->put($result['path'], $result['contents']);
@@ -319,7 +318,7 @@ class ArtistPageController extends Controller
         $this->authorize('update', $page);
 
         if ($page->logo_path) {
-            Storage::disk('public')->delete($page->logo_path);
+            $this->deletePublicAssetIfOwned($page->logo_path, 'logos/' . $page->id . '/');
             $page->logo_path = null;
             $page->save();
         }
@@ -355,7 +354,7 @@ class ArtistPageController extends Controller
 
         // Delete avatar file if exists
         if ($page->avatar_path) {
-            Storage::disk('public')->delete($page->avatar_path);
+            $this->deletePublicAssetIfOwned($page->avatar_path, 'avatars/' . $page->id . '/');
             $page->avatar_path = null;
             $page->save();
         }
@@ -370,7 +369,7 @@ class ArtistPageController extends Controller
 
         // Delete hero image file if exists
         if ($page->header_path) {
-            Storage::disk('public')->delete($page->header_path);
+            $this->deletePublicAssetIfOwned($page->header_path, 'hero-images/' . $page->id . '/');
             $page->header_path = null;
             $page->save();
         }
@@ -433,5 +432,21 @@ class ArtistPageController extends Controller
             'id' => $artistPage->id,
             'visible_sections' => $artistPage->visible_sections,
         ]);
+    }
+
+    private function deletePublicAssetIfOwned(string $path, string $expectedPrefix): void
+    {
+        $normalizedPath = ltrim(trim($path), '/');
+
+        // Defense-in-depth against path traversal and deleting foreign assets.
+        if (
+            $normalizedPath === '' ||
+            str_contains($normalizedPath, '..') ||
+            !str_starts_with($normalizedPath, $expectedPrefix)
+        ) {
+            return;
+        }
+
+        Storage::disk('public')->delete($normalizedPath);
     }
 }

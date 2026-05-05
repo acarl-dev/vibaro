@@ -149,6 +149,69 @@ class AnalyticsOverviewBreakdownTest extends TestCase
             ->assertStatus(404);
     }
 
+    public function test_record_pageview_nulls_foreign_spotlight_id_to_prevent_cross_page_pollution(): void
+    {
+        [, $pageA] = $this->createUserWithArtistPage('page-a-owner');
+        [$userB, $pageB] = $this->createUserWithArtistPage('page-b-owner');
+
+        $spotlightB = $this->createSpotlight($pageB, 'B Spotlight');
+
+        $this->postJson('/api/v1/analytics/pageview', [
+            'handle' => $pageA->handle,
+            'spotlight_id' => $spotlightB->id,
+            'referrer' => 'https://instagram.com/some-profile',
+        ], [
+            'User-Agent' => 'Mozilla/5.0 (Cross Spotlight Test)',
+        ])->assertNoContent();
+
+        $this->assertDatabaseHas('page_view_events', [
+            'artist_page_id' => $pageA->id,
+            'spotlight_id' => null,
+        ]);
+
+        Sanctum::actingAs($userB);
+
+        $this->getJson("/api/v1/analytics/overview?range=7d&spotlight_id={$spotlightB->id}")
+            ->assertOk()
+            ->assertJsonPath('data.total_pageviews', 0);
+    }
+
+    public function test_record_pageview_keeps_own_spotlight_id(): void
+    {
+        [, $page] = $this->createUserWithArtistPage('own-spotlight-owner');
+        $spotlight = $this->createSpotlight($page, 'Own Spotlight');
+
+        $this->postJson('/api/v1/analytics/pageview', [
+            'handle' => $page->handle,
+            'spotlight_id' => $spotlight->id,
+            'referrer' => 'https://instagram.com/some-profile',
+        ], [
+            'User-Agent' => 'Mozilla/5.0 (Own Spotlight Test)',
+        ])->assertNoContent();
+
+        $this->assertDatabaseHas('page_view_events', [
+            'artist_page_id' => $page->id,
+            'spotlight_id' => $spotlight->id,
+        ]);
+    }
+
+    public function test_record_pageview_without_spotlight_id_stores_null_when_no_active_spotlight(): void
+    {
+        [, $page] = $this->createUserWithArtistPage('no-active-spotlight-owner');
+
+        $this->postJson('/api/v1/analytics/pageview', [
+            'handle' => $page->handle,
+            'referrer' => 'https://instagram.com/some-profile',
+        ], [
+            'User-Agent' => 'Mozilla/5.0 (No Spotlight Test)',
+        ])->assertNoContent();
+
+        $this->assertDatabaseHas('page_view_events', [
+            'artist_page_id' => $page->id,
+            'spotlight_id' => null,
+        ]);
+    }
+
     private function createUserWithArtistPage(string $handle): array
     {
         $user = User::factory()->create();

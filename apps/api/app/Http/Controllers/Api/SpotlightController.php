@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SpotlightResource;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\Spotlight;
+use App\Rules\SafeExternalUrl;
 use App\Services\MetadataService;
 use App\Services\SpotlightLifecycleService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 class SpotlightController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
 
     /**
      * Fetch oEmbed metadata from a public URL (Spotify, YouTube, SoundCloud, etc.).
@@ -22,8 +25,10 @@ class SpotlightController extends Controller
      */
     public function fetchMetadata(Request $request, MetadataService $metadataService): JsonResponse
     {
+        $this->normalizeUrlInput($request, ['url']);
+
         $validated = $request->validate([
-            'url' => 'required|url|max:1000',
+            'url' => ['required', 'string', 'max:1000', new SafeExternalUrl()],
         ]);
 
         $meta = $metadataService->fetchFromUrl($validated['url']);
@@ -72,21 +77,28 @@ class SpotlightController extends Controller
     {
         $artistPage = $request->user()->artistPage;
 
+        $this->normalizeUrlInput($request, [
+            'primary_url',
+            'cover_image_url',
+            'secondary_cta_url',
+            'background_image_url',
+        ]);
+
         $validated = $request->validate([
             'title'              => 'required|string|max:255',
             'type'               => 'required|string|in:single,album,tour,event,video,merch,livestream,collab,studio,focus',
             'starts_at'          => 'nullable|date',
             'ends_at'            => 'nullable|date|after:starts_at',
-            'primary_url'        => 'nullable|url|max:1000',
-            'cover_image_url'    => 'nullable|url|max:1000',
+            'primary_url'        => ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
+            'cover_image_url'    => ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
             'artist_name'        => 'nullable|string|max:255',
             'platform_name'      => 'nullable|string|max:100',
             'description'        => 'nullable|string|max:1000',
             'subtitle'           => 'nullable|string|max:500',
             'cta_label'          => 'nullable|string|max:100',
-            'secondary_cta_url'  => 'nullable|url|max:1000',
+            'secondary_cta_url'  => ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
             'secondary_cta_label'=> 'nullable|string|max:100',
-            'background_image_url'=> 'nullable|url|max:1000',
+            'background_image_url'=> ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
             'meta'               => 'nullable|array',
             'show_on_page'       => 'nullable|boolean',
             'activate'           => 'nullable|boolean',
@@ -134,21 +146,28 @@ class SpotlightController extends Controller
 
         Gate::authorize('update', $spotlight);
 
+        $this->normalizeUrlInput($request, [
+            'primary_url',
+            'cover_image_url',
+            'secondary_cta_url',
+            'background_image_url',
+        ]);
+
         $validated = $request->validate([
             'title'              => 'sometimes|string|max:255',
             'type'               => 'sometimes|string|in:single,album,tour,event,video,merch,livestream,collab,studio,focus',
             'starts_at'          => 'nullable|date',
             'ends_at'            => 'nullable|date|after:starts_at',
-            'primary_url'        => 'sometimes|url|max:1000',
-            'cover_image_url'    => 'nullable|url|max:1000',
+            'primary_url'        => ['sometimes', 'nullable', 'string', 'max:1000', new SafeExternalUrl()],
+            'cover_image_url'    => ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
             'artist_name'        => 'nullable|string|max:255',
             'platform_name'      => 'nullable|string|max:100',
             'description'        => 'nullable|string|max:1000',
             'subtitle'           => 'nullable|string|max:500',
             'cta_label'          => 'nullable|string|max:100',
-            'secondary_cta_url'  => 'nullable|url|max:1000',
+            'secondary_cta_url'  => ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
             'secondary_cta_label'=> 'nullable|string|max:100',
-            'background_image_url'=> 'nullable|url|max:1000',
+            'background_image_url'=> ['nullable', 'string', 'max:1000', new SafeExternalUrl()],
             'meta'               => 'nullable|array',
             'show_on_page'       => 'sometimes|boolean',
         ]);

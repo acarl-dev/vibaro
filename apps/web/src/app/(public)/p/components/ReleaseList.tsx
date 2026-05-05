@@ -1,5 +1,6 @@
 import type { ReleaseItem } from "./types";
 import { EmptyReleasesState } from "./EmptyStates";
+import { safeHref } from "@/lib/safe-href";
 
 // -----------------------------------------------------------------------------
 // ReleaseList Component
@@ -10,10 +11,13 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
 
   return (
     <ul className="grid gap-6 grid-cols-2 lg:grid-cols-3">
-      {items.map((release, index) => (
+      {items.map((release, index) => {
+        const releaseHref = safeHref(release.url);
+
+        return (
         <li key={index}>
           <a
-            href={release.url ?? "#"}
+            href={releaseHref ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="group block h-full flex flex-col"
@@ -91,7 +95,8 @@ export function ReleaseList({ items }: { items: ReleaseItem[] }) {
             </div>
           </a>
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }

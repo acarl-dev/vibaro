@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\Platform;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\TrackingLink;
+use App\Rules\SafeExternalUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
@@ -13,6 +15,7 @@ use Illuminate\Validation\Rules\Enum;
 class TrackingLinkController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
 
     /**
      * Get all tracking links for authenticated user's artist page.
@@ -60,11 +63,13 @@ class TrackingLinkController extends Controller
     {
         $artistPage = $request->user()->artistPage;
 
+        $this->normalizeUrlInput($request, ['target_url']);
+
         $validated = $request->validate([
             'spotlight_id' => 'required|exists:spotlights,id',
             'platform' => ['required', 'string', new Enum(Platform::class)],
             'placement' => 'required|string|max:50',
-            'target_url' => 'required|url|max:1000',
+            'target_url' => ['required', 'string', 'max:1000', new SafeExternalUrl()],
         ]);
 
         // Ownership check: Spotlight belongs to this artist page

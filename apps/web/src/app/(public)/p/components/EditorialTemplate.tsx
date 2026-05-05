@@ -12,6 +12,7 @@ import {
 import { PreviewBanner } from "./PreviewBanner";
 import LazyVideoEmbed from "./LazyVideoEmbed";
 import PhaseHero from "@/components/public-page/PhaseHero";
+import { safeHref } from "@/lib/safe-href";
 
 /**
  * EditorialTemplate - Text-led, quiet, curated (Artist Plan only)
@@ -269,7 +270,7 @@ function EditorialFokusRelease({ release }: { release: ReleaseItem }) {
       }}
     >
       <a
-        href={release.url ?? "#"}
+        href={safeHref(release.url) ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className="group block"
@@ -412,7 +413,7 @@ function EditorialFokusShow({ show }: { show: ShowItem }) {
 
         {show.url && (
           <a
-            href={show.url}
+            href={safeHref(show.url) ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -466,7 +467,7 @@ function EditorialReleases({ items }: { items: ReleaseItem[] }) {
         {releases.map((release, index) => (
           <a
             key={index}
-            href={release.url ?? "#"}
+            href={safeHref(release.url) ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-4 hover:opacity-80 transition-opacity duration-200"
@@ -586,7 +587,7 @@ function EditorialShows({ items }: { items: ShowItem[] }) {
 
             {show.url && (
               <a
-                href={show.url}
+                href={safeHref(show.url) ?? undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="opacity-30 group-hover:opacity-60 transition-opacity duration-200"
@@ -767,7 +768,7 @@ function EditorialFooter({
                 {links.map((link, index) => (
                   <a
                     key={index}
-                    href={link.url}
+                    href={safeHref(link.url) ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:opacity-70 transition-opacity duration-200"

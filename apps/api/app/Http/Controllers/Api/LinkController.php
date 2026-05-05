@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\NormalizesUrlInput;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
-use App\Models\Link;
+use App\Rules\SafeExternalUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Gate;
 class LinkController extends Controller
 {
     use ApiResponse;
+    use NormalizesUrlInput;
 
     /**
      * GET /artist-pages/me/links
@@ -61,9 +63,11 @@ class LinkController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['url']);
+
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'url' => 'nullable|string|max:2048',
+            'url' => ['nullable', 'string', 'max:2048', new SafeExternalUrl(allowMailto: true, allowTel: true)],
             'type' => 'nullable|string|in:facebook,instagram,tiktok,x,youtube,spotify,applemusic,soundcloud,bandcamp,website,custom',
         ]);
 
@@ -95,11 +99,13 @@ class LinkController extends Controller
         $artistPage = ArtistPage::findOrFail($id);
         Gate::authorize('update', $artistPage);
 
+        $this->normalizeUrlInput($request, ['url']);
+
         $link = $artistPage->links()->findOrFail($linkId);
 
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'url' => 'nullable|string|max:2048',
+            'url' => ['nullable', 'string', 'max:2048', new SafeExternalUrl(allowMailto: true, allowTel: true)],
             'type' => 'nullable|string|in:facebook,instagram,tiktok,x,youtube,spotify,applemusic,soundcloud,bandcamp,website,custom',
             'is_visible' => 'nullable|boolean',
         ]);

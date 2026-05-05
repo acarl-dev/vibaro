@@ -12,6 +12,7 @@ import {
 } from "./shared";
 import { PreviewBanner } from "./PreviewBanner";
 import PhaseHero from "@/components/public-page/PhaseHero";
+import { safeHref } from "@/lib/safe-href";
 
 /**
  * MinimalTemplate - Ultra-reduced, typography-first, no decoration
@@ -374,7 +375,7 @@ function MinimalReleaseRow({ release }: { release: ReleaseItem }) {
   if (release.url) {
     return (
       <a
-        href={release.url}
+        href={safeHref(release.url) ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className="minimal-link"
@@ -474,7 +475,7 @@ function MinimalShowRow({ show }: { show: ShowItem }) {
   if (show.url) {
     return (
       <a
-        href={show.url}
+        href={safeHref(show.url) ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className="minimal-link"
@@ -521,7 +522,7 @@ function MinimalVideos({
         {items.map((video, index) => (
           <li key={index}>
             <a
-              href={video.url}
+              href={safeHref(video.url) ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="minimal-link"
@@ -565,7 +566,7 @@ function MinimalLinks({ items }: { items: LinkItem[] }) {
         {items.map((link, index) => (
           <li key={index}>
             <a
-              href={link.url}
+              href={safeHref(link.url) ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="minimal-link"

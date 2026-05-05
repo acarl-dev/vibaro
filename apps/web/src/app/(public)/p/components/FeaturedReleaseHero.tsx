@@ -1,5 +1,6 @@
 import { ReleaseItem } from "./shared";
 import { containerStyle, SECTION_PADDING_Y_LARGE, BORDER_DARK } from "./constants";
+import { safeHref } from "@/lib/safe-href";
 
 type FeaturedReleaseHeroProps = {
   release: ReleaseItem;
@@ -10,6 +11,8 @@ type FeaturedReleaseHeroProps = {
  * Used in DarkEditorialFullTemplate for prominent new release display
  */
 export function FeaturedReleaseHero({ release }: FeaturedReleaseHeroProps) {
+  const releaseHref = safeHref(release.url);
+
   return (
     <section className={`${SECTION_PADDING_Y_LARGE} border-b ${BORDER_DARK}`}>
       <div className="mx-auto" style={containerStyle("wide")}>
@@ -37,10 +40,10 @@ export function FeaturedReleaseHero({ release }: FeaturedReleaseHeroProps) {
                 })}
               </p>
             )}
-            {release.url && (
+            {releaseHref && (
               <div className="flex gap-3">
                 <a
-                  href={release.url}
+                  href={releaseHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg hover:bg-zinc-100 transition-colors"

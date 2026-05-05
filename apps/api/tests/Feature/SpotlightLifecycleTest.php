@@ -336,6 +336,36 @@ class SpotlightLifecycleTest extends TestCase
         $this->assertNotNull($spotlight->ends_at);
     }
 
+    public function test_store_accepts_nullable_primary_url_for_focus_spotlight(): void
+    {
+        [$user] = $this->createUserWithArtistPage('nullable-primary-owner');
+
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/v1/spotlights', [
+            'title' => 'Studio Focus Week',
+            'type' => 'focus',
+            'primary_url' => null,
+            'show_on_page' => true,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.primary_url', null);
+    }
+
+    public function test_store_rejects_javascript_primary_url(): void
+    {
+        [$user] = $this->createUserWithArtistPage('unsafe-primary-owner');
+
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/v1/spotlights', [
+            'title' => 'Unsafe Spotlight',
+            'type' => 'single',
+            'primary_url' => 'javascript:alert(1)',
+            'show_on_page' => true,
+        ])->assertStatus(422);
+    }
+
     private function createUserWithArtistPage(string $handle = 'artist'): array
     {
         $user = User::factory()->create();

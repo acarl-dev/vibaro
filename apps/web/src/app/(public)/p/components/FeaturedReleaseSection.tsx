@@ -1,5 +1,6 @@
 import type { ReleaseItem } from "./types";
 import { containerStyle, PADDING_SECTION_FULL } from "./constants";
+import { safeHref } from "@/lib/safe-href";
 
 /**
  * Inline section header to avoid circular dependency with SectionLayout
@@ -17,12 +18,14 @@ function FeaturedSectionHeader({ title }: { title: string }) {
 // -----------------------------------------------------------------------------
 
 export function FeaturedReleaseSection({ release }: { release: ReleaseItem }) {
+  const releaseHref = safeHref(release.url);
+
   return (
     <section className="mx-auto" style={{ maxWidth: containerStyle().maxWidth, padding: PADDING_SECTION_FULL }}>
       <FeaturedSectionHeader title="New Release" />
       
       <a
-        href={release.url ?? "#"}
+        href={releaseHref ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className="group block"
@@ -51,7 +54,7 @@ export function FeaturedReleaseSection({ release }: { release: ReleaseItem }) {
             {release.release_date && (
               <p className="text-sm text-zinc-500 mb-6">{release.release_date}</p>
             )}
-            {release.url && (
+            {releaseHref && (
               <span className="inline-block px-6 py-3 bg-white text-zinc-950 font-semibold rounded-lg transition-colors group-hover:bg-zinc-100">
                 Jetzt anhören
               </span>

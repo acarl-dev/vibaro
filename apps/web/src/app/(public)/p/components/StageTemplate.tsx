@@ -14,6 +14,7 @@ import MusicPlayer from "./MusicPlayer";
 import { PreviewBanner } from "./PreviewBanner";
 import LazyVideoEmbed from "./LazyVideoEmbed";
 import PhaseHero from "@/components/public-page/PhaseHero";
+import { safeHref } from "@/lib/safe-href";
 
 /**
  * StageTemplate - Energy-focused template for live-oriented bands
@@ -423,7 +424,7 @@ function StageShowList({ items }: { items: ShowItem[] }) {
           <div className="shrink-0">
             {show.url ? (
               <a
-                href={show.url}
+                href={safeHref(show.url) ?? undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wider transition-all"
@@ -540,7 +541,7 @@ function StageReleaseList({ items }: { items: ReleaseItem[] }) {
       {releases.map((release, index) => (
         <li key={index}>
           <a
-            href={release.url ?? "#"}
+            href={safeHref(release.url) ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="group block"
