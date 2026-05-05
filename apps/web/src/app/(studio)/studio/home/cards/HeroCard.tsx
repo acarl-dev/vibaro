@@ -145,7 +145,7 @@ export function HeroActive({
         ) : (
           <>
             <Link
-              href="/studio/settings"
+              href="/studio/page"
               className="studio-btn studio-btn-primary"
             >
               Seite veröffentlichen

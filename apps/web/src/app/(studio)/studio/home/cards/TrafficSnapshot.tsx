@@ -55,7 +55,7 @@ export default function TrafficSnapshot({ snap, stats, page, hasActivePhase }: T
         <div className="flex flex-wrap gap-2.5">
           {hasActivePhase && !page?.is_published ? (
             <Link
-              href="/studio/settings"
+              href="/studio/page"
               className="studio-btn studio-btn-secondary"
             >
               Seite veröffentlichen
