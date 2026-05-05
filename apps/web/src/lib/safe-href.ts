@@ -14,7 +14,7 @@ export function safeHref(rawHref: string | null | undefined): string | null {
     return null;
   }
 
-  const schemeMatch = href.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):(.*)$/s);
+  const schemeMatch = href.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):([\s\S]*)$/);
   if (!schemeMatch) {
     return null;
   }

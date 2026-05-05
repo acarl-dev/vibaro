@@ -218,15 +218,19 @@ export default function SpotlightCard({
           style={{ color: "var(--studio-text-secondary)", borderBottom: "1px solid var(--studio-border)" }}
         >
           <span>Slug: {spotlight.slug}</span>
-          <a
-            href={spotlight.primary_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline transition-colors"
-            style={{ color: "var(--studio-accent)" }}
-          >
-            Link öffnen →
-          </a>
+          {spotlight.primary_url ? (
+            <a
+              href={spotlight.primary_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline transition-colors"
+              style={{ color: "var(--studio-accent)" }}
+            >
+              Link öffnen →
+            </a>
+          ) : (
+            <span style={{ opacity: 0.7 }}>Kein Link hinterlegt</span>
+          )}
           {spotlight.show_on_page && (
             <span style={{ color: "var(--studio-success)" }}>✓ Hero-Banner aktiv</span>
           )}
