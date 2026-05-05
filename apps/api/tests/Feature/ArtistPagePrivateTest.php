@@ -126,6 +126,29 @@ class ArtistPagePrivateTest extends TestCase
         $response->assertJsonPath('error.code', 'ARTIST_PAGE_EXISTS');
     }
 
+    public function test_store_second_create_attempt_returns_conflict_and_keeps_single_row(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum');
+
+        $firstResponse = $this->postJson('/api/v1/artist-pages', [
+            'handle' => 'first-page',
+            'display_name' => 'First Page',
+        ]);
+
+        $secondResponse = $this->postJson('/api/v1/artist-pages', [
+            'handle' => 'second-page',
+            'display_name' => 'Second Page',
+        ]);
+
+        $firstResponse->assertCreated();
+        $secondResponse->assertStatus(409);
+        $secondResponse->assertJsonPath('error.code', 'ARTIST_PAGE_EXISTS');
+
+        $this->assertSame(1, ArtistPage::where('user_id', $user->id)->count());
+    }
+
     public function test_update_requires_accent_color_when_manual(): void
     {
         $user = User::factory()->create();
@@ -271,6 +294,131 @@ class ArtistPagePrivateTest extends TestCase
         // Controller returns 404 (not 403) to avoid revealing that the resource
         // exists for another user — intentional enumeration protection (see SECURITY.md).
         $response->assertStatus(404);
+    }
+
+    public function test_update_with_is_published_does_not_publish_page(): void
+    {
+        $user = User::factory()->create();
+
+        $page = ArtistPage::create([
+            'user_id' => $user->id,
+            'handle' => 'secure-page',
+            'display_name' => 'Secure Page',
+            'bio' => 'Ready but unpublished',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'accent_color' => null,
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->patchJson("/api/v1/artist-pages/{$page->id}", [
+            'display_name' => 'Still Secure',
+            'is_published' => true,
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('data.is_published', false);
+
+        $page->refresh();
+        $this->assertFalse($page->is_published);
+        $this->assertNull($page->published_at);
+    }
+
+    public function test_update_with_published_at_does_not_change_timestamp(): void
+    {
+        $user = User::factory()->create();
+        $originalPublishedAt = now()->subDay()->startOfMinute();
+
+        $page = ArtistPage::create([
+            'user_id' => $user->id,
+            'handle' => 'published-check',
+            'display_name' => 'Published Check',
+            'bio' => 'Already has timestamp',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'accent_color' => null,
+            'is_published' => true,
+            'published_at' => $originalPublishedAt,
+        ]);
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->patchJson("/api/v1/artist-pages/{$page->id}", [
+            'display_name' => 'Published Check Updated',
+            'published_at' => now()->addDay()->toIso8601String(),
+        ]);
+
+        $response->assertOk();
+
+        $page->refresh();
+        $this->assertNotNull($page->published_at);
+        $this->assertSame(
+            $originalPublishedAt->toIso8601String(),
+            $page->published_at?->copy()->startOfMinute()->toIso8601String()
+        );
+    }
+
+    public function test_publish_endpoint_still_publishes_page(): void
+    {
+        $user = User::factory()->create();
+
+        $page = ArtistPage::create([
+            'user_id' => $user->id,
+            'handle' => 'publish-me',
+            'display_name' => 'Publish Me',
+            'bio' => 'Complete bio',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'accent_color' => null,
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->postJson("/api/v1/artist-pages/{$page->id}/publish");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.is_published', true);
+        $this->assertNotNull($response->json('data.published_at'));
+
+        $page->refresh();
+        $this->assertTrue($page->is_published);
+        $this->assertNotNull($page->published_at);
+    }
+
+    public function test_unpublish_endpoint_still_unpublishes_page(): void
+    {
+        $user = User::factory()->create();
+
+        $page = ArtistPage::create([
+            'user_id' => $user->id,
+            'handle' => 'unpublish-me',
+            'display_name' => 'Unpublish Me',
+            'bio' => 'Complete bio',
+            'theme_key' => 'modern',
+            'theme_variant' => 'auto',
+            'accent_mode' => 'auto',
+            'accent_color' => null,
+            'is_published' => true,
+            'published_at' => now()->subHour(),
+        ]);
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->postJson("/api/v1/artist-pages/{$page->id}/unpublish");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.is_published', false);
+
+        $page->refresh();
+        $this->assertFalse($page->is_published);
     }
 
     public function test_generic_update_ignores_avatar_path_changes(): void

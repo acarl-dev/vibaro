@@ -1,6 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  consumeRateLimit,
+  createIpRateLimitKey,
+  getClientIp,
+} from "../_lib/rate-limit";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+const REGISTER_IP_LIMIT = {
+  maxAttempts: 10,
+  windowMs: 60_000,
+};
+
+function rateLimitedResponse(retryAfterSeconds: number): NextResponse {
+  return NextResponse.json(
+    {
+      error: {
+        code: "RATE_LIMITED",
+        message: "Too many requests. Please try again later.",
+      },
+    },
+    {
+      status: 429,
+      headers: {
+        "Retry-After": String(retryAfterSeconds),
+      },
+    }
+  );
+}
 
 export async function POST(request: NextRequest) {
   if (!API_BASE_URL) {
@@ -28,6 +55,17 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 }
     );
+  }
+
+  const clientIp = getClientIp(request);
+
+  const ipRateLimit = consumeRateLimit(
+    createIpRateLimitKey("register", clientIp),
+    REGISTER_IP_LIMIT
+  );
+
+  if (!ipRateLimit.allowed) {
+    return rateLimitedResponse(ipRateLimit.retryAfterSeconds);
   }
 
   const apiResponse = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {

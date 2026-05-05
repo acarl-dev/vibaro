@@ -7,6 +7,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\ArtistPage;
 use App\Services\ImageProcessingService;
 use App\Services\LinkService;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -34,7 +35,9 @@ class ArtistPageController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        if ($request->user()->artistPage) {
+        $userId = $request->user()->id;
+
+        if (ArtistPage::where('user_id', $userId)->exists()) {
             return $this->error('ARTIST_PAGE_EXISTS', 'Artist page already exists.', 409);
         }
 
@@ -49,17 +52,30 @@ class ArtistPageController extends Controller
 
         $handle = strtolower($validated['handle']);
 
-        $page = ArtistPage::create([
-            'user_id' => $request->user()->id,
-            'handle' => $handle,
-            'display_name' => $validated['display_name'],
-            'bio' => null,
-            'theme_key' => 'modern',
-            'theme_variant' => 'auto',
-            'accent_mode' => 'auto',
-            'accent_color' => null,
-            'is_published' => false,
-        ]);
+        try {
+            $page = ArtistPage::create([
+                'user_id' => $userId,
+                'handle' => $handle,
+                'display_name' => $validated['display_name'],
+                'bio' => null,
+                'theme_key' => 'modern',
+                'theme_variant' => 'auto',
+                'accent_mode' => 'auto',
+                'accent_color' => null,
+                'is_published' => false,
+            ]);
+        } catch (QueryException $e) {
+            $sqlState = $e->errorInfo[0] ?? null;
+            $duplicateKey = in_array($sqlState, ['23000', '23505'], true);
+            $mentionsUserConstraint = str_contains(strtolower($e->getMessage()), 'artist_pages.user_id')
+                || str_contains(strtolower($e->getMessage()), 'artist_pages_user_id_unique');
+
+            if ($duplicateKey && $mentionsUserConstraint) {
+                return $this->error('ARTIST_PAGE_EXISTS', 'Artist page already exists.', 409);
+            }
+
+            throw $e;
+        }
 
         // Create default social media links (pre-filled, empty URLs)
         LinkService::createDefaultLinksForArtistPage($page);
@@ -95,7 +111,6 @@ class ArtistPageController extends Controller
                 'press_email' => ['sometimes', 'nullable', 'email', 'max:255'],
                 'whatsapp_number' => ['sometimes', 'nullable', 'string', 'max:50'],
                 'contact_message' => ['sometimes', 'nullable', 'string', 'max:500'],
-                'is_published' => ['sometimes', 'boolean'],
             ]);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
@@ -108,11 +123,6 @@ class ArtistPageController extends Controller
 
         if (($validated['accent_mode'] ?? null) === 'auto') {
             $validated['accent_color'] = null;
-        }
-
-        // Set published_at timestamp when publishing
-        if (isset($validated['is_published']) && $validated['is_published'] && !$page->is_published) {
-            $validated['published_at'] = now();
         }
 
         $page->fill($validated);

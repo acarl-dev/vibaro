@@ -198,6 +198,10 @@ Request:
 
 Partial updates erlaubt.
 
+Hinweis:
+- `is_published` und `published_at` sind in diesem generischen Update nicht client-setzbar.
+- Veröffentlichen/Zurückziehen erfolgt ausschließlich über die dedizierten Endpunkte `/artist-pages/{id}/publish` und `/artist-pages/{id}/unpublish`.
+
 Request:
 
 ```json

@@ -32,7 +32,11 @@ class SpotlightLifecycleService
                 ->get()
                 ->each(fn (Spotlight $other) => $this->endInternal($other, $endedAt));
 
-            $spotlight->update(['status' => 'active']);
+            // Active spotlight should be visible on the public page by default.
+            $spotlight->update([
+                'status' => 'active',
+                'show_on_page' => true,
+            ]);
         });
     }
 

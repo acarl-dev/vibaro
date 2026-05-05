@@ -1,6 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  consumeRateLimit,
+  createIpRateLimitKey,
+  createLoginEmailRateLimitKey,
+  getClientIp,
+  normalizeEmail,
+} from "../_lib/rate-limit";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+const LOGIN_IP_LIMIT = {
+  maxAttempts: 25,
+  windowMs: 60_000,
+};
+
+const LOGIN_IP_EMAIL_LIMIT = {
+  maxAttempts: 10,
+  windowMs: 60_000,
+};
+
+function rateLimitedResponse(retryAfterSeconds: number): NextResponse {
+  return NextResponse.json(
+    {
+      error: {
+        code: "RATE_LIMITED",
+        message: "Too many requests. Please try again later.",
+      },
+    },
+    {
+      status: 429,
+      headers: {
+        "Retry-After": String(retryAfterSeconds),
+      },
+    }
+  );
+}
 
 export async function POST(request: NextRequest) {
   if (!API_BASE_URL) {
@@ -28,6 +62,29 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 }
     );
+  }
+
+  const clientIp = getClientIp(request);
+
+  const ipRateLimit = consumeRateLimit(
+    createIpRateLimitKey("login", clientIp),
+    LOGIN_IP_LIMIT
+  );
+
+  if (!ipRateLimit.allowed) {
+    return rateLimitedResponse(ipRateLimit.retryAfterSeconds);
+  }
+
+  const email = normalizeEmail((body as { email?: unknown } | null)?.email);
+  if (email) {
+    const emailRateLimit = consumeRateLimit(
+      createLoginEmailRateLimitKey(clientIp, email),
+      LOGIN_IP_EMAIL_LIMIT
+    );
+
+    if (!emailRateLimit.allowed) {
+      return rateLimitedResponse(emailRateLimit.retryAfterSeconds);
+    }
   }
 
   const apiResponse = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {

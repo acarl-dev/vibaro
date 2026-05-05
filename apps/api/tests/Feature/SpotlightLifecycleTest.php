@@ -116,6 +116,39 @@ class SpotlightLifecycleTest extends TestCase
         $this->assertSame('active', $newSpotlight->status);
     }
 
+    public function test_activate_sets_show_on_page_true_for_newly_active_spotlight(): void
+    {
+        [$user, $page] = $this->createUserWithArtistPage('activate-visible-owner');
+
+        Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Current Active',
+            'type' => 'single',
+            'status' => 'active',
+            'primary_url' => 'https://example.com/current-active-2',
+            'show_on_page' => true,
+        ]);
+
+        $scheduledHidden = Spotlight::create([
+            'artist_page_id' => $page->id,
+            'title' => 'Hidden Scheduled',
+            'type' => 'single',
+            'status' => 'scheduled',
+            'primary_url' => 'https://example.com/hidden-scheduled',
+            'show_on_page' => false,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/v1/spotlights/{$scheduledHidden->id}/activate")
+            ->assertOk()
+            ->assertJsonPath('data.active_spotlight_id', $scheduledHidden->id);
+
+        $scheduledHidden->refresh();
+        $this->assertSame('active', $scheduledHidden->status);
+        $this->assertTrue((bool) $scheduledHidden->show_on_page);
+    }
+
     public function test_end_sets_status_and_archives_active_tracking_links(): void
     {
         [$user, $page] = $this->createUserWithArtistPage();

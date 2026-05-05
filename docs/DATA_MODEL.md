@@ -69,7 +69,7 @@ Zentrale Entität für Musiker-Seiten.
 
 **Indizes**
 - unique(handle)
-- index(user_id)
+- unique(user_id)
 
 **Wichtig**
 - Legacy-Kontaktfelder (`booking_email` etc.) bleiben im Schema für die Studio-Settings erhalten.
