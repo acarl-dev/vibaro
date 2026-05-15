@@ -13,8 +13,7 @@ Vibaro is a full-stack SaaS project for musicians and bands. It allows artists t
 
 The project is built as a personal portfolio and learning project to practice modern web application development, API-driven architecture, authentication flows, public/private data boundaries, tracking logic, and deployment preparation.
 
-> **Status:** Work in progress. Vibaro is actively developed and not yet intended for production use.
-
+> **Status:** Work in progress. Vibaro is an actively developed personal SaaS project. The codebase is not yet launch-ready, but it is designed with a future production release in mind.
 ---
 
 ## What Vibaro Does
