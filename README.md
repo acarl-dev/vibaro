@@ -1,7 +1,5 @@
 # Vibaro
 
-# Vibaro
-
 ![Status](https://img.shields.io/badge/status-active%20development-yellow)
 ![Frontend](https://img.shields.io/badge/frontend-Next.js-black)
 ![Backend](https://img.shields.io/badge/backend-Laravel-red)
