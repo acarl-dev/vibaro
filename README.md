@@ -338,6 +338,6 @@ It focuses on topics that are relevant in real-world web applications:
 
 ## License
 
-No license has been selected yet.
+No open-source license has been selected.
 
-This repository is currently intended as a personal portfolio and learning project. Reuse, distribution or commercial use is not granted unless a license is added later.
+This repository is published as a personal portfolio and learning project. All rights are reserved unless a license is added later. Reuse, redistribution or commercial use is not permitted without explicit permission.
