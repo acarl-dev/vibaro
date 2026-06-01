@@ -1,7 +1,5 @@
 # Vibaro
 
-# Vibaro
-
 ![Status](https://img.shields.io/badge/status-active%20development-yellow)
 ![Frontend](https://img.shields.io/badge/frontend-Next.js-black)
 ![Backend](https://img.shields.io/badge/backend-Laravel-red)
@@ -14,6 +12,49 @@ Vibaro is a full-stack SaaS project for musicians and bands. It allows artists t
 The project is built as a personal portfolio and learning project to practice modern web application development, API-driven architecture, authentication flows, public/private data boundaries, tracking logic, and deployment preparation.
 
 > **Status:** Work in progress. Vibaro is an actively developed personal SaaS project. The codebase is not yet launch-ready, but it is designed with a future production release in mind.
+> 
+---
+
+## Screenshots
+
+Vibaro is built as a product-oriented SaaS application with a public landing page, an authenticated studio, phase-based sharing, tracking links, QR code support and simple performance analytics.
+
+### Landing Page
+
+![Vibaro landing page](docs/screenshots/landingpage.png)
+
+The landing page introduces Vibaro as a focused band page and sharing tool for musicians.
+
+### Studio Dashboard
+
+![Vibaro studio dashboard](docs/screenshots/studio-dashboard.png)
+
+The studio dashboard gives artists a quick overview of their active phase, key metrics and next actions.
+
+### Phase Management
+
+![Vibaro phase management](docs/screenshots/phases-overview.png)
+
+Artists can manage active and planned phases for releases, shows, tours, merch campaigns or other current priorities.
+
+### Link Distribution
+
+![Vibaro tracking link distribution](docs/screenshots/distribution-links.png)
+
+Tracking links can be created for different platforms and placements, making it possible to see where clicks came from.
+
+### Performance Analytics
+
+![Vibaro performance analytics](docs/screenshots/phase-performance.png)
+
+The performance view shows basic metrics such as visitors, link clicks, QR scans and phase comparison data.
+
+### QR & Offline Sharing
+
+![Vibaro QR code and offline sharing](docs/screenshots/qr-offline.png)
+
+The permanent band QR code can be used on flyers, stickers, posters, merch or other offline touchpoints.
+
 ---
 
 ## What Vibaro Does

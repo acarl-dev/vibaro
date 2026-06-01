@@ -45,6 +45,60 @@ function deriveSpotlightParams(
   return { type: "album", title: "Neues Album in Arbeit", ctaLabel: "Mehr erfahren" };
 }
 
+function normalizeOptionalExternalUrl(raw: string): { value: string | null; error: string | null } {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return { value: null, error: null };
+  }
+
+  const hasScheme = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed);
+  const candidate = hasScheme ? trimmed : `https://${trimmed}`;
+
+  try {
+    const parsed = new URL(candidate);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return {
+        value: null,
+        error: "Bitte verwende einen gueltigen Link mit http:// oder https://.",
+      };
+    }
+    if (!parsed.hostname) {
+      return {
+        value: null,
+        error: "Bitte verwende einen gueltigen Link mit Domain.",
+      };
+    }
+
+    return { value: parsed.toString(), error: null };
+  } catch {
+    return {
+      value: null,
+      error: "Bitte verwende einen gueltigen Link mit Domain.",
+    };
+  }
+}
+
+async function readApiErrorMessage(response: Response): Promise<string | null> {
+  const fallback = "Fehler beim Erstellen der Seite. Bitte versuche es erneut.";
+
+  try {
+    const json = (await response.json()) as {
+      error?: { message?: string; fields?: Record<string, string[]> };
+    };
+    const message = json?.error?.message;
+    if (message && message.trim().length > 0) {
+      return message;
+    }
+
+    const firstFieldMessage = json?.error?.fields
+      ? Object.values(json.error.fields)[0]?.[0]
+      : null;
+    return firstFieldMessage || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function OnboardingClient() {
   const router = useRouter();
 
@@ -200,8 +254,13 @@ export function OnboardingClient() {
     const bio = `${displayName.trim()} verbindet rohe Energie mit klaren Hooks.
 Entstanden aus der Szene, geprägt von Live-Momenten und neuen Ideen, entwickelt sich ihr Sound stetig weiter.`;
     const params = deriveSpotlightParams(phase, rk, lk, pt, pl);
-    const trimmedUrl = url.trim();
-    const primaryUrl = trimmedUrl.length > 0 ? trimmedUrl : null;
+    const normalizedUrl = normalizeOptionalExternalUrl(url);
+    if (normalizedUrl.error) {
+      setGenerateError(normalizedUrl.error);
+      setGenerating(false);
+      return;
+    }
+    const primaryUrl = normalizedUrl.value;
 
     // Pre-populate preview state so it's available immediately when step changes
     setPreviewBio(bio);
@@ -213,13 +272,16 @@ Entstanden aus der Szene, geprägt von Live-Momenten und neuen Ideen, entwickelt
     });
 
     try {
-      await studioFetch(`/api/studio/artist-pages/${pageId}`, {
+      const updatePageResponse = await studioFetch(`/api/studio/artist-pages/${pageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bio }),
       });
+      if (!updatePageResponse.ok) {
+        throw new Error(await readApiErrorMessage(updatePageResponse));
+      }
 
-      await fetch("/api/studio/spotlights", {
+      const createSpotlightResponse = await studioFetch("/api/studio/spotlights", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -231,10 +293,20 @@ Entstanden aus der Szene, geprägt von Live-Momenten und neuen Ideen, entwickelt
           activate: true,
         }),
       });
+      if (!createSpotlightResponse.ok) {
+        throw new Error(await readApiErrorMessage(createSpotlightResponse));
+      }
 
-      await studioFetch(`/api/studio/artist-pages/${pageId}/publish`, { method: "POST" });
-    } catch {
-      setGenerateError("Fehler beim Erstellen der Seite. Bitte versuche es erneut.");
+      const publishPageResponse = await studioFetch(`/api/studio/artist-pages/${pageId}/publish`, { method: "POST" });
+      if (!publishPageResponse.ok) {
+        throw new Error(await readApiErrorMessage(publishPageResponse));
+      }
+    } catch (error) {
+      setGenerateError(
+        error instanceof Error && error.message
+          ? error.message
+          : "Fehler beim Erstellen der Seite. Bitte versuche es erneut."
+      );
       setGenerating(false);
       return;
     }
