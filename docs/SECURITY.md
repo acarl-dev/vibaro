@@ -2,245 +2,245 @@
 
 Status: current
 Last verified: 2026-04-22
-Scope: aktueller Ist-Zustand von Web (`apps/web`) und API (`apps/api`)
+Scope: current state of Web (`apps/web`) and API (`apps/api`)
 
-Diese Datei beschreibt die aktuell implementierten Sicherheitsregeln.
-Zielbilder oder härtere Soll-Vorgaben gehören nicht hierher.
-
----
-
-## 1) Grundprinzipien
-
-- Öffentlich ist nur, was explizit als public Endpoint gedacht ist.
-- Für Artist Pages bedeutet das aktuell: veröffentlicht (`is_published = true`) und ohne private Felder.
-- `apps/web` greift nie direkt auf die Datenbank zu, sondern nur per HTTP auf `apps/api`.
-- Öffentliche Responses dürfen keine privaten Benutzerfelder enthalten.
+This file describes the security rules that are currently implemented.
+Target-state concepts or stricter future requirements do not belong here.
 
 ---
 
-## 2) Authentifizierung: Auth-Architektur und Token-Fluss
+## 1) Core principles
 
-### Bewusstes Modell: Bearer-Token im httpOnly Cookie via BFF
+- Only what is explicitly intended as a public endpoint is public.
+- For Artist Pages, this currently means: published (`is_published = true`) and without private fields.
+- `apps/web` never accesses the database directly, only `apps/api` via HTTP.
+- Public responses must not contain private user fields.
 
-Vibaro verwendet **kein klassisches Sanctum-Session/CSRF-Cookie-Modell**, sondern ein bewusstes BFF-Muster:
+---
 
-| Eigenschaft | Klassisch (Session/CSRF) | Vibaro (Bearer via BFF) |
+## 2) Authentication: auth architecture and token flow
+
+### Intentional model: bearer token in an httpOnly cookie via BFF
+
+Vibaro does **not** use a classic Sanctum session/CSRF cookie model. It uses an intentional BFF pattern instead:
+
+| Property | Classic (Session/CSRF) | Vibaro (Bearer via BFF) |
 |---|---|---|
-| Token-Typ | Session-Cookie + CSRF-Token | Sanctum Personal Access Token |
-| Token-Speicherort | Server-Session + Browser-Cookie | httpOnly Cookie (`vibaro_token`) |
-| Authorization-Header | keiner (Cookie automatisch) | Bearer-Token, nur serverseitig gesetzt |
-| Wer setzt den Header | Laravel intern | ausschließlich `backendFetch()` |
-| Browser-JS-Zugriff auf Token | nein | nein |
+| Token type | Session cookie + CSRF token | Sanctum personal access token |
+| Token storage location | Server session + browser cookie | httpOnly cookie (`vibaro_token`) |
+| Authorization header | none (cookie automatically) | Bearer token, set server-side only |
+| Who sets the header | Laravel internally | only `backendFetch()` |
+| Browser JS access to token | no | no |
 
-**Warum kein klassisches Session-Modell:**
-- Sanctum-Session-Auth erfordert `cookie`-Middleware und SPA-Domain-Konfiguration, die für das BFF-Muster überflüssige Komplexität erzeugt.
-- Personal Access Tokens funktionieren stateless; die Next.js-BFF-Schicht übernimmt die Zustandshaltung im httpOnly Cookie.
-- Das Modell bleibt erweiterbar (zukünftige Token-Rotation, Multi-Device-Sessions) ohne Laravel-Session-Infrastruktur.
+**Why not a classic session model:**
+- Sanctum session auth requires `cookie` middleware and SPA domain configuration, which adds unnecessary complexity for the BFF pattern.
+- Personal access tokens work statelessly; the Next.js BFF layer owns the state via the httpOnly cookie.
+- The model remains extensible (future token rotation, multi-device sessions) without Laravel session infrastructure.
 
-### Token-Fluss
+### Token flow
 
 ```text
 Browser -> Next.js Route Handler (BFF) -> Laravel API
                                                  |
                               Token in JSON-Response (server-only)
                                                  |
-                    Next.js setzt httpOnly Cookie <- 
-                    Browser erhält: { user, next } (kein Token)
+                    Next.js sets httpOnly cookie <- 
+                    Browser receives: { user, next } (no token)
 ```
 
-Präzise Aussagen für den Ist-Zustand:
+Precise statements for the current state:
 
-- Laravel `POST /api/v1/auth/login` und `POST /api/v1/auth/register` liefern `data.token` in der JSON-Response — aber nur an den Next.js Route Handler, nicht an den Browser.
-- Dieser Token wird im Route Handler gelesen und als `vibaro_token`-Cookie mit `HttpOnly` gesetzt.
-- Die BFF-Response an den Browser enthält `user` und `next`, aber keinen Token.
-- Der Token ist für Browser-JavaScript nicht lesbar.
+- Laravel `POST /api/v1/auth/login` and `POST /api/v1/auth/register` return `data.token` in the JSON response, but only to the Next.js route handler, not to the browser.
+- This token is read in the route handler and stored as the `vibaro_token` cookie with `HttpOnly`.
+- The BFF response to the browser contains `user` and `next`, but no token.
+- The token is not readable by browser JavaScript.
 
-### Zwingend geltende Regeln
+### Mandatory rules
 
-Diese Regeln sind nicht optional:
+These rules are not optional:
 
-1. **Token darf nie an Browser-JS gelangen.** Kein Route Handler darf den Token als JSON-Feld zurückgeben.
-2. **Nur `backendFetch()` darf den Authorization-Header setzen.** Direkte `fetch()`-Aufrufe mit manuellem `Authorization: Bearer ...` in Route Handlern sind verboten — ausgenommen die initialen Auth-Endpunkte (`/auth/login`, `/auth/register`, `/auth/logout`), die den Token noch nicht aus dem Cookie lesen können.
-3. **Kein direkter Laravel-Aufruf aus Client Components.** Authentifizierte Requests aus Client Components laufen immer über einen Next.js-BFF-Endpunkt unter `/api/...`.
-4. **`backendFetch()` ist server-only.** Die Datei `apps/web/src/lib/api/backend.ts` enthält `import "server-only"` — sie darf nicht in Client Components importiert werden.
-5. **Token nie in Client-Storage.** `localStorage`, `sessionStorage` und explizite Cookies per Client-JS sind verboten.
+1. **A token must never reach browser JS.** No route handler may return the token as a JSON field.
+2. **Only `backendFetch()` may set the Authorization header.** Direct `fetch()` calls with manual `Authorization: Bearer ...` in route handlers are forbidden, except for the initial auth endpoints (`/auth/login`, `/auth/register`, `/auth/logout`), which cannot read the token from the cookie yet.
+3. **No direct Laravel calls from client components.** Authenticated requests from client components must always go through a Next.js BFF endpoint under `/api/...`.
+4. **`backendFetch()` is server-only.** The file `apps/web/src/lib/api/backend.ts` contains `import "server-only"`; it must not be imported into client components.
+5. **Never store tokens in client storage.** `localStorage`, `sessionStorage`, and explicit cookies set via client JS are forbidden.
 
 ---
 
-## 3) BFF-Regel für authentifizierte Browser-Requests
+## 3) BFF rule for authenticated browser requests
 
-Für Browser-Requests mit Auth gilt aktuell weiterhin die BFF-Regel:
+For browser requests that require auth, the BFF rule still applies:
 
 ```text
 Browser -> Next.js Route Handler / server-only utility -> Laravel API
 ```
 
-Das bedeutet:
+This means:
 
-- Client-Komponenten rufen für authentifizierte Aktionen Next.js-Endpunkte unter `/api/**` auf.
-- Server-seitige authentifizierte Fetches laufen über `backendFetch()` und lesen den Cookie serverseitig.
-- Der Browser soll keinen Bearer-Token kennen oder direkt an Laravel senden.
+- Client components call Next.js endpoints under `/api/**` for authenticated actions.
+- Server-side authenticated fetches run through `backendFetch()` and read the cookie on the server side.
+- The browser should not know the bearer token or send it directly to Laravel.
 
-Nicht erlaubt:
+Not allowed:
 
-- Tokens in `localStorage` oder `sessionStorage`
-- ein Route Handler, der den Token wieder als JSON an den Browser herausgibt
-- direkte Browser-Requests an Laravel mit Bearer-Token
+- tokens in `localStorage` or `sessionStorage`
+- a route handler that returns the token back to the browser as JSON
+- direct browser requests to Laravel with a bearer token
 
 ---
 
-## 4) Autorisierung und Sichtbarkeit
+## 4) Authorization and visibility
 
-- Private Ressourcen laufen hinter `auth:sanctum`.
-- Owner-Preview für unveröffentlichte Seiten läuft über `GET /api/v1/p/{handle}/preview` und benötigt Auth.
-- Der öffentliche Endpoint `GET /api/v1/p/{handle}` darf nur veröffentlichte Daten ausliefern.
+- Private resources are protected by `auth:sanctum`.
+- Owner preview for unpublished pages runs through `GET /api/v1/p/{handle}/preview` and requires auth.
+- The public endpoint `GET /api/v1/p/{handle}` may only return published data.
 
-Private Felder dürfen nicht in Public Responses erscheinen, insbesondere:
+Private fields must not appear in public responses, especially:
 
 - `email`
 - `user_id`
-- interne User-IDs oder Tokenwerte
-- interne Billing-Informationen
+- internal user IDs or token values
+- internal billing information
 
-Kontaktdaten bleiben privat, solange sie nicht explizit als veröffentlichte öffentliche Felder modelliert und abgesichert sind.
-
----
-
-## 5) Cookies, CORS und Same-Origin-Verhalten
-
-Aktuell relevant:
-
-- Auth-Cookie: `vibaro_token`
-- Cookie-Flags: `HttpOnly`, `SameSite=Lax`, `Secure` in Production
-- Browser spricht im Regelfall mit derselben Next.js-Origin; Laravel wird für Auth-Fälle über BFF bzw. serverseitige Fetches angesprochen
-
-Deshalb bleibt die CORS-Regel konservativ:
-
-- keine Wildcards in Production
-- nur explizit erlaubte Origins
-- Credential-Handling nur dort aktivieren, wo es wirklich gebraucht wird
+Contact data remains private unless it is explicitly modeled and secured as published public fields.
 
 ---
 
-## 6) Input Validation und Schreibzugriffe
+## 5) Cookies, CORS, and same-origin behavior
 
-- Schreibende API-Routen validieren Input serverseitig.
-- Responses für Fehler und Validierung müssen `CONVENTIONS.md` folgen.
-- Ungeprüfte Massenupdates bleiben verboten.
+Currently relevant:
 
----
+- Auth cookie: `vibaro_token`
+- Cookie flags: `HttpOnly`, `SameSite=Lax`, `Secure` in production
+- The browser typically talks to the same Next.js origin; Laravel is accessed for auth cases through the BFF or server-side fetches
 
-## 7) Rate Limiting und Abuse Protection
+Therefore the CORS rule remains conservative:
 
-Aktuell dokumentiert und im Routing sichtbar:
-
-- strengeres Throttling für `POST /api/v1/auth/login` und `POST /api/v1/auth/register`
-- Public-Rate-Limit für öffentliche Artist-Page- und Analytics-Endpoints
-
-Schutzgedanke:
-
-- keine öffentlichen User-Lookup-Endpoints
-- keine vermeidbare Enumeration privater Daten
+- no wildcards in production
+- only explicitly allowed origins
+- only enable credential handling where it is actually needed
 
 ---
 
-## 8) Upload- und Content-Sicherheit
+## 6) Input validation and write operations
 
-- Uploads laufen nicht direkt vom Browser an Laravel mit Browser-Token, sondern über die Web-Schicht
-- MIME-Type, Größe und Dateiname müssen serverseitig kontrolliert werden
-- HTML in frei editierbaren Textfeldern ist im MVP nicht vorgesehen
-- User-URLs müssen validiert werden
+- Write API routes validate input on the server side.
+- Error and validation responses must follow `CONVENTIONS.md`.
+- Unchecked mass updates remain forbidden.
 
 ---
 
-## 8a) SSRF-Schutz für serverseitige Remote-Fetches
+## 7) Rate limiting and abuse protection
 
-Bestimmte Services holen Metadaten oder Inhalte von nutzergegebenen oder oEmbed-zurückgegebenen URLs serverseitig ab (`ReleaseMetadataService`, `MetadataService`). Alle solchen Fetches laufen über `SafeHttpService`.
+Currently documented and visible in routing:
 
-### Implementierte Maßnahmen
+- stricter throttling for `POST /api/v1/auth/login` and `POST /api/v1/auth/register`
+- public rate limiting for public Artist Page and analytics endpoints
 
-| Maßnahme | Umsetzung |
+Security goal:
+
+- no public user lookup endpoints
+- no avoidable enumeration of private data
+
+---
+
+## 8) Upload and content security
+
+- Uploads do not go directly from the browser to Laravel with a browser token; they go through the web layer
+- MIME type, size, and filename must be validated on the server side
+- HTML in freely editable text fields is not planned in the MVP
+- User URLs must be validated
+
+---
+
+## 8a) SSRF protection for server-side remote fetches
+
+Certain services fetch metadata or content server-side from user-provided URLs or URLs returned by oEmbed (`ReleaseMetadataService`, `MetadataService`). All such fetches run through `SafeHttpService`.
+
+### Implemented measures
+
+| Measure | Implementation |
 |---|---|
-| Nur `http` / `https` erlaubt | Scheme-Check in `SafeHttpService::isAllowed()` und in `MetadataService::fetchFromUrl()` |
-| Private / reservierte IP-Ranges blockiert | `FILTER_FLAG_NO_PRIV_RANGE \| FILTER_FLAG_NO_RES_RANGE` + DNS-Auflösung aller A/AAAA-Records |
-| Redirect-Guard | Jeder Redirect-Hop wird via Guzzle `on_redirect`-Callback erneut validiert |
-| Redirect-Limit | max. 3 Hops |
-| Timeout | 10 Sekunden (konfigurierbar per Aufruf) |
-| Max Response Size | 10 MB; Response wird nach dem Download geprüft |
-| Logging | Jede blockierte oder fehlgeschlagene Anfrage wird mit URL und Grund geloggt (`Log::warning`) |
+| Only `http` / `https` allowed | Scheme check in `SafeHttpService::isAllowed()` and in `MetadataService::fetchFromUrl()` |
+| Private / reserved IP ranges blocked | `FILTER_FLAG_NO_PRIV_RANGE \| FILTER_FLAG_NO_RES_RANGE` + DNS resolution of all A/AAAA records |
+| Redirect guard | Every redirect hop is revalidated via the Guzzle `on_redirect` callback |
+| Redirect limit | max. 3 hops |
+| Timeout | 10 seconds (configurable per call) |
+| Max response size | 10 MB; the response is checked after download |
+| Logging | Every blocked or failed request is logged with URL and reason (`Log::warning`) |
 
-### Blockierte IP-Ranges (via PHP-Flags)
+### Blocked IP ranges (via PHP flags)
 
-- `127.0.0.0/8` — Loopback
-- `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` — Private Ranges
-- `169.254.0.0/16` — Link-Local / AWS EC2 Metadata Service
-- `240.0.0.0/4` — Reserviert
-- `::1/128` — IPv6 Loopback
-- `fc00::/7` — IPv6 Unique Local
-- `fe80::/10` — IPv6 Link-Local
+- `127.0.0.0/8` — loopback
+- `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` — private ranges
+- `169.254.0.0/16` — link-local / AWS EC2 Metadata Service
+- `240.0.0.0/4` — reserved
+- `::1/128` — IPv6 loopback
+- `fc00::/7` — IPv6 unique local
+- `fe80::/10` — IPv6 link-local
 
-Hostname-Literale `localhost`, `ip6-localhost`, `ip6-loopback` werden zusätzlich vor DNS-Auflösung blockiert.
+Hostname literals `localhost`, `ip6-localhost`, and `ip6-loopback` are additionally blocked before DNS resolution.
 
 ### Scope
 
-- `ReleaseMetadataService`: direkter Fetch von Spotify-URLs (Release-Type-Scraping), Plattform-URLs (Release-Date-Scraping), oEmbed-Thumbnail-URLs
-- `MetadataService`: kein direkter User-URL-Fetch; URL wird nur als Query-Param an fixe oEmbed-Endpoints weitergegeben; Scheme-Validierung (`http`/`https`) greift trotzdem frühzeitig
+- `ReleaseMetadataService`: direct fetch of Spotify URLs (release type scraping), platform URLs (release date scraping), and oEmbed thumbnail URLs
+- `MetadataService`: no direct user URL fetch; the URL is only passed as a query parameter to fixed oEmbed endpoints; scheme validation (`http`/`https`) still applies early
 
-### Was NICHT durch `SafeHttpService` abgesichert ist
+### What is NOT protected by `SafeHttpService`
 
-- oEmbed-Endpunkte selbst sind hardcodiert (z. B. `open.spotify.com/oembed`) — kein SSRF-Risiko
-- DNS-Rebinding zwischen Pre-Flight-Check und TCP-Connect: TOCTOU-Restrisiko, akzeptiert im MVP; vollständige Abhilfe würde einen Guzzle-Post-Connect-IP-Check erfordern
-
----
-
-## 9) Secrets, Logs und Datenminimierung
-
-- Keine Secrets im Git
-- Keine Tokens oder Passwörter in Logs
-- Public Responses nur mit den wirklich öffentlichen Feldern
+- The oEmbed endpoints themselves are hardcoded (for example `open.spotify.com/oembed`) and therefore are not an SSRF risk
+- DNS rebinding between the preflight check and TCP connect is a residual TOCTOU risk, accepted in the MVP; full mitigation would require a Guzzle post-connect IP check
 
 ---
 
-## 10) Token-Lifecycle und Session-Invalidation
+## 9) Secrets, logs, and data minimization
 
-### Aktuelles Modell (MVP)
+- No secrets in Git
+- No tokens or passwords in logs
+- Public responses only with fields that are actually public
 
-- Sanctum Personal Access Tokens haben kein serverseitiges Ablaufdatum im MVP. Der Token bleibt gültig, bis er explizit revoziert wird.
-- **Logout** ruft `DELETE /api/v1/auth/logout` auf, wodurch Laravel den Token aus der `personal_access_tokens`-Tabelle löscht. Anschließend wird das `vibaro_token`-Cookie im Browser gelöscht.
-- **Session-Invalidation** durch Logout ist damit vollständig: Token ist weder im Cookie noch in der Datenbank vorhanden.
+---
 
-### Token-Rotation (zukünftig)
+## 10) Token lifecycle and session invalidation
 
-Wenn Token-Rotation eingeführt wird, muss sie ausschließlich serverseitig ablaufen:
+### Current model (MVP)
+
+- Sanctum personal access tokens have no server-side expiration in the MVP. The token remains valid until it is explicitly revoked.
+- **Logout** calls `DELETE /api/v1/auth/logout`, which causes Laravel to delete the token from the `personal_access_tokens` table. Afterwards, the `vibaro_token` cookie is deleted in the browser.
+- **Session invalidation** via logout is therefore complete: the token exists neither in the cookie nor in the database.
+
+### Token rotation (future)
+
+If token rotation is introduced, it must happen exclusively on the server side:
 
 ```text
-BFF-Route empfängt Request -> Token abgelaufen? -> backendFetch refresh-Endpoint
+BFF route receives request -> Token expired? -> backendFetch refresh endpoint
                                                           |
-                                          neuer Token in JSON-Response
+                                          new token in JSON response
                                                           |
-                                    httpOnly Cookie aktualisieren <- 
-                                    Response mit neuem Token an Client weitergeben
+                                    update httpOnly cookie <- 
+                                    return response with new token to client
 ```
 
-Der Client bekommt dabei keinen Token zu sehen — er erhält lediglich eine neue erfolgreiche Response.
+The client does not get to see a token in this flow; it only receives a new successful response.
 
-### Was NICHT erlaubt ist
+### What is NOT allowed
 
-- Token-Expiry-Prüfung im Client-JS
-- Token-Refresh aus Client Components direkt gegen Laravel
-- Ablaufzeit oder Token-Value in JSON-Responses an den Browser
+- token expiry checks in client JS
+- token refresh from client components directly against Laravel
+- expiration times or token values in JSON responses to the browser
 
 ---
 
-## 11) Never-Do-Liste
+## 11) Never-do list
 
-- ❌ Tokens in Client-Storage speichern (`localStorage`, `sessionStorage`, explizite Client-Cookies)
-- ❌ BFF umgehen, wenn Browser-Auth nötig ist
-- ❌ Token als JSON-Feld in BFF-Response an den Browser zurückgeben
-- ❌ Direkte `fetch()`-Aufrufe mit manuellem `Authorization: Bearer ...` in Studio Route Handlern (stattdessen `backendFetch()` verwenden)
-- ❌ Authentifizierte Laravel-Calls direkt aus Client Components
-- ❌ `backendFetch()` oder `getTokenFromCookies()` in Client Components importieren
-- ❌ CORS-Wildcards in Production
-- ❌ Uploads ohne Server-Prüfung
-- ❌ öffentliche Responses mit privaten Userdaten
-- ❌ Token-Expiry-Logik im Browser
+- ❌ store tokens in client storage (`localStorage`, `sessionStorage`, explicit client cookies)
+- ❌ bypass the BFF when browser auth is required
+- ❌ return the token to the browser as a JSON field in a BFF response
+- ❌ use direct `fetch()` calls with manual `Authorization: Bearer ...` in Studio route handlers (use `backendFetch()` instead)
+- ❌ make authenticated Laravel calls directly from client components
+- ❌ import `backendFetch()` or `getTokenFromCookies()` into client components
+- ❌ use CORS wildcards in production
+- ❌ allow uploads without server-side validation
+- ❌ expose private user data in public responses
+- ❌ implement token expiry logic in the browser

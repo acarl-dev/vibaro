@@ -1,7 +1,7 @@
 # Vibaro Conventions
 
-Diese Datei definiert verbindliche Konventionen für das gesamte Vibaro-Projekt.
-Alle Implementierungen (Web, API, später Add-ons) müssen sich daran halten.
+This file defines binding conventions for the entire Vibaro project.
+All implementations (web, API, and later add-ons) must follow them.
 
 ---
 
@@ -10,86 +10,79 @@ Alle Implementierungen (Web, API, später Add-ons) müssen sich daran halten.
 ### Artist Handle
 - lowercase
 - URL-safe (`a-z`, `0-9`, `-`)
-- eindeutig (unique)
-- Beispiel: `emily-j`, `darkwave-berlin`
+- unique
+- Example: `emily-j`, `darkwave-berlin`
 
-### Öffentliche Seiten
-- Public Route: `/p/[handle]`
-- Keine Großbuchstaben
-- Keine internen IDs in URLs
+### Public Pages
+- Public route: `/p/[handle]`
+- No uppercase letters
+- No internal IDs in URLs
 
 ---
 
-## 2. Frontend – apps/web (Next.js)
+## 2. Frontend - apps/web (Next.js)
 
-### Grundsätze
+### Principles
 - Next.js App Router
-- TypeScript überall
-- Server Components bevorzugen, **wo sinnvoll**
-- Client Components nur für:
-  - Formulare
-  - Editoren
-  - Interaktive UI
+- TypeScript everywhere
+- Prefer Server Components **where appropriate**
+- Use Client Components only for:
+  - forms
+  - editors
+  - interactive UI
 
-### Ordnerstruktur
-- `src/app/` → Routen & Layouts
-- `src/components/` → UI-Komponenten
-- `src/lib/api/` → API-Clients & Fetch-Wrapper
-- `src/lib/theme/` → Theme- & Variant-Logik
-- `src/styles/` → globale Styles & Themes (`themes.css`)
+### Folder Structure
+- `src/app/` -> routes and layouts
+- `src/components/` -> UI components
+- `src/lib/api/` -> API clients and fetch wrappers
+- `src/lib/theme/` -> theme and variant logic
+- `src/styles/` -> global styles and themes (`themes.css`)
 
 ### Styling
-- **Keine hardcodierten Farben**
-- Farben **nur über CSS-Variablen**
-- Theme-Zuweisung über:
+- **No hardcoded colors**
+- Use colors **only via CSS variables**
+- Theme assignment via:
   - `data-theme`
   - `data-variant`
 
-❌ Verboten:
+Forbidden:
 ```tsx
 style={{ color: "#ff00ff" }}
-````
+```
 
-✅ Erlaubt:
-
+Allowed:
 ```css
 color: var(--text);
 ```
 
 ---
 
-## 3. Backend – apps/api (Laravel)
+## 3. Backend - apps/api (Laravel)
 
-### API-Struktur
+### API Structure
+- REST JSON API
+- Versioned: `/api/v1/...`
+- No HTML responses
 
-* REST JSON API
-* Versioniert: `/api/v1/...`
-* Keine HTML-Responses
-
-### Controller-Regeln
-
-* Controller sind **thin**
-* Keine Business-Logik im Controller
-* Validierung:
-
-  * Request-Klassen, wenn sinnvoll
-* Autorisierung:
-
-  * Laravel Policies
+### Controller Rules
+- Controllers are **thin**
+- No business logic in controllers
+- Validation:
+  - use Request classes where appropriate
+- Authorization:
+  - use Laravel Policies
 
 ### Services
-
-* Services nur, wenn Logik:
-
-  * wiederverwendbar
-  * oder komplexer wird
-* Kein Overengineering im MVP
+- Use services only when logic is:
+  - reusable
+  - or becoming complex
+- No overengineering in MVP
 
 ---
 
-## 4. API Response Format (verbindlich)
+## 4. API Response Format (binding)
 
-### Erfolg
+### Success
 
 ```json
 {
@@ -97,7 +90,7 @@ color: var(--text);
 }
 ```
 
-### Fehler
+### Error
 
 ```json
 {
@@ -108,7 +101,7 @@ color: var(--text);
 }
 ```
 
-### Validierungsfehler
+### Validation Error
 
 ```json
 {
@@ -122,20 +115,19 @@ color: var(--text);
 }
 ```
 
-❌ Keine gemischten Response-Formate
-❌ Keine nackten Strings oder Arrays als Response
+No mixed response formats.
+No bare strings or arrays as responses.
 
 ---
 
 ## 5. Auth & Security (MVP)
 
-* Auth erfolgt ausschließlich über API
-* Web greift **nie direkt** auf DB zu
-* Keine sensiblen Felder in Public Responses:
-
-  * keine E-Mail
-  * keine internen IDs
-  * keine Tokens
+- Auth is handled exclusively via API
+- Web **never** accesses the DB directly
+- No sensitive fields in public responses:
+  - no email
+  - no internal IDs
+  - no tokens
 
 ---
 
@@ -143,55 +135,51 @@ color: var(--text);
 
 ### Branches
 
-* `main` → stabil / produktionsnah
-* `develop` → aktive Entwicklung
-* `feature/<name>`
-* `fix/<name>`
+- `main` -> stable / production-close
+- `develop` -> active development
+- `feature/<name>`
+- `fix/<name>`
 
 ### Commits
 
-* Imperativ
-* Kurz & klar
+- Imperative mood
+- Short and clear
 
-✅ Beispiele:
+Examples:
+- `Add artist page editor`
+- `Fix public page caching`
+- `Refactor theme handling`
 
-* `Add artist page editor`
-* `Fix public page caching`
-* `Refactor theme handling`
-
-❌ Keine:
-
-* `stuff`
-* `wip`
-* `changes`
+Do not use:
+- `stuff`
+- `wip`
+- `changes`
 
 ---
 
-## 7. MVP-Fokus (wichtig)
+## 7. MVP Focus (important)
 
-* Fokus auf **Free + Artist**
-* Keine AI-Features
-* Keine App
-* Keine Feature-Flut
+- Focus on **Free + Artist**
+- No AI features
+- No app
+- No feature flood
 
-> Wenn etwas nicht klar ist:
-> **einfach, stabil, nachvollziehbar > clever**
-
----
-
-## 8. Harte Verbote
-
-* ❌ `node_modules` oder `vendor` committen
-* ❌ Cross-Imports zwischen `apps/web` und `apps/api`
-* ❌ Farbpicker im MVP
-* ❌ „Magic“ ohne Dokumentation
+> If something is unclear:
+> **simple, stable, understandable > clever**
 
 ---
 
-## 9. Leitsatz
+## 8. Hard Prohibitions
 
-> Vibaro ist ein Produkt für Musiker.
-> Klarheit, Ruhe und Geschmack sind wichtiger als technische Spielereien.
+- Do not commit `node_modules` or `vendor`
+- No cross-imports between `apps/web` and `apps/api`
+- No color picker in MVP
+- No "magic" without documentation
 
-```
+---
+
+## 9. Guiding Principle
+
+> Vibaro is a product for musicians.
+> Clarity, calm, and taste matter more than technical gimmicks.
 

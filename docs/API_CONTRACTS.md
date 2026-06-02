@@ -2,23 +2,23 @@
 
 Status: historical / needs update
 Last verified: 2026-04-22
-Scope: gemischter Vertragsbestand mit teilweise aktuellem, teilweise historischem Inhalt
+Scope: mixed contract inventory with partially current and partially historical content
 
-Diese Datei ist **aktuell nicht mehr als Ganzes bindend**.
+This file is **currently no longer fully binding as a whole**.
 
-Grund:
+Reason:
 
-- sie mischt historische Produktstände und aktuelle Endpunkte in einem Dokument
-- sie verwendet gleichzeitig V1-/V2-Sprache und Current-Contract-Sprache
-- einzelne Claims sind im aktuellen Routen-Scan nicht eindeutig verifiziert
+- it mixes historical product states and current endpoints in one document
+- it uses V1/V2 terminology and current-contract terminology at the same time
+- individual claims are not unambiguously verified in the current route scan
 
-Bis zur Aufteilung in kleinere Vertragsdateien gilt:
+Until this is split into smaller contract files, the following applies:
 
-- `apps/api/routes/api.php` ist der Referenzpunkt für die existierende API-Fläche
-- diese Datei ist vor allem Kontext- und Migrationsdokumentation
-- neue Arbeit an Endpunkten sollte Verträge domänenscharf dokumentieren
+- `apps/api/routes/api.php` is the reference point for the existing API surface
+- this file is primarily context and migration documentation
+- new endpoint work should document contracts in a domain-specific way
 
-Empfohlene Zielaufteilung:
+Recommended target split:
 
 - Auth
 - Public Page
@@ -26,7 +26,7 @@ Empfohlene Zielaufteilung:
 - Tracking / Analytics
 - Spotlight / Campaign
 
-Alle Responses folgen weiterhin dem Standard aus `CONVENTIONS.md`.
+All responses continue to follow the standard in `CONVENTIONS.md`.
 
 ## Domain Map In This File
 
@@ -42,7 +42,7 @@ Alle Responses folgen weiterhin dem Standard aus `CONVENTIONS.md`.
 - V1 (Legacy): Mini-Homepage / Free + Artist
 - V2 (Product target / active product language): Stage System (`docs/PRODUCT_V2.md`)
 
-Die V1-/V2-Begriffe in dieser Datei sind daher Kontext, nicht automatisch gleichbedeutend mit vollständig verifiziertem Current Contract.
+The V1/V2 terms in this file therefore provide context and are not automatically equivalent to a fully verified current contract.
 
 ---
 
@@ -84,7 +84,7 @@ Error:
 
 ### POST /auth/register
 
-Registriert einen neuen User.
+Registers a new user.
 
 Request:
 
@@ -100,7 +100,7 @@ Request:
 
 ### POST /auth/login
 
-Login eines bestehenden Users.
+Login for an existing user.
 
 Request:
 
@@ -181,7 +181,7 @@ Response:
 
 ### POST /artist-pages
 
-Erstellt eine Artist Page (MVP: max. eine pro User)
+Creates an artist page (MVP: max one per user)
 
 Request:
 
@@ -196,11 +196,11 @@ Request:
 
 ### PATCH /artist-pages/{id}
 
-Partial updates erlaubt.
+Partial updates are allowed.
 
-Hinweis:
-- `is_published` und `published_at` sind in diesem generischen Update nicht client-setzbar.
-- Veröffentlichen/Zurückziehen erfolgt ausschließlich über die dedizierten Endpunkte `/artist-pages/{id}/publish` und `/artist-pages/{id}/unpublish`.
+Note:
+- `is_published` and `published_at` cannot be set by the client in this generic update.
+- Publishing/unpublishing is done exclusively via the dedicated endpoints `/artist-pages/{id}/publish` and `/artist-pages/{id}/unpublish`.
 
 Request:
 
@@ -220,11 +220,11 @@ Request:
 
 Auth required.
 
-Validierung:
+Validation:
 
-* handle vorhanden
-* display_name vorhanden
-* bio vorhanden
+* handle present
+* display_name present
+* bio present
 
 Response:
 
@@ -411,13 +411,13 @@ This section extends API v1. All existing v1 endpoints remain valid unless expli
 - `GET /api/v1/analytics/breakdown`
 - `GET /api/v1/analytics/comparison`
 - `GET /api/v1/studio/home`
-- Spotlight-, Campaign- und Tracking-Link-Endpunkte unter `/api/v1/**`
+- Spotlight, campaign, and tracking link endpoints under `/api/v1/**`
 
 ### Not verified in `apps/api/routes/api.php` during this review
 - `GET /t/{slug}` / `GET /t/{short_code}` public tracking redirect
 - CSV export endpoint
 
-Diese Punkte sind nicht automatisch falsch, aber aus diesem Review heraus nicht als current source of truth bestätigt.
+These points are not automatically wrong, but they are not confirmed as the current source of truth based on this review.
 
 ---
 
@@ -519,8 +519,8 @@ Returns all non-archived spotlights for the authenticated user's artist page.
       "platform_name": null,
       "description": "New dates announced.",
       "show_on_page": false,
-      "subtitle": "15 Städte, 4 Länder",
-      "cta_label": "Tickets sichern",
+      "subtitle": "15 cities, 4 countries",
+      "cta_label": "Get tickets",
       "secondary_cta_url": null,
       "secondary_cta_label": null,
       "background_image_url": null,
@@ -556,7 +556,7 @@ Creates a new spotlight.
   "description": "Feel-good summer anthem.",
   "show_on_page": true,
   "subtitle": "feat. Guest Artist",
-  "cta_label": "Jetzt hören",
+  "cta_label": "Listen now",
   "secondary_cta_url": "https://apple.music.com/...",
   "secondary_cta_label": "Apple Music",
   "background_image_url": "https://example.com/hero-bg.jpg",
@@ -598,7 +598,7 @@ Creates a new spotlight.
     "description": "Feel-good summer anthem.",
     "show_on_page": true,
     "subtitle": "feat. Guest Artist",
-    "cta_label": "Jetzt hören",
+    "cta_label": "Listen now",
     "secondary_cta_url": "https://apple.music.com/...",
     "secondary_cta_label": "Apple Music",
     "background_image_url": "https://example.com/hero-bg.jpg",
@@ -784,10 +784,10 @@ Response:
 
 ## Campaigns
 
-> **Status:** Technisch vorhanden (Backend, Routen, Modell, `campaign_id`-FK in `tracking_links` und Analytics).
-> Wird in der UI nicht exponiert — kein Campaign-Einstiegspunkt im Studio.
-> Das frühere „Stage Pro"-Tier-Konzept existiert nicht mehr; Vibaro hat ein einheitliches Preismodell.
-> Campaign-Endpunkte sind für eine spätere Aktivierung vorbereitet, aber derzeit ohne Produkt-Kontext.
+> **Status:** Technically present (backend, routes, model, `campaign_id` foreign key in `tracking_links`, and analytics).
+> Not exposed in the UI - no campaign entry point in Studio.
+> The former "Stage Pro" tier concept no longer exists; Vibaro now has a unified pricing model.
+> Campaign endpoints are prepared for future activation, but currently have no product context.
 
 ### GET /campaigns
 
@@ -1007,7 +1007,7 @@ Response (duplicate):
 {
   "error": {
     "code": "duplicate_link",
-    "message": "Ein Link für diese Kombination existiert bereits.",
+    "message": "A link for this combination already exists.",
     "details": {
       "spotlight_id": 12,
       "platform": "instagram",
@@ -1048,7 +1048,7 @@ Response:
 **Rules:**
 - Does not delete click history
 - Archived links can be restored via backend (not exposed in MVP)
-- Archivierung removes the link from active queries and releases the unique constraint
+- Archiving removes the link from active queries and releases the unique constraint
 
 ---
 
@@ -1334,8 +1334,8 @@ Response:
     },
     "tip": {
       "type": "spotlight",
-      "message": "Erstelle ein Spotlight, um deine Performance zu tracken.",
-      "action_label": "Spotlight erstellen",
+      "message": "Create a spotlight to track your performance.",
+      "action_label": "Create spotlight",
       "action_type": "navigate",
       "action_payload": { "path": "/studio/project" }
     }
@@ -1353,7 +1353,7 @@ Rules:
 
 ## Export
 
-> **Status:** Noch nicht implementiert. Abhängig von Campaign-Aktivierung (siehe Campaigns-Abschnitt).
+> **Status:** Not implemented yet. Depends on campaign activation (see Campaigns section).
 
 ### GET /exports/campaigns/{id}.csv
 

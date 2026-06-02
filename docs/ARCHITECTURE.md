@@ -2,67 +2,67 @@
 
 Status: current
 Last verified: 2026-04-22
-Scope: aktuelle Laufzeit- und Integrationsarchitektur des Monorepos
+Scope: current runtime and integration architecture of the monorepo
 
-Diese Datei beschreibt den derzeitigen Systemzuschnitt.
-Produktvisionen oder historische V1/V2-Einordnungen gehören in die Produktdokumente, nicht hierher.
+This file describes the current system shape.
+Product visions or historical V1/V2 classification belong in product documents, not here.
 
 ## Goal
 
-Vibaro ist aktuell ein Monorepo mit Next.js-Webanwendung und Laravel-JSON-API für Public Pages, Studio-Funktionen, Auth sowie die aktuellen Spotlight-/Tracking-/Analytics-Flows.
+Vibaro is currently a monorepo with a Next.js web application and a Laravel JSON API for public pages, Studio features, auth, and the current spotlight/tracking/analytics flows.
 
 ## Monorepo Structure
 
 - `apps/web`: Next.js App Router, Landing, Auth, Studio, Public Artist Pages, BFF Route Handlers
-- `apps/api`: Laravel JSON API für Auth, Artist Pages, Studio CRUD, Tracking, Analytics und Spotlights
-- `packages/shared`: framework-agnostische gemeinsame Artefakte, ohne Cross-App-Laufzeitkopplung
-- `infra/`: lokale Infrastruktur und Skripte
-- `docs/`: Dokumentation; nur korrekt, wenn mit Code synchron gehalten
+- `apps/api`: Laravel JSON API for auth, artist pages, Studio CRUD, tracking, analytics, and spotlights
+- `packages/shared`: framework-agnostic shared artifacts, without cross-app runtime coupling
+- `infra/`: local infrastructure and scripts
+- `docs/`: documentation; only correct if kept in sync with code
 
 ## Hard Boundaries
 
-- `apps/web` importiert keinen Code aus `apps/api`.
-- Kommunikation zwischen Web und API erfolgt über HTTP/JSON.
-- Gemeinsamer Code gehört nur nach `packages/shared` und muss framework-agnostisch bleiben.
+- `apps/web` must not import code from `apps/api`.
+- Communication between web and API happens over HTTP/JSON.
+- Shared code belongs only in `packages/shared` and must remain framework-agnostic.
 
 ## Current Runtime Topology
 
-- Browser spricht primär mit Next.js.
-- Laravel ist das Backend-System für Daten, Auth, Policies und Business-Logik.
-- Authentifizierte Browser-Aktionen laufen über Next.js Route Handlers oder server-only Utilities.
-- Öffentliche Server-Fetches dürfen direkt von Next.js zur Laravel-API gehen, wenn kein Browser-Token beteiligt ist.
+- The browser primarily talks to Next.js.
+- Laravel is the backend system for data, auth, policies, and business logic.
+- Authenticated browser actions run through Next.js route handlers or server-only utilities.
+- Public server fetches may go directly from Next.js to the Laravel API when no browser token is involved.
 
 ## Current Auth/Data Flow
 
 ### Authentication
 
 - Laravel erzeugt Sanctum Personal Access Tokens.
-- Next.js Login-/Register-Route-Handler lesen den Token aus der Laravel-Response und setzen `vibaro_token` als `httpOnly` Cookie.
-- Authentifizierte Requests aus Browser-Clients laufen über Next.js-BFF-Endpunkte.
-- Authentifizierte serverseitige Requests laufen über `backendFetch()`.
-- Der Browser hält keinen lesbaren Bearer-Token.
+- Next.js login/register route handlers read the token from the Laravel response and set `vibaro_token` as an `httpOnly` cookie.
+- Authenticated requests from browser clients run through Next.js BFF endpoints.
+- Authenticated server-side requests run through `backendFetch()`.
+- The browser does not hold a readable bearer token.
 
 ### Public Artist Pages
 
-- Öffentliche Seiten liegen unter `/p/[handle]`.
-- Der veröffentlichte öffentliche Pfad nutzt den Public-Endpoint der API.
-- Die Owner-Preview für unveröffentlichte Seiten nutzt einen separaten authentifizierten Preview-Endpoint.
-- Öffentliche und Preview-Pfade bleiben bewusst getrennt, damit Caching-Regeln nicht vermischt werden.
+- Public pages live under `/p/[handle]`.
+- The published public path uses the API's public endpoint.
+- The owner preview for unpublished pages uses a separate authenticated preview endpoint.
+- Public and preview paths remain deliberately separated so caching rules are not mixed.
 
 ## Route Handler Classification
 
 | Category | Current rule | Example |
 |---|---|---|
-| Auth-sensitive | Muss über BFF oder server-only Helper laufen | Studio-Endpunkte |
-| Upload proxy | Muss über Web-Schicht laufen | Avatar-, Hero-, Cover-, Flyer-Uploads |
-| Public, directly fetchable | Darf server-seitig direkt gegen Laravel gehen | veröffentlichte Public Page |
-| Public but transformed | Route Handler nur bei zusätzlicher Aggregation/Transformation | spezielle zusammengesetzte Web-Responses |
+| Auth-sensitive | Must run through BFF or server-only helper | Studio endpoints |
+| Upload proxy | Must run through the web layer | Avatar, hero, cover, flyer uploads |
+| Public, directly fetchable | May go server-side directly to Laravel | Published public page |
+| Public but transformed | Route handler only for additional aggregation/transformation | Special composed web responses |
 
-Die bindende Grenze ist einfach:
-Sobald ein Request den `vibaro_token` braucht, darf die Browser-Schicht den Token nicht selbst halten oder an Laravel senden.
+The binding boundary is simple:
+As soon as a request needs `vibaro_token`, the browser layer must not hold the token itself or send it to Laravel.
 
 ## Non-Goals (Current)
 
-- kein direkter DB-Zugriff aus `apps/web`
-- keine zweite Auth-Schiene neben dem BFF-/server-only-Muster
-- keine Cross-App-Imports zwischen Web und API
+- no direct database access from `apps/web`
+- no second auth path beside the BFF/server-only pattern
+- no cross-app imports between web and API

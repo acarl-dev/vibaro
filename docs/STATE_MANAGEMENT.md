@@ -2,81 +2,81 @@
 
 Status: current
 Last verified: 2026-04-22
-Scope: aktueller Ist-Zustand in `apps/web`
+Scope: current state in `apps/web`
 
-Diese Datei beschreibt den derzeit tatsächlich genutzten State-Ansatz im Frontend.
-Sie ist keine Zielarchitektur.
-
----
-
-## Grundsatz
-
-State bleibt so lokal wie möglich.
-Der aktuelle Code bevorzugt Server Components, Route Handlers und lokale `useState`-Zustände statt eines allgemeinen Client-State-Frameworks.
+This file describes the state approach currently used in the frontend.
+It is not a target architecture.
 
 ---
 
-## Was aktuell **nicht** im Projekt verwendet wird
+## Principle
 
-- Kein TanStack Query
-- Kein Zustand Store
-- Kein globaler Auth-Context
+State stays as local as possible.
+The current code prefers Server Components, Route Handlers, and local `useState` state instead of a general client-state framework.
 
-Diese Bibliotheken sind im aktuellen Web-Paket nicht installiert und werden im Codepfad nicht verwendet.
+---
+
+## What is currently **not** used in the project
+
+- No TanStack Query
+- No Zustand store
+- No global auth context
+
+These libraries are not installed in the current web package and are not used in the code path.
 
 ---
 
 ## Server State (API-Daten)
 
-Serverdaten werden aktuell auf zwei Arten geladen:
+Server data is currently loaded in two ways:
 
-- Server-seitig über Next.js Server Components und server-only Utilities wie `backendFetch()`
-- Client-seitig über `fetch()` gegen Next.js Route Handlers unter `/api/**`
+- Server-side via Next.js Server Components and server-only utilities like `backendFetch()`
+- Client-side via `fetch()` against Next.js Route Handlers under `/api/**`
 
-Konkrete Muster im aktuellen Code:
+Concrete patterns in the current code:
 
-- Authentifizierte Server-Fetches laufen über `src/lib/api/backend.ts`
-- Öffentliche Daten können server-seitig direkt vom Laravel-API-Endpunkt geladen werden
-- Interaktive Studio-Clients laden und mutieren Daten meist direkt über `fetch("/api/studio/..." )`
+- Authenticated server fetches run through `src/lib/api/backend.ts`
+- Public data can be loaded server-side directly from the Laravel API endpoint
+- Interactive Studio clients usually load and mutate data directly through `fetch("/api/studio/..." )`
 
-Es gibt derzeit keinen zentralen Cache-Layer für Server State im Browser.
-Wenn dieselben Daten an mehreren Stellen gebraucht werden, werden sie heute entweder server-seitig erneut geladen oder lokal im jeweiligen Client gehalten.
+There is currently no central cache layer for server state in the browser.
+If the same data is needed in multiple places, it is currently either reloaded on the server side or kept locally in the respective client.
 
 ---
 
 ## UI State
 
-Der dominante UI-State-Mechanismus ist aktuell lokales `useState` in der jeweiligen Komponente.
+The dominant UI state mechanism is currently local `useState` in the respective component.
 
-Typische Beispiele:
+Typical examples:
 
-- Formulare
-- Upload-Status
-- Modal- und Panel-Zustände
-- lokale Fehler- und Erfolgsanzeigen
-- Sortier- und Bearbeitungszustände in Studio-Ansichten
+- forms
+- upload status
+- modal and panel state
+- local error and success messages
+- sorting and editing state in Studio views
 
-Komplexerer UI-State wird momentan ebenfalls lokal pro Feature gehalten, nicht in einem globalen Store.
+More complex UI state is also currently kept locally per feature, not in a global store.
 
 ---
 
 ## React Context
 
-React Context wird aktuell sparsam für querschnittliche UI-Themen eingesetzt, nicht für API-Daten oder Auth.
+React Context is currently used sparingly for cross-cutting UI concerns, not for API data or auth.
 
-Derzeit vorhandene Contexts:
+Currently existing contexts:
 
-- `ToastContext` für Toast-Ausgabe
-- `HelpModeContext` für Help-Mode und Help-Hub-UI
+- `ToastContext` for toast output
+- `HelpModeContext` for Help Mode and Help Hub UI
 
-Auth- und Session-Prüfung laufen aktuell server-seitig über Cookies, Redirects und `backendFetch()`, nicht über einen React Context.
+Auth and session checks currently run server-side via cookies, redirects, and `backendFetch()`, not through a React Context.
 
 ---
 
-## Verboten / Nicht vorgesehen
+## Forbidden / Not intended
 
-- API-Daten in React Context duplizieren
-- einen globalen Store „auf Vorrat“ einführen
-- mehrere konkurrierende Strategien für denselben Zustand parallel betreiben
+- duplicating API data in React Context
+- introducing a global store "just in case"
+- running multiple competing strategies for the same state in parallel
 
-Wenn TanStack Query, Zustand oder ein anderer globaler State-Ansatz später eingeführt wird, muss diese Datei vorher oder gleichzeitig von `current` auf den neuen Ist-Zustand angepasst werden.
+If TanStack Query, Zustand, or another global state approach is introduced later, this file must be updated beforehand or at the same time from `current` to the new actual state.

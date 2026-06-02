@@ -1,17 +1,17 @@
-# Vibaro Environment
+﻿# Vibaro Environment
 
-Diese Datei beschreibt das Setup für **Local Development**, **Staging** (Hetzner CPX21) und **Production** (Hybrid: Vercel + Hetzner).
-Sie ist die verbindliche Referenz für `.env` Keys, Ports, Services und typische Probleme.
+This file describes the setup for **local development**, **staging** (Hetzner CPX21), and **production** (hybrid: Vercel + Hetzner).
+It is the binding reference for `.env` keys, ports, services, and common issues.
 
 ---
 
 ## 1) Monorepo Overview
 
 Root:
-- `apps/web` → Next.js (Landing, Dashboard, Public Pages)
-- `apps/api` → Laravel (JSON API)
-- `infra/docker` → lokale Services (Postgres, Redis, Mailhog)
-- `docs` → Dokumentation (Source of Truth)
+- `apps/web` -> Next.js (landing, dashboard, public pages)
+- `apps/api` -> Laravel (JSON API)
+- `infra/docker` -> local services (Postgres, Redis, Mailhog)
+- `docs` -> documentation (source of truth)
 
 ---
 
@@ -25,12 +25,12 @@ Root:
 - Mailhog UI: `http://localhost:8025`
 - Mailhog SMTP: `localhost:1025`
 
-> Wichtig: Local läuft Web und API typischerweise direkt (nicht in Containern), DB/Redis/Mailhog via Docker.
+> Important: In local development, web and API usually run directly (not in containers), while DB/Redis/Mailhog run via Docker.
 
 ---
 
 ### 2.2 Local Services via Docker Compose
-Empfohlen: Docker Compose unter `infra/docker/docker-compose.yml` mit:
+Recommended: Docker Compose at `infra/docker/docker-compose.yml` with:
 - `postgres:16`
 - `redis:7`
 - `mailhog`
@@ -38,10 +38,9 @@ Empfohlen: Docker Compose unter `infra/docker/docker-compose.yml` mit:
 Start:
 ```bash
 docker compose -f infra/docker/docker-compose.yml up -d
-````
+```
 
 Stop:
-
 ```bash
 docker compose -f infra/docker/docker-compose.yml down
 ```
@@ -58,7 +57,7 @@ Minimal:
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-> **Kanonischer Name:** `NEXT_PUBLIC_API_BASE_URL` ist der einzige korrekte Variablenname für die Backend-URL im Web-Projekt. Alle Route Handlers und Server-Utilities in `apps/web` lesen ausschließlich diese Variable (via `getBackendBaseUrl()` in `src/lib/api/backend.ts`).
+> **Canonical name:** `NEXT_PUBLIC_API_BASE_URL` is the only correct variable name for the backend URL in the web project. All route handlers and server utilities in `apps/web` read only this variable (via `getBackendBaseUrl()` in `src/lib/api/backend.ts`).
 
 #### 2.3.2 API: `apps/api/.env`
 
@@ -100,7 +99,7 @@ From repo root:
 npm run dev:web
 ```
 
-oder direkt:
+Or directly:
 
 ```bash
 cd apps/web && npm run dev
@@ -124,24 +123,24 @@ php artisan migrate
 
 ## 3) Staging (Hetzner CPX21)
 
-### 3.1 Ziele
+### 3.1 Goals
 
-Staging ist für:
+Staging is used for:
 
-* Deploy-Proben
-* Stripe Test Mode
-* Upload/Storage Tests
-* CORS/Auth Checks
-* Webhooks (Test)
+* deploy rehearsals
+* Stripe test mode
+* upload/storage tests
+* CORS/auth checks
+* webhooks (test)
 
-### 3.2 Domains (Beispiel)
+### 3.2 Domains (Example)
 
-* `staging-api.<domain>` → Hetzner CPX21
-* Optional: `staging.<domain>` → Vercel Preview oder separate Vercel env
+* `staging-api.<domain>` -> Hetzner CPX21
+* Optional: `staging.<domain>` -> Vercel preview or separate Vercel env
 
 ### 3.3 ENV (API Staging)
 
-Wichtige Unterschiede zu local:
+Important differences from local:
 
 ```env
 APP_ENV=staging
@@ -157,11 +156,11 @@ REDIS_HOST=localhost
 
 ### 3.4 HTTPS
 
-Staging muss echtes HTTPS nutzen (LetsEncrypt), weil:
+Staging must use real HTTPS (LetsEncrypt), because of:
 
-* Cookies/Auth
-* Stripe Webhooks
-* Public Links
+* cookies/auth
+* Stripe webhooks
+* public links
 
 ---
 
@@ -171,14 +170,14 @@ Staging muss echtes HTTPS nutzen (LetsEncrypt), weil:
 
 * Web: **Vercel**
 * API: **Hetzner**
-* DB/Redis: Hetzner (auf dem API-Server am Anfang ok)
-* Assets: später S3-compatible Storage (Hetzner Object Storage / R2 / DO Spaces)
+* DB/Redis: Hetzner (on the API server is fine at the beginning)
+* Assets: later S3-compatible storage (Hetzner Object Storage / R2 / DO Spaces)
 
-### 4.2 Domains (Empfehlung)
+### 4.2 Domains (Recommendation)
 
-* `vibaro.<domain>` oder `<domain>` → Vercel (Landing)
-* `app.<domain>` → Vercel (Dashboard)
-* `api.<domain>` → Hetzner (Laravel API)
+* `vibaro.<domain>` or `<domain>` -> Vercel (landing)
+* `app.<domain>` -> Vercel (dashboard)
+* `api.<domain>` -> Hetzner (Laravel API)
 
 Public pages:
 
@@ -231,10 +230,10 @@ MAIL_FROM_NAME="Vibaro"
 
 ### 5.1 Token Auth (MVP recommended)
 
-* Works well across Vercel ↔ Hetzner.
+* Works well across Vercel <-> Hetzner.
 * Avoids most cookie domain/samesite complexity.
 
-### 5.2 Cookie Auth (If used later)
+### 5.2 Cookie Auth (if used later)
 
 Then you must configure:
 
@@ -276,13 +275,13 @@ Recommended:
 
 * Check `NEXT_PUBLIC_API_BASE_URL`
 * Check API is running (`curl http://127.0.0.1:8000`)
-* Check CORS if browser blocks requests
+* Check CORS if the browser blocks requests
 
 ### API cannot connect to Postgres
 
-* Is docker compose running?
-* Is `DB_HOST=127.0.0.1` correct (not `db`) when DB is on host?
-* Check port 5432 not in use
+* Is Docker Compose running?
+* Is `DB_HOST=127.0.0.1` correct (not `db`) when DB runs on host?
+* Check that port 5432 is not in use
 
 ### Mail not arriving locally
 
@@ -291,8 +290,7 @@ Recommended:
 
 ---
 
-## 9) Required Files (Never commit secrets)
+## 9) Required Files (Never Commit Secrets)
 
 * Commit: `.env.example`, `.env.local.example`
 * Never commit: `.env`, `.env.local`
-

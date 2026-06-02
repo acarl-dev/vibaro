@@ -4,86 +4,86 @@ Status: Active
 Scope: Studio, Public Page, Landingpage  
 Related: ARCHITECTURE.md, PRODUCT_RULES.md, PRODUCT_V2.md, THEMES.md
 
-Dieser Styleguide definiert verbindlich die visuelle und sprachliche Ausrichtung von Vibaro.
-Er gilt fuer alle Design- und UX-Entscheidungen im MVP.
+This styleguide defines Vibaro's visual and verbal direction in a binding way.
+It applies to all design and UX decisions in the MVP.
 
-Leitsatz: ruhig, hochwertig, zeitlos. Die Band steht im Mittelpunkt, das Tool bleibt im Hintergrund.
-
----
-
-## 1. Produkt-DNA
-
-### Was Vibaro ist
-
-- Eine Bandseite auf Vibaro mit klarem aktuellem Fokus.
-- Ein Workflow-System fuer konkrete Promotion-Phasen.
-- Ein Tool, das Sichtbarkeit und Wirkung pro Phase messbar macht.
-
-### Was Vibaro nicht ist
-
-- Keine generische "Baukasten-Homepage" ohne Handlungsfokus.
-- Kein lautes Marketing-Dashboard.
-- Kein Feature-Katalog ohne klaren naechsten Schritt.
-
-### Zentraler Produktloop (visuell zu stuetzen)
-
-1. Aktuellen Fokus festlegen.
-2. Links und QR-Code teilen.
-3. Sehen, was funktioniert.
-
-Regel fuer alle Screens: Der aktuelle Schritt im Loop muss klar erkennbar sein, und der naechste Schritt muss sichtbar vorbereitet werden.
+Guiding principle: calm, high-quality, timeless. The band is the focus; the tool stays in the background.
 
 ---
 
-## 2. Zielgruppe Und Tonalitaet
+## 1. Product DNA
 
-### Primare MVP-Zielgruppe
+### What Vibaro is
 
-- Ambitionierte Metal-, Metalcore- und Alternative-Bands.
+- A band page on Vibaro with a clear current focus.
+- A workflow system for concrete promotion phases.
+- A tool that makes visibility and impact measurable per phase.
 
-### Tonalitaet
+### What Vibaro is not
 
-- Ernsthaft.
-- Hochwertig.
-- Ruhig.
-- Kontrolliert.
-- Direkt und klar.
+- Not a generic "website builder homepage" without action focus.
+- Not a loud marketing dashboard.
+- Not a feature catalog without a clear next step.
 
-### Nicht erlaubt
+### Core product loop (to support visually)
 
-- Verspielte oder ironische Produktsprache.
-- Generische SaaS-Floskeln.
-- Startup-Buzzwords.
+1. Define the current focus.
+2. Share links and QR code.
+3. See what works.
 
-Referenzgefuehl: moderne Editorial-Aesthetik aus Musik-/Kulturkontext, nicht "Growth-Tool"-Optik.
+Rule for all screens: the current step in the loop must be clearly recognizable, and the next step must be visibly prepared.
 
 ---
 
-## 3. Sprache Und Begriffe
+## 2. Target Audience And Tone
 
-### Verbindliche Produktbegriffe (UI-nah)
+### Primary MVP target audience
 
-- Meine Seite = dauerhafte Bandseite.
-- Phase = aktueller Fokus (z. B. Release, Tour, Merch, Studio).
-- Links verteilen = Tracking-Links und QR-Code je Kanal.
-- Performance dieser Phase = Auswertung einer konkreten Phase.
-- Analyse = uebergreifende Auswertung ueber mehrere Phasen.
+- Ambitious metal, metalcore, and alternative bands.
 
-### Bevorzugte sichtbare Begriffe in der Primar-UI
+### Tone
 
-- Fokus
+- Serious.
+- High-quality.
+- Calm.
+- Controlled.
+- Direct and clear.
+
+### Not allowed
+
+- Playful or ironic product language.
+- Generic SaaS phrases.
+- Startup buzzwords.
+
+Reference feel: a modern editorial aesthetic from a music/cultural context, not a "growth tool" look.
+
+---
+
+## 3. Language And Terms
+
+### Binding product terms (UI-facing)
+
+- My Page = permanent band page.
+- Phase = current focus (for example release, tour, merch, studio).
+- Share Links = tracking links and QR code per channel.
+- Performance for This Phase = evaluation of one concrete phase.
+- Analytics = cross-phase evaluation across multiple phases.
+
+### Preferred visible terms in the primary UI
+
+- Focus
 - Phase
-- Links verteilen
-- QR-Code
-- Performance dieser Phase
-- Analyse
-- Veroeffentlichen
-- Sichtbar / Nicht sichtbar
+- Share Links
+- QR Code
+- Performance for This Phase
+- Analytics
+- Publish
+- Visible / Not Visible
 
-### Zu vermeidende technische Begriffe in der Primar-UI
+### Technical terms to avoid in the primary UI
 
-- Distribution (als Hauptbegriff)
-- Tracking (als dominante Nutzerbezeichnung)
+- Distribution (as the primary term)
+- Tracking (as the dominant user-facing term)
 - Conversion
 - Handle
 - Hero
@@ -91,205 +91,205 @@ Referenzgefuehl: moderne Editorial-Aesthetik aus Musik-/Kulturkontext, nicht "Gr
 - UTM
 - Attribution
 
-Technische Begriffe duerfen in Entwicklerdoku, optionalen Hilfetexten oder API-Kontexten vorkommen, aber nicht als dominante Nutzerfuehrung im Studio.
+Technical terms may appear in developer docs, optional help text, or API contexts, but not as dominant user guidance in the Studio.
 
-### Begriffsumgang (verbindlich)
+### Term handling (binding)
 
-- Distribution: intern okay, extern in der UI durch "Links verteilen" ersetzen.
-- Tracking: intern/fachlich okay, in der UI bevorzugt "Performance" oder "Wirkung".
-- Conversion: nur in Analyse-Kontexten, nicht als Einstiegssprache.
-- Handle: in UI als "Band-Adresse" oder "Seiten-Adresse" erklaeren.
-- Hero: nur als interner Designbegriff.
-- Template: in UI durch "Design" oder "Look" ersetzen.
+- Distribution: okay internally; replace with "Share Links" in the UI.
+- Tracking: okay internally/technically; prefer "Performance" or "Impact" in the UI.
+- Conversion: only in analytics contexts, not as entry-point language.
+- Handle: explain in the UI as "Band Address" or "Page Address".
+- Hero: internal design term only.
+- Template: replace in the UI with "Design" or "Look".
 
-### Deutsch/Englisch-Regel
+### German/English rule
 
-- Studio: Deutsch als Standardsprache fuer Navigation, Aktionen, Hilfetexte und Status.
-- Public Page: Sprache der Bandinhalte frei waehlbar; Produkt-/Tool-Sprache bleibt im Hintergrund.
-- Technische englische Fachbegriffe nur dann, wenn es keine klare deutsche Alternative im jeweiligen Kontext gibt.
-
----
-
-## 4. Informationsarchitektur
-
-### Trennung der Kernbereiche
-
-- Meine Seite: dauerhafte Identitaet und Grundauftritt.
-- Phase: aktueller Promotion-Fokus.
-- Links verteilen: operative Ausspielung pro Kanal inklusive QR.
-- Performance dieser Phase: Wirkung einer konkreten Phase.
-- Analyse: uebergreifende Sicht auf Entwicklung und Muster.
-
-### Navigationsprinzip
-
-- Jeder Screen braucht einen klaren naechsten Schritt.
-- Jeder Screen-Zustand hat genau einen dominanten CTA.
-- Sekundaeraktionen bleiben visuell nachgeordnet.
-
-### Priorisierung
-
-- Aktionen sind wichtiger als Datenmasse.
-- Daten werden kontextuell gezeigt, nicht als permanente Dashboard-Wand.
+- Studio: German as the default language for navigation, actions, help text, and status.
+- Public Page: the language of band content is freely selectable; product/tool language stays in the background.
+- Technical English terms only when there is no clear German alternative in the respective context.
 
 ---
 
-## 5. Visuelles System
+## 4. Information Architecture
 
-### Farben
+### Separation of the core areas
 
-- Farben kommen ausschliesslich aus dem Theme-System gemaess THEMES.md.
-- Keine freien HEX-Farben in Komponenten.
-- Keine grellen Flaechen als Standard.
-- Kontraste muessen klar lesbar, aber nicht aggressiv sein.
+- My Page: permanent identity and base presence.
+- Phase: current promotion focus.
+- Share Links: operational distribution per channel including QR.
+- Performance for This Phase: impact of a concrete phase.
+- Analytics: broader view across development and patterns.
 
-### Typografie
+### Navigation principle
 
-- Ruhige, moderne Sans-Serif-Systematik.
-- Keine verspielten oder dekorativen Schriftstile.
-- Klare Hierarchie: Headline, Subheadline, Body, Meta.
-- Textbreiten begrenzen, damit Inhalte editorial und lesbar bleiben.
+- Every screen needs a clear next step.
+- Every screen state has exactly one dominant CTA.
+- Secondary actions remain visually subordinate.
+
+### Prioritization
+
+- Actions are more important than data volume.
+- Data is shown contextually, not as a permanent dashboard wall.
+
+---
+
+## 5. Visual System
+
+### Colors
+
+- Colors come exclusively from the theme system according to THEMES.md.
+- No arbitrary HEX colors in components.
+- No loud color fields as the default.
+- Contrasts must be clearly readable, but not aggressive.
+
+### Typography
+
+- Calm, modern sans-serif typography.
+- No playful or decorative type styles.
+- Clear hierarchy: headline, subheadline, body, meta.
+- Limit text widths so content stays editorial and readable.
 
 ### Spacing
 
-- Grosszuegige Abstaende statt kompakter Verdichtung.
-- Weniger Elemente pro Viewport.
-- Mobile-first mit sauberer vertikaler Rhythmik.
+- Generous spacing instead of dense compaction.
+- Fewer elements per viewport.
+- Mobile-first with a clean vertical rhythm.
 
 ### Cards
 
-- Klare Gruppierung, dezente Trennung.
-- Keine starken Schatten, keine lauten Effekte.
-- Karten duerfen nicht wie austauschbare SaaS-Featureboxen wirken.
+- Clear grouping, subtle separation.
+- No heavy shadows, no loud effects.
+- Cards must not feel like interchangeable SaaS feature boxes.
 
 ### Buttons
 
-- Primaerer Button pro Screen-Zustand.
-- Klares visuelles Gefaelle zwischen primaer und sekundaer.
-- Keine "shiny"- oder spielerischen Stilmittel.
+- One primary button per screen state.
+- Clear visual hierarchy between primary and secondary.
+- No "shiny" or playful styling devices.
 
 ### Icons
 
-- Funktional, sparsam, konsistent.
-- Keine Deko-Icons ohne Informationswert.
+- Functional, restrained, consistent.
+- No decorative icons without informational value.
 
 ### Empty States
 
-- Immer mit klarer naechster Aktion.
-- Kurz erklaeren, warum etwas leer ist.
-- Keine toten Enden.
+- Always include a clear next action.
+- Briefly explain why something is empty.
+- No dead ends.
 
-### Hilfe-Elemente
+### Help Elements
 
-- Hilfe ist sichtbar, aber nicht dominant.
-- Hilfetexte unterstuetzen Entscheidungen statt sie zu ersetzen.
+- Help is visible, but not dominant.
+- Help text supports decisions instead of replacing them.
 
 ---
 
 ## 6. Studio Design
 
-### Grundprinzip
+### Core principle
 
-- Ruhig, kontrolliert, workflow-orientiert.
+- Calm, controlled, workflow-oriented.
 
-### Verbindliche Regeln
+### Binding rules
 
-- Keine Dashboard-Ueberladung mit gleichgewichtigen Widgets.
-- Aktionen vor Kennzahlen.
-- Die aktuelle Phase muss visuell eindeutig sein.
-- Hilfesystem ist immer erreichbar, aber draengt Aktionen nicht weg.
+- No dashboard overload with equally weighted widgets.
+- Actions before metrics.
+- The current phase must be visually unambiguous.
+- The help system must always be reachable, but must not push actions away.
 
-### Interaktion
+### Interaction
 
-- Kurze, subtile Motion nur zur Orientierung.
-- Keine Daueranimationen.
-- Keine Effekte, die Aufmerksamkeit unnoetig binden.
+- Short, subtle motion only for orientation.
+- No continuous animations.
+- No effects that hold attention unnecessarily.
 
 ---
 
 ## 7. Public Page Design
 
-### Zielbild
+### Target image
 
-- Band im Mittelpunkt.
-- Hochwertig, dunkel, stage-/editorial-artig.
-- Mobile-first fuer Fans.
+- The band at the center.
+- High-quality, dark, stage/editorial-like.
+- Mobile-first for fans.
 
-### Branding-Regel (verbindlich)
+### Branding rule (binding)
 
-- Vibaro-Branding darf sichtbar sein, aber nur dezent im Footer.
-- Kein Vibaro-Branding im Hero.
-- Keine dominante Vibaro-CTA im Content.
-- Die Bandidentitaet hat immer Prioritaet.
+- Vibaro branding may be visible, but only subtly in the footer.
+- No Vibaro branding in the hero.
+- No dominant Vibaro CTA inside the content.
+- The band identity always has priority.
 
-### Sprachregel Public Page
+### Language rule for the Public Page
 
-- Keine generische Template-Sprache.
-- Inhalte sollen nach echter Bandkommunikation klingen, nicht nach Tool-Text.
-
----
-
-## 8. Landingpage Design
-
-### Positionierung
-
-- Die Landingpage verkauft nicht nur "eine Homepage".
-- Sie erklaert den Produktloop: Fokus festlegen, Links/QR teilen, Performance sehen.
-
-### Struktur-Regel
-
-- Hero und erste Sections muessen den Produktloop sichtbar machen.
-- Keine Feature-Wueste.
-- Keine austauschbare SaaS-Optik.
-
-### Gestaltungsprinzip
-
-- Reduziert, editorial, klar priorisiert.
-- Eine dominante Botschaft pro Abschnitt.
-- Bildsprache: authentisch, musiknah, nicht stockhaft-startup.
+- No generic template language.
+- Content should sound like real band communication, not tool copy.
 
 ---
 
-## 9. Hilfe-System
+## 8. Landing Page Design
+
+### Positioning
+
+- The landing page does not sell only "a homepage".
+- It explains the product loop: define focus, share links/QR, see performance.
+
+### Structure rule
+
+- The hero and first sections must make the product loop visible.
+- No feature desert.
+- No interchangeable SaaS look.
+
+### Design principle
+
+- Reduced, editorial, clearly prioritized.
+- One dominant message per section.
+- Imagery: authentic, music-adjacent, not stock-startup-like.
+
+---
+
+## 9. Help System
 
 ### ExplainPanels
 
-- Kurz.
-- Kontextbezogen.
-- Handlungsorientiert.
+- Short.
+- Contextual.
+- Action-oriented.
 
 ### WhyButtons
 
-- Optional fuer mehr Tiefe.
-- Kein Pflichtschritt fuer den Hauptworkflow.
+- Optional for more depth.
+- Not a required step for the main workflow.
 
 ### HelpHub
 
-- Einstieg ueber den Produktloop.
-- Hilfe entlang der drei Kernschritte strukturieren.
+- Entry via the product loop.
+- Structure help along the three core steps.
 
-### Konsistenz-Regel
+### Consistency rule
 
-- Keine Wiederholungen gleicher Hilfetexte in mehreren Komponenten.
-- Hilfe darf nie die primaere Aktion auf dem Screen verdraengen.
+- No repetition of the same help text across multiple components.
+- Help must never displace the primary action on the screen.
 
 ---
 
 ## 10. Forbidden / Anti-Patterns
 
-- Zu viele gleich starke CTAs auf einem Screen.
-- Technische Begriffe als primaere Nutzerfuehrung.
-- "Distribution" als dominanter sichtbarer Begriff.
-- Vibaro-zentrierte Public Page statt bandzentrierter Darstellung.
-- Generische SaaS-Cards ohne produktive Handlung.
-- Zu viele "Coming Soon"-Bloecke in produktiven Flows.
-- Hilfe-Elemente, die die eigentliche Aktion ueberlagern.
-- Grelle Farben, visuelles Chaos oder dauerhafte Animationen.
-- Beliebige Startup-Buzzword-Texte statt klarer, musiknaher Sprache.
+- Too many equally strong CTAs on one screen.
+- Technical terms as primary user guidance.
+- "Distribution" as the dominant visible term.
+- A Vibaro-centered public page instead of a band-centered presentation.
+- Generic SaaS cards without productive action.
+- Too many "Coming Soon" blocks in production flows.
+- Help elements that cover the actual action.
+- Loud colors, visual chaos, or permanent animations.
+- Generic startup buzzword copy instead of clear, music-adjacent language.
 
 ---
 
-## Umsetzungshinweis
+## Implementation note
 
-Bei Konflikten zwischen Design-Wuenschen und Produktlogik gilt der Produktloop:
-Fokus setzen -> Links/QR teilen -> Performance sehen.
-Alle neuen UX-/UI-Slices muessen diesen Ablauf sicht- und nutzbar staerken.
+If there is a conflict between design wishes and product logic, the product loop applies:
+Set focus -> Share links/QR -> See performance.
+All new UX/UI slices must strengthen this flow in both visibility and usability.

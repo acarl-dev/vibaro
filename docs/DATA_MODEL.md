@@ -1,35 +1,35 @@
-# Vibaro Data Model (V1 + V2)
+﻿# Vibaro Data Model (V1 + V2)
 
 This document contains:
-- Legacy V1 data model (Mini-Homepage system)
-- Active V2 extensions (Stage System)
+- Legacy V1 data model (mini-homepage system)
+- Active V2 extensions (stage system)
 
 Active product rules: docs/PRODUCT_V2.md
 
 This file is the binding source for:
-- Migrations
-- Eloquent Models
-- Policies
-- API Responses
+- migrations
+- Eloquent models
+- policies
+- API responses
 
 ---
 
 # ===============================
-# V1 – Representation Layer
+# V1 - Representation Layer
 # ===============================
 
 ## users
 
-Authentifizierte Benutzer.
+Authenticated users.
 
-| Feld | Typ | Hinweise |
+| Field | Type | Notes |
 |----|----|----|
 | id | bigint | PK |
 | name | string | |
 | email | string | unique |
 | password | string | hashed |
 | is_admin | boolean | default false |
-| trial_ends_at | timestamp | nullable. Gesetzt bei Registrierung. Null = Probezeit abgelaufen oder nie gestartet. |
+| trial_ends_at | timestamp | nullable. Set on registration. Null = trial expired or never started. |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -37,22 +37,22 @@ Authentifizierte Benutzer.
 
 ## artist_pages
 
-Zentrale Entität für Musiker-Seiten.
+Central entity for musician pages.
 
-| Feld | Typ | Hinweise |
+| Field | Type | Notes |
 |----|----|----|
 | id | bigint | PK |
-| user_id | bigint | FK → users.id |
+| user_id | bigint | FK -> users.id |
 | handle | string | unique, lowercase, url-safe |
-| display_name | string | öffentlich sichtbar |
+| display_name | string | publicly visible |
 | bio | text | nullable |
 | avatar_path | string | nullable |
 | header_path | string | nullable |
 | logo_path | string | nullable |
-| hero_focal_x | integer | nullable, 0–100, default 50. Horizontaler Fokuspunkt des Hero-Bilds. |
-| hero_focal_y | integer | nullable, 0–100, default 35. Vertikaler Fokuspunkt des Hero-Bilds. |
-| theme_key | string | aktuell nur `modern` |
-| theme_variant | string | aktuell nur `auto` |
+| hero_focal_x | integer | nullable, 0-100, default 50. Horizontal focal point of the hero image. |
+| hero_focal_y | integer | nullable, 0-100, default 35. Vertical focal point of the hero image. |
+| theme_key | string | currently only `modern` |
+| theme_variant | string | currently only `auto` |
 | accent_mode | string | `auto` \| `manual` |
 | accent_color | string | hex, nullable |
 | booking_email | string | nullable, PRIVATE (legacy) |
@@ -67,21 +67,21 @@ Zentrale Entität für Musiker-Seiten.
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-**Indizes**
+**Indexes**
 - unique(handle)
 - unique(user_id)
 
-**Wichtig**
-- Legacy-Kontaktfelder (`booking_email` etc.) bleiben im Schema für die Studio-Settings erhalten.
-- Das `contacts`-Array ist die neue Source of Truth für die Public Page. Die API baut es aus `contacts` (falls gesetzt) oder fällt auf die Legacy-Felder zurück.
-- Handle darf nicht geändert werden, wenn veröffentlicht.
-- Public Queries erfolgen immer über handle, nie über ID.
+**Important**
+- Legacy contact fields (`booking_email`, etc.) remain in the schema for Studio settings.
+- The `contacts` array is the new source of truth for the public page. The API builds it from `contacts` (if set) or falls back to the legacy fields.
+- Handle must not be changed when published.
+- Public queries always run by handle, never by ID.
 
 ---
 
 ## links
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -97,7 +97,7 @@ Zentrale Entität für Musiker-Seiten.
 
 ## shows
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -119,7 +119,7 @@ Zentrale Entität für Musiker-Seiten.
 
 ## releases
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -137,7 +137,7 @@ Zentrale Entität für Musiker-Seiten.
 
 ## featured_tracks
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -154,7 +154,7 @@ Zentrale Entität für Musiker-Seiten.
 
 ## videos
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -173,7 +173,7 @@ Zentrale Entität für Musiker-Seiten.
 
 ## gallery_images
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -186,49 +186,49 @@ Zentrale Entität für Musiker-Seiten.
 ---
 
 # ===============================
-# V2 – Stage System
+# V2 - Stage System
 # ===============================
 
-V2 erweitert Vibaro um ein Spotlight-zentriertes Performance-Modell.
+V2 extends Vibaro with a spotlight-centered performance model.
 
-Leitprinzipien:
-- Server-side Tracking
-- Keine personenbezogenen Profile
-- Keine Fingerprints
-- Tracking ist kontextualisiert über Spotlight
+Guiding principles:
+- server-side tracking
+- no personal profiles
+- no fingerprints
+- tracking is contextualized through spotlight
 
 ---
 
 ## spotlights
 
-| Feld | Typ | Hinweise |
+| Field | Type | Notes |
 |----|----|----|
 | id | bigint | PK |
-| artist_page_id | bigint | FK → artist_pages.id |
-| title | string | Öffentlich sichtbar, kann geändert werden |
-| slug | string | **Stabil**, einmalig generiert, unique, url-safe |
-| type | string | z.B. `release`, `tour`, `single`, `merch` |
+| artist_page_id | bigint | FK -> artist_pages.id |
+| title | string | Publicly visible, can be changed |
+| slug | string | **Stable**, generated once, unique, url-safe |
+| type | string | e.g. `release`, `tour`, `single`, `merch` |
 | status | string | `active` \| `scheduled` \| `ended` |
 | starts_at | datetime | nullable |
 | ends_at | datetime | nullable |
 | primary_url | string | nullable |
-| cover_image_url | string | nullable, auto-gefüllt via oEmbed (Spotify, YouTube, etc.) |
-| artist_name | string | nullable, auto-gefüllt via oEmbed oder manuell |
-| platform_name | string | nullable, auto-erkannt aus URL (z.B. "Spotify", "YouTube") |
+| cover_image_url | string | nullable, auto-filled via oEmbed (Spotify, YouTube, etc.) |
+| artist_name | string | nullable, auto-filled via oEmbed or manually |
+| platform_name | string | nullable, auto-detected from URL (e.g. "Spotify", "YouTube") |
 | description | text | nullable |
-| subtitle | string(500) | nullable, ergänzende Zeile unter Titel |
-| cta_label | string(100) | nullable, überschreibt den Standard-CTA-Text |
-| secondary_cta_url | string(1000) | nullable, zweiter CTA Link |
-| secondary_cta_label | string(100) | nullable, Label für zweiten CTA |
-| background_image_url | string(1000) | nullable, Custom Hero-Hintergrund |
-| meta | jsonb | nullable, typ-spezifische Zusatzdaten (siehe unten) |
-| show_on_page | boolean | default true, steuert Hero-Banner |
+| subtitle | string(500) | nullable, additional line under title |
+| cta_label | string(100) | nullable, overrides default CTA text |
+| secondary_cta_url | string(1000) | nullable, second CTA link |
+| secondary_cta_label | string(100) | nullable, label for second CTA |
+| background_image_url | string(1000) | nullable, custom hero background |
+| meta | jsonb | nullable, type-specific additional data (see below) |
+| show_on_page | boolean | default true, controls hero banner |
 | archived_at | timestamp | nullable, soft delete |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-**meta (jsonb) – typ-spezifische Felder**
-| Type | Mögliche Keys | Beispiel |
+**meta (jsonb) - type-specific fields**
+| Type | Possible keys | Example |
 |----|----|----|
 | album | track_count | `{"track_count": 12}` |
 | video | duration | `{"duration": "4:32"}` |
@@ -236,24 +236,24 @@ Leitprinzipien:
 | event | venue, date | `{"venue": "Wacken", "date": "2026-08-06"}` |
 | livestream | stream_date | `{"stream_date": "2026-03-15T20:00:00Z"}` |
 | collab | partner_name | `{"partner_name": "Meshuggah"}` |
-| single | *(keine)* | `{}` |
-| merch | *(keine)* | `{}` |
+| single | *(none)* | `{}` |
+| merch | *(none)* | `{}` |
 
-**Regeln**
-- Maximal ein `active` Spotlight pro artist_page.
-- DB-Enforcement: Partial Unique Index auf `(artist_page_id)` für Zeilen mit `status = 'active'` und `archived_at IS NULL`.
-- `ends_at` darf nicht kleiner als `starts_at` sein.
-- **slug ist die stabile Campaign-Identität** – Titeländerung beeinflusst Analytics nicht.
-- slug wird bei Erstellung generiert (lowercase, url-safe, unique).
-- `show_on_page = true` + `status = active` + `archived_at IS NULL` → Hero-Banner sichtbar auf öffentlicher Seite.
-- Archivierung eines aktiven Spotlights normalisiert den Status auf `ended`, setzt `ends_at` falls nötig und entfernt es aus dem Hero-Zustand.
-- Archivierung (`archived_at`) entfernt Spotlight aus Studio-Ansichten, löscht aber keine TrackingLinks oder ClickEvents.
+**Rules**
+- Maximum one `active` spotlight per artist_page.
+- DB enforcement: partial unique index on `(artist_page_id)` for rows with `status = 'active'` and `archived_at IS NULL`.
+- `ends_at` must not be earlier than `starts_at`.
+- **slug is the stable campaign identity** - title changes do not affect analytics.
+- slug is generated on creation (lowercase, url-safe, unique).
+- `show_on_page = true` + `status = active` + `archived_at IS NULL` -> hero banner visible on public page.
+- Archiving an active spotlight normalizes status to `ended`, sets `ends_at` if needed, and removes it from the hero state.
+- Archiving (`archived_at`) removes spotlight from Studio views but does not delete tracking links or click events.
 
 ---
 
 ## campaigns (Stage Pro)
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -266,55 +266,55 @@ Leitprinzipien:
 | created_at | timestamp |
 | updated_at | timestamp |
 
-**Regeln**
-- campaign_id ist optional für tracking_links.
-- spotlight_id ist optional – Kampagnen können global oder Spotlight-spezifisch sein.
+**Rules**
+- campaign_id is optional for tracking_links.
+- spotlight_id is optional - campaigns can be global or spotlight-specific.
 
 ---
 
 ## tracking_links
 
-| Feld | Typ | Hinweise |
+| Field | Type | Notes |
 |----|----|----|
 | id | bigint | PK |
-| artist_page_id | bigint | FK → artist_pages.id |
-| spotlight_id | bigint | FK → spotlights.id |
+| artist_page_id | bigint | FK -> artist_pages.id |
+| spotlight_id | bigint | FK -> spotlights.id |
 | campaign_id | bigint | nullable, (Stage Pro, future) |
-| platform | string | z.B. `instagram`, `tiktok`, `email`, `spotify` |
-| placement | string | z.B. `story`, `bio`, `post`, `reel`, `newsletter` |
-| label | string | nullable, öffentlich sichtbar (z.B. "Hör jetzt rein") |
-| target_url | string | Ziel-URL |
-| short_code | string | unique, Public identifier (8 chars) |
-| utm_source | string | serverseitig generiert |
-| utm_medium | string | serverseitig generiert |
-| utm_campaign | string | **spotlight.slug** (stabil) |
+| platform | string | e.g. `instagram`, `tiktok`, `email`, `spotify` |
+| placement | string | e.g. `story`, `bio`, `post`, `reel`, `newsletter` |
+| label | string | nullable, publicly visible (e.g. "Listen now") |
+| target_url | string | destination URL |
+| short_code | string | unique, public identifier (8 chars) |
+| utm_source | string | server-generated |
+| utm_medium | string | server-generated |
+| utm_campaign | string | **spotlight.slug** (stable) |
 | utm_content | string | nullable |
 | utm_term | string | nullable |
-| click_count | integer | default 0, nur atomar inkrementiert |
+| click_count | integer | default 0, only atomically incremented |
 | archived_at | timestamp | nullable, soft delete |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-**Indizes**
+**Indexes**
 - unique(short_code)
 - index(artist_page_id)
 - index(spotlight_id)
-- **Partial Unique Index**: (spotlight_id, platform, placement) WHERE archived_at IS NULL
+- **Partial unique index**: (spotlight_id, platform, placement) WHERE archived_at IS NULL
 
-**Regeln**
-- Öffentliche Tracking-Route verwendet nur `short_code`.
-- target_url wird serverseitig validiert (http/https only).
-- **Keine Duplikate**: Pro Spotlight kann es nur einen aktiven Link pro (platform, placement) geben.
-- Archivierung löscht keine Click-Historie.
-- **utm_campaign basiert immer auf spotlight.slug**, nicht auf spotlight.title.
-- click_count is a Cache für Performance (Top-Listen), echte Analytics basieren auf click_events.
-- **click_count zählt ausschließlich nicht als Preview klassifizierte Klicks** (`is_preview = false`). Preview-Bots (WhatsApp, Telegram, Facebook Link Crawler etc.) werden zwar als ClickEvent gespeichert, erhöhen aber `click_count` nicht. Deshalb kann `click_count` kleiner sein als die Gesamtzahl der ClickEvents für denselben Link.
+**Rules**
+- Public tracking route uses only `short_code`.
+- target_url is validated server-side (http/https only).
+- **No duplicates**: Per spotlight, there can be only one active link per (platform, placement).
+- Archiving does not delete click history.
+- **utm_campaign is always based on spotlight.slug**, not spotlight.title.
+- click_count is a cache for performance (top lists); real analytics are based on click_events.
+- **click_count counts only clicks not classified as preview** (`is_preview = false`). Preview bots (WhatsApp, Telegram, Facebook link crawler, etc.) are stored as ClickEvents but do not increment `click_count`. Therefore, `click_count` can be lower than the total number of ClickEvents for the same link.
 
 ---
 
 ## click_events
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | tracking_link_id | bigint |
@@ -335,17 +335,17 @@ Leitprinzipien:
 - No fingerprinting.
 - No personal user profiles.
 
-**Unique-Visitor-Einschränkung (MVP)**
-- `unique_pageviews` und `visitors` werden über einen privacy-aware Visitor-Key dedupliziert (UA-Hash + coarse IP bucket + primäre Sprache; legacy fallback: `user_agent_hash`).
-- Das ist weiterhin eine **grobe Heuristik**: Kollisionen und Fehltrennungen bleiben möglich, daher sind die Werte nur trendtauglich.
-- Folge: Conversion-Metriken bleiben Approximationen und sind nicht als belastbare Attribution zu interpretieren.
-- **MVP-only.** Für Stage Pro / Insights ist ein robusteres Modell notwendig (z.B. serverseitig generierte Session-Token ohne personenbezogene Daten).
+**Unique Visitor Limitation (MVP)**
+- `unique_pageviews` and `visitors` are deduplicated via a privacy-aware visitor key (UA hash + coarse IP bucket + primary language; legacy fallback: `user_agent_hash`).
+- This is still a **coarse heuristic**: collisions and false splits remain possible, so these values are only trend-suitable.
+- Consequence: conversion metrics remain approximations and must not be interpreted as robust attribution.
+- **MVP only.** A more robust model is required for Stage Pro / Insights (e.g. server-generated session tokens without personal data).
 
 ---
 
 ## Optional: daily_rollups
 
-| Feld | Typ |
+| Field | Type |
 |----|----|
 | id | bigint |
 | artist_page_id | bigint |
@@ -368,33 +368,33 @@ Leitprinzipien:
 
 ---
 
-# V1 → V2 Konsolidierungsplan
+# V1 -> V2 Consolidation Plan
 
-## Aktueller Status
+## Current Status
 
-V1 (Mini-Homepage) und V2 (Stage System) laufen im Schema und in der API parallel. Das ist für die MVP-Übergangsphase bewusst so.
+V1 (mini-homepage) and V2 (stage system) currently run in parallel in schema and API. This is intentional for the MVP transition phase.
 
-## Was ist Source of Truth
+## What Is the Source of Truth
 
-| Bereich | Führende Version | Begründung |
+| Area | Leading version | Rationale |
 |---|---|---|
-| Spotlight / Phase / Analytics | **V2** | Aktives Produkt |
-| TrackingLinks, ClickEvents, PageViews | **V2** | Aktives Produkt |
-| Artist Page Metadaten | **V1 + V2 gemischt** | `contacts`-Array ist neue SoT, Legacy-Felder bleiben kompatibel |
-| Links, Shows, Releases, Videos, Gallery | **V1** | Noch aktiv, kein V2-Äquivalent geplant |
-| `focus_type` | **Legacy / abgekündigt** | Nicht mehr im Produkt, Feld lebt im Schema aber wird nicht mehr befüllt |
+| Spotlight / Phase / Analytics | **V2** | Active product |
+| TrackingLinks, ClickEvents, PageViews | **V2** | Active product |
+| Artist page metadata | **V1 + V2 mixed** | `contacts` array is the new SoT, legacy fields remain compatible |
+| Links, Shows, Releases, Videos, Gallery | **V1** | Still active, no V2 equivalent planned |
+| `focus_type` | **Legacy / deprecated** | No longer in product, field remains in schema but is no longer populated |
 
-## Regeln für neue Features
+## Rules for New Features
 
-- **Neue Features landen ausschließlich in V2-Strukturen** (Spotlights, TrackingLinks, ClickEvents).
-- V1-Felder werden nicht erweitert; sie werden nur noch kompatibel gehalten.
-- Neue API-Endpunkte folgen V2-Konventionen und Contracts.
+- **New features go exclusively into V2 structures** (spotlights, tracking links, click events).
+- V1 fields are not expanded; they are only kept compatible.
+- New API endpoints follow V2 conventions and contracts.
 
-## Exit-Bedingung für V1
+## Exit Condition for V1
 
-V1-Felder und -Logik werden erst entfernt, wenn:
-1. Das V2-Äquivalent stabil ist und genutzt wird.
-2. Keine aktiven Nutzer mehr V1-only-Daten haben.
-3. Ein expliziter Migrations-Plan existiert (inkl. Backfill-Migration).
+V1 fields and logic are removed only when:
+1. The V2 equivalent is stable and in use.
+2. No active users still have V1-only data.
+3. An explicit migration plan exists (including backfill migration).
 
-Bis dahin gilt: **V1-Code nicht aktiv löschen, aber auch nicht erweitern.**
+Until then: **do not actively delete V1 code, but also do not expand it.**

@@ -1,4 +1,4 @@
-# Vibaro Domain Assignment Standard
+﻿# Vibaro Domain Assignment Standard
 
 Status: binding for consolidation planning
 Date: 2026-04-30
@@ -6,16 +6,16 @@ Scope: apps/api, apps/web, docs
 
 ## 1) Purpose
 
-Dieses Dokument definiert den verbindlichen Produkt-Kern fuer die Konsolidierung.
-Ziel ist eindeutige Verantwortung pro produktiver Datei, bevor Refactors umgesetzt werden.
+This document defines the binding product core for consolidation.
+The goal is clear ownership per production file before refactors are implemented.
 
-Dieses Dokument aendert keinen produktiven Code.
+This document does not change production code.
 
 ## 2) Binding Sources
 
-1. docs/API_CONTRACTS.md ist vorerst die einzige bindende Vertragsquelle fuer API-Verhalten.
-2. Veraltete Dokumente sind fuer diese Konsolidierung nicht bindend.
-3. Bei Widerspruch zwischen aelteren Dokumenten und API_CONTRACTS gilt API_CONTRACTS.
+1. docs/API_CONTRACTS.md is currently the only binding contract source for API behavior.
+2. Outdated documents are not binding for this consolidation.
+3. In case of conflict between older documents and API_CONTRACTS, API_CONTRACTS takes precedence.
 
 ## 3) In Scope vs Out of Scope
 
@@ -28,113 +28,113 @@ Out of Scope:
 - infra
 - node_modules
 - vendor
-- build artefacts
+- build artifacts
 - tests
 
 ## 4) Domain Cores
 
-### 4.1 Website-Kern
-Alles rund um ArtistPage, oeffentliche Bandseite, Profil, Sections, Darstellung und Inhalte.
+### 4.1 Website Core
+Everything related to ArtistPage, public band page, profile, sections, presentation, and content.
 
-Typische Verantwortung:
-- ArtistPage-Stammdaten
-- Profile, Appearance, Contact
-- Sections und Sichtbarkeit von Sections
-- Shows, Releases, Videos, Gallery, Featured Content
-- Public Page Rendering und oeffentliche Content-Darstellung
+Typical responsibilities:
+- ArtistPage master data
+- Profile, appearance, contact
+- Sections and section visibility
+- Shows, releases, videos, gallery, featured content
+- Public page rendering and public content presentation
 
-### 4.2 Phase-Kern
-Alles rund um den aktuellen Fokus einer Band.
-UI-Begriff: Phase.
-Technisches Backend-Modell bleibt vorerst Spotlight.
+### 4.2 Phase Core
+Everything related to the current focus of a band.
+UI term: Phase.
+The technical backend model remains Spotlight for now.
 
-Typische Verantwortung:
-- Phase Wizard
-- Aktivierung, Beenden, Archivieren, Wiederherstellen
-- Phase Overview und phasebezogene Darstellung
-- Fokus-/Statuswechsel, die Verhalten zeitlich veraendern
+Typical responsibilities:
+- Phase wizard
+- Activate, end, archive, restore
+- Phase overview and phase-related presentation
+- Focus/status changes that alter behavior over time
 
-### 4.3 Links-Kern
-Alles rund um TrackingLink, Distribution und kanalbezogene Ausspielung.
+### 4.3 Links Core
+Everything related to TrackingLink, distribution, and channel-specific delivery.
 
-Typische Verantwortung:
-- Plattform-/Placement-Links
-- QR und Redirect-Flows
-- Tracking-Link-Erzeugung und Link-Lifecycle
-- Linkbezogene Kampagnenlogik
+Typical responsibilities:
+- Platform/placement links
+- QR and redirect flows
+- Tracking link creation and link lifecycle
+- Link-related campaign logic
 
-### 4.4 Analytics-Kern
-Alles rund um Auswertung und Vergleich.
+### 4.4 Analytics Core
+Everything related to evaluation and comparison.
 
-Typische Verantwortung:
-- PageViewEvent und ClickEvent Auswertung
-- Performance, Results, Metriken, Reporting
-- Breakdown, Comparison, Insights
+Typical responsibilities:
+- PageViewEvent and ClickEvent evaluation
+- Performance, results, metrics, reporting
+- Breakdown, comparison, insights
 
 ### 4.5 Shared/Foundation
-Nur technische Querschnittslogik, die bewusst keinem Produktkern gehoert.
+Only technical cross-cutting logic that intentionally belongs to no product core.
 
-Erlaubte Inhalte:
+Allowed contents:
 - Auth
-- API Clients
-- BFF Proxy
-- HTTP Utilities
-- Error Handling
+- API clients
+- BFF proxy
+- HTTP utilities
+- Error handling
 - Toasts
-- Base UI Components
-- Layout Shells
+- Base UI components
+- Layout shells
 
-Nicht erlaubt:
-- Versteckte Produktlogik aus Website, Phase, Links oder Analytics.
+Not allowed:
+- Hidden product logic from Website, Phase, Links, or Analytics.
 
 ## 5) Hard Rules
 
-1. Jede produktive Datei in apps/api und apps/web muss genau einem Kern oder Shared/Foundation zugeordnet werden.
-2. Shared/Foundation darf nicht als Sammelbecken fuer unklare Produktlogik missbraucht werden.
-3. Dateien mit mehreren Verantwortlichkeiten muessen als Konflikt markiert werden.
-4. Refactors werden erst aus der Matrix in docs/REFACTOR_MATRIX.md abgeleitet.
-5. Bis zur Umsetzung sind keine API-Aenderungen, keine Datei-Verschiebungen, keine Import-Aenderungen Teil dieses Schritts.
+1. Every production file in apps/api and apps/web must be assigned to exactly one core or Shared/Foundation.
+2. Shared/Foundation must not be misused as a catch-all for unclear product logic.
+3. Files with multiple responsibilities must be marked as conflict.
+4. Refactors are derived only from the matrix in docs/REFACTOR_MATRIX.md.
+5. Until implementation, no API changes, no file moves, and no import changes are part of this step.
 
 ## 6) Assignment Decision Rule
 
-Primarfrage pro Datei:
-- Welchen fachlichen Zustand besitzt diese Datei primaer?
+Primary question per file:
+- Which domain state does this file primarily own?
 
-Sekundaerfrage bei Unschaerfe:
-- Welche Produktentscheidung waere ohne diese Datei nicht moeglich?
+Secondary question when unclear:
+- Which product decision would not be possible without this file?
 
-Wenn Datei mehrere Produktzustaende gleichwertig traegt:
-- Konflikt markieren: Ja: Mischverantwortung
-- Ziel-Kernel festlegen
-- Massnahme auf spaeter setzen (extrahieren/zentralisieren/pruefen)
+If a file carries multiple product states equally:
+- Mark conflict: Yes: mixed responsibility
+- Define target core
+- Defer measure to later (extract/centralize/review)
 
 ## 7) Conflict Taxonomy
 
-Zulaessige Konfliktwerte:
-- Nein
-- Ja: Mischverantwortung
-- Ja: falscher Begriff
-- Ja: doppelte Logik
-- Ja: Ziel unklar
+Allowed conflict values:
+- No
+- Yes: mixed responsibility
+- Yes: wrong term
+- Yes: duplicate logic
+- Yes: target unclear
 
 ## 8) Action Taxonomy
 
-Zulaessige Massnahmen:
-- Behalten
-- Umbenennung UI-Text
-- Spaeter extrahieren
-- Spaeter zentralisieren
-- Spaeter loeschen/redirecten
-- Pruefen
+Allowed actions:
+- Keep
+- Rename UI text
+- Extract later
+- Centralize later
+- Delete/redirect later
+- Review
 
 ## 9) Enforcement
 
-Ein Matrix-Eintrag gilt als vollstaendig, wenn alle Felder gesetzt sind:
-- Datei
-- Aktueller Kernel
-- Ziel-Kernel
-- Konflikt
-- Begruendung
-- Massnahme
+A matrix entry is considered complete when all fields are set:
+- File
+- Current core
+- Target core
+- Conflict
+- Rationale
+- Action
 
-Neue oder geaenderte produktive Dateien sollen kuenftig nur mit klarer Domain-Zuordnung in PR-Reviews akzeptiert werden.
+New or changed production files should only be accepted in PR reviews in the future when they have a clear domain assignment.
